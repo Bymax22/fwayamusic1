@@ -1,14 +1,12 @@
-# Node / Next / monorepo
+# Node/Next/monorepo
 node_modules/
 .next/
 dist/
 .vscode/
 .turbo/
-.npm/
-.DS_Store
-Thumbs.db
+packages/**/node_modules/
 
-# build / caches / logs
+# caches / logs
 *.log
 .cache/
 npm-debug.log*
@@ -23,7 +21,9 @@ serviceAccountKey.json
 *.pem
 *.key
 
-# uploads / media
+# uploads / media / built assets
 uploads/
 public/audio/
 public/covers/
+apps/backend/dist/
+apps/backend/.git.backup/
