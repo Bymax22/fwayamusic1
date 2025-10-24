@@ -1,0 +1,29 @@
+# Node / Next / monorepo
+node_modules/
+.next/
+dist/
+.vscode/
+.turbo/
+.npm/
+.DS_Store
+Thumbs.db
+
+# build / caches / logs
+*.log
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env & secrets
+.env
+.env.local
+.env.*.local
+serviceAccountKey.json
+*.pem
+*.key
+
+# uploads / media
+uploads/
+public/audio/
+public/covers/
