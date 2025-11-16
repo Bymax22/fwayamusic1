@@ -162,19 +162,19 @@ export default function Browse() {
         setError(null);
 
         const [mediaResponse, playlistsResponse, userPlaylistsResponse, artistsResponse] = await Promise.all([
-          fetch('http://localhost:3001/api/v1/media', {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`, {
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
           }),
-          fetch('http://localhost:3001/api/v1/playlist?type=SYSTEM', {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=SYSTEM`, {
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
           }),
-          fetch('http://localhost:3001/api/v1/playlist?type=USER', {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=USER`, {
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
           }),
-          fetch('http://localhost:3001/api/v1/artists', { 
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/artists`, { 
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
           })
@@ -400,7 +400,7 @@ export default function Browse() {
 
   const handleLike = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/media/${id}/like`, { 
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/like`, { 
         method: 'POST',
         credentials: 'include'
       });
@@ -425,7 +425,7 @@ export default function Browse() {
 
   const handleSave = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/media/${id}/save`, { 
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/save`, { 
         method: 'POST',
         credentials: 'include'
       });
@@ -449,7 +449,7 @@ export default function Browse() {
 
   const handleDownload = async (file: MediaFile) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/media/${file.id}/download`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/download`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -507,7 +507,7 @@ export default function Browse() {
     }
 
   try {
-    const response = await fetch(`http://localhost:3001/api/v1/payment/transaction`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/transaction`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -576,7 +576,7 @@ export default function Browse() {
 
   const handleAddToPlaylist = async (playlistId: number, mediaId: number) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/playlists/${playlistId}/media`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlists/${playlistId}/media`, {
         method: 'POST',
         credentials: 'include',
         headers: {

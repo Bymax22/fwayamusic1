@@ -1042,7 +1042,7 @@ const GuestWelcome = () => {
       setLoading(true);
       try {
         // Fetch homepage media sections
-        const homepageSectionsRes = await fetch("http://localhost:3001/api/v1/media/homepage-sections");
+        const homepageSectionsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/homepage-sections`);
         const homepageSections = await homepageSectionsRes.json();
 
         // Fetch other data
@@ -1051,9 +1051,9 @@ const GuestWelcome = () => {
           newsRes,
           playlistsRes
         ] = await Promise.all([
-          fetch("http://localhost:3001/api/v1/artists"),
-          fetch("http://localhost:3001/api/v1/news"),
-          fetch("http://localhost:3001/api/v1/playlist?type=SYSTEM")
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/artists`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/news`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=SYSTEM`)
         ]);
 
         const [artistsData, newsData, playlistsData] = await Promise.all([

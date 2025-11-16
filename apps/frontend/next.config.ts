@@ -2,13 +2,16 @@
 import { NextConfig } from "next";
 import path from "path";
 
+// Use environment variable to point to backend in production (set NEXT_PUBLIC_API_URL in Vercel)
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 const nextConfig: NextConfig = {
-  // Proxy API requests to NestJS backend in development
+  // Proxy API requests to NestJS backend in development or when an API URL is provided
   async rewrites() {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:3001/:path*",
+        destination: `${API_URL}/:path*`,
       },
     ];
   },
@@ -27,9 +30,9 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: `
               default-src 'self';
-              script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com blob:;
-              script-src-elem 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com blob:;
-              connect-src 'self' http://localhost:3001 https://api.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://graph.facebook.com https://www.google.com;
+              script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com blob:;
+              script-src-elem 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com blob:;
+              connect-src 'self' ${API_URL} https://api.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://graph.facebook.com https://www.google.com;
               img-src 'self' https://res.cloudinary.com data: blob:;
               media-src 'self' https://res.cloudinary.com blob:;
               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;

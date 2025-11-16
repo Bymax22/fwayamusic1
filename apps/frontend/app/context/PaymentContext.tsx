@@ -50,7 +50,7 @@ export const PaymentProvider: React.FC<PaymentProviderProps> = ({ children }) =>
   ): Promise<PaymentTransactionResponse> => {
     setIsProcessing(true);
     try {
-      const response = await fetch('http://localhost:3001/api/v1/payment/transaction', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/transaction`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -94,7 +94,7 @@ export const PaymentProvider: React.FC<PaymentProviderProps> = ({ children }) =>
     transactionId: number
   ): Promise<PaymentStatusResponse> => {
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/payment/transaction/${transactionId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/transaction/${transactionId}`, {
         credentials: 'include',
       });
 

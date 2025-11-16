@@ -42,7 +42,7 @@ export default function LibraryPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3001/media', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/media`, {
           credentials: 'include',
         });
         const { data } = await response.json();
