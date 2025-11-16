@@ -88,8 +88,8 @@ export class ResellerService {
     });
 
     // Use correct field names from schema
-    const totalClicks = links.reduce((sum, link) => sum + (link.clickCount || 0), 0);
-    const totalConversions = links.reduce((sum, link) => sum + (link.conversionCount || 0), 0);
+    const totalClicks = links.reduce((sum: number, link: any) => sum + (link.clickCount || 0), 0);
+    const totalConversions = links.reduce((sum: number, link: any) => sum + (link.conversionCount || 0), 0);
     const conversionRate = totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0;
 
     return {

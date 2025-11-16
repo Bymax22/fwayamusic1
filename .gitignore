@@ -27,3 +27,4 @@ public/audio/
 public/covers/
 apps/backend/dist/
 apps/backend/.git.backup/
+.vercel
