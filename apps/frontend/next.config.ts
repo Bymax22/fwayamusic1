@@ -32,7 +32,11 @@ const nextConfig: NextConfig = {
               default-src 'self';
               script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com blob:;
               script-src-elem 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com blob:;
-              connect-src 'self' ${API_URL} https://api.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://graph.facebook.com https://www.google.com;
+              connect-src 'self' ${API_URL} https://api.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://graph.facebook.com https://www.google.com https://www.google-analytics.com;
+              
+              /* Allow Google Analytics and Tag Manager for analytics collection (add only if you use GA) */
+              script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com blob:;
+              script-src-elem 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com blob:;
               img-src 'self' https://res.cloudinary.com data: blob:;
               media-src 'self' https://res.cloudinary.com blob:;
               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;

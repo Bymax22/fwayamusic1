@@ -9,22 +9,36 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   // Configure CORS
+  // Read allowed origins from environment variable ALLOWED_ORIGINS (comma-separated)
+  const allowedOriginsEnv = process.env.ALLOWED_ORIGINS || '';
+  const allowedOrigins = allowedOriginsEnv
+    ? allowedOriginsEnv.split(',').map(s => s.trim())
+    : [
+        'http://localhost:3000', // Frontend dev
+        'http://localhost', // Local testing
+        'https://fwaya-music.com',
+        'https://www.fwayainnovations.com', // add your production frontend domain here
+      ];
+
   app.enableCors({
-    origin: [
-      'http://localhost:3000',    // Frontend
-      'http://localhost',         // Local testing
-      'https://fwaya-music.com'   // Production
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, same-origin)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+      return callback(new Error('CORS policy: Origin not allowed'), false);
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: [
       'Content-Type',
       'Authorization',
       'Accept',
-      'X-Requested-With'
+      'X-Requested-With',
     ],
     credentials: true,
     preflightContinue: false,
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 204,
   });
 
   // Global prefix
