@@ -114,58 +114,26 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const SidebarWithAuth = ({
-  sidebarExpanded,
-  sidebarOpen,
-  setSidebarOpen,
-  onSidebarHandleTouchStart,
-  onSidebarHandleTouchMove,
-  onSidebarHandleTouchEnd,
-}: {
-  sidebarExpanded: boolean;
-  sidebarOpen: boolean;
-  setSidebarOpen: (open: boolean) => void;
-  onSidebarHandleTouchStart?: (e: React.TouchEvent) => void;
-  onSidebarHandleTouchMove?: (e: React.TouchEvent) => void;
-  onSidebarHandleTouchEnd?: (e: React.TouchEvent) => void;
-}) => {
+
+const SidebarWithAuth = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
   const { user } = useAuth();
   if (!user) return null;
-  
   return (
-    <>
-      {!sidebarExpanded && !sidebarOpen && (
-        <div
-          className="sidebar-handle"
-          onClick={() => setSidebarOpen(true)}
-          aria-label={`Open sidebar for ${user.displayName || user.username || "user"}`}
-          title={user.displayName || user.username || "Open sidebar"}
-          onTouchStart={onSidebarHandleTouchStart}
-          onTouchMove={onSidebarHandleTouchMove}
-          onTouchEnd={onSidebarHandleTouchEnd}
-        >
-          <div className="w-1 h-6 bg-gradient-to-b from-[#e51f48] to-[#ff4d6d] rounded-full" />
+    <aside
+      id="sidebar"
+      className={`sidebar fixed top-12 left-0 h-[calc(100vh-3rem)] z-40 transition-all duration-300 ease-in-out ${sidebarExpanded ? "w-56" : "w-14"}`}
+      style={{ display: sidebarExpanded ? undefined : "none" }}
+    >
+      <div className="flex items-center gap-2 p-3 border-b border-white/10">
+        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center text-white text-xs font-bold">
+          {user.displayName?.charAt(0) || user.username?.charAt(0) || "U"}
         </div>
-      )}
-
-      <aside
-        id="sidebar"
-        className={`sidebar fixed top-12 left-0 h-[calc(100vh-3rem)] z-40 transition-all duration-300 ease-in-out ${
-          sidebarExpanded || sidebarOpen ? "w-56" : "w-14"
-        } ${sidebarOpen ? "sidebar--open" : ""}`}
-        style={{ display: sidebarExpanded || sidebarOpen ? undefined : "none" }}
-      >
-        <div className="flex items-center gap-2 p-3 border-b border-white/10">
-          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center text-white text-xs font-bold">
-            {user.displayName?.charAt(0) || user.username?.charAt(0) || "U"}
-          </div>
-          <span className="text-white text-sm font-medium truncate mobile-text-sm">
-            {user.displayName || user.username}
-          </span>
-        </div>
-        <Sidebar sidebarExpanded={sidebarExpanded || sidebarOpen} />
-      </aside>
-    </>
+        <span className="text-white text-sm font-medium truncate mobile-text-sm">
+          {user.displayName || user.username}
+        </span>
+      </div>
+      <Sidebar sidebarExpanded={sidebarExpanded} />
+    </aside>
   );
 };
 
@@ -206,7 +174,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         setSidebarExpanded(false);
       } else {
         setSidebarExpanded(true);
-        setSidebarOpen(false);
       }
     };
     handleResize();
@@ -230,28 +197,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     fetchNonce();
   }, []);
 
-  // Touch handlers for swipe sidebar
-  const handleSidebarHandleTouchStart = (e: React.TouchEvent) => {
-    setTouchStartX(e.touches[0].clientX);
-    setTouching(true);
-  };
-
-  const handleSidebarHandleTouchMove = (e: React.TouchEvent) => {
-    if (!touching || touchStartX === null) return;
-    const deltaX = e.touches[0].clientX - touchStartX;
-    if (deltaX > 40) {
-      setSidebarOpen(true);
-      setTouching(false);
-      setTouchStartX(null);
-    }
-  };
-
-  const handleSidebarHandleTouchEnd = () => {
-    setTouching(false);
-    setTouchStartX(null);
-  };
-
-  const showSidebar = !!user && (sidebarExpanded || sidebarOpen);
+  // Remove swipe/touch logic for sidebar
+  const showSidebar = !!user && sidebarExpanded;
 
   // Player state handlers
   const handlePlayerOpen = (track: Track) => {
@@ -313,14 +260,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   {/* Main content area */}
                   <div className="flex flex-1 pt-12"> {/* Added pt-12 for navbar */}
                     {user && (
-                      <SidebarWithAuth
-                        sidebarExpanded={sidebarExpanded}
-                        sidebarOpen={sidebarOpen}
-                        setSidebarOpen={setSidebarOpen}
-                        onSidebarHandleTouchStart={handleSidebarHandleTouchStart}
-                        onSidebarHandleTouchMove={handleSidebarHandleTouchMove}
-                        onSidebarHandleTouchEnd={handleSidebarHandleTouchEnd}
-                      />
+                      <SidebarWithAuth sidebarExpanded={sidebarExpanded} />
                     )}
                     
                     <main
