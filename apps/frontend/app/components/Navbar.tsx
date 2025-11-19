@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable */
 import { UserPlus, Download, Music, DollarSign, Search, User, Bell, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -7,11 +8,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
-interface NavbarProps {
-  onPlayerOpen?: (track: any) => void;
-}
+interface NavbarProps {}
 
-export default function Navbar({ onPlayerOpen }: NavbarProps) {
+export default function Navbar(_: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);

@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable */
 import React from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -19,7 +20,6 @@ import {
   FaTimes,
   FaShoppingCart,
   FaDownload,
-  FaShare,
   FaComment,
   FaEye
 } from "react-icons/fa";

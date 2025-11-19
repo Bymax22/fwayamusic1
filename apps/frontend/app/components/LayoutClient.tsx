@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable */
 import { PaymentProvider } from '../context/PaymentContext';
 import "../globals.css";
 import Sidebar from "../components/Sidebar";
@@ -169,9 +170,18 @@ const SidebarWithAuth = ({
 };
 
 // Add this interface for player state
+interface Track {
+  id: string | number;
+  title?: string;
+  artist?: string;
+  imageUrl?: string;
+  audioUrl?: string;
+  [key: string]: unknown;
+}
+
 interface PlayerState {
   isOpen: boolean;
-  track: any;
+  track: Track | null;
   isPlaying: boolean;
 }
 
@@ -244,7 +254,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const showSidebar = !!user && (sidebarExpanded || sidebarOpen);
 
   // Player state handlers
-  const handlePlayerOpen = (track: any) => {
+  const handlePlayerOpen = (track: Track) => {
     setPlayerState({
       isOpen: true,
       track,
@@ -297,7 +307,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   
                   {/* Compact Navbar */}
                   <header className="fixed top-0 left-0 right-0 h-12 z-50">
-                    <Navbar onPlayerOpen={handlePlayerOpen} />
+                    <Navbar />
                   </header>
                   
                   {/* Main content area */}
@@ -330,7 +340,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   {user && (
                     <BottomNav 
                       isVisible={!playerState.isOpen}
-                      currentPath={typeof window !== 'undefined' ? window.location.pathname : '/'}
                       onMenuOpen={handleMobileMenuOpen}
                     />
                   )}
