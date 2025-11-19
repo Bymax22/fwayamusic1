@@ -19,6 +19,15 @@ interface BottomNavProps {
 
 export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
   const pathname = usePathname();
+  // Get user from AuthContext
+  let user = null;
+  try {
+    // Dynamically import useAuth to avoid SSR issues
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    user = require("@/context/AuthContext").useAuth().user;
+  } catch (e) {
+    user = null;
+  }
 
   // Full nav items: Home, Search, Browse, Menu (center), Resell, Library, Profile
   const navItems = [
@@ -35,6 +44,8 @@ export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
     <nav className={`bottom-nav flex justify-between items-center px-2 ${!isVisible ? 'bottom-nav--hidden' : ''}`}>
       {navItems.map((item, idx) => {
         const Icon = item.icon;
+        // Links that require authentication
+        const requiresAuth = ["Library", "Profile", "Resell"].includes(item.name);
         if (item.center) {
           // Centered, slightly larger Menu button (no red background)
           return (
@@ -51,6 +62,21 @@ export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
             </div>
           );
         }
+        // If guest and link requires auth, redirect to login
+        if (requiresAuth && !user) {
+          return (
+            <button
+              key={item.name}
+              className={`bottom-nav__item touch-target flex flex-col items-center`}
+              aria-label={item.name}
+              onClick={() => window.location.href = "/auth/user/signin"}
+            >
+              <Icon size={22} className={`bottom-nav__icon mb-1 text-gray-300`} strokeWidth={2} />
+              <span className={`mobile-text-xs font-medium text-white`}>{item.name}</span>
+            </button>
+          );
+        }
+        // Otherwise, normal link
         return (
           <Link key={item.name} href={item.href} passHref>
             <button

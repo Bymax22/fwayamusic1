@@ -277,12 +277,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </div>
 
                   {/* Bottom Navigation - Auto-hides when player opens */}
-                  {user && (
-                    <BottomNav 
-                      isVisible={!playerState.isOpen}
-                      onMenuOpen={handleMobileMenuOpen}
-                    />
-                  )}
+                  <BottomNav 
+                    isVisible={!playerState.isOpen}
+                    onMenuOpen={handleMobileMenuOpen}
+                  />
 
                   {/* Mobile Menu - Beautiful glassmorphic popup */}
                   <MobileMenu 
