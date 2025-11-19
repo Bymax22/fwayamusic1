@@ -23,10 +23,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   // Close menu on route change
   useEffect(() => {
-    if (isOpen) {
-      onClose();
-    }
-  }, [pathname, isOpen, onClose]);
+    onClose();
+  }, [pathname, onClose]);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
