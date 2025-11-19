@@ -14,19 +14,19 @@ import {
   HeartIcon,
   QueueListIcon,
   MusicalNoteIcon,
-  EllipsisHorizontalIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 
 type TrackType = {
-  id: string;
-  title: string;
-  artist: string;
+  id: string | number;
+  title?: string;
+  artist?: string;
   album?: string;
   imageUrl?: string;
   audioUrl?: string;
   duration?: number;
+ 
 };
 
 interface PlayerProps {
@@ -272,7 +272,7 @@ export default function Player({
             <div className="relative flex-shrink-0 group">
               <Image
                 src={track.imageUrl || "/default-cover.jpg"}
-                alt={track.title}
+                alt={track.title || "Track cover"}
                 width={isExpanded ? 120 : 48} // Reduced sizes
                 height={isExpanded ? 120 : 48}
                 className={`rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#e51f48]/50 ${
@@ -297,12 +297,12 @@ export default function Player({
             <div className={`ml-2 ${isExpanded ? "flex-1" : "flex-1 min-w-0"}`}>
               <div className="flex items-center">
                 <h3 className={`${isExpanded ? "text-lg" : "text-sm"} font-bold text-white truncate mobile-text-sm`}>
-                  {track.title}
-                </h3>
+                    {track.title || "Unknown Title"}
+                  </h3>
                 {isLiked && <HeartIcon className="ml-1 w-3 h-3 text-[#e51f48]" />}
               </div>
               <p className={`${isExpanded ? "text-sm" : "text-xs"} text-gray-300 truncate mobile-text-xs`}>
-                {track.artist}
+                {track.artist || "Unknown Artist"}
               </p>
               {isExpanded && track.album && (
                 <p className="text-xs text-gray-400 mt-0.5 mobile-text-xs">{track.album}</p>
