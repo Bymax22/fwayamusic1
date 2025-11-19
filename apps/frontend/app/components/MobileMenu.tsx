@@ -1,6 +1,6 @@
 "use client";
 /* eslint-disable */
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings } from "lucide-react";
 import Link from "next/link";
@@ -21,10 +21,14 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  // Close menu on route change
+  // Only close menu if pathname changes after menu is already open
+  const prevPathnameRef = useRef(pathname);
   useEffect(() => {
-    onClose();
-  }, [pathname, onClose]);
+    if (isOpen && prevPathnameRef.current !== pathname) {
+      onClose();
+    }
+    prevPathnameRef.current = pathname;
+  }, [pathname, isOpen, onClose]);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
