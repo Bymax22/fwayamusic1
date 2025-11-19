@@ -9,32 +9,33 @@ import {
   Compass,
   LogIn
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface BottomNavProps {
   isVisible: boolean;
   onMenuOpen: () => void;
 }
 
+interface NavItem {
+  name: string;
+  href?: string;
+  icon: React.ComponentType<any>;
+  active: boolean;
+  action?: () => void;
+  center?: boolean;
+}
+
 export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
   const pathname = usePathname();
-  // Get user from AuthContext
-  let user = null;
-  try {
-    // Dynamically import useAuth to avoid SSR issues
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { useAuth } = require("@/context/AuthContext");
-    user = useAuth().user;
-  } catch (e) {
-    user = null;
-  }
+  const { user } = useAuth();
 
   // Determine profile item based on auth state
-  const profileItem = user 
+  const profileItem: NavItem = user 
     ? { name: "Profile", href: "/profile", icon: User, active: pathname.startsWith("/profile") }
     : { name: "Login", href: "/auth/user/signin", icon: LogIn, active: pathname.startsWith("/auth") };
 
   // Simplified nav items: Home, Search, Browse, Menu (center), Profile/Login
-  const navItems = [
+  const navItems: NavItem[] = [
     { name: "Home", href: "/dashboard", icon: Home, active: pathname === "/dashboard" },
     { name: "Search", href: "/search", icon: Search, active: pathname.startsWith("/search") },
     { name: "Browse", href: "/browse", icon: Compass, active: pathname.startsWith("/browse") },
@@ -47,7 +48,7 @@ export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
       {navItems.map((item) => {
         const Icon = item.icon;
         
-        if (item.center) {
+        if (item.center && item.action) {
           // Centered, larger Menu button with accent background
           return (
             <div key={item.name} className="flex-1 flex justify-center -mt-8"> {/* Increased negative margin */}
@@ -70,6 +71,7 @@ export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
         }
 
         // Normal link (Home, Search, Browse, Profile/Login)
+        if (!item.href) return null;
         return (
           <Link key={item.name} href={item.href} passHref className="flex-1">
             <button
