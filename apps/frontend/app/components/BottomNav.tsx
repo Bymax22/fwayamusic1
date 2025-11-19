@@ -20,13 +20,15 @@ interface BottomNavProps {
 export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
   const pathname = usePathname();
 
-  // New nav items: Home, Browse, Menu (center), Reseller, Library
+  // Full nav items: Home, Search, Browse, Menu (center), Resell, Library, Profile
   const navItems = [
     { name: "Home", href: "/dashboard", icon: Home, active: pathname === "/dashboard" },
+    { name: "Search", href: "/search", icon: Search, active: pathname.startsWith("/search") },
     { name: "Browse", href: "/browse", icon: Compass, active: pathname.startsWith("/browse") },
     { name: "Menu", href: "#", icon: Menu, active: false, action: onMenuOpen, center: true },
-    { name: "Reseller", href: "/auth/reseller/signin", icon: DollarSign, active: pathname.startsWith("/auth/reseller") },
+    { name: "Resell", href: "/auth/reseller/signin", icon: DollarSign, active: pathname.startsWith("/auth/reseller") },
     { name: "Library", href: "/library", icon: Library, active: pathname.startsWith("/library") },
+    { name: "Profile", href: "/profile", icon: User, active: pathname.startsWith("/profile") },
   ];
 
   return (
@@ -34,7 +36,7 @@ export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
       {navItems.map((item, idx) => {
         const Icon = item.icon;
         if (item.center) {
-          // Centered, larger Menu button with red accent circle
+          // Centered, slightly larger Menu button (no red background)
           return (
             <div key={item.name} className="flex-1 flex justify-center">
               <button
@@ -43,11 +45,8 @@ export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
                 aria-label={item.name}
                 style={{ zIndex: 2 }}
               >
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span className="w-12 h-12 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] opacity-80 shadow-lg"></span>
-                </span>
-                <Icon size={32} className="bottom-nav__icon text-white relative z-10" strokeWidth={2.5} />
-                <span className="mobile-text-xs font-bold text-white relative z-10">{item.name}</span>
+                <Icon size={28} className="bottom-nav__icon text-white relative z-10" strokeWidth={2.5} />
+                <span className="mobile-text-xs font-bold text-white relative z-10 mt-0.5">{item.name}</span>
               </button>
             </div>
           );
