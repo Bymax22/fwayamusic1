@@ -187,7 +187,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               <div className="px-6 mt-8">
                 <div className="text-center">
                   <p className="text-xs text-gray-500">
-                    Fwaya Music v1.0 • Made with ♥
+                    Fwaya Music v1.0 • Developed by BymaxZM
                   </p>
                 </div>
               </div>

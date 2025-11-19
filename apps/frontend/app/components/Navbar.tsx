@@ -18,6 +18,9 @@ export default function Navbar(_: NavbarProps) {
   const router = useRouter();
   const { user, logout } = useAuth();
 
+  // Hide navbar for guest users — show only when logged in
+  if (!user) return null;
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);

@@ -54,12 +54,12 @@ export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
         return (
           <Link key={item.name} href={item.href} passHref>
             <button
-              className={`bottom-nav__item touch-target flex flex-col items-center ${item.active ? 'bottom-nav__item--active text-[#e51f48]' : 'text-gray-300'}`}
+              className={`bottom-nav__item touch-target flex flex-col items-center ${item.active ? 'bottom-nav__item--active' : ''}`}
               aria-label={item.name}
               aria-current={item.active ? "page" : undefined}
             >
-              <Icon size={22} className="bottom-nav__icon mb-1" strokeWidth={item.active ? 2.5 : 2} />
-              <span className="mobile-text-xs font-medium">{item.name}</span>
+              <Icon size={22} className={`bottom-nav__icon mb-1 ${item.active ? 'text-[#e51f48]' : 'text-gray-300'}`} strokeWidth={item.active ? 2.5 : 2} />
+              <span className={`mobile-text-xs font-medium ${item.active ? 'text-[#e51f48]' : 'text-white'}`}>{item.name}</span>
             </button>
           </Link>
         );
