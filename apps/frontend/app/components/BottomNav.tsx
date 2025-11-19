@@ -10,6 +10,7 @@ import {
   LogIn
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import type { LucideIcon } from "lucide-react";
 
 interface BottomNavProps {
   isVisible: boolean;
@@ -19,7 +20,7 @@ interface BottomNavProps {
 interface NavItem {
   name: string;
   href?: string;
-  icon: React.ComponentType<any>;
+  icon: LucideIcon;
   active: boolean;
   action?: () => void;
   center?: boolean;
