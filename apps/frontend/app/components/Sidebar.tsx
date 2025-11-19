@@ -88,8 +88,8 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-screen bg-[#0f2d3d] border-r border-[#1e293b] shadow-lg z-30 overflow-y-auto pt-16 transition-all duration-300
-        ${sidebarExpanded ? "w-56" : "w-16"} md:w-56`}
+      className={`hidden md:block fixed top-0 left-0 h-screen bg-[#0f2d3d] border-r border-[#1e293b] shadow-lg z-30 overflow-y-auto pt-16 transition-all duration-300
+        ${sidebarExpanded ? "w-56" : "w-16"} lg:w-56`}
     >
       <div className="flex flex-col h-[calc(100vh-4rem)] p-2 space-y-2">
         {/* Main Navigation */}
@@ -98,13 +98,13 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             <Link
               key={item.title}
               href={item.href}
-              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group"
+              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group mobile-text-sm"
             >
               <span className="flex-shrink-0 group-hover:scale-110 transition-transform">
                 {item.icon}
               </span>
               {sidebarExpanded && (
-                <span className="ml-2 text-sm truncate text-left">{item.title}</span>
+                <span className="ml-2 truncate text-left mobile-text-sm">{item.title}</span>
               )}
             </Link>
           ))}
@@ -115,7 +115,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
         {/* Music Library */}
         <div className="flex flex-col space-y-0.5">
           {sidebarExpanded && (
-            <h3 className="text-xs uppercase text-[#64748b] px-2 mb-1">
+            <h3 className="text-xs uppercase text-[#64748b] px-2 mb-1 mobile-text-xs">
               Your Library
             </h3>
           )}
@@ -123,13 +123,13 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             <Link
               key={item.title}
               href={item.href}
-              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group"
+              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group mobile-text-sm"
             >
               <span className="flex-shrink-0 group-hover:scale-110 transition-transform">
                 {item.icon}
               </span>
               {sidebarExpanded && (
-                <span className="ml-2 text-sm truncate text-left">{item.title}</span>
+                <span className="ml-2 truncate text-left mobile-text-sm">{item.title}</span>
               )}
             </Link>
           ))}
@@ -140,7 +140,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
         {/* Discover Section */}
         <div className="flex flex-col space-y-0.5">
           {sidebarExpanded && (
-            <h3 className="text-xs uppercase text-[#64748b] px-2 mb-1">
+            <h3 className="text-xs uppercase text-[#64748b] px-2 mb-1 mobile-text-xs">
               Discover
             </h3>
           )}
@@ -148,13 +148,13 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             <Link
               key={item.title}
               href={item.href}
-              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group"
+              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group mobile-text-sm"
             >
               <span className="flex-shrink-0 group-hover:scale-110 transition-transform">
                 {item.icon}
               </span>
               {sidebarExpanded && (
-                <span className="ml-2 text-sm truncate text-left">{item.title}</span>
+                <span className="ml-2 truncate text-left mobile-text-sm">{item.title}</span>
               )}
             </Link>
           ))}
@@ -169,11 +169,13 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
               <Image
                 src={currentSong.cover}
                 alt={currentSong.title}
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-md object-cover"
               />
               <div className="ml-2 overflow-hidden">
-                <p className="text-xs font-medium truncate">{currentSong.title}</p>
-                <p className="text-xs text-[#64748b] truncate">{currentSong.artist}</p>
+                <p className="text-xs font-medium truncate mobile-text-xs">{currentSong.title}</p>
+                <p className="text-xs text-[#64748b] truncate mobile-text-xs">{currentSong.artist}</p>
               </div>
             </div>
 
@@ -199,7 +201,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             {/* Controls */}
             <div className="flex items-center mt-1.5 gap-1.5">
               <button
-                className="flex-1 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] p-1 rounded flex justify-center items-center text-xs hover:opacity-90 transition-all"
+                className="flex-1 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] p-1 rounded flex justify-center items-center text-xs hover:opacity-90 transition-all mobile-text-xs"
                 onClick={() => setIsPlaying(!isPlaying)}
               >
                 {isPlaying ? (
@@ -207,7 +209,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
                 ) : (
                   <HiPlay size={14} className="text-white" />
                 )}
-                <span className="ml-1 text-white">
+                <span className="ml-1 text-white mobile-text-xs">
                   {isPlaying ? "Pause" : "Play"}
                 </span>
               </button>
@@ -222,7 +224,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
         {/* Settings Section */}
         <div className="flex flex-col space-y-0.5">
           {sidebarExpanded && (
-            <h3 className="text-xs uppercase text-[#64748b] px-2 mb-1">
+            <h3 className="text-xs uppercase text-[#64748b] px-2 mb-1 mobile-text-xs">
               Settings
             </h3>
           )}
@@ -230,13 +232,13 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             <Link
               key={item.title}
               href={item.href}
-              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group"
+              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group mobile-text-sm"
             >
               <span className="flex-shrink-0 group-hover:scale-110 transition-transform">
                 {item.icon}
               </span>
               {sidebarExpanded && (
-                <span className="ml-2 text-sm truncate text-left">{item.title}</span>
+                <span className="ml-2 truncate text-left mobile-text-sm">{item.title}</span>
               )}
             </Link>
           ))}

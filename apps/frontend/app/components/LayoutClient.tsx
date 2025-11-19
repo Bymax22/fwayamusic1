@@ -3,13 +3,13 @@ import { PaymentProvider } from '../context/PaymentContext';
 import "../globals.css";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import BottomNav from "../components/BottomNav";
+import MobileMenu from "../components/MobileMenu";
 import { useState, useEffect } from "react";
 import { ThemeProvider } from "../context/ThemeContext";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
-
-
-
+import Player from "../components/Player";
 const HolographicPreloader = () => {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -18,7 +18,6 @@ const HolographicPreloader = () => {
     return () => clearTimeout(timer);
   }, []);
   
-
   return (
     <AnimatePresence>
       {isLoading && (
@@ -28,8 +27,7 @@ const HolographicPreloader = () => {
           transition={{ duration: 0.5 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a1f29]"
         >
-          <div className="relative w-48 h-48">
-            {/* Holographic Ring */}
+          <div className="relative w-32 h-32">
             <motion.div
               animate={{
                 rotate: 360,
@@ -57,15 +55,13 @@ const HolographicPreloader = () => {
                 )`,
               }}
             />
-
-            {/* Pulsing Core */}
             <motion.div
               animate={{
                 scale: [1, 1.1, 1],
                 boxShadow: [
                   '0 0 0 0 rgba(229, 31, 72, 0.4)',
-                  '0 0 0 20px rgba(229, 31, 72, 0)',
-                  '0 0 0 40px rgba(229, 31, 72, 0)'
+                  '0 0 0 15px rgba(229, 31, 72, 0)',
+                  '0 0 0 30px rgba(229, 31, 72, 0)'
                 ]
               }}
               transition={{
@@ -73,9 +69,9 @@ const HolographicPreloader = () => {
                 repeat: Infinity,
                 ease: "easeOut"
               }}
-              className="absolute inset-0 m-auto w-24 h-24 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center"
+              className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center"
             >
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-white">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
                 <path 
                   d="M12 3V18M9 5V16M15 7V18M18 9V16" 
                   stroke="currentColor" 
@@ -88,32 +84,11 @@ const HolographicPreloader = () => {
                 />
               </svg>
             </motion.div>
-
-            {/* Floating Particles */}
-            {[...Array(8)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: [0, 0.8, 0],
-                  x: Math.cos(i * 45 * (Math.PI / 180)) * 60,
-                  y: Math.sin(i * 45 * (Math.PI / 180)) * 60,
-                }}
-                transition={{
-                  duration: 2,
-                  delay: i * 0.1,
-                  repeat: Infinity,
-                  repeatDelay: 0.5
-                }}
-                className="absolute w-2 h-2 rounded-full bg-[#e51f48]"
-              />
-            ))}
-
             <motion.span 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="absolute bottom-0 left-0 right-0 text-center text-xl font-bold text-[#e51f48]"
+              className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#e51f48]"
             >
               Fwaya Music
             </motion.span>
@@ -130,7 +105,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#e51f48]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#e51f48]"></div>
       </div>
     );
   }
@@ -155,10 +130,9 @@ const SidebarWithAuth = ({
 }) => {
   const { user } = useAuth();
   if (!user) return null;
-  // Use user for accessibility and display
+  
   return (
     <>
-      {/* Sidebar handle for mobile */}
       {!sidebarExpanded && !sidebarOpen && (
         <div
           className="sidebar-handle"
@@ -169,24 +143,24 @@ const SidebarWithAuth = ({
           onTouchMove={onSidebarHandleTouchMove}
           onTouchEnd={onSidebarHandleTouchEnd}
         >
-          <div className="w-1 h-8 bg-gradient-to-b from-[#e51f48] to-[#ff4d6d] rounded-full" />
+          <div className="w-1 h-6 bg-gradient-to-b from-[#e51f48] to-[#ff4d6d] rounded-full" />
         </div>
       )}
 
-      {/* Sidebar for desktop and mobile */}
       <aside
         id="sidebar"
-        className={`sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] z-40 transition-all duration-300 ease-in-out ${
-          sidebarExpanded || sidebarOpen ? "w-56" : "w-16"
+        className={`sidebar fixed top-12 left-0 h-[calc(100vh-3rem)] z-40 transition-all duration-300 ease-in-out ${
+          sidebarExpanded || sidebarOpen ? "w-56" : "w-14"
         } ${sidebarOpen ? "sidebar--open" : ""}`}
         style={{ display: sidebarExpanded || sidebarOpen ? undefined : "none" }}
       >
-        {/* Show user info at the top of the sidebar */}
-        <div className="flex items-center gap-2 p-4">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center text-white font-bold">
+        <div className="flex items-center gap-2 p-3 border-b border-white/10">
+          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center text-white text-xs font-bold">
             {user.displayName?.charAt(0) || user.username?.charAt(0) || "U"}
           </div>
-          <span className="text-white font-medium truncate">{user.displayName || user.username}</span>
+          <span className="text-white text-sm font-medium truncate mobile-text-sm">
+            {user.displayName || user.username}
+          </span>
         </div>
         <Sidebar sidebarExpanded={sidebarExpanded || sidebarOpen} />
       </aside>
@@ -194,13 +168,27 @@ const SidebarWithAuth = ({
   );
 };
 
+// Add this interface for player state
+interface PlayerState {
+  isOpen: boolean;
+  track: any;
+  isPlaying: boolean;
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [nonce, setNonce] = useState<string | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touching, setTouching] = useState(false);
+  const [playerState, setPlayerState] = useState<PlayerState>({
+    isOpen: false,
+    track: null,
+    isPlaying: false
+  });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
+
   // Responsive sidebar
   useEffect(() => {
     const handleResize = () => {
@@ -232,7 +220,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     fetchNonce();
   }, []);
 
-  // Touch handlers for swipe sidebar (mobile)
+  // Touch handlers for swipe sidebar
   const handleSidebarHandleTouchStart = (e: React.TouchEvent) => {
     setTouchStartX(e.touches[0].clientX);
     setTouching(true);
@@ -241,7 +229,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const handleSidebarHandleTouchMove = (e: React.TouchEvent) => {
     if (!touching || touchStartX === null) return;
     const deltaX = e.touches[0].clientX - touchStartX;
-    // If swipe right more than 40px, open sidebar
     if (deltaX > 40) {
       setSidebarOpen(true);
       setTouching(false);
@@ -254,7 +241,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     setTouchStartX(null);
   };
 
-const showSidebar = !!user && (sidebarExpanded || sidebarOpen);
+  const showSidebar = !!user && (sidebarExpanded || sidebarOpen);
+
+  // Player state handlers
+  const handlePlayerOpen = (track: any) => {
+    setPlayerState({
+      isOpen: true,
+      track,
+      isPlaying: true
+    });
+  };
+
+  const handlePlayerClose = () => {
+    setPlayerState(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const handlePlayPause = () => {
+    setPlayerState(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
+  };
+
+  // Mobile menu handlers
+  const handleMobileMenuOpen = () => {
+    setIsMobileMenuOpen(true);
+  };
+
+  const handleMobileMenuClose = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <ThemeProvider>
@@ -265,7 +278,6 @@ const showSidebar = !!user && (sidebarExpanded || sidebarOpen);
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <meta name="description" content="Discover and stream your favorite music" />
             <link rel="icon" href="/logo4.png" />
-            {/* removed in-file CSP meta — CSP must be delivered by server headers (next.config.ts) */}
             {nonce && (
               <script
                 nonce={nonce}
@@ -275,44 +287,75 @@ const showSidebar = !!user && (sidebarExpanded || sidebarOpen);
               />
             )}
           </head>
-        <body className="bg-background text-foreground antialiased">
-          <HolographicPreloader />
-          <PaymentProvider>
-            <AuthWrapper>
-              <div className="flex flex-col h-screen">
-                {/* Top Accent Bar */}
-                <div style={{ backgroundColor: "rgb(var(--primary-accent))" }} className="w-full h-1 z-[9999]"></div>
-                {/* Navbar */}
-                <header className="fixed top-0 left-0 right-0 h-16 z-50">
-                  <Navbar />
-                </header>
-                {/* Main content area */}
-    <div className="flex flex-1">
-      {user && (
-        <SidebarWithAuth
-          sidebarExpanded={sidebarExpanded}
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          onSidebarHandleTouchStart={handleSidebarHandleTouchStart}
-          onSidebarHandleTouchMove={handleSidebarHandleTouchMove}
-          onSidebarHandleTouchEnd={handleSidebarHandleTouchEnd}
-        />
-      )}
-<main
-  className={`main-content flex-1 overflow-y-auto transition-all duration-300 ease-in-out ${
-    showSidebar ? (sidebarExpanded ? "ml-56" : "ml-16") : "no-sidebar"
-  }`}
->
-  {children}
-</main>
-                
+          <body className="bg-background text-foreground antialiased">
+            <HolographicPreloader />
+            <PaymentProvider>
+              <AuthWrapper>
+                <div className="flex flex-col h-screen">
+                  {/* Top Accent Bar - Made thinner */}
+                  <div style={{ backgroundColor: "rgb(var(--primary-accent))" }} className="w-full h-0.5 z-[9999]"></div>
+                  
+                  {/* Compact Navbar */}
+                  <header className="fixed top-0 left-0 right-0 h-12 z-50">
+                    <Navbar onPlayerOpen={handlePlayerOpen} />
+                  </header>
+                  
+                  {/* Main content area */}
+                  <div className="flex flex-1 pt-12"> {/* Added pt-12 for navbar */}
+                    {user && (
+                      <SidebarWithAuth
+                        sidebarExpanded={sidebarExpanded}
+                        sidebarOpen={sidebarOpen}
+                        setSidebarOpen={setSidebarOpen}
+                        onSidebarHandleTouchStart={handleSidebarHandleTouchStart}
+                        onSidebarHandleTouchMove={handleSidebarHandleTouchMove}
+                        onSidebarHandleTouchEnd={handleSidebarHandleTouchEnd}
+                      />
+                    )}
+                    
+                    <main
+                      className={`main-content flex-1 overflow-y-auto transition-all duration-300 ease-in-out pb-16 ${
+                        showSidebar ? (sidebarExpanded ? "ml-56" : "ml-14") : "no-sidebar"
+                      }`}
+                      style={{ 
+                        paddingBottom: playerState.isOpen ? '4.5rem' : '3.5rem',
+                        transition: 'padding-bottom 0.3s ease'
+                      }}
+                    >
+                      {children}
+                    </main>
+                  </div>
+
+                  {/* Bottom Navigation - Auto-hides when player opens */}
+                  {user && (
+                    <BottomNav 
+                      isVisible={!playerState.isOpen}
+                      currentPath={typeof window !== 'undefined' ? window.location.pathname : '/'}
+                      onMenuOpen={handleMobileMenuOpen}
+                    />
+                  )}
+
+                  {/* Mobile Menu - Beautiful glassmorphic popup */}
+                  <MobileMenu 
+                    isOpen={isMobileMenuOpen}
+                    onClose={handleMobileMenuClose}
+                  />
+
+                  {/* Player - Now with auto-hide functionality */}
+                  {playerState.isOpen && playerState.track && (
+                    <Player
+                      track={playerState.track}
+                      isPlaying={playerState.isPlaying}
+                      onPlayPause={handlePlayPause}
+                      onClose={handlePlayerClose}
+                    />
+                  )}
                 </div>
-              </div>
-            </AuthWrapper>
-          </PaymentProvider>
-        </body>
-      </html>
-    </AuthProvider>
-  </ThemeProvider>
-);
+              </AuthWrapper>
+            </PaymentProvider>
+          </body>
+        </html>
+      </AuthProvider>
+    </ThemeProvider>
+  );
 }

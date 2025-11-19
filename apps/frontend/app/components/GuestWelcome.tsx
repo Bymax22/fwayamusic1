@@ -139,7 +139,7 @@ interface AudioPlayerState {
   duration: number;
 }
 
-// Enhanced Media Card Component with all interactions
+// Enhanced Media Card Component - Mobile Optimized
 const MediaCard = ({ 
   item, 
   onPlay,
@@ -188,22 +188,22 @@ const MediaCard = ({
     onShare?.(item);
   };
 
-const getImageUrl = () => {
-  if (type === 'artist') {
+  const getImageUrl = () => {
+    if (type === 'artist') {
+      return (
+        (item as Artist).imageUrl ||
+        (item as Artist).avatarUrl ||
+        "/default-artist.png"
+      );
+    }
     return (
-      (item as Artist).imageUrl ||
-      (item as Artist).avatarUrl ||
-      "/default-artist.png"
+      (item as MediaItem).imageUrl ||
+      (item as MediaItem).coverArt ||
+      (item as MediaItem).artCoverUrl ||
+      (item as MediaItem).thumbnailUrl ||
+      "/default-cover.png"
     );
-  }
-  return (
-    (item as MediaItem).imageUrl ||
-    (item as MediaItem).coverArt ||
-    (item as MediaItem).artCoverUrl ||
-    (item as MediaItem).thumbnailUrl ||
-    "/default-cover.png"
-  );
-};
+  };
 
   const getTitle = () => {
     if (type === 'artist') {
@@ -212,23 +212,23 @@ const getImageUrl = () => {
     return (item as MediaItem).title;
   };
 
-const getSubtitle = () => {
-  if (type === 'artist') {
-    return `${Number((item as Artist).followers ?? 0).toLocaleString()} followers`;
-  }
-  const media = item as MediaItem;
-  return (
-    media.artist ||
-    media.user?.displayName ||
-    media.user?.username ||
-    "Unknown Artist"
-  );
-};
+  const getSubtitle = () => {
+    if (type === 'artist') {
+      return `${Number((item as Artist).followers ?? 0).toLocaleString()} followers`;
+    }
+    const media = item as MediaItem;
+    return (
+      media.artist ||
+      media.user?.displayName ||
+      media.user?.username ||
+      "Unknown Artist"
+    );
+  };
 
   return (
     <motion.div
-      className="relative bg-[#0a3747] bg-opacity-50 rounded-lg p-3 cursor-pointer flex-shrink-0 w-[160px] sm:w-[180px]"
-      whileHover={{ y: -5 }}
+      className="relative bg-[#0a3747] bg-opacity-50 rounded-lg p-2 cursor-pointer flex-shrink-0 w-[140px] mobile-card"
+      whileHover={{ y: -3 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       onClick={() => {
@@ -254,106 +254,82 @@ const getSubtitle = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-2"
+              className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-1"
             >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onPlay(item as MediaItem);
                 }}
-                className="bg-[#e51f48] p-3 rounded-full"
+                className="bg-[#e51f48] p-2 rounded-full touch-target"
               >
-                {isCurrentTrack && isPlaying ? <FaPause size={16} /> : <FaPlay size={16} />}
+                {isCurrentTrack && isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
               </button>
               {(item as MediaItem).accessType === 'FREE' && (
                 <button 
                   onClick={handleDownload}
-                  className="bg-green-600 p-3 rounded-full"
+                  className="bg-green-600 p-2 rounded-full touch-target"
                 >
-                  <FaDownload size={14} />
+                  <FaDownload size={10} />
                 </button>
               )}
-              <button 
-                onClick={handleShare}
-                className="bg-blue-600 p-3 rounded-full"
-              >
-                <FaShare size={14} />
-              </button>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div className="mt-3">
-        <h3 className="font-bold text-white truncate text-sm">{getTitle()}</h3>
-        <p className="text-xs text-gray-300 truncate">{getSubtitle()}</p>
+      <div className="mt-2">
+        <h3 className="font-bold text-white truncate mobile-text-sm">{getTitle()}</h3>
+        <p className="text-xs text-gray-300 truncate mobile-text-xs">{getSubtitle()}</p>
         
-        <div className="flex justify-between items-center mt-2">
+        <div className="flex justify-between items-center mt-1">
           {type === 'media' && (
             <>
-              <span className="text-xs text-gray-400 flex items-center gap-2">
-<span className="flex items-center gap-1">
-  <FaHeadphones size={10} />
-  {Number((item as MediaItem).plays ?? (item as MediaItem).views ?? 0).toLocaleString()}
-</span>
-<span className="flex items-center gap-1 ml-2">
-  <FaHeart size={10} className="text-[#e51f48]" />
-  {Number((item as MediaItem).likes ?? 0).toLocaleString()}
-</span>
+              <span className="text-xs text-gray-400 flex items-center gap-1">
+                <FaHeadphones size={8} />
+                {Number((item as MediaItem).plays ?? (item as MediaItem).views ?? 0).toLocaleString()}
               </span>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <button 
                   onClick={handleLike}
-                  className="text-[#e51f48] hover:scale-110 transition-transform"
+                  className="text-[#e51f48] hover:scale-110 transition-transform touch-target"
                 >
-                  {isLiked ? <FaHeart size={14} /> : <FaRegHeart size={14} />}
-                </button>
-                <button 
-                  onClick={handleShare}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <FaShare size={12} />
+                  {isLiked ? <FaHeart size={12} /> : <FaRegHeart size={12} />}
                 </button>
               </div>
             </>
           )}
           
-{type === 'artist' && (
-  <div className="flex items-center justify-between w-full">
-<span className="text-xs text-gray-400 flex items-center gap-1">
-  <FaUserFriends size={10} />
-  {Number((item as Artist).followers ?? 0).toLocaleString()} followers
-</span>
-    <div className="flex items-center gap-1">
-      <button 
-        onClick={handleFollow}
-        className={`
-          rounded-full transition-colors text-xs px-2 py-1
-          ${isFollowing 
-            ? 'bg-[#e51f48] text-white' 
-            : 'bg-[#0b2936] text-[#e51f48] hover:bg-[#e51f48] hover:text-white'
-          }
-        `}
-      >
-        {isFollowing ? 'Following' : 'Follow'}
-      </button>
-      <button 
-        onClick={handleShare}
-        className="text-gray-400 hover:text-white transition-colors p-1"
-      >
-        <FaShare size={10} />
-      </button>
-    </div>
-  </div>
-)}
+          {type === 'artist' && (
+            <div className="flex items-center justify-between w-full">
+              <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
+                <FaUserFriends size={8} />
+                {Number((item as Artist).followers ?? 0).toLocaleString()}
+              </span>
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={handleFollow}
+                  className={`
+                    rounded-full transition-colors text-xs px-1.5 py-0.5 touch-target mobile-text-xs
+                    ${isFollowing 
+                      ? 'bg-[#e51f48] text-white' 
+                      : 'bg-[#0b2936] text-[#e51f48] hover:bg-[#e51f48] hover:text-white'
+                    }
+                  `}
+                >
+                  {isFollowing ? 'Following' : 'Follow'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>
   );
 };
 
-// Premium Media Card with Buy Button
+// Premium Media Card with Buy Button - Mobile Optimized
 const PremiumMediaCard = ({ 
   item, 
   onPlay,
@@ -372,8 +348,8 @@ const PremiumMediaCard = ({
 
   return (
     <motion.div
-      className="relative bg-gradient-to-br from-amber-900/30 to-amber-800/20 rounded-lg p-3 cursor-pointer border border-amber-500/30 w-[160px] sm:w-[180px]"
-      whileHover={{ y: -5 }}
+      className="relative bg-gradient-to-br from-amber-900/30 to-amber-800/20 rounded-lg p-2 cursor-pointer border border-amber-500/30 w-[140px] mobile-card"
+      whileHover={{ y: -3 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       onClick={() => onPlay(item)}
@@ -395,9 +371,9 @@ const PremiumMediaCard = ({
           }}
         />
         
-        <div className="absolute top-2 left-2 flex gap-1">
-          <div className="flex items-center gap-1 px-2 py-1 bg-amber-500/20 text-amber-400 rounded-full text-xs backdrop-blur-sm">
-            <FaCrown className="w-3 h-3" />
+        <div className="absolute top-1 left-1">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded-full text-xs backdrop-blur-sm mobile-text-xs">
+            <FaCrown className="w-2 h-2" />
             Premium
           </div>
         </div>
@@ -408,46 +384,46 @@ const PremiumMediaCard = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-2"
+              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-1"
             >
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   onPlay(item);
                 }}
-                className="bg-[#e51f48] p-3 rounded-full"
+                className="bg-[#e51f48] p-2 rounded-full touch-target"
               >
-                {isCurrent && isPlaying ? <FaPause size={16} /> : <FaPlay size={16} />}
+                {isCurrent && isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
               </button>
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   onPurchase(item);
                 }}
-                className="bg-green-600 p-3 rounded-full text-white text-xs font-bold"
+                className="bg-green-600 p-2 rounded-full text-white text-xs font-bold touch-target"
               >
-                <FaShoppingCart size={16} />
+                <FaShoppingCart size={12} />
               </button>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div className="mt-3">
-        <h3 className="font-bold text-white truncate text-sm">{item.title}</h3>
-        <p className="text-xs text-gray-400 truncate">
+      <div className="mt-2">
+        <h3 className="font-bold text-white truncate mobile-text-sm">{item.title}</h3>
+        <p className="text-xs text-gray-400 truncate mobile-text-xs">
           {item.artist ||
            item.user?.displayName ||
            item.user?.username ||
            "Unknown Artist"}
         </p>
         
-        <div className="flex justify-between items-center mt-2">
-          <span className="text-xs text-gray-400 flex items-center gap-1">
-            <FaHeadphones size={10} />
+        <div className="flex justify-between items-center mt-1">
+          <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
+            <FaHeadphones size={8} />
             {Number(item.plays ?? item.views ?? 0).toLocaleString()}
           </span>
-          <span className="text-sm font-bold text-amber-400">
+          <span className="text-xs font-bold text-amber-400 mobile-text-xs">
             ZMW{item.price?.toFixed(2)}
           </span>
         </div>
@@ -456,7 +432,7 @@ const PremiumMediaCard = ({
   );
 }
 
-// Beat Card Component
+// Beat Card Component - Mobile Optimized
 const BeatCard = ({
   beat,
   onPlay,
@@ -482,8 +458,8 @@ const BeatCard = ({
 
   return (
     <motion.div
-      className="relative bg-[#0a3747] bg-opacity-50 rounded-lg p-3 cursor-pointer flex-shrink-0 w-[160px] sm:w-[180px]"
-      whileHover={{ y: -5 }}
+      className="relative bg-[#0a3747] bg-opacity-50 rounded-lg p-2 cursor-pointer flex-shrink-0 w-[140px] mobile-card"
+      whileHover={{ y: -3 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       onClick={() => onPlay(beat)}
@@ -499,14 +475,14 @@ const BeatCard = ({
           }}
         />
         
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
+        <div className="absolute top-1 left-1">
           {beat.isPremium ? (
-            <div className="flex items-center gap-1 px-2 py-1 bg-amber-500/20 text-amber-400 rounded-full text-xs backdrop-blur-sm">
-              <FaCrown className="w-3 h-3" />
+            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded-full text-xs backdrop-blur-sm mobile-text-xs">
+              <FaCrown className="w-2 h-2" />
               Premium
             </div>
           ) : (
-            <div className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs backdrop-blur-sm">
+            <div className="px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded-full text-xs backdrop-blur-sm mobile-text-xs">
               Free
             </div>
           )}
@@ -518,47 +494,41 @@ const BeatCard = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-2"
+              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-1"
             >
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   onPlay(beat);
                 }}
-                className="bg-[#e51f48] p-3 rounded-full"
+                className="bg-[#e51f48] p-2 rounded-full touch-target"
               >
-                {isCurrent && isPlaying ? <FaPause size={16} /> : <FaPlay size={16} />}
+                {isCurrent && isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
               </button>
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   onPurchase(beat);
                 }}
-                className="bg-green-600 p-3 rounded-full text-white text-xs font-bold"
+                className="bg-green-600 p-2 rounded-full text-white text-xs font-bold touch-target"
               >
-                <FaShoppingCart size={16} />
-              </button>
-              <button 
-                onClick={handleShare}
-                className="bg-blue-600 p-3 rounded-full"
-              >
-                <FaShare size={14} />
+                <FaShoppingCart size={12} />
               </button>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div className="mt-3">
-        <h3 className="font-bold text-white truncate text-sm">{beat.title}</h3>
-        <p className="text-xs text-gray-300 truncate">{beat.producer}</p>
+      <div className="mt-2">
+        <h3 className="font-bold text-white truncate mobile-text-sm">{beat.title}</h3>
+        <p className="text-xs text-gray-300 truncate mobile-text-xs">{beat.producer}</p>
         
-        <div className="flex justify-between items-center mt-2">
-          <span className="text-xs text-gray-400">
-            {beat.bpm} BPM • {beat.genre}
+        <div className="flex justify-between items-center mt-1">
+          <span className="text-xs text-gray-400 mobile-text-xs">
+            {beat.bpm} BPM
           </span>
           
-          <span className="text-sm font-bold text-[#e51f48]">
+          <span className="text-xs font-bold text-[#e51f48] mobile-text-xs">
             ZMW{beat.price.toFixed(2)}
           </span>
         </div>
@@ -567,7 +537,7 @@ const BeatCard = ({
   );
 };
 
-// Enhanced News Card Component with Interactions
+// Enhanced News Card Component with Interactions - Mobile Optimized
 const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: NewsItem) => void }) => {
   const reactions: Reaction[] = item.reactions || [
     { emoji: '👍', count: 15, userReacted: false },
@@ -588,11 +558,11 @@ const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: N
 
   return (
     <motion.div
-      className="bg-[#0a3747]/70 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer"
-      whileHover={{ y: -5 }}
+      className="bg-[#0a3747]/70 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer mobile-card"
+      whileHover={{ y: -3 }}
       onClick={() => onNewsClick(item)}
     >
-      <div className="relative h-48">
+      <div className="relative h-32">
         <Image
           src={item.imageUrl}
           alt={item.title}
@@ -602,21 +572,21 @@ const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: N
             (e.target as HTMLImageElement).src = "/default-news.png";
           }}
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
-          <span className="text-xs text-[#e51f48] font-medium">{item.category}</span>
-          <h3 className="text-white font-bold line-clamp-1 text-sm sm:text-base">{item.title}</h3>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+          <span className="text-xs text-[#e51f48] font-medium mobile-text-xs">{item.category}</span>
+          <h3 className="text-white font-bold line-clamp-1 mobile-text-sm">{item.title}</h3>
         </div>
       </div>
-      <div className="p-4">
-        <p className="text-sm text-gray-300 line-clamp-2 mb-3">{item.excerpt}</p>
+      <div className="p-3">
+        <p className="text-sm text-gray-300 line-clamp-2 mb-2 mobile-text-xs">{item.excerpt}</p>
         
         {/* Reactions */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            {reactions.map((reaction, index) => (
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1">
+            {reactions.slice(0, 2).map((reaction, index) => (
               <button
                 key={index}
-                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-colors ${
+                className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs transition-colors touch-target mobile-text-xs ${
                   reaction.userReacted 
                     ? 'bg-[#e51f48]/20 text-[#e51f48]' 
                     : 'bg-gray-600/50 text-gray-400 hover:bg-gray-500/50'
@@ -627,22 +597,22 @@ const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: N
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-3 text-xs text-gray-400">
+          <div className="flex items-center gap-2 text-xs text-gray-400 mobile-text-xs">
             <button className="flex items-center gap-1 hover:text-white transition-colors">
-              <FaComment size={10} />
+              <FaComment size={8} />
               <span>{comments.length}</span>
             </button>
             <div className="flex items-center gap-1">
-              <FaEye size={10} />
+              <FaEye size={8} />
               <span>{item.views || 0}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between items-center pt-3 border-t border-gray-600/50">
-          <span className="text-xs text-gray-400">{item.date}</span>
+        <div className="flex justify-between items-center pt-2 border-t border-gray-600/50">
+          <span className="text-xs text-gray-400 mobile-text-xs">{item.date}</span>
           <button 
-            className="text-xs text-[#e51f48] hover:underline flex items-center gap-1"
+            className="text-xs text-[#e51f48] hover:underline flex items-center gap-1 mobile-text-xs"
             onClick={(e) => {
               e.stopPropagation();
               onNewsClick(item);
@@ -667,24 +637,24 @@ const WelcomeNotification = () => {
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -50 }}
-      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] text-white p-4 rounded-lg shadow-lg max-w-xs sm:max-w-md mx-3"
+      className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] text-white p-3 rounded-lg shadow-lg max-w-xs mx-3 mobile-text-sm"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-sm sm:text-lg mb-1">Welcome to Fwaya Music!</h3>
-          <p className="text-xs sm:text-sm opacity-90 mb-2 leading-tight">
+          <h3 className="font-bold mobile-text-sm mb-1">Welcome to Fwaya Music!</h3>
+          <p className="opacity-90 mb-2 leading-tight mobile-text-xs">
             Start earning as a reseller! Share music and earn commissions.
           </p>
-          <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
+          <div className="flex flex-col gap-1">
             <button 
               onClick={() => window.location.href = '/auth?tab=reseller'}
-              className="bg-white text-[#e51f48] px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors whitespace-nowrap"
+              className="bg-white text-[#e51f48] px-3 py-1.5 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors whitespace-nowrap touch-target mobile-text-xs"
             >
               Become Reseller
             </button>
             <button 
               onClick={() => window.location.href = '/auth'}
-              className="border border-white text-white px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs font-bold hover:bg-white/10 transition-colors whitespace-nowrap"
+              className="border border-white text-white px-3 py-1.5 rounded-full text-xs font-bold hover:bg-white/10 transition-colors whitespace-nowrap touch-target mobile-text-xs"
             >
               Create Account
             </button>
@@ -692,16 +662,16 @@ const WelcomeNotification = () => {
         </div>
         <button 
           onClick={() => setIsVisible(false)}
-          className="text-white hover:text-gray-200 transition-colors flex-shrink-0 mt-1"
+          className="text-white hover:text-gray-200 transition-colors flex-shrink-0 mt-1 touch-target"
         >
-          <FaTimes size={14} />
+          <FaTimes size={12} />
         </button>
       </div>
     </motion.div>
   );
 };
 
-// Enhanced Top Charts Section with proper play functionality
+// Enhanced Top Charts Section with proper play functionality - Mobile Optimized
 const TopChartsSection = ({ 
   songs, 
   onPlay,
@@ -714,28 +684,28 @@ const TopChartsSection = ({
   isPlaying: boolean;
 }) => {
   return (
-    <section className="mb-16 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] p-4 sm:p-6 rounded-xl">
-      <div className="flex justify-between items-center mb-6">
+    <section className="mb-8 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] p-4 rounded-xl">
+      <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white">Top Charts</h2>
-          <p className="text-gray-400 text-sm">Most played tracks this week</p>
+          <h2 className="text-lg font-bold text-white mobile-text-lg">Top Charts</h2>
+          <p className="text-gray-400 text-xs mobile-text-xs">Most played tracks this week</p>
         </div>
-        <button className="text-sm text-[#e51f48] hover:underline">See all</button>
+        <button className="text-xs text-white hover:underline mobile-text-xs">See all</button>
       </div>
-      <div className="space-y-2">
-        {songs.slice(0, 5).map((song, index) => {
+      <div className="space-y-1">
+        {songs.slice(0, 3).map((song, index) => {
           const isCurrent = currentTrack?.id === song.id;
           return (
             <div 
               key={song.id} 
-              className="flex items-center gap-3 p-3 hover:bg-[#0a3747] rounded-lg cursor-pointer transition-colors group"
+              className="flex items-center gap-2 p-2 hover:bg-[#0a3747] rounded-lg cursor-pointer transition-colors group touch-target"
               onClick={() => onPlay(song)}
             >
               <div className="flex items-center w-full">
-                <span className="text-gray-400 w-6 text-right mr-2 text-lg font-bold">
+                <span className="text-gray-400 w-4 text-right mr-2 font-bold mobile-text-sm">
                   {index + 1}
                 </span>
-                <div className="relative h-12 w-12 flex-shrink-0">
+                <div className="relative h-8 w-8 flex-shrink-0">
                   <Image 
                     src={
                       song.imageUrl ||
@@ -752,32 +722,29 @@ const TopChartsSection = ({
                     }}
                   />
                 </div>
-                <div className="ml-3 flex-1 min-w-0">
-                  <h3 className="font-medium truncate text-white group-hover:text-[#e51f48] transition-colors text-sm sm:text-base">
+                <div className="ml-2 flex-1 min-w-0">
+                  <h3 className="font-medium truncate text-white group-hover:text-[#e51f48] transition-colors mobile-text-sm">
                     {song.title}
                   </h3>
-                  <p className="text-xs text-gray-400 truncate">
+                  <p className="text-xs text-gray-400 truncate mobile-text-xs">
                     {song.user?.displayName || song.user?.username || song.artist || "Unknown Artist"}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-4 ml-auto">
-                <span className="text-xs text-gray-400 hidden sm:block">
-                  {Math.floor(song.duration / 60)}:{(song.duration % 60).toString().padStart(2, '0')}
-                </span>
+              <div className="flex items-center gap-2 ml-auto">
                 <button 
-                  className={`p-2 rounded-full transition-all ${
+                  className={`p-1.5 rounded-full transition-all touch-target ${
                     isCurrent 
-                      ? 'text-[#e51f48] opacity-100' 
-                      : 'text-gray-400 opacity-0 group-hover:opacity-100 hover:text-[#e51f48]'
+                      ? 'text-white opacity-100' 
+                      : 'text-gray-400 opacity-0 group-hover:opacity-100 hover:text-white'
                   }`}
                   onClick={(e) => {
                     e.stopPropagation();
                     onPlay(song);
                   }}
                 >
-                  {isCurrent && isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
+                  {isCurrent && isPlaying ? <FaPause size={10} /> : <FaPlay size={10} />}
                 </button>
               </div>
             </div>
@@ -788,7 +755,7 @@ const TopChartsSection = ({
   );
 };
 
-// Horizontal Scroll Section Component
+// Horizontal Scroll Section Component - Mobile Optimized
 const HorizontalScrollSection = ({ 
   title, 
   subtitle,
@@ -828,7 +795,7 @@ const HorizontalScrollSection = ({
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -300 : 300;
+      const scrollAmount = direction === 'left' ? -200 : 200;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
@@ -847,14 +814,14 @@ const HorizontalScrollSection = ({
   }, [checkScroll]);
 
   return (
-    <section className="mb-12 relative">
-      <div className="flex justify-between items-center mb-6 px-2">
+    <section className="mb-8 relative">
+      <div className="flex justify-between items-center mb-4 px-1">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white">{title}</h2>
-          {subtitle && <p className="text-gray-400 mt-1 text-sm">{subtitle}</p>}
+          <h2 className="text-lg font-bold text-white mobile-text-lg">{title}</h2>
+          {subtitle && <p className="text-gray-400 mt-0.5 text-xs mobile-text-xs">{subtitle}</p>}
         </div>
-        <button className="text-sm text-[#e51f48] hover:underline flex items-center gap-1">
-          See all <FaArrowRight size={12} />
+        <button className="text-xs text-[#e51f48] hover:underline flex items-center gap-1 mobile-text-xs">
+          See all <FaArrowRight size={10} />
         </button>
       </div>
       
@@ -862,67 +829,67 @@ const HorizontalScrollSection = ({
         {showLeftArrow && (
           <button 
             onClick={() => scroll('left')}
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-[#0a3747] bg-opacity-80 p-2 sm:p-3 rounded-full hover:bg-opacity-100 transition-all"
+            className="absolute left-1 top-1/2 transform -translate-y-1/2 z-10 bg-[#0a3747] bg-opacity-80 p-1.5 rounded-full hover:bg-opacity-100 transition-all touch-target"
           >
-            <FaChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+            <FaChevronLeft className="w-3 h-3" />
           </button>
         )}
         
-<div 
-  ref={scrollRef}
-  className="flex overflow-x-auto scrollbar-hide gap-3 sm:gap-4 pb-4 px-2"
-  style={{ scrollbarWidth: 'none' }}
->
-  {items.map((item: MediaItem | Artist | BeatItem | Playlist) => (
-    <div key={item.id} className="flex-shrink-0">
-      {type === 'beat' ? (
-        <BeatCard 
-          beat={item as BeatItem} 
-          onPlay={onPlay}
-          onPurchase={onPurchase as (beat: BeatItem) => void}
-          onShare={onShare as (beat: BeatItem) => void}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-      ) : type === 'premium' ? (
-        <PremiumMediaCard 
-          item={item as MediaItem}
-          onPlay={onPlay}
-          onPurchase={onPurchase as (item: MediaItem) => void}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-      ) : type === 'artist' ? (
-        <MediaCard 
-          item={item as Artist}
-          onPlay={onPlay as (item: MediaItem) => void}
-          onLike={onLike}
-          onShare={onShare}
-          type="artist"
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-      ) : (
-        <MediaCard 
-          item={item as MediaItem}
-          onPlay={onPlay as (item: MediaItem) => void}
-          onLike={onLike}
-          onDownload={onDownload}
-          onShare={onShare}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-      )}
-    </div>
-  ))}
-</div>
+        <div 
+          ref={scrollRef}
+          className="flex overflow-x-auto scrollbar-hide gap-2 pb-3 px-1 horizontal-scroll"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {items.map((item: MediaItem | Artist | BeatItem | Playlist) => (
+            <div key={item.id} className="flex-shrink-0">
+              {type === 'beat' ? (
+                <BeatCard 
+                  beat={item as BeatItem} 
+                  onPlay={onPlay}
+                  onPurchase={onPurchase as (beat: BeatItem) => void}
+                  onShare={onShare as (beat: BeatItem) => void}
+                  currentTrack={currentTrack}
+                  isPlaying={isPlaying}
+                />
+              ) : type === 'premium' ? (
+                <PremiumMediaCard 
+                  item={item as MediaItem}
+                  onPlay={onPlay}
+                  onPurchase={onPurchase as (item: MediaItem) => void}
+                  currentTrack={currentTrack}
+                  isPlaying={isPlaying}
+                />
+              ) : type === 'artist' ? (
+                <MediaCard 
+                  item={item as Artist}
+                  onPlay={onPlay as (item: MediaItem) => void}
+                  onLike={onLike}
+                  onShare={onShare}
+                  type="artist"
+                  currentTrack={currentTrack}
+                  isPlaying={isPlaying}
+                />
+              ) : (
+                <MediaCard 
+                  item={item as MediaItem}
+                  onPlay={onPlay as (item: MediaItem) => void}
+                  onLike={onLike}
+                  onDownload={onDownload}
+                  onShare={onShare}
+                  currentTrack={currentTrack}
+                  isPlaying={isPlaying}
+                />
+              )}
+            </div>
+          ))}
+        </div>
         
         {showRightArrow && (
           <button 
             onClick={() => scroll('right')}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-[#0a3747] bg-opacity-80 p-2 sm:p-3 rounded-full hover:bg-opacity-100 transition-all"
+            className="absolute right-1 top-1/2 transform -translate-y-1/2 z-10 bg-[#0a3747] bg-opacity-80 p-1.5 rounded-full hover:bg-opacity-100 transition-all touch-target"
           >
-            <FaChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+            <FaChevronRight className="w-3 h-3" />
           </button>
         )}
       </div>
@@ -930,9 +897,7 @@ const HorizontalScrollSection = ({
   );
 };
 
-
-// Featured Playlists Carousel Component
-// 1. Featured Playlists Carousel: make it horizontally scrollable and auto-scroll
+// Featured Playlists Carousel Component - Mobile Optimized
 const FeaturedPlaylistsCarousel = ({ 
   playlists, 
   onPlaylistClick 
@@ -941,46 +906,43 @@ const FeaturedPlaylistsCarousel = ({
   onPlaylistClick: (playlist: Playlist) => void;
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  
 
   // Auto-scroll horizontally every 5s
   useEffect(() => {
     const interval = setInterval(() => {
       if (scrollRef.current) {
-        scrollRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+        scrollRef.current.scrollBy({ left: 280, behavior: 'smooth' });
       }
-      // If you want to track index, uncomment below:
-      // setCurrentIndex(prev => (prev + 1) % playlists.length);
     }, 5000);
     return () => clearInterval(interval);
   }, [playlists.length]);
 
-return (
-    <section className="mb-12">
-      <div className="flex justify-between items-center mb-6 px-2">
+  return (
+    <section className="mb-8">
+      <div className="flex justify-between items-center mb-4 px-1">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white">Featured Playlists</h2>
-          <p className="text-gray-400 mt-1 text-sm">Curated collections for every mood</p>
+          <h2 className="text-lg font-bold text-white mobile-text-lg">Featured Playlists</h2>
+          <p className="text-gray-400 mt-0.5 text-xs mobile-text-xs">Curated collections for every mood</p>
         </div>
-        <button className="text-sm text-[#e51f48] hover:underline flex items-center gap-1">
-          View All <FaArrowRight size={12} />
+        <button className="text-xs text-[#e51f48] hover:underline flex items-center gap-1 mobile-text-xs">
+          View All <FaArrowRight size={10} />
         </button>
       </div>
       <div className="relative">
         <div
           ref={scrollRef}
-          className="flex overflow-x-auto scrollbar-hide gap-4 px-2 pb-4"
+          className="flex overflow-x-auto scrollbar-hide gap-3 px-1 pb-3 horizontal-scroll"
           style={{ scrollbarWidth: 'none' }}
         >
           {playlists.map((playlist) => (
             <motion.div
               key={playlist.id}
-              className="bg-gradient-to-br from-[#0a3747] to-[#0a1f29] rounded-xl overflow-hidden cursor-pointer group min-w-[320px] max-w-[320px]"
+              className="bg-gradient-to-br from-[#0a3747] to-[#0a1f29] rounded-xl overflow-hidden cursor-pointer group min-w-[280px] max-w-[280px] mobile-card"
               whileHover={{ scale: 1.02 }}
               onClick={() => onPlaylistClick(playlist)}
             >
-              <div className="flex h-24 sm:h-32">
-                <div className="relative w-24 sm:w-32 flex-shrink-0">
+              <div className="flex h-20">
+                <div className="relative w-20 flex-shrink-0">
                   <Image
                     src={playlist.coverUrl || playlist.imageUrl || "/default-playlist.png"}
                     alt={playlist.name}
@@ -993,20 +955,19 @@ return (
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                     <motion.button
                       whileHover={{ scale: 1.1 }}
-                      className="bg-[#e51f48] p-2 sm:p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                      className="bg-[#e51f48] p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all touch-target"
                     >
-                      <FaPlay size={14} className="sm:w-4 sm:h-4" />
+                      <FaPlay size={10} />
                     </motion.button>
                   </div>
                 </div>
-                <div className="p-3 sm:p-4 flex-1">
-                  <h3 className="font-bold text-white text-sm sm:text-lg mb-1 sm:mb-2">{playlist.name}</h3>
-                  <p className="text-gray-300 text-xs line-clamp-2 mb-2">
+                <div className="p-2 flex-1">
+                  <h3 className="font-bold text-white mobile-text-sm mb-1">{playlist.name}</h3>
+                  <p className="text-gray-300 text-xs line-clamp-2 mb-1 mobile-text-xs">
                     {playlist.description || `${playlist.mediaCount} tracks`}
                   </p>
-                  <div className="flex items-center justify-between text-xs text-gray-400">
+                  <div className="flex items-center justify-between text-xs text-gray-400 mobile-text-xs">
                     <span>{playlist.mediaCount} songs</span>
-                    <span>{playlist.type.toLowerCase().replace('_', ' ')}</span>
                   </div>
                 </div>
               </div>
@@ -1018,7 +979,7 @@ return (
   );
 };
 
-// Main Component
+// Main Component - Mobile Optimized
 const GuestWelcome = () => {
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     currentTrack: null,
@@ -1063,34 +1024,25 @@ const GuestWelcome = () => {
         ]);
 
         const featuredSongs = homepageSections.featuredSongs || [];
-const trendingSongs = homepageSections.trendingSongs || [];
-const topCharts = homepageSections.topCharts || [];
+        const trendingSongs = homepageSections.trendingSongs || [];
+        const topCharts = homepageSections.topCharts || [];
 
-setFeaturedAlbums(featuredSongs);
-setTrendingSongs(trendingSongs);
-setFeaturedPlaylists(playlistsData || []);
-setFavoriteArtists(artistsData || []);
-setNewsItems(newsData || []);
-setBeatsForProducers(homepageSections.beats || []);
-
-        // Process and set data
-        setFeaturedAlbums(homepageSections.featuredSongs || []);
-        setTrendingSongs(homepageSections.trendingSongs || []);
+        setFeaturedAlbums(featuredSongs);
+        setTrendingSongs(trendingSongs);
         setFeaturedPlaylists(playlistsData || []);
         setFavoriteArtists(artistsData || []);
         setNewsItems(newsData || []);
-        
-        
-        // Filter premium content
-// Alternative approach with type assertions
-const allContent = [
-  ...featuredSongs,
-  ...trendingSongs,
-  ...topCharts
-] as MediaItem[];
+        setBeatsForProducers(homepageSections.beats || []);
 
-setPremiumContent(allContent.filter(item => item.accessType === 'PREMIUM'));
-setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType === 'FREE'));
+        // Filter premium content
+        const allContent = [
+          ...featuredSongs,
+          ...trendingSongs,
+          ...topCharts
+        ] as MediaItem[];
+
+        setPremiumContent(allContent.filter(item => item.accessType === 'PREMIUM'));
+        setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType === 'FREE'));
 
       } catch (err) {
         console.error("Failed to fetch data:", err);
@@ -1167,8 +1119,8 @@ setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType ===
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#e51f48] mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading Fwaya Music...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e51f48] mx-auto mb-3"></div>
+          <p className="text-white mobile-text-sm">Loading Fwaya Music...</p>
         </div>
       </div>
     );
@@ -1179,29 +1131,27 @@ setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType ===
       {/* Welcome Notification */}
       <WelcomeNotification />
 
-      {/* Enhanced Header for mobile */}
+      {/* Mobile-Optimized Header */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-[#0a3747]/90 backdrop-blur-lg border-b border-white/10">
-        <div className="container mx-auto flex items-center justify-between p-3 sm:p-4">
-          <div className="flex items-center gap-4 sm:gap-6">
-            <div className="flex items-center gap-2">
-              <IoMdMusicalNote className="text-[#e51f48] text-xl sm:text-2xl" />
-              <span className="text-white font-bold text-lg sm:text-xl">Fwaya Music</span>
-            </div>
+        <div className="container mx-auto flex items-center justify-between p-3">
+          <div className="flex items-center gap-2">
+            <IoMdMusicalNote className="text-[#e51f48] text-lg" />
+            <span className="text-white font-bold mobile-text-lg">Fwaya Music</span>
           </div>
 
-          <div className="relative flex-1 max-w-md mx-2 sm:mx-4">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+          <div className="relative flex-1 max-w-xs mx-2">
+            <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs" />
             <input
               type="text"
               placeholder="Search songs, artists..."
-              className="w-full bg-[#0a1f29] bg-opacity-70 rounded-full py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#e51f48] text-white placeholder-gray-400"
+              className="w-full bg-[#0a1f29] bg-opacity-70 rounded-full py-1.5 pl-6 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#e51f48] text-white placeholder-gray-400 mobile-text-xs"
             />
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2">
             <button 
               onClick={() => window.location.href = '/auth'}
-              className="bg-[#e51f48] hover:bg-[#ff4d6d] text-white px-4 py-2 sm:px-6 sm:py-2 rounded-full font-semibold transition-colors text-sm"
+              className="bg-[#e51f48] hover:bg-[#ff4d6d] text-white px-3 py-1.5 rounded-full font-semibold transition-colors text-xs touch-target mobile-text-xs"
             >
               Sign In
             </button>
@@ -1210,23 +1160,23 @@ setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType ===
       </header>
 
       {/* Main Content */}
-      <main className="pt-20 sm:pt-24 pb-32 px-3 sm:px-4 max-w-7xl mx-auto">
-        {/* Hero Section */}
-        <section className="relative py-8 sm:py-12 px-4">
+      <main className="pt-16 pb-24 px-2 max-w-7xl mx-auto">
+        {/* Hero Section - Mobile Optimized */}
+        <section className="relative py-6 px-2">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center text-white mb-12 sm:mb-16">
+            <div className="text-center text-white mb-8">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 0.6 }}
               >
-                <div className="flex justify-center mb-4 sm:mb-6">
+                <div className="flex justify-center mb-3">
                   <div className="relative">
                     <Image
                       src="/Fwaya Music Icon-01.png"
                       alt="Fwaya Music"
-                      width={80}
-                      height={80}
+                      width={60}
+                      height={60}
                       className="rounded-lg"
                     />
                     <motion.div
@@ -1237,29 +1187,29 @@ setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType ===
                   </div>
                 </div>
                 
-                <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6">
+                <h1 className="text-2xl font-bold mb-3 mobile-text-2xl">
                   Fwaya<span className="text-[#e51f48]">Music</span>
                 </h1>
                 
-                <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-300 max-w-2xl mx-auto px-4">
+                <p className="mobile-text-sm mb-4 text-gray-300 max-w-md mx-auto px-2">
                   Discover the heartbeat of Zambian music. Stream, share, and connect with artists worldwide.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-8 sm:mb-12 px-4">
+                <div className="flex flex-col gap-2 justify-center items-center mb-6 px-2">
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-[#e51f48] hover:bg-[#ff4d6d] text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold text-base sm:text-lg flex items-center gap-2 transition-all w-full sm:w-auto justify-center"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="bg-[#e51f48] hover:bg-[#ff4d6d] text-white px-4 py-2.5 rounded-full font-bold mobile-text-sm flex items-center gap-1 transition-all w-full max-w-xs justify-center touch-target"
                     onClick={() => window.location.href = '/auth'}
                   >
-                    <FaPlay />
+                    <FaPlay size={12} />
                     Start Listening Free
                   </motion.button>
                   
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="border-2 border-[#e51f48] text-[#e51f48] hover:bg-[#e51f48] hover:text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold text-base sm:text-lg transition-all w-full sm:w-auto justify-center"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="border border-[#e51f48] text-[#e51f48] hover:bg-[#e51f48] hover:text-white px-4 py-2.5 rounded-full font-bold mobile-text-sm transition-all w-full max-w-xs justify-center touch-target"
                     onClick={() => window.location.href = '/browse'}
                   >
                     Explore Music
@@ -1282,7 +1232,7 @@ setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType ===
         <HorizontalScrollSection
           title="Featured Songs"
           subtitle="Handpicked content just for you"
-          items={featuredAlbums.slice(0, 8)}
+          items={featuredAlbums.slice(0, 6)}
           onPlay={handlePlay}
           onLike={handleLike}
           onDownload={handleDownload}
@@ -1295,7 +1245,7 @@ setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType ===
         <HorizontalScrollSection
           title="Trending Now"
           subtitle="The hottest tracks everyone's listening to"
-          items={trendingSongs.slice(0, 8)}
+          items={trendingSongs.slice(0, 6)}
           onPlay={handlePlay}
           onLike={handleLike}
           onDownload={handleDownload}
@@ -1305,37 +1255,38 @@ setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType ===
         />
 
         {/* Premium Content */}
-{premiumContent.length > 0 && (
-  <HorizontalScrollSection
-    title="Premium Exclusives"
-    subtitle="Unlock premium content for the best experience"
-    items={premiumContent}
-    type="premium"
-    onPlay={handlePlay}
-    onPurchase={handlePurchase}
-    onShare={handleShare}
-    currentTrack={audioPlayerState.currentTrack}
-    isPlaying={audioPlayerState.isPlaying}
-  />
-)}
+        {premiumContent.length > 0 && (
+          <HorizontalScrollSection
+            title="Premium Exclusives"
+            subtitle="Unlock premium content for the best experience"
+            items={premiumContent.slice(0, 6)}
+            type="premium"
+            onPlay={handlePlay}
+            onPurchase={handlePurchase}
+            onShare={handleShare}
+            currentTrack={audioPlayerState.currentTrack}
+            isPlaying={audioPlayerState.isPlaying}
+          />
+        )}
 
         {/* Favorite Artists */}
-<HorizontalScrollSection
-  title="Favourite Artists"
-  subtitle="Follow your favorite artists"
-  items={favoriteArtists}
-  type="artist"
-  onPlay={handlePlay}
-  onLike={handleFollowArtist}
-  onShare={handleShare}
-  currentTrack={audioPlayerState.currentTrack}
-  isPlaying={audioPlayerState.isPlaying}
-/>
+        <HorizontalScrollSection
+          title="Favourite Artists"
+          subtitle="Follow your favorite artists"
+          items={favoriteArtists.slice(0, 6)}
+          type="artist"
+          onPlay={handlePlay}
+          onLike={handleFollowArtist}
+          onShare={handleShare}
+          currentTrack={audioPlayerState.currentTrack}
+          isPlaying={audioPlayerState.isPlaying}
+        />
+
         {/* Free Content */}
         <HorizontalScrollSection
           title="Free Favourite Mix"
           subtitle="Enjoy these tracks without any cost"
-          items={freeContent}
+          items={freeContent.slice(0, 6)}
           onPlay={handlePlay}
           onLike={handleLike}
           onDownload={handleDownload}
@@ -1345,17 +1296,17 @@ setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType ===
         />
 
         {/* Beats Marketplace */}
-<HorizontalScrollSection
-  title="Beats & Instruments"
-  subtitle="Premium and free beats from beatmakers & producers"
-  items={beatsForProducers}
-  type="beat"
-  onPlay={handlePlay}
-  onPurchase={handlePurchase}
-  onShare={handleShare}
-  currentTrack={audioPlayerState.currentTrack}
-  isPlaying={audioPlayerState.isPlaying}
-/>
+        <HorizontalScrollSection
+          title="Beats & Instruments"
+          subtitle="Premium and free beats from beatmakers & producers"
+          items={beatsForProducers.slice(0, 6)}
+          type="beat"
+          onPlay={handlePlay}
+          onPurchase={handlePurchase}
+          onShare={handleShare}
+          currentTrack={audioPlayerState.currentTrack}
+          isPlaying={audioPlayerState.isPlaying}
+        />
 
         {/* Top Charts Section */}
         <TopChartsSection 
@@ -1366,27 +1317,27 @@ setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType ===
         />
 
         {/* Latest News */}
-<section className="mb-16">
-  <div className="flex justify-between items-center mb-6 px-2">
-    <div>
-      <h2 className="text-xl sm:text-2xl font-bold text-white">Latest News & Updates</h2>
-      <p className="text-gray-400 mt-1 text-sm">Stay updated with the latest from Fwaya Music</p>
-    </div>
-    <button className="text-sm text-[#e51f48] hover:underline flex items-center gap-1">
-      View All <FaArrowRight size={12} />
-    </button>
-  </div>
-  <div
-    className="flex overflow-x-auto scrollbar-hide gap-4 px-2 pb-4"
-    style={{ scrollbarWidth: 'none' }}
-  >
-    {newsItems.map((newsItem) => (
-      <div key={newsItem.id} className="min-w-[320px] max-w-[320px]">
-        <NewsCard item={newsItem} onNewsClick={handleNewsClick} />
-      </div>
-    ))}
-  </div>
-</section>
+        <section className="mb-8">
+          <div className="flex justify-between items-center mb-4 px-1">
+            <div>
+              <h2 className="text-lg font-bold text-white mobile-text-lg">Latest News</h2>
+              <p className="text-gray-400 mt-0.5 text-xs mobile-text-xs">Stay updated with Fwaya Music</p>
+            </div>
+            <button className="text-xs text-[#e51f48] hover:underline flex items-center gap-1 mobile-text-xs">
+              View All <FaArrowRight size={10} />
+            </button>
+          </div>
+          <div
+            className="flex overflow-x-auto scrollbar-hide gap-3 px-1 pb-3 horizontal-scroll"
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {newsItems.slice(0, 4).map((newsItem) => (
+              <div key={newsItem.id} className="min-w-[280px] max-w-[280px]">
+                <NewsCard item={newsItem} onNewsClick={handleNewsClick} />
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
 
       {/* Player */}
