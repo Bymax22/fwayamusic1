@@ -50,22 +50,28 @@ export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
         const Icon = item.icon;
         
         if (item.center && item.action) {
-          // Centered, larger Menu button with accent background
+          // Centered, larger Menu button with transparent background and animation
           return (
-            <div key={item.name} className="flex-1 flex justify-center -mt-8"> {/* Increased negative margin */}
+            <div key={item.name} className="flex-1 flex justify-center -mt-8">
               <button
                 onClick={item.action}
                 className="relative flex flex-col items-center touch-target group"
                 aria-label={item.name}
               >
-                {/* Larger background circle */}
-                <div className="w-18 h-18 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-110">
-                  <Icon size={30} className="text-white" strokeWidth={2.5} />
+                {/* Transparent background circle with border and pulse animation */}
+                <div className="relative w-18 h-18 rounded-full bg-transparent border-2 border-[#e51f48] border-opacity-60 flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:border-opacity-100 group-hover:bg-[#e51f48] group-hover:bg-opacity-20">
+                  <Icon size={30} className="text-[#e51f48] group-hover:text-white transition-colors duration-300" strokeWidth={2.5} />
+                  
+                  {/* Pulsing animation ring */}
+                  <div className="absolute inset-0 rounded-full border-2 border-[#e51f48] border-opacity-30 animate-ping-slow"></div>
                 </div>
-                <span className="mobile-text-xs font-bold text-white mt-1">{item.name}</span>
                 
-                {/* Subtle glow effect */}
-                <div className="absolute inset-0 rounded-full bg-[#e51f48] opacity-20 blur-md -z-10 group-hover:opacity-30 transition-opacity"></div>
+                <span className="mobile-text-xs font-bold text-white mt-1 transition-colors duration-300 group-hover:text-[#e51f48]">
+                  {item.name}
+                </span>
+                
+                {/* Subtle glow effect that pulses */}
+                <div className="absolute inset-0 rounded-full bg-[#e51f48] opacity-10 blur-md -z-10 group-hover:opacity-20 transition-opacity duration-300 animate-pulse-slow"></div>
               </button>
             </div>
           );
