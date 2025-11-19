@@ -39,7 +39,7 @@
   /* Mobile-first layout */
   --navbar-height: 3rem;
   --player-height: 4.5rem;
-  --bottom-nav-height: 3.5rem;
+  --bottom-nav-height: 4.5rem;
   --sidebar-width: 14rem;
   --sidebar-collapsed: 4rem;
   
@@ -253,42 +253,42 @@
     }
   }
 
-  /* Bottom Navigation */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--bottom-nav-height);
-    background: rgba(var(--primary-dark), 0.98);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(var(--border), 0.3);
-    z-index: 45;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 var(--gap-sm);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+/* Update bottom nav styles */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-height); /* Now uses the increased height */
+  background: rgba(var(--primary-dark), 0.98);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(var(--border), 0.3);
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 var(--gap-sm);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
   .bottom-nav--hidden {
     transform: translateY(100%);
   }
 
-  .bottom-nav__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    padding: var(--gap-xs) 0;
-    color: rgb(var(--muted));
-    font-size: var(--text-xs);
-    transition: all 0.2s ease;
-    min-height: 44px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: var(--gap-xs) 0;
+  color: rgb(var(--muted));
+  font-size: var(--text-xs);
+  transition: all 0.2s ease;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
     
     &:hover {
       color: rgb(var(--foreground));
@@ -782,4 +782,9 @@
   .bottom-nav {
     background-color: rgb(var(--primary-dark));
   }
+}
+
+/* Adjust main content padding to account for taller bottom nav */
+.main-content {
+  padding-bottom: var(--bottom-nav-height);
 }
