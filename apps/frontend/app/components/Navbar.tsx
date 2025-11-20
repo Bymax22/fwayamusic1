@@ -1,8 +1,7 @@
 "use client";
 import { 
-  UserPlus, Download, Music, DollarSign, Search, User, Bell, 
-  LogOut, Settings, Headphones, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Users, Gift
+  Music, Search, User, Bell, LogOut, Settings, Headphones, Share2, Crown, TrendingUp, 
+  Heart, Plus, Radio, Mic2, Gift
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -11,9 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
-interface NavbarProps {}
-
-export default function Navbar(_: NavbarProps) {
+export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
