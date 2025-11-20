@@ -1,7 +1,7 @@
 "use client";
 import { 
   Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Gift
+  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -74,19 +74,10 @@ export default function Navbar() {
 
             {/* Right Section - Guest Features */}
             <div className="flex items-center gap-4">
-                {/* Invite Friends */}
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-[#0a1f29] rounded-full hover:bg-[#0a3747] transition-all group">
-                <Gift size={18} className="text-green-400 group-hover:text-green-300" />
-                <span className="text-sm font-medium text-white">Invite & Earn</span>
+              {/* Invite Friends - Icon Only */}
+              <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+                <Gift size={22} className="text-green-400 group-hover:text-green-300 group-hover:scale-110 transition-transform" />
               </button>
-
-              {/* Sign In Button */}
-              <Link href="/auth/user/signin" passHref>
-                <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full text-white font-semibold hover:shadow-lg transition-all">
-                  <User size={18} />
-                  <span>Sign In</span>
-                </button>
-              </Link>
             </div>
           </div>
         </nav>
@@ -105,7 +96,7 @@ export default function Navbar() {
         border-b border-[#0a3747]/30 shadow-lg`}
       >
         <div className="container mx-auto px-4 h-full flex items-center justify-between">
-          {/* Left Section - Logo */}
+          {/* Left Section - Logo with Tagline */}
           <div className="flex items-center gap-3">
             <Link href="/dashboard" className="flex items-center gap-2">
               <Image 
@@ -115,9 +106,12 @@ export default function Navbar() {
                 height={36}
                 className="rounded"
               />
-              <span className="text-xl font-bold text-white">
-                Fwaya<span className="text-[#e51f48]">Music</span>
-              </span>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold text-white">
+                  Fwaya<span className="text-[#e51f48]">Music</span>
+                </span>
+                <span className="text-xs text-gray-400 -mt-1">Explore & Start Earning</span>
+              </div>
             </Link>
           </div>
 
@@ -140,6 +134,18 @@ export default function Navbar() {
                     </button>
                   </Link>
                 ))}
+                
+                {/* Explore Icon */}
+                <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all touch-target group text-gray-300 hover:text-white hover:bg-[#0a3747]/50">
+                  <Compass size={20} className="group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium">Explore</span>
+                </button>
+                
+                {/* Earn Icon */}
+                <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all touch-target group text-gray-300 hover:text-white hover:bg-[#0a3747]/50">
+                  <DollarSign size={20} className="group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium">Earn</span>
+                </button>
               </div>
 
               {/* Search removed: reserved spacing left */}
