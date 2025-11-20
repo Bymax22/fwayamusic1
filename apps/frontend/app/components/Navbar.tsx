@@ -1,7 +1,7 @@
 "use client";
 import { 
   Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign
+  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -10,9 +10,174 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
+// Invite Popup Component
+const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const inviteUrl = "https://fwayamusic.com/invite";
+  const shareText = "🎵 Discover Fwaya Music! Stream latest music worldwide for FREE, sell your music, resell and earn without investment, buy music, beats and instruments. Join now!";
+  
+  const sharePlatforms = [
+    {
+      name: "WhatsApp",
+      icon: "📱",
+      shareUrl: `https://wa.me/?text=${encodeURIComponent(shareText + " " + inviteUrl)}`,
+      color: "bg-green-500 hover:bg-green-600"
+    },
+    {
+      name: "Facebook",
+      icon: "📘",
+      shareUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(inviteUrl)}&quote=${encodeURIComponent(shareText)}`,
+      color: "bg-blue-600 hover:bg-blue-700"
+    },
+    {
+      name: "Twitter",
+      icon: "🐦",
+      shareUrl: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(inviteUrl)}`,
+      color: "bg-sky-500 hover:bg-sky-600"
+    },
+    {
+      name: "Telegram",
+      icon: "📨",
+      shareUrl: `https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent(shareText)}`,
+      color: "bg-blue-500 hover:bg-blue-600"
+    },
+    {
+      name: "Email",
+      icon: "✉️",
+      shareUrl: `mailto:?subject=Join Fwaya Music&body=${encodeURIComponent(shareText + " " + inviteUrl)}`,
+      color: "bg-gray-600 hover:bg-gray-700"
+    },
+    {
+      name: "Copy Link",
+      icon: "🔗",
+      shareUrl: inviteUrl,
+      color: "bg-purple-600 hover:bg-purple-700",
+      isCopy: true
+    }
+  ];
+
+  const handleShare = async (platform: typeof sharePlatforms[0]) => {
+    if (platform.isCopy) {
+      try {
+        await navigator.clipboard.writeText(inviteUrl);
+        alert("Invite link copied to clipboard!");
+        return;
+      } catch (err) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = inviteUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert("Invite link copied to clipboard!");
+      }
+    } else {
+      window.open(platform.shareUrl, '_blank', 'width=600,height=400');
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-gradient-to-br from-[#0a3747] to-[#0a1f29] rounded-2xl p-6 max-w-md w-full border border-[#0a4a5f] shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Image 
+              src="/Fwaya Music Icon-01.png" 
+              alt="Fwaya Music" 
+              width={40}
+              height={40}
+              className="rounded-lg"
+            />
+            <div>
+              <h2 className="text-xl font-bold text-white">Invite Friends</h2>
+              <p className="text-sm text-gray-400">Earn rewards when friends join</p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-[#0a4a5f] transition-colors touch-target"
+          >
+            <X size={20} className="text-gray-400" />
+          </button>
+        </div>
+
+        {/* Invite Card Preview */}
+        <div className="bg-[#0a4a5f] rounded-xl p-4 mb-6 border border-[#0a5a6f]">
+          <div className="flex items-center gap-3 mb-3">
+            <Image 
+              src="/Fwaya Music Icon-01.png" 
+              alt="Fwaya Music" 
+              width={50}
+              height={50}
+              className="rounded-lg"
+            />
+            <div>
+              <h3 className="font-bold text-white text-lg">Fwaya Music</h3>
+              <p className="text-sm text-gray-300">Join the music revolution</p>
+            </div>
+          </div>
+          <p className="text-sm text-gray-300 mb-3">
+            🎵 Stream latest music worldwide for FREE<br/>
+            💰 Sell your music & earn<br/>
+            🚀 Resell without investment<br/>
+            🎹 Buy music, beats & instruments
+          </p>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-400">{inviteUrl}</span>
+            <button className="px-3 py-1 bg-[#e51f48] text-white rounded-full text-xs font-bold hover:bg-[#ff4d6d] transition-colors">
+              View
+            </button>
+          </div>
+        </div>
+
+        {/* Share Platforms */}
+        <div className="grid grid-cols-3 gap-3">
+          {sharePlatforms.map((platform) => (
+            <button
+              key={platform.name}
+              onClick={() => handleShare(platform)}
+              className={`${platform.color} text-white p-3 rounded-xl transition-all hover:scale-105 touch-target flex flex-col items-center gap-2`}
+            >
+              <span className="text-2xl">{platform.icon}</span>
+              <span className="text-xs font-medium">{platform.name}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Benefits */}
+        <div className="mt-6 p-3 bg-[#0a4a5f]/50 rounded-lg border border-[#0a5a6f]">
+          <h4 className="text-sm font-bold text-white mb-2">Invite Benefits:</h4>
+          <ul className="text-xs text-gray-300 space-y-1">
+            <li>• Earn 20% commission on friend's purchases</li>
+            <li>• Get premium features for free</li>
+            <li>• Early access to new features</li>
+            <li>• Special badges and recognition</li>
+          </ul>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showInvitePopup, setShowInvitePopup] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -69,18 +234,26 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Middle Section - reserved spacing (search removed) */}
+            {/* Middle Section - reserved spacing */}
             <div className="flex-1 max-w-lg mx-6" />
 
             {/* Right Section - Guest Features */}
             <div className="flex items-center gap-4">
-              {/* Invite Friends - Icon Only */}
-              <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
-                <Gift size={22} className="text-green-400 group-hover:text-green-300 group-hover:scale-110 transition-transform" />
+              {/* Invite Friends - Normal Button */}
+              <button 
+                onClick={() => setShowInvitePopup(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-semibold transition-all touch-target group"
+              >
+                <Gift size={18} className="group-hover:scale-110 transition-transform" />
+                <span>Invite</span>
               </button>
             </div>
           </div>
         </nav>
+
+        {/* Invite Popup */}
+        <InvitePopup isOpen={showInvitePopup} onClose={() => setShowInvitePopup(false)} />
+
         {/* Spacer for fixed navbar */}
         <div className="h-16"></div>
       </>
@@ -118,7 +291,7 @@ export default function Navbar() {
           {/* Middle Section - Navigation & Search */}
           <div className="flex-1 max-w-2xl mx-6">
             <div className="flex items-center gap-4">
-              {/* Navigation Links */}
+              {/* Navigation Links - Hidden on mobile */}
               <div className="hidden lg:flex items-center gap-1">
                 {loggedInNavLinks.map((link) => (
                   <Link key={link.name} href={link.href} passHref>
@@ -155,7 +328,7 @@ export default function Navbar() {
 
           {/* Right Section - User Actions */}
           <div className="flex items-center gap-3">
-            {/* Quick Actions */}
+            {/* Quick Actions - Hidden on mobile */}
             <div className="hidden md:flex items-center gap-2">
               {/* Create */}
               <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
@@ -168,8 +341,21 @@ export default function Navbar() {
               </button>
               
               {/* Share */}
-              <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+              <button 
+                onClick={() => setShowInvitePopup(true)}
+                className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group"
+              >
                 <Share2 size={20} className="group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
+
+            {/* Mobile Icons - Premium & Earn (Visible on mobile) */}
+            <div className="flex md:hidden items-center gap-2">
+              <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+                <Crown size={20} className="text-amber-400 group-hover:scale-110 transition-transform" />
+              </button>
+              <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+                <DollarSign size={20} className="text-green-400 group-hover:scale-110 transition-transform" />
               </button>
             </div>
 
@@ -275,6 +461,10 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
+
+      {/* Invite Popup */}
+      <InvitePopup isOpen={showInvitePopup} onClose={() => setShowInvitePopup(false)} />
+
       {/* Spacer for fixed navbar */}
       <div className="h-16"></div>
     </>
