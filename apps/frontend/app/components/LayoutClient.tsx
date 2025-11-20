@@ -234,7 +234,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <title>FwayaMusic | Modern Music Experience</title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <meta name="description" content="Discover and stream your favorite music" />
-            <link rel="icon" href="/logo4.png" />
+            <link rel="icon" href="/Fwaya Innovations icon 1-01.png" />
             {nonce && (
               <script
                 nonce={nonce}

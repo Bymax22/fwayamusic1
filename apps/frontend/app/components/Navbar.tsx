@@ -260,7 +260,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             <Link href="/dashboard" className="flex items-center gap-2">
               <Image 
-                src="/Fwaya Music Icon-01.png" 
+                src="/Fwaya Innovations icon-01.png" 
                 alt="Fwaya Music Logo" 
                 width={36}
                 height={36}
