@@ -31,14 +31,15 @@ export function ReCAPTCHA({
   size = 'normal'
 }: ReCAPTCHAProps) {
   const recaptchaRef = useRef<HTMLDivElement>(null);
-  const widgetId = useRef<number | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const injectRecaptchaScript = () => {
     if (document.querySelector('script[src*="recaptcha/api.js"]')) return;
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
     const s = document.createElement('script');
-    s.src = "https://www.google.com/recaptcha/api.js?render=explicit";
+    // For reCAPTCHA v3 we load the script with the site key so we can execute actions
+    s.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
     s.async = true;
     s.defer = true;
     s.onload = () => console.debug("reCAPTCHA script loaded");
@@ -55,69 +56,64 @@ export function ReCAPTCHA({
     let timeoutHandle: number | undefined;
     let injectHandle: number | undefined;
 
-    const tryRender = () => {
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    if (!siteKey) {
+      const msg = 'reCAPTCHA site key not configured (NEXT_PUBLIC_RECAPTCHA_SITE_KEY)';
+      setLoadError(msg);
+      onError(msg);
+      return;
+    }
+
+    const executeV3 = async () => {
       try {
-        if (typeof window.grecaptcha === 'undefined' || !recaptchaRef.current) return false;
-
-        const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-        if (!siteKey) {
-          throw new Error('reCAPTCHA site key not configured (NEXT_PUBLIC_RECAPTCHA_SITE_KEY)');
-        }
-
-        const doRender = () => {
-          try {
-            widgetId.current = window.grecaptcha!.render(recaptchaRef.current as HTMLElement, {
-              sitekey: siteKey,
-              callback: onVerify,
-              'expired-callback': onExpire,
-              'error-callback': () => {
-                const errMsg = 'reCAPTCHA error occurred';
-                onError(errMsg);
-                setLoadError(errMsg);
-              },
-              theme,
-              size,
-            } as GrecaptchaOptions);
-            setIsLoaded(true);
-            return true;
-          } catch {
-            return false;
-          }
-        };
-
+        if (typeof window.grecaptcha === 'undefined') return false;
         if (typeof window.grecaptcha!.ready === 'function') {
-          window.grecaptcha!.ready(() => doRender());
+          window.grecaptcha!.ready(async () => {
+            try {
+              const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as any);
+              onVerify(token as string);
+              setIsLoaded(true);
+            } catch (err) {
+              const errMsg = 'reCAPTCHA execute failed';
+              setLoadError(errMsg);
+              onError(errMsg);
+            }
+          });
         } else {
-          doRender();
+          // fallback execute
+          const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as any);
+          onVerify(token as string);
+          setIsLoaded(true);
         }
-
         return true;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load reCAPTCHA';
+        const errorMessage = error instanceof Error ? error.message : 'Failed to execute reCAPTCHA';
         setLoadError(errorMessage);
         onError(errorMessage);
         return false;
       }
     };
 
-    // If grecaptcha already present, try immediately
+    // If grecaptcha already present, try execute immediately
     if (typeof window.grecaptcha !== 'undefined') {
-      tryRender();
+      executeV3();
     } else {
-      // If grecaptcha doesn't show up, inject script after a short delay (handles missing loader)
+      // Inject script after a short delay
       injectHandle = window.setTimeout(() => {
         injectRecaptchaScript();
-      }, 1500);
+      }, 500);
 
       const start = Date.now();
       // Poll for grecaptcha for up to 20s
       poll = window.setInterval(() => {
         if (typeof window.grecaptcha !== 'undefined') {
-          if (tryRender()) {
-            if (poll) { clearInterval(poll); poll = undefined; }
-            if (timeoutHandle) { clearTimeout(timeoutHandle); timeoutHandle = undefined; }
-            if (injectHandle) { clearTimeout(injectHandle); injectHandle = undefined; }
-          }
+          executeV3().then((ok) => {
+            if (ok) {
+              if (poll) { clearInterval(poll); poll = undefined; }
+              if (timeoutHandle) { clearTimeout(timeoutHandle); timeoutHandle = undefined; }
+              if (injectHandle) { clearTimeout(injectHandle); injectHandle = undefined; }
+            }
+          });
         } else if (Date.now() - start > 20000) {
           const msg = 'Timeout loading reCAPTCHA (grecaptcha not available)';
           setLoadError(msg);
@@ -140,19 +136,19 @@ export function ReCAPTCHA({
       if (poll) clearInterval(poll);
       if (timeoutHandle) clearTimeout(timeoutHandle);
       if (injectHandle) clearTimeout(injectHandle);
-      if (widgetId.current !== null && typeof window.grecaptcha !== 'undefined') {
-        try {
-          window.grecaptcha.reset(widgetId.current);
-        } catch (e) {
-          console.error('Error resetting reCAPTCHA:', e);
-        }
-      }
     };
   }, [onVerify, onExpire, onError, theme, size]);
 
-  const resetReCAPTCHA = () => {
-    if (widgetId.current !== null && typeof window.grecaptcha !== 'undefined') {
-      window.grecaptcha.reset(widgetId.current);
+  const resetReCAPTCHA = async () => {
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    if (!siteKey || typeof window.grecaptcha === 'undefined') return;
+    try {
+      const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as any);
+      onVerify(token as string);
+    } catch (err) {
+      const errMsg = 'Failed to refresh reCAPTCHA token';
+      setLoadError(errMsg);
+      onError(errMsg);
     }
   };
 
