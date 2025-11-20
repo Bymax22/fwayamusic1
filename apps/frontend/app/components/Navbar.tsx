@@ -61,7 +61,7 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         await navigator.clipboard.writeText(inviteUrl);
         alert("Invite link copied to clipboard!");
         return;
-      } catch (err) {
+      } catch {
         // Fallback for older browsers
         const textArea = document.createElement('textarea');
         textArea.value = inviteUrl;
@@ -133,9 +133,9 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
           </div>
           <p className="text-sm text-gray-300 mb-3">
             🎵 Stream latest music worldwide for FREE<br/>
-            💰 Sell your music & earn<br/>
+            💰 Sell your music &amp; earn<br/>
             🚀 Resell without investment<br/>
-            🎹 Buy music, beats & instruments
+            🎹 Buy music, beats &amp; instruments
           </p>
           <div className="flex items-center justify-between">
             <span className="text-xs text-gray-400">{inviteUrl}</span>
