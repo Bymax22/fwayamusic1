@@ -4,6 +4,8 @@ import { Download, Music, Headphones, HardDrive, ArrowDown, Check, Crown, Clock,
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatFileSize, formatDuration } from '@/lib/utils';
 import Image from "next/image";
+import Protected from '@/components/Protected';
+import { useAuth } from '@/context/AuthContext';
 
 interface DownloadItem {
   id: string;
@@ -44,6 +46,7 @@ export default function DownloadPage() {
   const [deviceLicenses, setDeviceLicenses] = useState<DeviceLicense[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
   const { currentTrack, setCurrentTrack } = useAudioPlayer();
+  const { getToken } = useAuth();
 
 useEffect(() => {
   const generateDeviceId = () => {
@@ -57,20 +60,30 @@ useEffect(() => {
 
   const fetchDownloadData = async () => {
     try {
+      const token = await getToken();
+      if (!token) return;
+
       const [downloadsRes, suggestionsRes, licensesRes] = await Promise.all([
-        fetch('/api/user/downloads'),
-        fetch('/api/media/suggestions?type=downloadable'),
-        fetch('/api/user/device-licenses')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/downloads`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/suggestions?type=downloadable`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/device-licenses`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
-      if (downloadsRes.ok) setDownloads(await downloadsRes.json());
+      if (downloadsRes.ok) {
+        const d = await downloadsRes.json();
+        setDownloads(Array.isArray(d) ? d : (d.data ?? d));
+      }
       if (suggestionsRes.ok) {
         const suggested = await suggestionsRes.json();
-        setSuggestions(suggested);
-        setFreeDownloads(suggested.filter((item: DownloadItem) => item.accessType === 'FREE'));
-        setPremiumDownloads(suggested.filter((item: DownloadItem) => item.accessType === 'PREMIUM'));
+        const s = Array.isArray(suggested) ? suggested : (suggested.data ?? suggested);
+        setSuggestions(s);
+        setFreeDownloads(s.filter((item: DownloadItem) => item.accessType === 'FREE'));
+        setPremiumDownloads(s.filter((item: DownloadItem) => item.accessType === 'PREMIUM'));
       }
-      if (licensesRes.ok) setDeviceLicenses(await licensesRes.json());
+      if (licensesRes.ok) {
+        const lic = await licensesRes.json();
+        setDeviceLicenses(Array.isArray(lic) ? lic : (lic.data ?? lic));
+      }
 
     } catch (error) {
       console.error('Error fetching download data:', error);
@@ -251,7 +264,8 @@ useEffect(() => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen p-4 sm:p-6">
+    <Protected>
+      <div className="bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -593,6 +607,7 @@ useEffect(() => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </Protected>
   );
 }

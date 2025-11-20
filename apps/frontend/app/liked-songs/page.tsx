@@ -4,6 +4,8 @@ import { Play, Pause, Heart, Share2, Clock, Shuffle } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from "next/image";
+import Protected from '@/components/Protected';
+import { useAuth } from '@/context/AuthContext';
 
 interface MediaFile {
   id: number;
@@ -22,16 +24,34 @@ export default function LikedSongsPage() {
   const [likedSongs, setLikedSongs] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
   const { currentTrack, isPlaying, setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { getToken } = useAuth();
 
   useEffect(() => {
     const fetchLikedSongs = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/media`, {
-          credentials: 'include',
+        const token = await getToken();
+        if (!token) {
+          setLikedSongs([]);
+          return;
+        }
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/liked`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         });
-        const { data } = await response.json();
-        
-        // Filter liked songs (mock implementation - in real app, this would come from API)
+
+        if (!response.ok) {
+          console.error('Failed to fetch liked songs:', response.statusText);
+          setLikedSongs([]);
+          return;
+        }
+
+        const json = await response.json();
+        const data = Array.isArray(json) ? json : (json.data ?? json.liked ?? []);
+
         const formattedData = (data as MediaFile[]).map((item: MediaFile) => ({
           id: item.id,
           title: item.title || 'Untitled',
@@ -42,13 +62,13 @@ export default function LikedSongsPage() {
           views: item.views || 0,
           likes: item.likes || 0,
           genre: item.genre || 'Other',
-          liked: Math.random() > 0.3 // Mock liked status
+          liked: true
         }));
 
-        const liked = formattedData.filter((file: MediaFile) => file.liked);
-        setLikedSongs(liked);
+        setLikedSongs(formattedData);
       } catch (err) {
         console.error('Fetch error:', err);
+        setLikedSongs([]);
       } finally {
         setLoading(false);
       }
@@ -113,7 +133,8 @@ export default function LikedSongsPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <Protected>
+      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
       {/* Header */}
       <div className="bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] rounded-xl p-8 mb-8">
         <div className="flex items-end gap-6">
@@ -245,6 +266,7 @@ export default function LikedSongsPage() {
           <p className="text-gray-500">Like some songs to see them here</p>
         </div>
       )}
-    </div>
+      </div>
+    </Protected>
   );
 }

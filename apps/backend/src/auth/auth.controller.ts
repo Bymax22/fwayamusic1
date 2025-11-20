@@ -24,6 +24,20 @@ export class AuthController {
     return this.authService.socialLogin(dto);
   }
 
+  @Post('send-otp')
+  async sendOtp(@Body() body: { method: 'email' | 'phone'; identifier: string }) {
+    const { method, identifier } = body;
+    return this.authService.sendOtp(identifier, method);
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post('verify-otp')
+  async verifyOtp(@Req() req: any, @Body() body: { method: 'email' | 'phone'; code: string }) {
+    const user = req.user;
+    const { method, code } = body;
+    return this.authService.verifyOtp(user, method, code);
+  }
+
   // ✅ /api/v1/auth/me - frontend calls this to sync Firebase user
   @UseGuards(FirebaseAuthGuard)
   @Get('me')

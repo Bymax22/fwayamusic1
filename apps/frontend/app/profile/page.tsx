@@ -1,5 +1,7 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import { 
   User, 
   Edit3, 
@@ -42,48 +44,63 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
-    id: 1,
-    username: "fwayamusic",
-    displayName: "Fwaya Music",
-    email: "hello@fwayamusic.com",
-    avatar: "/artist300x300.jpg",
-    coverImage: "/covers/banner1.jpg",
-    bio: "Music creator and enthusiast. Making waves in the Afrobeats scene. 🎵",
-    location: "Lusaka,Zambia",
-    website: "fwayamusic.com",
-    joinDate: "204-01-15T00:00:00Z",
+    id: 0,
+    username: '',
+    displayName: '',
+    email: '',
+    avatar: '/default-avatar.jpg',
+    coverImage: '/covers/banner1.jpg',
+    bio: '',
+    location: '',
+    website: '',
+    joinDate: new Date().toISOString(),
     stats: {
-      tracksPlayed: 1247,
-      likedSongs: 89,
-      playlists: 12,
-      followers: 15420,
-      following: 243
+      tracksPlayed: 0,
+      likedSongs: 0,
+      playlists: 0,
+      followers: 0,
+      following: 0
     },
-    recentActivity: [
-      {
-        id: 1,
-        type: 'played',
-        title: "CEO Wandi",
-        artist: "Fwaya Music",
-        timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString()
-      },
-      {
-        id: 2,
-        type: 'liked',
-        title: "Blinding Lights",
-        artist: "The Weeknd",
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString()
-      },
-      {
-        id: 3,
-        type: 'created',
-        title: "Summer Vibes Playlist",
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
-      }
-    ]
+    recentActivity: []
   });
+
+  // Redirect unauthenticated users to signin and populate profile from backend user
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/signin');
+      return;
+    }
+
+    if (user) {
+      // Map fields from backend user object into the profile structure
+      setProfile((prev) => ({
+        ...prev,
+        id: user.id,
+        username: user.username || user.email.split('@')[0],
+        displayName: user.displayName || user.username || user.email,
+        email: user.email,
+        avatar: user.avatarUrl || '/default-avatar.jpg',
+        coverImage: prev.coverImage,
+        bio: (user as any).bio || prev.bio,
+        location: (user as any).country || prev.location,
+        website: (user as any).website || prev.website,
+        joinDate: user.createdAt || prev.joinDate,
+        stats: {
+          tracksPlayed: (user as any).tracksPlayed || prev.stats.tracksPlayed,
+          likedSongs: (user as any).likedSongs || prev.stats.likedSongs,
+          playlists: (user as any).playlists || prev.stats.playlists,
+          followers: (user as any).followers || prev.stats.followers,
+          following: (user as any).following || prev.stats.following,
+        },
+        recentActivity: (user as any).recentActivity || prev.recentActivity,
+      }));
+    }
+  }, [user, loading, router]);
 
   const [editForm, setEditForm] = useState({
     displayName: profile.displayName,

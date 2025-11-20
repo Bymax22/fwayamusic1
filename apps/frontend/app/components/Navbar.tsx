@@ -206,13 +206,19 @@ export default function Navbar() {
             {/* Left Section - Bigger Logo for Guests */}
             <div className="flex items-center gap-3">
               <Link href="/" className="flex items-center gap-3">
-                <Image 
-                  src="/Fwaya Innovations icon-01.png" 
-                  alt="Fwaya Music Logo" 
-                  width={44}
-                  height={44}
-                  className="rounded-lg animate-pulse"
-                />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  className="shadow-lg"
+                >
+                  <Image 
+                    src="/Fwaya Innovations icon-01.png" 
+                    alt="Fwaya Music Logo" 
+                    width={44}
+                    height={44}
+                    className="rounded-lg"
+                  />
+                </motion.div>
                 <div className="flex flex-col">
                   <span className="text-2xl font-bold text-white">
                     Fwaya<span className="text-[#e51f48]">Music</span>
@@ -259,13 +265,19 @@ export default function Navbar() {
           {/* Left Section - Logo with Tagline */}
           <div className="flex items-center gap-3">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <Image 
-                src="/Fwaya Innovations icon-01.png" 
-                alt="Fwaya Music Logo" 
-                width={36}
-                height={36}
-                className="rounded"
-              />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                className="shadow-lg"
+              >
+                <Image 
+                  src="/Fwaya Innovations icon-01.png" 
+                  alt="Fwaya Music Logo" 
+                  width={36}
+                  height={36}
+                  className="rounded"
+                />
+              </motion.div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-white">
                   Fwaya<span className="text-[#e51f48]">Music</span>
@@ -337,15 +349,15 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Icons - Premium, Notifications, Account (Visible on mobile) */}
-            <div className="flex md:hidden items-center gap-1"> {/* Reduced gap from gap-2 to gap-1 */}
+            <div className="flex md:hidden items-center gap-0.5"> {/* Reduced gap from gap-2 to gap-0.5 */}
               {/* Premium Icon */}
-              <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
-                <Crown size={20} className="text-amber-400 group-hover:scale-110 transition-transform" />
+              <button className="p-2.5 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+                <Crown size={22} className="text-amber-400 group-hover:scale-110 transition-transform" />
               </button>
 
               {/* Notifications */}
-              <button className="relative p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
-                <Bell size={20} className="group-hover:scale-110 transition-transform" />
+              <button className="relative p-2.5 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+                <Bell size={22} className="group-hover:scale-110 transition-transform" />
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#e51f48] rounded-full border border-[#0a3747]"></div>
               </button>
 
@@ -353,19 +365,19 @@ export default function Navbar() {
               <div className="relative">
                 <button 
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="p-2 rounded-full hover:bg-[#0a3747]/50 transition-all touch-target group"
+                  className="p-2.5 rounded-full hover:bg-[#0a3747]/50 transition-all touch-target group"
                 >
                   {user.avatarUrl ? (
                     <Image
                       src={user.avatarUrl}
                       alt={user.displayName || user.username}
-                      width={24}
-                      height={24}
+                      width={26}
+                      height={26}
                       className="rounded-full group-hover:scale-110 transition-transform"
                     />
                   ) : (
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <User size={14} className="text-white" />
+                      <User size={16} className="text-white" />
                     </div>
                   )}
                 </button>

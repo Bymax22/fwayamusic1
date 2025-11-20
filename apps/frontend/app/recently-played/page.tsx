@@ -4,6 +4,8 @@ import { Pause, Heart, Clock, MoreHorizontal } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration} from '@/lib/utils';
 import Image from "next/image";
+import Protected from '@/components/Protected';
+import { useAuth } from '@/context/AuthContext';
 
 interface MediaFile {
   id: number;
@@ -21,70 +23,30 @@ export default function RecentlyPlayedPage() {
   const [recentTracks, setRecentTracks] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
   const { currentTrack, isPlaying, setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { getToken } = useAuth();
 
   useEffect(() => {
     const fetchRecentlyPlayed = async () => {
       try {
-        // Mock data - replace with actual API call to fetch recently played
-        const mockData: MediaFile[] = [
-          {
-            id: 1,
-            title: "CEO Wandi",
-            artist: "Fwaya Music",
-            url: "/music/ceo-wandi.mp3",
-            duration: 180,
-            coverArt: "/covers/wt3.jpg",
-            genre: "Afrobeats",
-            lastPlayedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
-            playCount: 15
-          },
-          {
-            id: 2,
-            title: "Blinding Lights",
-            artist: "The Weeknd",
-            url: "/music/blinding-lights.mp3",
-            duration: 201,
-            coverArt: "/covers/blinding-lights.jpg",
-            genre: "Pop",
-            lastPlayedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-            playCount: 8
-          },
-          {
-            id: 3,
-            title: "Midnight City",
-            artist: "M83",
-            url: "/music/midnight-city.mp3",
-            duration: 243,
-            coverArt: "/covers/midnight-city.jpg",
-            genre: "Electronic",
-            lastPlayedAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
-            playCount: 12
-          },
-          {
-            id: 4,
-            title: "Save Your Tears",
-            artist: "The Weeknd",
-            url: "/music/save-your-tears.mp3",
-            duration: 215,
-            coverArt: "/covers/save-your-tears.jpg",
-            genre: "Pop",
-            lastPlayedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-            playCount: 6
-          },
-          {
-            id: 5,
-            title: "Levitating",
-            artist: "Dua Lipa",
-            url: "/music/levitating.mp3",
-            duration: 203,
-            coverArt: "/covers/levitating.jpg",
-            genre: "Pop",
-            lastPlayedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
-            playCount: 9
-          }
-        ];
+        const token = await getToken();
+        if (!token) {
+          setRecentTracks([]);
+          return;
+        }
 
-        setRecentTracks(mockData);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/recent`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+          console.error('Failed to fetch recently played:', res.statusText);
+          setRecentTracks([]);
+          return;
+        }
+
+        const json = await res.json();
+        const data = Array.isArray(json) ? json : (json.data ?? json.recent ?? []);
+        setRecentTracks(data as MediaFile[]);
       } catch (error) {
         console.error('Error fetching recently played:', error);
       } finally {
@@ -139,7 +101,8 @@ export default function RecentlyPlayedPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <Protected>
+      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Recently Played</h1>
@@ -244,6 +207,7 @@ export default function RecentlyPlayedPage() {
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </Protected>
   );
 }

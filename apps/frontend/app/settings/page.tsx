@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import Protected from '@/components/Protected';
 import { 
   Settings, 
  
@@ -44,7 +45,8 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <Protected>
+      <div className="p-6 max-w-6xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32" />
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
@@ -348,6 +350,6 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
-    </div>
+    </Protected>
   );
 }

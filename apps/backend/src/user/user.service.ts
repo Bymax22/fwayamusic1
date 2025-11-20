@@ -31,4 +31,47 @@ export class UserService {
 
     return user;
   }
+
+  /**
+   * Return a richer profile for the given user email
+   */
+  async getProfileByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: {
+        playlists: { include: { entries: { include: { media: true } } } },
+        interactions: { include: { media: true } },
+        downloads: { include: { media: true } },
+        verifications: true,
+      },
+    });
+
+    if (!user) throw new BadRequestException('User not found');
+
+    return user;
+  }
+
+  async getPlaylistsForUserByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email }, select: { id: true } });
+    if (!user) throw new BadRequestException('User not found');
+    return this.prisma.playlist.findMany({ where: { userId: user.id }, include: { entries: { include: { media: true } } } });
+  }
+
+  async getLikedMediaByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email }, select: { id: true } });
+    if (!user) throw new BadRequestException('User not found');
+    return this.prisma.mediaInteraction.findMany({ where: { userId: user.id, liked: true }, include: { media: true } });
+  }
+
+  async getRecentPlaysByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email }, select: { id: true } });
+    if (!user) throw new BadRequestException('User not found');
+    return this.prisma.mediaInteraction.findMany({ where: { userId: user.id, played: true }, include: { media: true }, orderBy: { interactedAt: 'desc' }, take: 50 });
+  }
+
+  async getDownloadsByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email }, select: { id: true } });
+    if (!user) throw new BadRequestException('User not found');
+    return this.prisma.download.findMany({ where: { userId: user.id }, include: { media: true }, orderBy: { downloadedAt: 'desc' } });
+  }
 }
