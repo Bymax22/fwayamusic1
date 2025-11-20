@@ -70,10 +70,11 @@ export function ReCAPTCHA({
         if (typeof window.grecaptcha!.ready === 'function') {
           window.grecaptcha!.ready(async () => {
             try {
-              const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as any);
-              onVerify(token as string);
+              const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown);
+              onVerify(String(token));
               setIsLoaded(true);
-            } catch (err) {
+            } catch (error) {
+              console.error('reCAPTCHA execute error:', error);
               const errMsg = 'reCAPTCHA execute failed';
               setLoadError(errMsg);
               onError(errMsg);
@@ -81,13 +82,14 @@ export function ReCAPTCHA({
           });
         } else {
           // fallback execute
-          const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as any);
-          onVerify(token as string);
+          const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown);
+          onVerify(String(token));
           setIsLoaded(true);
         }
         return true;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to execute reCAPTCHA';
+        console.error('reCAPTCHA executeV3 error:', error);
         setLoadError(errorMessage);
         onError(errorMessage);
         return false;
@@ -113,6 +115,8 @@ export function ReCAPTCHA({
               if (timeoutHandle) { clearTimeout(timeoutHandle); timeoutHandle = undefined; }
               if (injectHandle) { clearTimeout(injectHandle); injectHandle = undefined; }
             }
+          }).catch((e) => {
+            console.error('executeV3 promise error:', e);
           });
         } else if (Date.now() - start > 20000) {
           const msg = 'Timeout loading reCAPTCHA (grecaptcha not available)';
@@ -137,15 +141,16 @@ export function ReCAPTCHA({
       if (timeoutHandle) clearTimeout(timeoutHandle);
       if (injectHandle) clearTimeout(injectHandle);
     };
-  }, [onVerify, onExpire, onError, theme, size]);
+    }, [onVerify, onExpire, onError, theme, size, injectRecaptchaScript]);
 
   const resetReCAPTCHA = async () => {
     const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
     if (!siteKey || typeof window.grecaptcha === 'undefined') return;
     try {
-      const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as any);
-      onVerify(token as string);
-    } catch (err) {
+      const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown);
+      onVerify(String(token));
+    } catch (error) {
+      console.error('resetReCAPTCHA error:', error);
       const errMsg = 'Failed to refresh reCAPTCHA token';
       setLoadError(errMsg);
       onError(errMsg);
