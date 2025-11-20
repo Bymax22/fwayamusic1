@@ -180,8 +180,8 @@ export default function ProfilePage() {
               width={128}
               height={128}
               className="w-32 h-32 rounded-full border-4 border-[#0a3747] object-cover"
-              onError={(e: any) => {
-                e.currentTarget.src = '/default-avatar.jpg';
+              onError={() => {
+                setProfile((prev) => ({ ...prev, avatar: '/default-avatar.jpg' }));
               }}
             />
             {isEditing && (
