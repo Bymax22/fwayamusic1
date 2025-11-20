@@ -12,45 +12,45 @@ import { useAuth } from "@/context/AuthContext";
 
 // Invite Popup Component
 const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const inviteUrl = "https://fwayamusic.com/invite";
-  const shareText = "🎵 Discover Fwaya Music! Stream latest music worldwide for FREE, sell your music, resell and earn without investment, buy music, beats and instruments. Join now!";
+  const inviteUrl = "https://www.fwayainnovations.com";
+  const shareText = "Check out Fwaya Music - The ultimate platform for music lovers! 🎵";
   
   const sharePlatforms = [
     {
       name: "WhatsApp",
-      icon: "📱",
+      icon: "💬",
       shareUrl: `https://wa.me/?text=${encodeURIComponent(shareText + " " + inviteUrl)}`,
-      color: "bg-green-500 hover:bg-green-600"
+      color: "from-green-500 to-green-600"
     },
     {
       name: "Facebook",
-      icon: "📘",
-      shareUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(inviteUrl)}&quote=${encodeURIComponent(shareText)}`,
-      color: "bg-blue-600 hover:bg-blue-700"
+      icon: "👥",
+      shareUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(inviteUrl)}`,
+      color: "from-blue-600 to-blue-700"
     },
     {
       name: "Twitter",
       icon: "🐦",
-      shareUrl: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(inviteUrl)}`,
-      color: "bg-sky-500 hover:bg-sky-600"
+      shareUrl: `https://twitter.com/intent/tweet?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent(shareText)}`,
+      color: "from-sky-400 to-sky-500"
     },
     {
       name: "Telegram",
-      icon: "📨",
+      icon: "📱",
       shareUrl: `https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent(shareText)}`,
-      color: "bg-blue-500 hover:bg-blue-600"
+      color: "from-blue-400 to-blue-500"
     },
     {
       name: "Email",
-      icon: "✉️",
-      shareUrl: `mailto:?subject=Join Fwaya Music&body=${encodeURIComponent(shareText + " " + inviteUrl)}`,
-      color: "bg-gray-600 hover:bg-gray-700"
+      icon: "📧",
+      shareUrl: `mailto:?subject=Join Fwaya Music&body=${encodeURIComponent(shareText + "\n\n" + inviteUrl)}`,
+      color: "from-gray-600 to-gray-700"
     },
     {
       name: "Copy Link",
       icon: "🔗",
       shareUrl: inviteUrl,
-      color: "bg-purple-600 hover:bg-purple-700",
+      color: "from-purple-500 to-purple-600",
       isCopy: true
     }
   ];
@@ -61,7 +61,7 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         await navigator.clipboard.writeText(inviteUrl);
         alert("Invite link copied to clipboard!");
         return;
-      } catch {
+      } catch (err) {
         // Fallback for older browsers
         const textArea = document.createElement('textarea');
         textArea.value = inviteUrl;
@@ -96,16 +96,12 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Image 
-              src="/Fwaya Music Icon-01.png" 
-              alt="Fwaya Music" 
-              width={40}
-              height={40}
-              className="rounded-lg"
-            />
+            <div className="w-12 h-12 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] rounded-lg flex items-center justify-center">
+              <Gift size={24} className="text-white" />
+            </div>
             <div>
               <h2 className="text-xl font-bold text-white">Invite Friends</h2>
-              <p className="text-sm text-gray-400">Earn rewards when friends join</p>
+              <p className="text-sm text-gray-400">Share Fwaya Music with friends</p>
             </div>
           </div>
           <button 
@@ -116,58 +112,50 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
           </button>
         </div>
 
-        {/* Invite Card Preview */}
-        <div className="bg-[#0a4a5f] rounded-xl p-4 mb-6 border border-[#0a5a6f]">
-          <div className="flex items-center gap-3 mb-3">
-            <Image 
-              src="/Fwaya Music Icon-01.png" 
-              alt="Fwaya Music" 
-              width={50}
-              height={50}
-              className="rounded-lg"
-            />
-            <div>
-              <h3 className="font-bold text-white text-lg">Fwaya Music</h3>
-              <p className="text-sm text-gray-300">Join the music revolution</p>
-            </div>
-          </div>
-          <p className="text-sm text-gray-300 mb-3">
-            🎵 Stream latest music worldwide for FREE<br/>
-            💰 Sell your music &amp; earn<br/>
-            🚀 Resell without investment<br/>
-            🎹 Buy music, beats &amp; instruments
-          </p>
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-400">{inviteUrl}</span>
-            <button className="px-3 py-1 bg-[#e51f48] text-white rounded-full text-xs font-bold hover:bg-[#ff4d6d] transition-colors">
-              View
-            </button>
-          </div>
-        </div>
-
-        {/* Share Platforms */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* Share Platforms Grid */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
           {sharePlatforms.map((platform) => (
             <button
               key={platform.name}
               onClick={() => handleShare(platform)}
-              className={`${platform.color} text-white p-3 rounded-xl transition-all hover:scale-105 touch-target flex flex-col items-center gap-2`}
+              className={`bg-gradient-to-br ${platform.color} text-white p-3 rounded-xl transition-all hover:scale-105 touch-target flex flex-col items-center gap-2`}
             >
-              <span className="text-2xl">{platform.icon}</span>
+              <span className="text-xl">{platform.icon}</span>
               <span className="text-xs font-medium">{platform.name}</span>
             </button>
           ))}
         </div>
 
-        {/* Benefits */}
-        <div className="mt-6 p-3 bg-[#0a4a5f]/50 rounded-lg border border-[#0a5a6f]">
-          <h4 className="text-sm font-bold text-white mb-2">Invite Benefits:</h4>
-          <ul className="text-xs text-gray-300 space-y-1">
-            <li>• Earn 20% commission on friend&apos;s purchases</li>
-            <li>• Get premium features for free</li>
-            <li>• Early access to new features</li>
-            <li>• Special badges and recognition</li>
-          </ul>
+        {/* Preview of what friends will see */}
+        <div className="bg-[#0a4a5f] rounded-xl p-4 border border-[#0a5a6f]">
+          <h4 className="text-sm font-bold text-white mb-3">Your friends will receive:</h4>
+          <div className="bg-white rounded-lg p-3">
+            <div className="flex items-center gap-3 mb-2">
+              <Image 
+                src="/Fwaya Music Icon-01.png" 
+                alt="Fwaya Music" 
+                width={40}
+                height={40}
+                className="rounded"
+              />
+              <div>
+                <h5 className="font-bold text-gray-900">Fwaya Music</h5>
+                <p className="text-xs text-gray-600">The ultimate music platform</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-700 mb-3">
+              🎵 Stream latest music worldwide for FREE<br/>
+              💰 Sell your music & earn commissions<br/>
+              🚀 Resell without any investment<br/>
+              🎹 Buy music, beats & instruments
+            </p>
+            <button 
+              onClick={() => window.open(inviteUrl, '_blank')}
+              className="w-full bg-[#e51f48] hover:bg-[#ff4d6d] text-white py-2 rounded-lg font-semibold transition-colors"
+            >
+              Visit Fwaya Music
+            </button>
+          </div>
         </div>
       </motion.div>
     </motion.div>
@@ -239,13 +227,12 @@ export default function Navbar() {
 
             {/* Right Section - Guest Features */}
             <div className="flex items-center gap-4">
-              {/* Invite Friends - Normal Button */}
+              {/* Invite Friends - Text Only Button */}
               <button 
                 onClick={() => setShowInvitePopup(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-semibold transition-all touch-target group"
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-semibold transition-all touch-target"
               >
-                <Gift size={18} className="group-hover:scale-110 transition-transform" />
-                <span>Invite</span>
+                Invite
               </button>
             </div>
           </div>
@@ -327,7 +314,7 @@ export default function Navbar() {
           </div>
 
           {/* Right Section - User Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2"> {/* Reduced gap from gap-3 to gap-2 */}
             {/* Quick Actions - Hidden on mobile */}
             <div className="hidden md:flex items-center gap-2">
               {/* Create */}
@@ -349,24 +336,86 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* Mobile Icons - Premium & Earn (Visible on mobile) */}
-            <div className="flex md:hidden items-center gap-2">
+            {/* Mobile Icons - Premium, Notifications, Account (Visible on mobile) */}
+            <div className="flex md:hidden items-center gap-1"> {/* Reduced gap from gap-2 to gap-1 */}
+              {/* Premium Icon */}
               <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
                 <Crown size={20} className="text-amber-400 group-hover:scale-110 transition-transform" />
               </button>
-              <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
-                <DollarSign size={20} className="text-green-400 group-hover:scale-110 transition-transform" />
+
+              {/* Notifications */}
+              <button className="relative p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+                <Bell size={20} className="group-hover:scale-110 transition-transform" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#e51f48] rounded-full border border-[#0a3747]"></div>
               </button>
+
+              {/* User Account */}
+              <div className="relative">
+                <button 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="p-2 rounded-full hover:bg-[#0a3747]/50 transition-all touch-target group"
+                >
+                  {user.avatarUrl ? (
+                    <Image
+                      src={user.avatarUrl}
+                      alt={user.displayName || user.username}
+                      width={24}
+                      height={24}
+                      className="rounded-full group-hover:scale-110 transition-transform"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <User size={14} className="text-white" />
+                    </div>
+                  )}
+                </button>
+
+                {/* Mobile User Dropdown */}
+                <AnimatePresence>
+                  {showUserMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute top-full right-0 mt-2 w-48 bg-[#0a3747] border border-[#0a4a5f] rounded-xl shadow-2xl py-2 z-50 backdrop-blur-lg"
+                    >
+                      {/* User Info */}
+                      <div className="px-3 py-2 border-b border-[#0a4a5f]">
+                        <p className="font-semibold text-white text-sm truncate">{user.displayName || user.username}</p>
+                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                      </div>
+
+                      {/* Quick Actions */}
+                      <div className="px-1 py-1">
+                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-[#0a4a5f] hover:text-white transition-colors text-sm">
+                          <User size={16} />
+                          <span>Profile</span>
+                        </Link>
+                        <Link href="/settings" className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-[#0a4a5f] hover:text-white transition-colors text-sm">
+                          <Settings size={16} />
+                          <span>Settings</span>
+                        </Link>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="border-t border-[#0a4a5f] my-1"></div>
+
+                      {/* Sign Out */}
+                      <button 
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full px-3 py-2 text-gray-300 hover:bg-[#0a4a5f] hover:text-white transition-colors rounded-lg text-sm"
+                      >
+                        <LogOut size={16} />
+                        <span>Sign Out</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
-            {/* Notifications */}
-            <button className="relative p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
-              <Bell size={22} className="group-hover:scale-110 transition-transform" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#e51f48] rounded-full border-2 border-[#0a3747]"></div>
-            </button>
-
-            {/* User Menu - KEEP THIS FOR LOGOUT */}
-            <div className="relative">
+            {/* Desktop User Menu */}
+            <div className="hidden md:block relative">
               <button 
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 p-1.5 bg-[#0a3747]/70 rounded-full hover:bg-[#0a3747] transition-all touch-target group"
@@ -389,7 +438,7 @@ export default function Navbar() {
                 </span>
               </button>
 
-              {/* Enhanced User Dropdown */}
+              {/* Desktop User Dropdown */}
               <AnimatePresence>
                 {showUserMenu && (
                   <motion.div
