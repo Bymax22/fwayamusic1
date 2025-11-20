@@ -21,7 +21,10 @@ import {
   FaShoppingCart,
   FaDownload,
   FaComment,
-  FaEye
+  FaEye,
+  FaMusic,
+  FaStar,
+  FaFire
 } from "react-icons/fa";
 import { IoMdMusicalNote } from "react-icons/io";
 
@@ -138,6 +141,298 @@ interface AudioPlayerState {
   progress: number;
   duration: number;
 }
+
+// Banner Types
+interface BannerItem {
+  id: number;
+  type: 'PROMO' | 'TRENDING' | 'NEW_RELEASE' | 'EVENT' | 'ADVERTISEMENT';
+  title: string;
+  subtitle?: string;
+  description?: string;
+  imageUrl: string;
+  backgroundColor?: string;
+  textColor?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  badge?: string;
+  featuredTrack?: MediaItem;
+  startDate?: string;
+  endDate?: string;
+  isActive?: boolean;
+}
+
+// Enhanced Hero Banner Component
+const HeroBanner = ({ 
+  banners, 
+  onBannerClick,
+  onPlayTrack 
+}: { 
+  banners: BannerItem[];
+  onBannerClick: (banner: BannerItem) => void;
+  onPlayTrack: (track: MediaItem) => void;
+}) => {
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const autoPlayRef = useRef<number | null>(null);
+
+  const nextBanner = useCallback(() => {
+    setDirection(1);
+    setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+  }, [banners.length]);
+
+  const prevBanner = useCallback(() => {
+    setDirection(-1);
+    setCurrentBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
+  }, [banners.length]);
+
+  const goToBanner = (index: number) => {
+    setDirection(index > currentBannerIndex ? 1 : -1);
+    setCurrentBannerIndex(index);
+  };
+
+  // Auto-play banners
+  useEffect(() => {
+    if (isAutoPlaying && banners.length > 1) {
+      autoPlayRef.current = window.setInterval(nextBanner, 5000);
+    }
+    return () => {
+      if (autoPlayRef.current !== null) {
+        window.clearInterval(autoPlayRef.current);
+        autoPlayRef.current = null;
+      }
+    };
+  }, [isAutoPlaying, nextBanner, banners.length]);
+
+  const handleBannerInteraction = () => {
+    setIsAutoPlaying(false);
+    if (autoPlayRef.current !== null) {
+      window.clearInterval(autoPlayRef.current);
+      autoPlayRef.current = null;
+    }
+    // Resume auto-play after 10 seconds of inactivity
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  if (!banners.length) return null;
+
+  const currentBanner = banners[currentBannerIndex];
+
+  const getBadgeIcon = (type: string) => {
+    switch (type) {
+      case 'TRENDING':
+        return <FaFire className="w-3 h-3" />;
+      case 'NEW_RELEASE':
+        return <FaMusic className="w-3 h-3" />;
+      case 'PROMO':
+        return <FaStar className="w-3 h-3" />;
+      default:
+        return <FaStar className="w-3 h-3" />;
+    }
+  };
+
+  const getBadgeColor = (type: string) => {
+    switch (type) {
+      case 'TRENDING':
+        return 'from-orange-500 to-red-500';
+      case 'NEW_RELEASE':
+        return 'from-blue-500 to-purple-500';
+      case 'PROMO':
+        return 'from-green-500 to-emerald-500';
+      case 'EVENT':
+        return 'from-purple-500 to-pink-500';
+      default:
+        return 'from-gray-500 to-gray-700';
+    }
+  };
+
+  return (
+    <section 
+      className="relative h-[400px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden mx-2 mb-8 mt-4"
+      onMouseEnter={() => setIsAutoPlaying(false)}
+      onMouseLeave={() => setIsAutoPlaying(true)}
+      onClick={handleBannerInteraction}
+    >
+      <AnimatePresence mode="wait" custom={direction}>
+        <motion.div
+          key={currentBannerIndex}
+          custom={direction}
+          initial={{ 
+            opacity: 0,
+            x: direction > 0 ? 300 : -300 
+          }}
+          animate={{ 
+            opacity: 1,
+            x: 0 
+          }}
+          exit={{ 
+            opacity: 0,
+            x: direction > 0 ? -300 : 300 
+          }}
+          transition={{ 
+            duration: 0.5,
+            ease: "easeInOut"
+          }}
+          className="relative w-full h-full"
+        >
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0">
+            <Image
+              src={currentBanner.imageUrl}
+              alt={currentBanner.title}
+              fill
+              className="object-cover"
+              priority
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/default-banner.jpg";
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+          </div>
+
+          {/* Content */}
+          <div className="relative z-10 h-full flex flex-col justify-end p-6 md:p-8 lg:p-12">
+            {/* Badge */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className={`flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r ${getBadgeColor(currentBanner.type)} text-white text-xs font-bold`}>
+                {getBadgeIcon(currentBanner.type)}
+                <span>{currentBanner.badge || currentBanner.type}</span>
+              </div>
+              {currentBanner.featuredTrack && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs text-white">
+                  <FaHeadphones className="w-3 h-3" />
+                  <span>{currentBanner.featuredTrack.plays?.toLocaleString() || '0'} plays</span>
+                </div>
+              )}
+            </div>
+
+            {/* Title & Description */}
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-3 max-w-2xl leading-tight"
+            >
+              {currentBanner.title}
+            </motion.h1>
+
+            {currentBanner.subtitle && (
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-lg md:text-xl text-gray-200 mb-4 max-w-xl"
+              >
+                {currentBanner.subtitle}
+              </motion.p>
+            )}
+
+            {currentBanner.description && (
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-sm md:text-base text-gray-300 mb-6 max-w-lg line-clamp-2"
+              >
+                {currentBanner.description}
+              </motion.p>
+            )}
+
+            {/* CTA Buttons */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex flex-wrap gap-3"
+            >
+              {currentBanner.featuredTrack ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPlayTrack(currentBanner.featuredTrack!);
+                  }}
+                  className="bg-[#e51f48] hover:bg-[#ff4d6d] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all transform hover:scale-105"
+                >
+                  <FaPlay className="w-4 h-4" />
+                  Play Now
+                </button>
+              ) : (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onBannerClick(currentBanner);
+                  }}
+                  className="bg-[#e51f48] hover:bg-[#ff4d6d] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all transform hover:scale-105"
+                >
+                  {currentBanner.ctaText || 'Explore More'}
+                  <FaArrowRight className="w-4 h-4" />
+                </button>
+              )}
+              
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBannerClick(currentBanner);
+                }}
+                className="border border-white/30 hover:border-white text-white hover:bg-white/10 px-6 py-3 rounded-full font-bold transition-all backdrop-blur-sm"
+              >
+                Learn More
+              </button>
+            </motion.div>
+          </div>
+
+          {/* Navigation Arrows */}
+          {banners.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevBanner();
+                  handleBannerInteraction();
+                }}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all z-20 backdrop-blur-sm"
+              >
+                <FaChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextBanner();
+                  handleBannerInteraction();
+                }}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all z-20 backdrop-blur-sm"
+              >
+                <FaChevronRight className="w-5 h-5" />
+              </button>
+            </>
+          )}
+
+          {/* Dots Indicator */}
+          {banners.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+              {banners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToBanner(index);
+                    handleBannerInteraction();
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentBannerIndex 
+                      ? 'bg-white w-6' 
+                      : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </section>
+  );
+};
 
 // Enhanced Media Card Component - Mobile Optimized
 const MediaCard = ({ 
@@ -996,12 +1291,61 @@ const GuestWelcome = () => {
   const [beatsForProducers, setBeatsForProducers] = useState<BeatItem[]>([]);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [featuredPlaylists, setFeaturedPlaylists] = useState<Playlist[]>([]);
+  const [banners, setBanners] = useState<BannerItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Sample banner data - you can replace this with API calls
+  const sampleBanners: BannerItem[] = [
+    {
+      id: 1,
+      type: 'TRENDING',
+      title: 'Summer Hits 2024',
+      subtitle: 'The hottest tracks for your summer playlist',
+      description: 'Curated collection of trending summer songs from top Zambian artists',
+      imageUrl: '/banners/summer-hits.jpg',
+      badge: 'Trending Now',
+      ctaText: 'Play Now',
+      featuredTrack: trendingSongs[0]
+    },
+    {
+      id: 2,
+      type: 'NEW_RELEASE',
+      title: 'New Album: "African Dreams"',
+      subtitle: 'Fresh from the studio',
+      description: 'Experience the latest album featuring collaborations with top artists',
+      imageUrl: '/banners/new-release.jpg',
+      badge: 'Just Released',
+      ctaText: 'Listen Now'
+    },
+    {
+      id: 3,
+      type: 'PROMO',
+      title: '50% Off All Beats',
+      subtitle: 'Limited Time Offer',
+      description: 'Get premium beats at half price for your next production',
+      imageUrl: '/banners/promo-beats.jpg',
+      badge: 'Special Offer',
+      ctaText: 'Shop Now'
+    },
+    {
+      id: 4,
+      type: 'EVENT',
+      title: 'Live Concert: Lusaka Nights',
+      subtitle: 'This Saturday at 8 PM',
+      description: 'Join us for an unforgettable night with top Zambian artists',
+      imageUrl: '/banners/live-concert.jpg',
+      badge: 'Upcoming Event',
+      ctaText: 'Get Tickets'
+    }
+  ];
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
+        // Set sample banners
+        setBanners(sampleBanners);
+
         // Fetch homepage media sections
         const homepageSectionsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/homepage-sections`);
         const homepageSections = await homepageSectionsRes.json();
@@ -1046,6 +1390,9 @@ const GuestWelcome = () => {
 
       } catch (err) {
         console.error("Failed to fetch data:", err);
+        
+        // Fallback to sample banners if API fails
+        setBanners(sampleBanners);
       }
       setLoading(false);
     }
@@ -1076,6 +1423,20 @@ const GuestWelcome = () => {
       ...prev,
       isPlaying: !prev.isPlaying
     }));
+  };
+
+  const handleBannerClick = (banner: BannerItem) => {
+    console.log('Banner clicked:', banner);
+    // Handle banner click - navigate to specific page or show modal
+    if (banner.featuredTrack) {
+      handlePlay(banner.featuredTrack);
+    } else if (banner.ctaLink) {
+      window.location.href = banner.ctaLink;
+    }
+  };
+
+  const handlePlayTrackFromBanner = (track: MediaItem) => {
+    handlePlay(track);
   };
 
   const handleLike = (id: string) => {
@@ -1133,44 +1494,28 @@ const GuestWelcome = () => {
 
       {/* Main Content */}
       <main className="pt-16 pb-24 px-2 max-w-7xl mx-auto">
-        {/* Hero Section - Mobile Optimized */}
-        <section className="relative py-6 px-2">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center text-white mb-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                {/* Header removed to avoid duplication with main Navbar */}
-                <p className="mobile-text-sm mb-4 text-gray-300 max-w-md mx-auto px-2">
-                  Discover the heartbeat of Zambian music. Stream, share, and connect with artists worldwide.
-                </p>
+        {/* Hero Banner Section */}
+        <HeroBanner 
+          banners={banners}
+          onBannerClick={handleBannerClick}
+          onPlayTrack={handlePlayTrackFromBanner}
+        />
 
-                <div className="flex flex-col gap-2 justify-center items-center mb-6 px-2">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="bg-[#e51f48] hover:bg-[#ff4d6d] text-white px-4 py-2.5 rounded-full font-bold mobile-text-sm flex items-center gap-1 transition-all w-full max-w-xs justify-center touch-target"
-                    onClick={() => window.location.href = '/auth'}
-                  >
-                    <FaPlay size={12} />
-                    Start Listening Free
-                  </motion.button>
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="border border-[#e51f48] text-[#e51f48] hover:bg-[#e51f48] hover:text-white px-4 py-2.5 rounded-full font-bold mobile-text-sm transition-all w-full max-w-xs justify-center touch-target"
-                    onClick={() => window.location.href = '/browse'}
-                  >
-                    Explore Music
-                  </motion.button>
-                </div>
-              </motion.div>
-            </div>
+        {/* Quick Stats Bar */}
+        <div className="grid grid-cols-3 gap-3 mx-2 mb-8">
+          <div className="bg-[#0a3747]/50 rounded-lg p-3 text-center backdrop-blur-sm">
+            <div className="text-2xl font-bold text-[#e51f48]">{trendingSongs.length}+</div>
+            <div className="text-xs text-gray-300">Trending Songs</div>
           </div>
-        </section>
+          <div className="bg-[#0a3747]/50 rounded-lg p-3 text-center backdrop-blur-sm">
+            <div className="text-2xl font-bold text-[#e51f48]">{favoriteArtists.length}+</div>
+            <div className="text-xs text-gray-300">Artists</div>
+          </div>
+          <div className="bg-[#0a3747]/50 rounded-lg p-3 text-center backdrop-blur-sm">
+            <div className="text-2xl font-bold text-[#e51f48]">{beatsForProducers.length}+</div>
+            <div className="text-xs text-gray-300">Beats</div>
+          </div>
+        </div>
 
         {/* Featured Playlists Carousel */}
         {featuredPlaylists.length > 0 && (
