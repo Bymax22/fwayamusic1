@@ -258,7 +258,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </header>
                   
                   {/* Main content area */}
-                  <div className="flex flex-1 pt-12"> {/* Added pt-12 for navbar */}
+                  <div className="flex flex-1 pt-0"> {/* Navbar is already fixed, no additional padding needed */}
                     {user && (
                       <SidebarWithAuth sidebarExpanded={sidebarExpanded} />
                     )}

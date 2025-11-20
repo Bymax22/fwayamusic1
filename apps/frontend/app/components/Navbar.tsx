@@ -230,7 +230,7 @@ export default function Navbar() {
               {/* Invite Friends - Text Only Button */}
               <button 
                 onClick={() => setShowInvitePopup(true)}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-white font-semibold transition-all touch-target"
+                className="px-3 py-1.5 text-sm bg-[#e51f48] hover:bg-[#ff4d6d] rounded-full text-white font-semibold transition-all touch-target md:px-4 md:py-2 md:text-base"
               >
                 Invite
               </button>

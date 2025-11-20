@@ -1493,7 +1493,7 @@ const GuestWelcome = () => {
       <WelcomeNotification />
 
       {/* Main Content */}
-      <main className="pt-16 pb-24 px-2 max-w-7xl mx-auto">
+      <main className="pt-4 pb-24 px-2 max-w-7xl mx-auto">
         {/* Hero Banner Section */}
         <HeroBanner 
           banners={banners}
