@@ -1131,34 +1131,6 @@ const GuestWelcome = () => {
       {/* Welcome Notification */}
       <WelcomeNotification />
 
-      {/* Mobile-Optimized Header */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[#0a3747]/90 backdrop-blur-lg border-b border-white/10">
-        <div className="container mx-auto flex items-center justify-between p-3">
-          <div className="flex items-center gap-2">
-            <IoMdMusicalNote className="text-[#e51f48] text-lg" />
-            <span className="text-white font-bold mobile-text-lg">Fwaya Music</span>
-          </div>
-
-          <div className="relative flex-1 max-w-xs mx-2">
-            <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs" />
-            <input
-              type="text"
-              placeholder="Search songs, artists..."
-              className="w-full bg-[#0a1f29] bg-opacity-70 rounded-full py-1.5 pl-6 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#e51f48] text-white placeholder-gray-400 mobile-text-xs"
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => window.location.href = '/auth'}
-              className="bg-[#e51f48] hover:bg-[#ff4d6d] text-white px-3 py-1.5 rounded-full font-semibold transition-colors text-xs touch-target mobile-text-xs"
-            >
-              Sign In
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="pt-16 pb-24 px-2 max-w-7xl mx-auto">
         {/* Hero Section - Mobile Optimized */}
