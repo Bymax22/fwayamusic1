@@ -1,6 +1,6 @@
 "use client";
 import { 
-  Music, Search, User, Bell, LogOut, Settings, Headphones, Share2, Crown, TrendingUp, 
+  Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
   Heart, Plus, Radio, Mic2, Gift
 } from "lucide-react";
 import Link from "next/link";
@@ -12,7 +12,6 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -70,42 +69,12 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Middle Section - Search & Features for Guests */}
-            <div className="flex-1 max-w-lg mx-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Discover music, artists, beats..."
-                  className="w-full bg-[#0a1f29] bg-opacity-70 rounded-full py-2.5 pl-10 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-[#e51f48] text-white placeholder-gray-400"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  aria-label="Search"
-                />
-                {searchQuery && (
-                  <button 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                    onClick={() => setSearchQuery("")}
-                    aria-label="Clear search"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                  </button>
-                )}
-              </div>
-            </div>
+            {/* Middle Section - reserved spacing (search removed) */}
+            <div className="flex-1 max-w-lg mx-6" />
 
             {/* Right Section - Guest Features */}
             <div className="flex items-center gap-4">
-              {/* Now Playing Preview */}
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-[#e51f48] bg-opacity-20 rounded-full hover:bg-opacity-30 transition-all group">
-                <Headphones size={18} className="text-[#e51f48] group-hover:animate-pulse" />
-                <span className="text-sm font-medium text-white">Now Playing</span>
-              </button>
-
-              {/* Invite Friends */}
+                {/* Invite Friends */}
               <button className="flex items-center gap-2 px-3 py-1.5 bg-[#0a1f29] rounded-full hover:bg-[#0a3747] transition-all group">
                 <Gift size={18} className="text-green-400 group-hover:text-green-300" />
                 <span className="text-sm font-medium text-white">Invite & Earn</span>
@@ -173,18 +142,8 @@ export default function Navbar() {
                 ))}
               </div>
 
-              {/* Search Bar */}
-              <div className="relative flex-1 max-w-xs">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type="text"
-                  placeholder="Search music, artists..."
-                  className="w-full bg-[#0a1f29] bg-opacity-70 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#e51f48] text-white placeholder-gray-400"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  aria-label="Search"
-                />
-              </div>
+              {/* Search removed: reserved spacing left */}
+              <div className="flex-1 max-w-xs" />
             </div>
           </div>
 
