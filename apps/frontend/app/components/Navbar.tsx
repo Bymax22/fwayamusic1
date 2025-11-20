@@ -61,7 +61,7 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         await navigator.clipboard.writeText(inviteUrl);
         alert("Invite link copied to clipboard!");
         return;
-      } catch (err) {
+      } catch {
         // Fallback for older browsers
         const textArea = document.createElement('textarea');
         textArea.value = inviteUrl;
