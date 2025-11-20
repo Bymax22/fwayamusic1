@@ -1142,27 +1142,7 @@ const GuestWelcome = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="flex justify-center mb-3">
-                  <div className="relative">
-                    <Image
-                      src="/Fwaya Music Icon-01.png"
-                      alt="Fwaya Music"
-                      width={60}
-                      height={60}
-                      className="rounded-lg"
-                    />
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 rounded-lg border-2 border-[#e51f48] border-dashed"
-                    ></motion.div>
-                  </div>
-                </div>
-                
-                <h1 className="text-2xl font-bold mb-3 mobile-text-2xl">
-                  Fwaya<span className="text-[#e51f48]">Music</span>
-                </h1>
-                
+                {/* Header removed to avoid duplication with main Navbar */}
                 <p className="mobile-text-sm mb-4 text-gray-300 max-w-md mx-auto px-2">
                   Discover the heartbeat of Zambian music. Stream, share, and connect with artists worldwide.
                 </p>
