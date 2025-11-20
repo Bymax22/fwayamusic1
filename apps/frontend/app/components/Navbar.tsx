@@ -163,7 +163,7 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         <div className="mt-6 p-3 bg-[#0a4a5f]/50 rounded-lg border border-[#0a5a6f]">
           <h4 className="text-sm font-bold text-white mb-2">Invite Benefits:</h4>
           <ul className="text-xs text-gray-300 space-y-1">
-            <li>• Earn 20% commission on friend's purchases</li>
+            <li>• Earn 20% commission on friend&apos;s purchases</li>
             <li>• Get premium features for free</li>
             <li>• Early access to new features</li>
             <li>• Special badges and recognition</li>
