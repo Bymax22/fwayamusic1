@@ -64,9 +64,9 @@ useEffect(() => {
       if (!token) return;
 
       const [downloadsRes, suggestionsRes, licensesRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/downloads`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/suggestions?type=downloadable`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/device-licenses`, { headers: { Authorization: `Bearer ${token}` } })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/downloads`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/suggestions?type=downloadable`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/device-licenses`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
       if (downloadsRes.ok) {

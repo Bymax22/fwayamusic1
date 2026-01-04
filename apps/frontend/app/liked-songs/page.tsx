@@ -36,7 +36,7 @@ export default function LikedSongsPage() {
           return;
         }
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/liked`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/liked`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',

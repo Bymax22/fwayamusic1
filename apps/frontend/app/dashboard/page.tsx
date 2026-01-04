@@ -328,7 +328,7 @@ const UserDashboard: React.FC = () => {
 
   const handleLike = async (mediaId: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${mediaId}/like`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${mediaId}/like`, {
         method: 'POST',
         credentials: 'include'
       });
@@ -348,7 +348,7 @@ const UserDashboard: React.FC = () => {
 
   const handleDownload = async (file: MediaFile) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/download`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/download`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

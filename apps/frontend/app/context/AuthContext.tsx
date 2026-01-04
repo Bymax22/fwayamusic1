@@ -201,7 +201,7 @@ const signUp = async (data: SignUpData): Promise<User> => {
 
      // Create user in backend
       const token = await firebaseUser.getIdToken();
-      const backendResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/signup`, {
+      const backendResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -345,7 +345,7 @@ const signInWithFacebook = async () => {
   const handleSocialSignIn = async (firebaseUser: FirebaseUser) => {
     const token = await firebaseUser.getIdToken();
     if (typeof window !== 'undefined' && token) localStorage.setItem('authToken', token);
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/social-login`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/social-login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
