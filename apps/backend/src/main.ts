@@ -1,10 +1,14 @@
 import { NestFactory } from '@nestjs/core';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
+import express from 'express';
+
+const server = express();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
@@ -45,11 +49,11 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api');
 
-  // Start application
-  const port = configService.get('PORT') || 3001;
-  await app.listen(port);
-  
-  logger.log(`Application running on ${await app.getUrl()}`);
+  await app.init();
 }
 
+// Initialize for Vercel
 bootstrap();
+
+// Export for Vercel
+export default server;
