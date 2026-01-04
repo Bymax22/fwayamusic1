@@ -18,9 +18,10 @@ export class MediaService {
   async createMedia(file: Express.Multer.File, userId: number, metadata?: { title?: string, description?: string }) {
     try {
       // 1. Upload to Cloudinary
-      const uploadResult = await cloudinary.uploader.upload(file.path, {
+      const uploadResult = await cloudinary.uploader.upload(file.buffer, {
         folder: 'fwaya-media',
         resource_type: 'auto',
+        public_id: file.originalname.replace(/\.[^/.]+$/, ""),
       });
 
       // 2. Create database record
