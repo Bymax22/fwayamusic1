@@ -35,7 +35,7 @@ export default function ExplorePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/media`, {
+        const response = await fetch(`/api/media`, {
           credentials: 'include',
         });
         const { data } = await response.json();
@@ -268,3 +268,7 @@ export default function ExplorePage() {
     </div>
   );
 }
+
+
+
+

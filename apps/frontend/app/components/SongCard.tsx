@@ -7,3 +7,7 @@ export default function SongCard({ title, artist }: { title: string; artist: str
     );
   }
   
+
+
+
+

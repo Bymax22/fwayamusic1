@@ -14,3 +14,7 @@ export const Card = ({ children }: { children: React.ReactNode }) => {
 export const CardContent = ({ children }: { children: React.ReactNode }) => {
   return <div className="p-4">{children}</div>;
 };
+
+
+
+

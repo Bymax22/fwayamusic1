@@ -24,3 +24,7 @@ export default function ReCAPTCHAWrapper({ onVerified }: { onVerified?: (token: 
 
   return <ReCAPTCHA onVerify={handleVerify} onExpire={handleExpire} onError={handleError} />;
 }
+
+
+
+

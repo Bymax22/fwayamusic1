@@ -169,19 +169,19 @@ const UserDashboard: React.FC = () => {
           userMediaRes,
           statsRes
         ] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/recent-plays`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/recent-plays`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/recommendations`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/recommendations`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/playlists`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/playlists`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/media`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/media`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/stats`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/stats`, {
             headers: { 'Authorization': `Bearer ${token}` }
           })
         ]);
@@ -328,7 +328,7 @@ const UserDashboard: React.FC = () => {
 
   const handleLike = async (mediaId: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${mediaId}/like`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${mediaId}/like`, {
         method: 'POST',
         credentials: 'include'
       });
@@ -348,7 +348,7 @@ const UserDashboard: React.FC = () => {
 
   const handleDownload = async (file: MediaFile) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/download`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/download`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -894,3 +894,7 @@ const UserDashboard: React.FC = () => {
 };
 
 export default UserDashboard;
+
+
+
+

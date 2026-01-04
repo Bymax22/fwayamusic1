@@ -257,3 +257,7 @@ export default function NewReleasesPage() {
     </div>
   );
 }
+
+
+
+

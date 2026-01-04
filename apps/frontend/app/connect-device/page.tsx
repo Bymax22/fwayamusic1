@@ -237,3 +237,7 @@ export default function ConnectDevicePage() {
     </div>
   );
 }
+
+
+
+

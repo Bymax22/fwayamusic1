@@ -18,6 +18,7 @@ async function bootstrap() {
         'http://localhost', // Local testing
         'https://fwaya-music.com',
         'https://www.fwayainnovations.com', // add your production frontend domain here
+        'https://fwayamusic1-frontend.vercel.app'
       ];
 
   app.enableCors({

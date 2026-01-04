@@ -34,7 +34,7 @@ export default function RecentlyPlayedPage() {
           return;
         }
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/users/me/recent`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/recent`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -211,3 +211,7 @@ export default function RecentlyPlayedPage() {
     </Protected>
   );
 }
+
+
+
+

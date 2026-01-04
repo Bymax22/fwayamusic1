@@ -547,3 +547,7 @@ export default function ResellerSignUp() {
     </div>
   );
 }
+
+
+
+

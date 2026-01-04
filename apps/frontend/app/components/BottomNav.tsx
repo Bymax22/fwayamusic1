@@ -107,3 +107,7 @@ export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
     </nav>
   );
 }
+
+
+
+
