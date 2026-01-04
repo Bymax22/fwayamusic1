@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary } from 'cloudinary';
-import * as fs from 'fs/promises';
 import { Prisma } from '@prisma/client';
 import { MediaType } from '@fwaya-music/types/enums';
 
@@ -18,7 +17,7 @@ export class MediaService {
   async createMedia(file: Express.Multer.File, userId: number, metadata?: { title?: string, description?: string }) {
     try {
       // 1. Upload to Cloudinary
-      const uploadResult = await cloudinary.uploader.upload(file.buffer, {
+      const uploadResult = await cloudinary.uploader.upload(`data:${file.mimetype};base64,${file.buffer.toString('base64')}`, {
         folder: 'fwaya-media',
         resource_type: 'auto',
         public_id: file.originalname.replace(/\.[^/.]+$/, ""),
@@ -59,12 +58,8 @@ include: {
 }
       });
 
-      // 3. Clean up temp file
-      await fs.unlink(file.path);
-
       return media;
     } catch (error) {
-      if (file?.path) await fs.unlink(file.path).catch(() => {});
       throw new InternalServerErrorException(
         error instanceof Error ? error.message : 'Media creation failed'
       );
