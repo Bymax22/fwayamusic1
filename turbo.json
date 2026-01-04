@@ -8,6 +8,37 @@
       "outputs": [
         "dist/**",
         ".next/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "FRONTEND_URL",
+        "DATABASE_URL",
+        "CLOUDINARY_CLOUD_NAME",
+        "CLOUDINARY_API_KEY",
+        "CLOUDINARY_API_SECRET",
+        "FIREBASE_API_KEY",
+        "FIREBASE_AUTH_DOMAIN",
+        "FIREBASE_PROJECT_ID",
+        "FIREBASE_MESSAGING_SENDER_ID",
+        "FIREBASE_APP_ID",
+        "FIREBASE_MEASUREMENT_ID",
+        "FIREBASE_PRIVATE_KEY",
+        "FIREBASE_CLIENT_EMAIL",
+        "JWT_SECRET",
+        "MTN_MONEY_ENVIRONMENT",
+        "MTN_MONEY_BASE_URL",
+        "MTN_MONEY_API_USER",
+        "MTN_MONEY_API_KEY",
+        "MTN_MONEY_SUBSCRIPTION_KEY",
+        "MTN_MONEY_CALLBACK_HOST",
+        "MTN_MONEY_TOKEN_URL",
+        "MTN_MONEY_COLLECTION_URL",
+        "AIRTEL_MONEY_API_URL",
+        "AIRTEL_CLIENT_ID",
+        "AIRTEL_CLIENT_SECRET",
+        "CURRENCY_API_KEY",
+        "ENCRYPTION_KEY",
+        "ALLOWED_ORIGINS"
       ]
     },
     "dev": {
