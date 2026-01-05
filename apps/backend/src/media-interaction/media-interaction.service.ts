@@ -51,7 +51,10 @@ export class MediaInteractionService {
         mediaId, 
         userId,
         deviceId: deviceId || 'web',
+        accessType: 'OFFLINE',
         isDRMProtected: true,
+        licenseKey: this.generateLicenseKey(),
+        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
       },
       include: { media: true }
     });
@@ -61,5 +64,9 @@ export class MediaInteractionService {
       downloadUrl: download.media.url, // For now, return the media URL
       isDRMProtected: download.isDRMProtected,
     };
+  }
+
+  private generateLicenseKey(): string {
+    return 'DRM-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
   }
 }
