@@ -78,11 +78,19 @@ export class PlaylistService {
       throw new Error('Media already in playlist');
     }
 
+    // Get the next position (max position + 1)
+    const maxPosition = await this.prisma.playlistEntry.aggregate({
+      where: { playlistId: playlistId },
+      _max: { position: true },
+    });
+    const nextPosition = (maxPosition._max.position || 0) + 1;
+
     // Add media to playlist
     return this.prisma.playlistEntry.create({
       data: {
         playlistId: playlistId,
         mediaId: mediaId,
+        position: nextPosition,
       },
       include: {
         media: true,
