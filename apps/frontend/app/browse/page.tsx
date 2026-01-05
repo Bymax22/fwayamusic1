@@ -125,7 +125,7 @@ interface Artist {
 }
 
 export default function Browse() {
-  const { user, getToken } = useAuth();
+  const { user: _user, getToken } = useAuth();
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<MediaFile[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(20); // new: how many items to show
