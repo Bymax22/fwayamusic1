@@ -43,4 +43,73 @@ export class PlaylistService {
       },
     });
   }
+
+  async addMediaToPlaylist(playlistId: number, mediaId: number, userId: number) {
+    // First check if the playlist exists and belongs to the user
+    const playlist = await this.prisma.playlist.findFirst({
+      where: {
+        id: playlistId,
+        userId: userId,
+      },
+    });
+
+    if (!playlist) {
+      throw new Error('Playlist not found or access denied');
+    }
+
+    // Check if media exists
+    const media = await this.prisma.media.findUnique({
+      where: { id: mediaId },
+    });
+
+    if (!media) {
+      throw new Error('Media not found');
+    }
+
+    // Check if media is already in playlist
+    const existingEntry = await this.prisma.playlistEntry.findFirst({
+      where: {
+        playlistId: playlistId,
+        mediaId: mediaId,
+      },
+    });
+
+    if (existingEntry) {
+      throw new Error('Media already in playlist');
+    }
+
+    // Add media to playlist
+    return this.prisma.playlistEntry.create({
+      data: {
+        playlistId: playlistId,
+        mediaId: mediaId,
+      },
+      include: {
+        media: true,
+        playlist: true,
+      },
+    });
+  }
+
+  async removeMediaFromPlaylist(playlistId: number, mediaId: number, userId: number) {
+    // First check if the playlist exists and belongs to the user
+    const playlist = await this.prisma.playlist.findFirst({
+      where: {
+        id: playlistId,
+        userId: userId,
+      },
+    });
+
+    if (!playlist) {
+      throw new Error('Playlist not found or access denied');
+    }
+
+    // Remove media from playlist
+    return this.prisma.playlistEntry.deleteMany({
+      where: {
+        playlistId: playlistId,
+        mediaId: mediaId,
+      },
+    });
+  }
 }

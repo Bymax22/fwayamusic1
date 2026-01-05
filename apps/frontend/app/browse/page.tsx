@@ -385,6 +385,16 @@ export default function Browse() {
     if (currentTrack?.id === file.id) {
       togglePlay();
     } else {
+      // Track play interaction
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/play`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: 1 }) // TODO: Get from auth context
+      }).catch(err => console.warn('Play tracking failed:', err));
+
       setCurrentTrack({
         id: file.id,
         title: file.title,
@@ -400,9 +410,13 @@ export default function Browse() {
 
   const handleLike = async (id: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/like`, { 
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/interact/like`, { 
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: 1 }) // TODO: Get from auth context
       });
 
       if (!response.ok) throw new Error('Like action failed');
@@ -423,39 +437,40 @@ export default function Browse() {
     }
   };
 
-  const handleSave = async (id: number) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/save`, { 
-        method: 'POST',
-        credentials: 'include'
-      });
+  // const handleSave = async (id: number) => {
+  //   try {
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/save`, { 
+  //       method: 'POST',
+  //       credentials: 'include'
+  //     });
 
-      if (!response.ok) throw new Error('Save action failed');
+  //     if (!response.ok) throw new Error('Save action failed');
 
-      setMediaFiles(mediaFiles.map(file => 
-        file.id === id ? { 
-          ...file, 
-          interactions: [...(file.interactions || []), { liked: false, saved: true }]
-        } : file
-      ));
-    } catch (err) {
-      console.error('Save error:', err);
-      setError({
-        message: 'Failed to save media',
-        details: err instanceof Error ? err.message : String(err)
-      });
-    }
-  };
+  //     setMediaFiles(mediaFiles.map(file => 
+  //       file.id === id ? { 
+  //         ...file, 
+  //         interactions: [...(file.interactions || []), { liked: false, saved: true }]
+  //       } : file
+  //     ));
+  //   } catch (err) {
+  //     console.error('Save error:', err);
+  //     setError({
+  //       message: 'Failed to save media',
+  //       details: err instanceof Error ? err.message : String(err)
+  //     });
+  //   }
+  // };
 
   const handleDownload = async (file: MediaFile) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/download`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/download`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId: 1, // TODO: Get from auth context
           deviceId: localStorage.getItem('deviceId') || 'web-browser',
           deviceInfo: {
             deviceId: localStorage.getItem('deviceId') || 'web-browser',
@@ -582,7 +597,10 @@ export default function Browse() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ mediaId })
+        body: JSON.stringify({ 
+          mediaId,
+          userId: 1 // TODO: Get from auth context
+        })
       });
 
       if (!response.ok) throw new Error('Failed to add to playlist');
@@ -1542,12 +1560,12 @@ export default function Browse() {
 </button>
 
                 <button
-                  onClick={() => handleSave(selectedMedia.id)}
-                  className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
-                >
-                  <BookmarkCheck className="w-5 h-5 text-[#e51f48]" />
-                  <span className="text-white">Save to Library</span>
-                </button>
+  className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
+  onClick={() => alert('Save to Library feature coming soon!')}
+>
+  <BookmarkCheck className="w-5 h-5 text-[#e51f48]" />
+  <span className="text-white">Save to Library</span>
+</button>
 
                 {selectedMedia.accessType === 'FREE' && (
                   <button
