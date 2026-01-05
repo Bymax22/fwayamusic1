@@ -33,14 +33,33 @@ export class MediaInteractionService {
     });
   }
 
-  async downloadMedia(mediaId: number, userId: number) {
+  async downloadMedia(mediaId: number, userId: number, deviceId?: string) {
+    // Check if media is free
+    const media = await this.prisma.media.findUnique({ where: { id: mediaId } });
+    if (!media || media.accessType !== 'FREE') {
+      throw new Error('Only free media can be downloaded');
+    }
+
     await this.prisma.media.update({
       where: { id: mediaId },
       data: { downloadCount: { increment: 1 } },
     });
-    // Optionally create a Download record
-    return this.prisma.download.create({
-      data: { mediaId, userId },
+
+    // Create download record
+    const download = await this.prisma.download.create({
+      data: { 
+        mediaId, 
+        userId,
+        deviceId: deviceId || 'web',
+        isDRMProtected: true,
+      },
+      include: { media: true }
     });
+
+    return {
+      downloadId: download.id,
+      downloadUrl: download.media.url, // For now, return the media URL
+      isDRMProtected: download.isDRMProtected,
+    };
   }
 }

@@ -11,7 +11,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration, formatFileSize } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
-import { AuthProvider } from "../context/AuthContext";
+import { AuthProvider, useAuth } from "../context/AuthContext";
 import { ThemeProvider } from "../context/ThemeContext";
 import { PaymentProvider } from "../context/PaymentContext";
 
@@ -125,6 +125,7 @@ interface Artist {
 }
 
 export default function Browse() {
+  const { user, getToken } = useAuth();
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<MediaFile[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(20); // new: how many items to show
@@ -154,6 +155,14 @@ export default function Browse() {
   const menuRef = useRef<HTMLDivElement>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const artistsScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Set device ID if not exists
+    if (typeof window !== 'undefined' && !localStorage.getItem('deviceId')) {
+      const deviceId = 'web-' + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('deviceId', deviceId);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -410,13 +419,14 @@ export default function Browse() {
 
   const handleLike = async (id: number) => {
     try {
+      const token = await getToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/interact/like`, { 
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId: 1 }) // TODO: Get from auth context
       });
 
       if (!response.ok) throw new Error('Like action failed');
@@ -463,21 +473,16 @@ export default function Browse() {
 
   const handleDownload = async (file: MediaFile) => {
     try {
+      const token = await getToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/download`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: 1, // TODO: Get from auth context
           deviceId: localStorage.getItem('deviceId') || 'web-browser',
-          deviceInfo: {
-            deviceId: localStorage.getItem('deviceId') || 'web-browser',
-            deviceName: 'Web Browser',
-            deviceType: 'desktop',
-            os: navigator.platform
-          }
         })
       });
 
