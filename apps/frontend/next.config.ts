@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
               default-src 'self';
               script-src 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com blob:;
               script-src-elem 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com blob:;
-              connect-src 'self' ${API_URL} https://api.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://graph.facebook.com https://www.google.com https://www.google-analytics.com;
+              connect-src 'self' ${API_URL} https://api.cloudinary.com https://res.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://graph.facebook.com https://www.google.com https://www.google-analytics.com;
               img-src 'self' https://res.cloudinary.com data: blob:;
               media-src 'self' https://res.cloudinary.com blob:;
               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
