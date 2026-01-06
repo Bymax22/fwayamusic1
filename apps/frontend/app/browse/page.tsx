@@ -408,47 +408,27 @@ export default function Browse() {
     if (currentTrack?.id === file.id) {
       togglePlay();
     } else {
-      // Check for encrypted download first
+      // Check for cached download first
       if (db) {
         const transaction = db.transaction(["downloads"], "readonly");
         const store = transaction.objectStore("downloads");
         const request = store.get(file.id);
         request.onsuccess = async (e: Event) => {
           if ((e.target as IDBRequest).result) {
-            const data = (e.target as IDBRequest).result;
-            const { encrypted, iv } = data;
-            const deviceId = localStorage.getItem('deviceId') || 'web-browser';
-            const key = await getKey(deviceId);
-            try {
-              const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
-              const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
-              const url = URL.createObjectURL(decryptedBlob);
-              setCurrentTrack({
-                id: file.id,
-                title: file.title,
-                artist: file.artist,
-                url: url,
-                coverArt: file.coverArt,
-                duration: file.duration,
-                isDRMProtected: file.isDRMProtected
-              });
-              setCurrentTime(0);
-            } catch (error) {
-              console.error('Decryption failed', error);
-              // Fallback to original URL
-              setCurrentTrack({
-                id: file.id,
-                title: file.title,
-                artist: file.artist,
-                url: file.url,
-                coverArt: file.coverArt,
-                duration: file.duration,
-                isDRMProtected: file.isDRMProtected
-              });
-              setCurrentTime(0);
-            }
+            const blob = (e.target as IDBRequest).result;
+            const url = URL.createObjectURL(blob);
+            setCurrentTrack({
+              id: file.id,
+              title: file.title,
+              artist: file.artist,
+              url: url,
+              coverArt: file.coverArt,
+              duration: file.duration,
+              isDRMProtected: file.isDRMProtected
+            });
+            setCurrentTime(0);
           } else {
-            // No encrypted download, use original URL
+            // No cached download, use original URL
             setCurrentTrack({
               id: file.id,
               title: file.title,
@@ -565,26 +545,19 @@ export default function Browse() {
         f.id === file.id ? { ...f, downloadCount: f.downloadCount + 1 } : f
       ));
 
-      // Trigger actual download with encryption
+      // Download the file
       const downloadResponse = await fetch(downloadData.downloadUrl);
       const blob = await downloadResponse.blob();
-      const deviceId = localStorage.getItem('deviceId') || 'web-browser';
-      const key = await getKey(deviceId);
-      const arrayBuffer = await blob.arrayBuffer();
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, arrayBuffer);
-      const encryptedBlob = new Blob([encrypted]);
 
-      // Store in IndexedDB for playback
+      // Store in IndexedDB for offline playback (optional)
       if (db) {
         const transaction = db.transaction(["downloads"], "readwrite");
         const store = transaction.objectStore("downloads");
-        const data = { encrypted: new Uint8Array(encrypted), iv };
-        store.put(data, file.id);
+        store.put(blob, file.id);
       }
 
-      // Download the encrypted file to device
-      const url = window.URL.createObjectURL(encryptedBlob);
+      // Download to device
+      const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `${file.title}.${file.format}`;
