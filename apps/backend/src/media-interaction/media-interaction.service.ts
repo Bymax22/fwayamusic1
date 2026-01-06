@@ -34,10 +34,18 @@ export class MediaInteractionService {
   }
 
   async downloadMedia(mediaId: number, userId: number, deviceId?: string) {
-    // Check if media is free
+    // Check if media exists
     const media = await this.prisma.media.findUnique({ where: { id: mediaId } });
-    if (!media || media.accessType !== 'FREE') {
+    if (!media) {
+      throw new Error('Media not found');
+    }
+
+    if (media.accessType !== 'FREE') {
       throw new Error('Only free media can be downloaded');
+    }
+
+    if (!media.url) {
+      throw new Error('Media file not available for download');
     }
 
     await this.prisma.media.update({
