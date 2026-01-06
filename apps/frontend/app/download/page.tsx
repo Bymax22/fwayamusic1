@@ -289,27 +289,6 @@ useEffect(() => {
     }
   };
 
-  const validateLicense = async (mediaId: string, licenseKey: string): Promise<boolean> => {
-    try {
-      const response = await fetch('/api/drm/validate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          mediaId,
-          licenseKey,
-          deviceId: currentDeviceId
-        }),
-      });
-
-      return response.ok;
-    } catch (error) {
-      console.error('License validation failed:', error);
-      return false;
-    }
-  };
-
   const handleDelete = async (id: string) => {
     try {
       const response = await fetch(`/api/user/downloads/${id}`, {
