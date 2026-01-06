@@ -495,17 +495,7 @@ export default function Browse() {
         f.id === file.id ? { ...f, downloadCount: f.downloadCount + 1 } : f
       ));
 
-      // Trigger actual download
-      const downloadResponse = await fetch(downloadData.downloadUrl);
-      const blob = await downloadResponse.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${file.title}.${file.format}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      alert("Downloaded for offline playback in the app. The file is not saved to your device to prevent sharing.");
 
     } catch (err) {
       console.error('Download error:', err);
