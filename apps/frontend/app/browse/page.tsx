@@ -155,6 +155,7 @@ export default function Browse() {
   const menuRef = useRef<HTMLDivElement>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const artistsScrollRef = useRef<HTMLDivElement>(null);
+  const [db, setDb] = useState<IDBDatabase | null>(null);
 
   useEffect(() => {
     // Set device ID if not exists
@@ -162,6 +163,19 @@ export default function Browse() {
       const deviceId = 'web-' + Math.random().toString(36).substring(2, 15);
       localStorage.setItem('deviceId', deviceId);
     }
+  }, []);
+
+  useEffect(() => {
+    const request = indexedDB.open("fwayaMusic", 1);
+    request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+      const db = (e.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains("downloads")) {
+        db.createObjectStore("downloads");
+      }
+    };
+    request.onsuccess = (e: Event) => {
+      setDb((e.target as IDBOpenDBRequest).result);
+    };
   }, []);
 
   useEffect(() => {
@@ -390,10 +404,77 @@ export default function Browse() {
     setVisibleCount(prev => Math.min(prev + PAGE_SIZE, filteredFiles.length));
   };
 
-  const handlePlay = (file: MediaFile) => {
+  const handlePlay = async (file: MediaFile) => {
     if (currentTrack?.id === file.id) {
       togglePlay();
     } else {
+      // Check for encrypted download first
+      if (db) {
+        const transaction = db.transaction(["downloads"], "readonly");
+        const store = transaction.objectStore("downloads");
+        const request = store.get(file.id);
+        request.onsuccess = async (e: Event) => {
+          if ((e.target as IDBRequest).result) {
+            const data = (e.target as IDBRequest).result;
+            const { encrypted, iv } = data;
+            const deviceId = localStorage.getItem('deviceId') || 'web-browser';
+            const key = await getKey(deviceId);
+            try {
+              const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
+              const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
+              const url = URL.createObjectURL(decryptedBlob);
+              setCurrentTrack({
+                id: file.id,
+                title: file.title,
+                artist: file.artist,
+                url: url,
+                coverArt: file.coverArt,
+                duration: file.duration,
+                isDRMProtected: file.isDRMProtected
+              });
+              setCurrentTime(0);
+            } catch (error) {
+              console.error('Decryption failed', error);
+              // Fallback to original URL
+              setCurrentTrack({
+                id: file.id,
+                title: file.title,
+                artist: file.artist,
+                url: file.url,
+                coverArt: file.coverArt,
+                duration: file.duration,
+                isDRMProtected: file.isDRMProtected
+              });
+              setCurrentTime(0);
+            }
+          } else {
+            // No encrypted download, use original URL
+            setCurrentTrack({
+              id: file.id,
+              title: file.title,
+              artist: file.artist,
+              url: file.url,
+              coverArt: file.coverArt,
+              duration: file.duration,
+              isDRMProtected: file.isDRMProtected
+            });
+            setCurrentTime(0);
+          }
+        };
+      } else {
+        // No IndexedDB, use original URL
+        setCurrentTrack({
+          id: file.id,
+          title: file.title,
+          artist: file.artist,
+          url: file.url,
+          coverArt: file.coverArt,
+          duration: file.duration,
+          isDRMProtected: file.isDRMProtected
+        });
+        setCurrentTime(0);
+      }
+
       // Track play interaction
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/play`, {
         method: 'POST',
@@ -403,17 +484,6 @@ export default function Browse() {
         },
         body: JSON.stringify({ userId: 1 }) // TODO: Get from auth context
       }).catch(err => console.warn('Play tracking failed:', err));
-
-      setCurrentTrack({
-        id: file.id,
-        title: file.title,
-        artist: file.artist,
-        url: file.url,
-        coverArt: file.coverArt,
-        duration: file.duration,
-        isDRMProtected: file.isDRMProtected
-      });
-      setCurrentTime(0);
     }
   };
 
@@ -495,7 +565,33 @@ export default function Browse() {
         f.id === file.id ? { ...f, downloadCount: f.downloadCount + 1 } : f
       ));
 
-      alert("Downloaded for offline playback in the app. The file is not saved to your device to prevent sharing.");
+      // Trigger actual download with encryption
+      const downloadResponse = await fetch(downloadData.downloadUrl);
+      const blob = await downloadResponse.blob();
+      const deviceId = localStorage.getItem('deviceId') || 'web-browser';
+      const key = await getKey(deviceId);
+      const arrayBuffer = await blob.arrayBuffer();
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, arrayBuffer);
+      const encryptedBlob = new Blob([encrypted]);
+
+      // Store in IndexedDB for playback
+      if (db) {
+        const transaction = db.transaction(["downloads"], "readwrite");
+        const store = transaction.objectStore("downloads");
+        const data = { encrypted: new Uint8Array(encrypted), iv };
+        store.put(data, file.id);
+      }
+
+      // Download the encrypted file to device
+      const url = window.URL.createObjectURL(encryptedBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${file.title}.${file.format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
 
     } catch (err) {
       console.error('Download error:', err);
@@ -504,6 +600,25 @@ export default function Browse() {
         details: err instanceof Error ? err.message : String(err)
       });
     }
+  };
+
+  const getKey = async (deviceId: string) => {
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw", 
+      new TextEncoder().encode(deviceId), 
+      "PBKDF2", 
+      false, 
+      ["deriveBits", "deriveKey"]
+    );
+    const salt = new Uint8Array(16);
+    salt.fill(0);
+    const key = await crypto.subtle.deriveKey({
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256"
+    }, keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+    return key;
   };
 
 
