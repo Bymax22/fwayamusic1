@@ -45,8 +45,34 @@ export default function DownloadPage() {
   const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [deviceLicenses, setDeviceLicenses] = useState<DeviceLicense[]>([]);
   const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
+  const [db, setDb] = useState<IDBDatabase | null>(null);
+  const [downloadedFiles, setDownloadedFiles] = useState<DownloadItem[]>([]);
   const { currentTrack, setCurrentTrack } = useAudioPlayer();
   const { getToken } = useAuth();
+
+  // Key derivation function for DRM
+  const getKey = async (deviceId: string): Promise<CryptoKey> => {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(deviceId),
+      "PBKDF2",
+      false,
+      ["deriveBits", "deriveKey"]
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: encoder.encode("fwaya-salt"),
+        iterations: 100000,
+        hash: "SHA-256"
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 },
+      true,
+      ["encrypt", "decrypt"]
+    );
+  };
 
 useEffect(() => {
   const generateDeviceId = () => {
@@ -56,6 +82,36 @@ useEffect(() => {
       localStorage.setItem('deviceId', deviceId);
     }
     setCurrentDeviceId(deviceId);
+  };
+
+  // Initialize IndexedDB
+  const initDB = () => {
+    const request = indexedDB.open("fwayaMusic", 2);
+    request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+      const db = (e.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains("downloads")) {
+        db.createObjectStore("downloads");
+      }
+      if (!db.objectStoreNames.contains("downloadMetadata")) {
+        const store = db.createObjectStore("downloadMetadata", { keyPath: "id" });
+        store.createIndex("title", "title", { unique: false });
+        store.createIndex("artist", "artist", { unique: false });
+      }
+    };
+    request.onsuccess = (e: Event) => {
+      setDb((e.target as IDBOpenDBRequest).result);
+      loadDownloadedFiles((e.target as IDBOpenDBRequest).result);
+    };
+  };
+
+  const loadDownloadedFiles = (database: IDBDatabase) => {
+    const transaction = database.transaction(["downloadMetadata"], "readonly");
+    const store = transaction.objectStore("downloadMetadata");
+    const request = store.getAll();
+    request.onsuccess = () => {
+      const files = request.result as DownloadItem[];
+      setDownloadedFiles(files);
+    };
   };
 
   const fetchDownloadData = async () => {
@@ -92,13 +148,14 @@ useEffect(() => {
 
   fetchDownloadData();
   generateDeviceId();
+  initDB();
 }, []);
 
 // Add this effect for storage usage calculation
 useEffect(() => {
-  const used = downloads.reduce((sum, item) => sum + item.fileSize, 0);
+  const used = [...downloads, ...downloadedFiles].reduce((sum, item) => sum + (item.fileSize || 0), 0);
   setStorageUsage(prev => ({ ...prev, used }));
-}, [downloads]);
+}, [downloads, downloadedFiles]);
 
   const handleDownload = async (item: DownloadItem) => {
     try {
@@ -168,24 +225,68 @@ useEffect(() => {
   };
 
   const handlePlay = async (item: DownloadItem) => {
-    // For DRM protected content, validate license
-    if (item.isDRMProtected && item.licenseKey) {
-      const isValid = await validateLicense(item.id, item.licenseKey);
-      if (!isValid) {
-        alert('This content cannot be played on this device. License validation failed.');
-        return;
-      }
+    // Check for offline download first
+    if (db) {
+      const transaction = db.transaction(["downloads"], "readonly");
+      const store = transaction.objectStore("downloads");
+      const request = store.get(item.id);
+      request.onsuccess = async (e: Event) => {
+        if ((e.target as IDBRequest).result) {
+          const data = (e.target as IDBRequest).result;
+          const { encrypted, iv } = data;
+          const deviceId = localStorage.getItem('deviceId') || 'web-browser';
+          const key = await getKey(deviceId);
+          try {
+            const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
+            const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
+            const url = URL.createObjectURL(decryptedBlob);
+            setCurrentTrack({
+              id: item.id,
+              title: item.title,
+              artist: item.artist,
+              url: url,
+              coverArt: item.coverArt,
+              duration: item.duration,
+              isDRMProtected: item.isDRMProtected
+            });
+          } catch (error) {
+            console.error('Decryption failed, falling back to stream:', error);
+            // Fallback to streaming
+            setCurrentTrack({
+              id: item.id,
+              title: item.title,
+              artist: item.artist,
+              url: `/api/media/stream/${item.id}?deviceId=${currentDeviceId}&licenseKey=${item.licenseKey || ''}`,
+              coverArt: item.coverArt,
+              duration: item.duration,
+              isDRMProtected: item.isDRMProtected
+            });
+          }
+        } else {
+          // No offline download, use streaming
+          setCurrentTrack({
+            id: item.id,
+            title: item.title,
+            artist: item.artist,
+            url: `/api/media/stream/${item.id}?deviceId=${currentDeviceId}&licenseKey=${item.licenseKey || ''}`,
+            coverArt: item.coverArt,
+            duration: item.duration,
+            isDRMProtected: item.isDRMProtected
+          });
+        }
+      };
+    } else {
+      // No IndexedDB, use streaming
+      setCurrentTrack({
+        id: item.id,
+        title: item.title,
+        artist: item.artist,
+        url: `/api/media/stream/${item.id}?deviceId=${currentDeviceId}&licenseKey=${item.licenseKey || ''}`,
+        coverArt: item.coverArt,
+        duration: item.duration,
+        isDRMProtected: item.isDRMProtected
+      });
     }
-
-    setCurrentTrack({
-      id: item.id,
-      title: item.title,
-      artist: item.artist,
-      url: `/api/media/stream/${item.id}?deviceId=${currentDeviceId}&licenseKey=${item.licenseKey || ''}`,
-      coverArt: item.coverArt,
-      duration: item.duration,
-      isDRMProtected: item.isDRMProtected
-    });
   };
 
   const validateLicense = async (mediaId: string, licenseKey: string): Promise<boolean> => {
@@ -234,11 +335,11 @@ useEffect(() => {
 
   const getFilteredDownloads = () => {
     switch (activeTab) {
-      case 'downloaded': return downloads.filter(d => d.downloadStatus === 'completed');
+      case 'downloaded': return [...downloads.filter(d => d.downloadStatus === 'completed'), ...downloadedFiles];
       case 'suggested': return suggestions;
       case 'free': return freeDownloads;
       case 'premium': return premiumDownloads;
-      default: return [...downloads, ...suggestions, ...freeDownloads];
+      default: return [...downloads, ...suggestions, ...freeDownloads, ...downloadedFiles];
     }
   };
 

@@ -166,11 +166,16 @@ export default function Browse() {
   }, []);
 
   useEffect(() => {
-    const request = indexedDB.open("fwayaMusic", 1);
+    const request = indexedDB.open("fwayaMusic", 2);
     request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
       const db = (e.target as IDBOpenDBRequest).result;
       if (!db.objectStoreNames.contains("downloads")) {
         db.createObjectStore("downloads");
+      }
+      if (!db.objectStoreNames.contains("downloadMetadata")) {
+        const store = db.createObjectStore("downloadMetadata", { keyPath: "id" });
+        store.createIndex("title", "title", { unique: false });
+        store.createIndex("artist", "artist", { unique: false });
       }
     };
     request.onsuccess = (e: Event) => {
@@ -408,27 +413,47 @@ export default function Browse() {
     if (currentTrack?.id === file.id) {
       togglePlay();
     } else {
-      // Check for cached download first
+      // Check for encrypted download first
       if (db) {
         const transaction = db.transaction(["downloads"], "readonly");
         const store = transaction.objectStore("downloads");
         const request = store.get(file.id);
         request.onsuccess = async (e: Event) => {
           if ((e.target as IDBRequest).result) {
-            const blob = (e.target as IDBRequest).result;
-            const url = URL.createObjectURL(blob);
-            setCurrentTrack({
-              id: file.id,
-              title: file.title,
-              artist: file.artist,
-              url: url,
-              coverArt: file.coverArt,
-              duration: file.duration,
-              isDRMProtected: file.isDRMProtected
-            });
-            setCurrentTime(0);
+            const data = (e.target as IDBRequest).result;
+            const { encrypted, iv } = data;
+            const deviceId = localStorage.getItem('deviceId') || 'web-browser';
+            const key = await getKey(deviceId);
+            try {
+              const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
+              const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
+              const url = URL.createObjectURL(decryptedBlob);
+              setCurrentTrack({
+                id: file.id,
+                title: file.title,
+                artist: file.artist,
+                url: url,
+                coverArt: file.coverArt,
+                duration: file.duration,
+                isDRMProtected: file.isDRMProtected
+              });
+              setCurrentTime(0);
+            } catch (error) {
+              console.error('Decryption failed', error);
+              // Fallback to original URL
+              setCurrentTrack({
+                id: file.id,
+                title: file.title,
+                artist: file.artist,
+                url: file.url,
+                coverArt: file.coverArt,
+                duration: file.duration,
+                isDRMProtected: file.isDRMProtected
+              });
+              setCurrentTime(0);
+            }
           } else {
-            // No cached download, use original URL
+            // No encrypted download, use original URL
             setCurrentTrack({
               id: file.id,
               title: file.title,
@@ -545,19 +570,78 @@ export default function Browse() {
         f.id === file.id ? { ...f, downloadCount: f.downloadCount + 1 } : f
       ));
 
-      // Download the file
+      // Encrypt and download the file
       const downloadResponse = await fetch(downloadData.downloadUrl);
       const blob = await downloadResponse.blob();
+      const deviceId = localStorage.getItem('deviceId') || 'web-browser';
+      const key = await getKey(deviceId);
+      const arrayBuffer = await blob.arrayBuffer();
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, arrayBuffer);
+      const encryptedBlob = new Blob([encrypted]);
 
-      // Store in IndexedDB for offline playback (optional)
+      // Store decryption data in IndexedDB
       if (db) {
         const transaction = db.transaction(["downloads"], "readwrite");
         const store = transaction.objectStore("downloads");
-        store.put(blob, file.id);
+        const data = { encrypted: new Uint8Array(encrypted), iv };
+        store.put(data, file.id);
+
+        // Also store metadata
+        if (!db.objectStoreNames.contains("downloadMetadata")) {
+          // Create the store if it doesn't exist
+          const version = db.version + 1;
+          db.close();
+          const upgradeRequest = indexedDB.open("fwayaMusic", version);
+          upgradeRequest.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+            const db = (e.target as IDBOpenDBRequest).result;
+            if (!db.objectStoreNames.contains("downloadMetadata")) {
+              const store = db.createObjectStore("downloadMetadata", { keyPath: "id" });
+              store.createIndex("title", "title", { unique: false });
+              store.createIndex("artist", "artist", { unique: false });
+            }
+          };
+          upgradeRequest.onsuccess = (e: Event) => {
+            const newDb = (e.target as IDBOpenDBRequest).result;
+            const metaTransaction = newDb.transaction(["downloadMetadata"], "readwrite");
+            const metaStore = metaTransaction.objectStore("downloadMetadata");
+            const metadata = {
+              id: file.id,
+              title: file.title,
+              artist: file.artist,
+              coverArt: file.coverArt,
+              duration: file.duration,
+              fileSize: blob.size,
+              quality: 'HD',
+              downloadDate: new Date().toISOString(),
+              accessType: file.accessType,
+              isDRMProtected: file.isDRMProtected,
+              downloadStatus: 'completed'
+            };
+            metaStore.put(metadata);
+          };
+        } else {
+          const metaTransaction = db.transaction(["downloadMetadata"], "readwrite");
+          const metaStore = metaTransaction.objectStore("downloadMetadata");
+          const metadata = {
+            id: file.id,
+            title: file.title,
+            artist: file.artist,
+            coverArt: file.coverArt,
+            duration: file.duration,
+            fileSize: blob.size,
+            quality: 'HD',
+            downloadDate: new Date().toISOString(),
+            accessType: file.accessType,
+            isDRMProtected: file.isDRMProtected,
+            downloadStatus: 'completed'
+          };
+          metaStore.put(metadata);
+        }
       }
 
-      // Download to device
-      const url = window.URL.createObjectURL(blob);
+      // Download the encrypted file (looks like normal audio but is encrypted)
+      const url = window.URL.createObjectURL(encryptedBlob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `${file.title}.${file.format}`;

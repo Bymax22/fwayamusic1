@@ -36,6 +36,8 @@ export default function LibraryPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [likedSongs, setLikedSongs] = useState<MediaFile[]>([]);
   const [recentlyPlayed, setRecentlyPlayed] = useState<MediaFile[]>([]);
+  const [downloadedSongs, setDownloadedSongs] = useState<MediaFile[]>([]);
+  const [db, setDb] = useState<IDBDatabase | null>(null);
   const [activeTab, setActiveTab] = useState<'playlists' | 'liked' | 'recent' | 'downloaded'>('playlists');
   const { currentTrack,  setCurrentTrack, togglePlay } = useAudioPlayer();
 
@@ -86,20 +88,125 @@ export default function LibraryPage() {
     };
 
     fetchData();
+    initDB();
   }, []);
 
-  const handlePlay = (file: MediaFile) => {
+  // Key derivation function for DRM
+  const getKey = async (deviceId: string): Promise<CryptoKey> => {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(deviceId),
+      "PBKDF2",
+      false,
+      ["deriveBits", "deriveKey"]
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: encoder.encode("fwaya-salt"),
+        iterations: 100000,
+        hash: "SHA-256"
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 },
+      true,
+      ["encrypt", "decrypt"]
+    );
+  };
+
+  // Initialize IndexedDB
+  const initDB = () => {
+    const request = indexedDB.open("fwayaMusic", 2);
+    request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+      const db = (e.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains("downloads")) {
+        db.createObjectStore("downloads");
+      }
+      if (!db.objectStoreNames.contains("downloadMetadata")) {
+        const store = db.createObjectStore("downloadMetadata", { keyPath: "id" });
+        store.createIndex("title", "title", { unique: false });
+        store.createIndex("artist", "artist", { unique: false });
+      }
+    };
+    request.onsuccess = (e: Event) => {
+      setDb((e.target as IDBOpenDBRequest).result);
+      loadDownloadedFiles((e.target as IDBOpenDBRequest).result);
+    };
+  };
+
+  const loadDownloadedFiles = (database: IDBDatabase) => {
+    const transaction = database.transaction(["downloadMetadata"], "readonly");
+    const store = transaction.objectStore("downloadMetadata");
+    const request = store.getAll();
+    request.onsuccess = () => {
+      const files = request.result as MediaFile[];
+      setDownloadedSongs(files);
+    };
+  };
+
+  const handlePlay = async (file: MediaFile) => {
     if (currentTrack?.id === file.id) {
       togglePlay();
     } else {
-      setCurrentTrack({
-        id: file.id,
-        title: file.title,
-        artist: file.artist,
-        url: file.url,
-        coverArt: file.coverArt,
-        duration: file.duration
-      });
+      // Check for encrypted download first
+      if (db) {
+        const transaction = db.transaction(["downloads"], "readonly");
+        const store = transaction.objectStore("downloads");
+        const request = store.get(file.id);
+        request.onsuccess = async (e: Event) => {
+          if ((e.target as IDBRequest).result) {
+            const data = (e.target as IDBRequest).result;
+            const { encrypted, iv } = data;
+            const deviceId = localStorage.getItem('deviceId') || 'web-browser';
+            const key = await getKey(deviceId);
+            try {
+              const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
+              const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
+              const url = URL.createObjectURL(decryptedBlob);
+              setCurrentTrack({
+                id: file.id,
+                title: file.title,
+                artist: file.artist,
+                url: url,
+                coverArt: file.coverArt,
+                duration: file.duration
+              });
+            } catch (error) {
+              console.error('Decryption failed', error);
+              // Fallback to original URL
+              setCurrentTrack({
+                id: file.id,
+                title: file.title,
+                artist: file.artist,
+                url: file.url,
+                coverArt: file.coverArt,
+                duration: file.duration
+              });
+            }
+          } else {
+            // No encrypted download, use original URL
+            setCurrentTrack({
+              id: file.id,
+              title: file.title,
+              artist: file.artist,
+              url: file.url,
+              coverArt: file.coverArt,
+              duration: file.duration
+            });
+          }
+        };
+      } else {
+        // No IndexedDB, use original URL
+        setCurrentTrack({
+          id: file.id,
+          title: file.title,
+          artist: file.artist,
+          url: file.url,
+          coverArt: file.coverArt,
+          duration: file.duration
+        });
+      }
     }
   };
 
@@ -127,7 +234,7 @@ export default function LibraryPage() {
       case 'recent':
         return recentlyPlayed;
       case 'downloaded':
-        return []; // You can implement downloaded files logic
+        return downloadedSongs;
       default:
         return [];
     }
