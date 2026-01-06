@@ -24,7 +24,7 @@ export class MediaInteractionController {
   }
 
   @Post('download')
-  async download(@Param('mediaId') mediaId: number, @CurrentUser() user: any, @Body() body: { deviceId?: string }) {
-    return this.service.downloadMedia(mediaId, user.id, body.deviceId);
+  async download(@Param('mediaId') mediaId: string, @CurrentUser() user: any, @Body() body: { deviceId?: string }) {
+    return this.service.downloadMedia(parseInt(mediaId, 10), user.id, body.deviceId);
   }
 }
