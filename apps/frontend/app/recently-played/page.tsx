@@ -22,7 +22,7 @@ interface MediaFile {
 export default function RecentlyPlayedPage() {
   const [recentTracks, setRecentTracks] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const { currentTrack, isPlaying, setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack, isPlaying, setCurrentTrack, togglePlay, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
 
   useEffect(() => {
@@ -61,10 +61,11 @@ export default function RecentlyPlayedPage() {
     if (currentTrack?.id === track.id) {
       togglePlay();
     } else {
-      setCurrentTrack({
+      playTrack({
         id: track.id,
         title: track.title,
         artist: track.artist,
+        audioUrl: track.url,
         url: track.url,
         coverArt: track.coverArt,
         duration: track.duration

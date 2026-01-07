@@ -39,7 +39,7 @@ export default function LibraryPage() {
   const [downloadedSongs, setDownloadedSongs] = useState<MediaFile[]>([]);
   const [db, setDb] = useState<IDBDatabase | null>(null);
   const [activeTab, setActiveTab] = useState<'playlists' | 'liked' | 'recent' | 'downloaded'>('playlists');
-  const { currentTrack,  setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack,  setCurrentTrack, togglePlay, playTrack } = useAudioPlayer();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -164,10 +164,11 @@ export default function LibraryPage() {
               const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
               const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
               const url = URL.createObjectURL(decryptedBlob);
-              setCurrentTrack({
+              playTrack({
                 id: file.id,
                 title: file.title,
                 artist: file.artist,
+                audioUrl: url,
                 url: url,
                 coverArt: file.coverArt,
                 duration: file.duration
@@ -175,10 +176,11 @@ export default function LibraryPage() {
             } catch (error) {
               console.error('Decryption failed', error);
               // Fallback to original URL
-              setCurrentTrack({
+              playTrack({
                 id: file.id,
                 title: file.title,
                 artist: file.artist,
+                audioUrl: file.url,
                 url: file.url,
                 coverArt: file.coverArt,
                 duration: file.duration
@@ -186,10 +188,11 @@ export default function LibraryPage() {
             }
           } else {
             // No encrypted download, use original URL
-            setCurrentTrack({
+            playTrack({
               id: file.id,
               title: file.title,
               artist: file.artist,
+              audioUrl: file.url,
               url: file.url,
               coverArt: file.coverArt,
               duration: file.duration
@@ -198,10 +201,11 @@ export default function LibraryPage() {
         };
       } else {
         // No IndexedDB, use original URL
-        setCurrentTrack({
+        playTrack({
           id: file.id,
           title: file.title,
           artist: file.artist,
+          audioUrl: file.url,
           url: file.url,
           coverArt: file.coverArt,
           duration: file.duration

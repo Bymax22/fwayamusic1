@@ -23,6 +23,7 @@ interface DownloadItem {
   licenseKey?: string;
   deviceId?: string;
   expiresAt?: string;
+  url?: string;
 }
 
 interface DeviceLicense {
@@ -47,7 +48,7 @@ export default function DownloadPage() {
   const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
   const [db, setDb] = useState<IDBDatabase | null>(null);
   const [downloadedFiles, setDownloadedFiles] = useState<DownloadItem[]>([]);
-  const { currentTrack, setCurrentTrack } = useAudioPlayer();
+  const { currentTrack, setCurrentTrack, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
 
   // Key derivation function for DRM
@@ -224,71 +225,6 @@ useEffect(() => {
     }
   };
 
-  const handlePlay = async (item: DownloadItem) => {
-    // Check for offline download first
-    if (db) {
-      const transaction = db.transaction(["downloads"], "readonly");
-      const store = transaction.objectStore("downloads");
-      const request = store.get(item.id);
-      request.onsuccess = async (e: Event) => {
-        if ((e.target as IDBRequest).result) {
-          const data = (e.target as IDBRequest).result;
-          const { encrypted, iv } = data;
-          const deviceId = localStorage.getItem('deviceId') || 'web-browser';
-          const key = await getKey(deviceId);
-          try {
-            const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
-            const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
-            const url = URL.createObjectURL(decryptedBlob);
-            setCurrentTrack({
-              id: item.id,
-              title: item.title,
-              artist: item.artist,
-              url: url,
-              coverArt: item.coverArt,
-              duration: item.duration,
-              isDRMProtected: item.isDRMProtected
-            });
-          } catch (error) {
-            console.error('Decryption failed, falling back to stream:', error);
-            // Fallback to streaming
-            setCurrentTrack({
-              id: item.id,
-              title: item.title,
-              artist: item.artist,
-              url: `/api/media/stream/${item.id}?deviceId=${currentDeviceId}&licenseKey=${item.licenseKey || ''}`,
-              coverArt: item.coverArt,
-              duration: item.duration,
-              isDRMProtected: item.isDRMProtected
-            });
-          }
-        } else {
-          // No offline download, use streaming
-          setCurrentTrack({
-            id: item.id,
-            title: item.title,
-            artist: item.artist,
-            url: `/api/media/stream/${item.id}?deviceId=${currentDeviceId}&licenseKey=${item.licenseKey || ''}`,
-            coverArt: item.coverArt,
-            duration: item.duration,
-            isDRMProtected: item.isDRMProtected
-          });
-        }
-      };
-    } else {
-      // No IndexedDB, use streaming
-      setCurrentTrack({
-        id: item.id,
-        title: item.title,
-        artist: item.artist,
-        url: `/api/media/stream/${item.id}?deviceId=${currentDeviceId}&licenseKey=${item.licenseKey || ''}`,
-        coverArt: item.coverArt,
-        duration: item.duration,
-        isDRMProtected: item.isDRMProtected
-      });
-    }
-  };
-
   const handleDelete = async (id: string) => {
     try {
       const response = await fetch(`/api/user/downloads/${id}`, {
@@ -310,6 +246,117 @@ useEffect(() => {
 
   const calculateStoragePercentage = () => {
     return Math.min(100, Math.max(0, (storageUsage.used / storageUsage.total) * 100));
+  };
+
+  const handlePlay = async (item: DownloadItem) => {
+    try {
+      // Check if this is a downloaded track that needs DRM decryption
+      if (db && item.downloadStatus === 'completed') {
+        const transaction = db.transaction(["downloads"], "readonly");
+        const store = transaction.objectStore("downloads");
+        const request = store.get(item.id);
+
+        request.onsuccess = async () => {
+          if (request.result) {
+            // Track is downloaded, decrypt it
+            try {
+              const deviceKey = localStorage.getItem('deviceKey');
+              if (!deviceKey) {
+                console.error('No device key found for DRM decryption');
+                // Fallback to streaming
+                playTrack({
+                  id: item.id,
+                  title: item.title,
+                  artist: item.artist,
+                  imageUrl: item.coverArt,
+                  audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
+                });
+                return;
+              }
+
+              const key = await crypto.subtle.importKey(
+                'jwk',
+                JSON.parse(deviceKey),
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['decrypt']
+              );
+
+              const encryptedData = request.result.encryptedData;
+              const iv = new Uint8Array(encryptedData.slice(0, 12));
+              const encrypted = new Uint8Array(encryptedData.slice(12));
+
+              const decrypted = await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv: iv },
+                key,
+                encrypted
+              );
+
+              const blob = new Blob([decrypted], { type: 'audio/mpeg' });
+              const url = URL.createObjectURL(blob);
+
+              playTrack({
+                id: item.id,
+                title: item.title,
+                artist: item.artist,
+                imageUrl: item.coverArt,
+                audioUrl: url
+              });
+            } catch (error) {
+              console.error('DRM decryption failed:', error);
+              // Fallback to streaming
+              playTrack({
+                id: item.id,
+                title: item.title,
+                artist: item.artist,
+                imageUrl: item.coverArt,
+                audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
+              });
+            }
+          } else {
+            // Track not downloaded, use streaming URL
+            playTrack({
+              id: item.id,
+              title: item.title,
+              artist: item.artist,
+              imageUrl: item.coverArt,
+              audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
+            });
+          }
+        };
+
+        request.onerror = () => {
+          console.error('Failed to check download status');
+          // Fallback to streaming
+          playTrack({
+            id: item.id,
+            title: item.title,
+            artist: item.artist,
+            imageUrl: item.coverArt,
+            audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
+          });
+        };
+      } else {
+        // Not downloaded or no DB, use streaming URL
+        playTrack({
+          id: item.id,
+          title: item.title,
+          artist: item.artist,
+          imageUrl: item.coverArt,
+          audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
+        });
+      }
+    } catch (error) {
+      console.error('Error in handlePlay:', error);
+      // Fallback to streaming
+      playTrack({
+        id: item.id,
+        title: item.title,
+        artist: item.artist,
+        imageUrl: item.coverArt,
+        audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
+      });
+    }
   };
 
   const getFilteredDownloads = () => {

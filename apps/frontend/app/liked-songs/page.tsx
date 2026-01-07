@@ -23,7 +23,7 @@ interface MediaFile {
 export default function LikedSongsPage() {
   const [likedSongs, setLikedSongs] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const { currentTrack, isPlaying, setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack, isPlaying, setCurrentTrack, togglePlay, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
 
   useEffect(() => {
@@ -81,10 +81,11 @@ export default function LikedSongsPage() {
     if (currentTrack?.id === file.id) {
       togglePlay();
     } else {
-      setCurrentTrack({
+      playTrack({
         id: file.id,
         title: file.title,
         artist: file.artist,
+        audioUrl: file.url,
         url: file.url,
         coverArt: file.coverArt,
         duration: file.duration
@@ -95,10 +96,11 @@ export default function LikedSongsPage() {
   const handlePlayAll = () => {
     if (likedSongs.length > 0) {
       const firstSong = likedSongs[0];
-      setCurrentTrack({
+      playTrack({
         id: firstSong.id,
         title: firstSong.title,
         artist: firstSong.artist,
+        audioUrl: firstSong.url,
         url: firstSong.url,
         coverArt: firstSong.coverArt,
         duration: firstSong.duration
