@@ -145,7 +145,7 @@ export default function Browse() {
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
   const [showMobileMoneyModal, setShowMobileMoneyModal] = useState(false);
   const [selectedMediaForPayment, setSelectedMediaForPayment] = useState<MediaFile | null>(null);
-  const { currentTrack, isPlaying, togglePlay, setCurrentTrack } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, setCurrentTrack, playTrack } = useAudioPlayer();
   const menuRef = useRef<HTMLDivElement>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const artistsScrollRef = useRef<HTMLDivElement>(null);
@@ -386,7 +386,7 @@ export default function Browse() {
               const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
               const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
               const url = URL.createObjectURL(decryptedBlob);
-              setCurrentTrack({
+              playTrack({
                 id: file.id,
                 title: file.title,
                 artist: file.artist,
@@ -399,7 +399,7 @@ export default function Browse() {
             } catch (error) {
               console.error('Decryption failed', error);
               // Fallback to original URL
-              setCurrentTrack({
+              playTrack({
                 id: file.id,
                 title: file.title,
                 artist: file.artist,
@@ -412,7 +412,7 @@ export default function Browse() {
             }
           } else {
             // No encrypted download, use original URL
-            setCurrentTrack({
+            playTrack({
               id: file.id,
               title: file.title,
               artist: file.artist,
@@ -426,7 +426,7 @@ export default function Browse() {
         };
       } else {
         // No IndexedDB, use original URL
-        setCurrentTrack({
+        playTrack({
           id: file.id,
           title: file.title,
           artist: file.artist,

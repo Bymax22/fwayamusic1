@@ -162,7 +162,7 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
   const [touching, setTouching] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
-  const { currentTrack, isPlaying, togglePlay } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, setCurrentTrack } = useAudioPlayer();
 
   // Responsive sidebar
   useEffect(() => {
@@ -282,7 +282,7 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
                       isPlaying={isPlaying}
                       onPlayPause={togglePlay}
                       onClose={() => {
-                        // Close player logic - could set currentTrack to null
+                        setCurrentTrack(null);
                       }}
                     />
                   )}
