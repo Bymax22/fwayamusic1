@@ -137,10 +137,6 @@ export default function Browse() {
   const [viewMode, setViewMode] = useState<'list' | 'grid' | 'compact'>('list');
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
-  const [currentTime, setCurrentTime] = useState(0);
-  const [volume, setVolume] = useState(80);
-  const [isShuffleOn, setIsShuffleOn] = useState(false);
-  const [isRepeatOn, setIsRepeatOn] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'popular' | 'newest' | 'trending' | 'recommended'>('popular');
   const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
@@ -149,9 +145,7 @@ export default function Browse() {
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
   const [showMobileMoneyModal, setShowMobileMoneyModal] = useState(false);
   const [selectedMediaForPayment, setSelectedMediaForPayment] = useState<MediaFile | null>(null);
-  const { currentTrack, isPlaying, togglePlay, setCurrentTrack } = useAudioPlayer();
-  const progressInterval = useRef<number | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { currentTrack, isPlaying, togglePlay, setCurrentTrack, playTrack } = useAudioPlayer();
   const menuRef = useRef<HTMLDivElement>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const artistsScrollRef = useRef<HTMLDivElement>(null);
@@ -368,42 +362,6 @@ export default function Browse() {
 
   // displayed slice based on visibleCount
   const displayedFiles = filteredFiles.slice(0, visibleCount);
-
-  // Sync audio element with player state
-   useEffect(() => {
-     if (!audioRef.current) return;
-     if (currentTrack) {
-       audioRef.current.src = currentTrack.url;
-       if (isPlaying) {
-         audioRef.current.play().catch((e) => {
-           console.warn('Audio play error:', e);
-         });
-       } else {
-         audioRef.current.pause();
-       }
-     } else {
-       audioRef.current.pause();
-       audioRef.current.currentTime = 0;
-     }
-   }, [currentTrack, isPlaying]);
-
-  // Update progress bar when playing
-  useEffect(() => {
-    if (isPlaying && currentTrack) {
-      progressInterval.current = window.setInterval(() => {
-        setCurrentTime(prev => {
-          const newTime = prev + 1;
-          return newTime >= currentTrack.duration ? 0 : newTime;
-        });
-      }, 1000);
-    } else {
-      if (progressInterval.current !== null) window.clearInterval(progressInterval.current);
-    }
-
-    return () => {
-      if (progressInterval.current !== null) window.clearInterval(progressInterval.current);
-    };
-  }, [isPlaying, currentTrack]);
 
   const loadMore = () => {
     setVisibleCount(prev => Math.min(prev + PAGE_SIZE, filteredFiles.length));
@@ -783,28 +741,6 @@ export default function Browse() {
     }
   };
 
-  const handleSkipForward = () => {
-    const currentIndex = filteredFiles.findIndex(file => file.id === currentTrack?.id);
-    if (currentIndex < filteredFiles.length - 1) {
-      handlePlay(filteredFiles[currentIndex + 1]);
-    }
-  };
-
-  const handleSkipBackward = () => {
-    const currentIndex = filteredFiles.findIndex(file => file.id === currentTrack?.id);
-    if (currentIndex > 0) {
-      handlePlay(filteredFiles[currentIndex - 1]);
-    }
-  };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseInt(e.target.value);
-    setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume / 100;
-    }
-  };
-
   const getGenres = () => {
     const genres = new Set(mediaFiles.map(file => file.genre).filter(Boolean));
     return ['all', ...Array.from(genres)];
@@ -879,7 +815,6 @@ export default function Browse() {
   if (error) {
     return (
       <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
-        <audio ref={audioRef} src={currentTrack?.url} />
         <h1 className="text-3xl font-bold text-white mb-8">Browse Music</h1>
         <div className="bg-[#0a3747] border border-[#0a3747] p-6 rounded-xl">
           <h3 className="text-[#e51f48] font-medium text-lg">{error.message}</h3>
@@ -968,14 +903,86 @@ export default function Browse() {
     }
   };
 
+  const handlePlay = async (file: MediaFile) => {
+    // Check for encrypted download first
+    if (db) {
+      const transaction = db.transaction(["downloads"], "readonly");
+      const store = transaction.objectStore("downloads");
+      const request = store.get(file.id);
+      request.onsuccess = async (e: Event) => {
+        if ((e.target as IDBRequest).result) {
+          const data = (e.target as IDBRequest).result;
+          const { encrypted, iv } = data;
+          const deviceId = localStorage.getItem('deviceId') || 'web-browser';
+          const key = await getKey(deviceId);
+          try {
+            const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
+            const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
+            const url = URL.createObjectURL(decryptedBlob);
+            playTrack({
+              id: file.id,
+              title: file.title,
+              artist: file.artist,
+              url: url,
+              coverArt: file.coverArt,
+              duration: file.duration,
+              isDRMProtected: file.isDRMProtected
+            });
+          } catch (error) {
+            console.error('Decryption failed', error);
+            // Fallback to original URL
+            playTrack({
+              id: file.id,
+              title: file.title,
+              artist: file.artist,
+              url: file.url,
+              coverArt: file.coverArt,
+              duration: file.duration,
+              isDRMProtected: file.isDRMProtected
+            });
+          }
+        } else {
+          // No encrypted download, use original URL
+          playTrack({
+            id: file.id,
+            title: file.title,
+            artist: file.artist,
+            url: file.url,
+            coverArt: file.coverArt,
+            duration: file.duration,
+            isDRMProtected: file.isDRMProtected
+          });
+        }
+      };
+    } else {
+      // No IndexedDB, use original URL
+      playTrack({
+        id: file.id,
+        title: file.title,
+        artist: file.artist,
+        url: file.url,
+        coverArt: file.coverArt,
+        duration: file.duration,
+        isDRMProtected: file.isDRMProtected
+      });
+    }
+
+    // Track play interaction
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/play`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId: 1 }) // TODO: Get from auth context
+    }).catch(err => console.warn('Play tracking failed:', err));
+  };
 
   return (
     <ThemeProvider>
       <AuthProvider>
         <PaymentProvider>
          <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
-            {/* Hidden audio element for volume control */ }
-            <audio ref={audioRef} src={currentTrack?.url} />
 
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-3xl font-bold text-white">Browse Music</h1>
@@ -1844,120 +1851,6 @@ export default function Browse() {
         )}
       </AnimatePresence>
 
-      {/* Now Playing Bar */}
-      {currentTrack && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 border-t border-[#0a3747] shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              {/* Track info */}
-              <div className="flex items-center gap-4 w-1/4">
-                <Image
-                  src={currentTrack.coverArt} 
-                  alt={currentTrack.title} 
-                  width={56}
-                  height={56}
-                  className="w-14 h-14 rounded-lg"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/default-cover.jpg';
-                  }}
-                />
-                <div className="min-w-0">
-                  <p className="font-medium text-white truncate">{currentTrack.title}</p>
-                  <p className="text-sm text-gray-400 truncate">{currentTrack.artist}</p>
-                </div>
-                <button 
-                  onClick={() => handleLike(Number(currentTrack.id))}
-                  className="text-gray-400 hover:text-[#e51f48] transition-colors"
-                  aria-label="Like"
-                >
-                  <Heart 
-                    className="w-5 h-5 group-hover:scale-110 transition-transform" 
-                    fill={typeof currentTrack.likes === 'number' && currentTrack.likes > 0 ? 'currentColor' : 'none'} 
-                  />
-                </button>
-              </div>
-              
-              {/* Player controls */}
-              <div className="flex flex-col items-center w-2/4">
-                <div className="flex items-center gap-4 mb-2">
-                  <button 
-                    onClick={() => setIsShuffleOn(!isShuffleOn)}
-                    className={`text-gray-400 hover:text-[#e51f48] transition-colors ${
-                      isShuffleOn ? 'text-[#e51f48]' : ''
-                    }`}
-                    aria-label="Shuffle"
-                  >
-                    <Shuffle className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={handleSkipBackward}
-                    className="text-gray-400 hover:text-[#e51f48] transition-colors"
-                    aria-label="Previous track"
-                  >
-                    <SkipBack className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={togglePlay}
-                    className="w-10 h-10 rounded-full bg-[#e51f48] hover:bg-[#ff4d6d] text-white flex items-center justify-center shadow-md transition-colors"
-                    aria-label={isPlaying ? 'Pause' : 'Play'}
-                  >
-                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                  </button>
-                  <button 
-                    onClick={handleSkipForward}
-                    className="text-gray-400 hover:text-[#e51f48] transition-colors"
-                    aria-label="Next track"
-                  >
-                    <SkipForward className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={() => setIsRepeatOn(!isRepeatOn)}
-                    className={`text-gray-400 hover:text-[#e51f48] transition-colors ${
-                      isRepeatOn ? 'text-[#e51f48]' : ''
-                    }`}
-                    aria-label="Repeat"
-                  >
-                    <Repeat className="w-5 h-5" />
-                  </button>
-                </div>
-                
-                {/* Progress bar */}
-                <div className="w-full flex items-center gap-3">
-                  <span className="text-xs text-gray-400 w-10 text-right">
-                    {formatDuration(currentTime)}
-                  </span>
-                  <div className="flex-1 h-1.5 bg-[#0a3747] rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full" 
-                      style={{ 
-                        width: `${(currentTime / currentTrack.duration) * 100}%`,
-                        transition: 'width 0.3s ease'
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-xs text-gray-400 w-10">
-                    {formatDuration(currentTrack.duration)}
-                  </span>
-                </div>
-              </div>
-              
-              {/* Volume control */}
-              <div className="flex items-center justify-end gap-2 w-1/4">
-                <Volume2 className="w-5 h-5 text-gray-400" />
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={volume}
-                  onChange={handleVolumeChange}
-                  className="w-24 h-1 bg-[#0a3747] rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#e51f48]"
-                  aria-label="Volume control"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
             </PaymentProvider>
       </AuthProvider>

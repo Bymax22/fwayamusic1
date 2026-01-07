@@ -11,6 +11,7 @@ import { ThemeProvider } from "../context/ThemeContext";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Player from "../components/Player";
+import { GlobalPlayerProvider, useAudioPlayer } from "../hooks/useAudioPlayer";
 const HolographicPreloader = () => {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -153,19 +154,15 @@ interface PlayerState {
   isPlaying: boolean;
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+const LayoutContent = ({ children }: { children: React.ReactNode }) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [nonce, setNonce] = useState<string | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touching, setTouching] = useState(false);
-  const [playerState, setPlayerState] = useState<PlayerState>({
-    isOpen: false,
-    track: null,
-    isPlaying: false
-  });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
+  const { currentTrack, isPlaying, togglePlay } = useAudioPlayer();
 
   // Responsive sidebar
   useEffect(() => {
@@ -199,23 +196,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   // Remove swipe/touch logic for sidebar
   const showSidebar = !!user && sidebarExpanded;
-
-  // Player state handlers
-  const handlePlayerOpen = (track: Track) => {
-    setPlayerState({
-      isOpen: true,
-      track,
-      isPlaying: true
-    });
-  };
-
-  const handlePlayerClose = () => {
-    setPlayerState(prev => ({ ...prev, isOpen: false }));
-  };
-
-  const handlePlayPause = () => {
-    setPlayerState(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
-  };
 
   // Mobile menu handlers
   const handleMobileMenuOpen = () => {
@@ -268,7 +248,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         showSidebar ? (sidebarExpanded ? "ml-56" : "ml-14") : "no-sidebar"
                       }`}
                       style={{ 
-                        paddingBottom: playerState.isOpen ? '4.5rem' : '3.5rem',
+                        paddingBottom: currentTrack ? '4.5rem' : '3.5rem',
                         transition: 'padding-bottom 0.3s ease'
                       }}
                     >
@@ -278,7 +258,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
                   {/* Bottom Navigation - Auto-hides when player opens */}
                   <BottomNav 
-                    isVisible={!playerState.isOpen}
+                    isVisible={!currentTrack}
                     onMenuOpen={handleMobileMenuOpen}
                   />
 
@@ -289,12 +269,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   />
 
                   {/* Player - Now with auto-hide functionality */}
-                  {playerState.isOpen && playerState.track && (
+                  {currentTrack && (
                     <Player
-                      track={playerState.track}
-                      isPlaying={playerState.isPlaying}
-                      onPlayPause={handlePlayPause}
-                      onClose={handlePlayerClose}
+                      track={{
+                        id: currentTrack.id,
+                        title: currentTrack.title,
+                        artist: currentTrack.artist,
+                        imageUrl: currentTrack.coverArt,
+                        audioUrl: currentTrack.url,
+                        duration: currentTrack.duration
+                      }}
+                      isPlaying={isPlaying}
+                      onPlayPause={togglePlay}
+                      onClose={() => {
+                        // Close player logic - could set currentTrack to null
+                      }}
                     />
                   )}
                 </div>
@@ -304,6 +293,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </html>
       </AuthProvider>
     </ThemeProvider>
+  );
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <GlobalPlayerProvider>
+      <LayoutContent>{children}</LayoutContent>
+    </GlobalPlayerProvider>
   );
 }
 

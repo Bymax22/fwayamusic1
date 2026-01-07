@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { FaUserFriends } from "react-icons/fa";
-import Player from './Player';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { 
   FaPlay, 
   FaPause,
@@ -27,6 +27,19 @@ import {
   FaFire
 } from "react-icons/fa";
 import { IoMdMusicalNote } from "react-icons/io";
+
+// Track interface for player
+interface Track {
+  id: string | number;
+  title: string;
+  artist: string;
+  imageUrl?: string;
+  audioUrl: string;
+  url?: string;
+  coverArt?: string;
+  duration?: number;
+  isDRMProtected?: boolean;
+}
 
 // Types
 interface MediaItem {
@@ -133,13 +146,6 @@ interface BeatItem {
   bpm: number;
   genre: string;
   audioUrl: string;
-}
-
-interface AudioPlayerState {
-  currentTrack: MediaItem | BeatItem | null;
-  isPlaying: boolean;
-  progress: number;
-  duration: number;
 }
 
 // Banner Types
@@ -983,7 +989,7 @@ const TopChartsSection = ({
 }: { 
   songs: MediaItem[];
   onPlay: (item: MediaItem) => void;
-  currentTrack: MediaItem | BeatItem | null;
+  currentTrack: Track | null;
   isPlaying: boolean;
 }) => {
   return (
@@ -1081,7 +1087,7 @@ const HorizontalScrollSection = ({
   onPurchase?: (item: MediaItem | BeatItem) => void;
   onDownload?: (item: MediaItem) => void;
   onShare?: (item: MediaItem | Artist | BeatItem) => void;
-  currentTrack?: MediaItem | BeatItem | null;
+  currentTrack?: Track | null;
   isPlaying?: boolean;
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -1284,13 +1290,7 @@ const FeaturedPlaylistsCarousel = ({
 
 // Main Component - Mobile Optimized
 const GuestWelcome = () => {
-  const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
-    currentTrack: null,
-    isPlaying: false,
-    progress: 0,
-    duration: 0
-  });
-  const [isPlayerVisible, setIsPlayerVisible] = useState(false);
+  const { currentTrack, isPlaying, playTrack } = useAudioPlayer();
   const [featuredAlbums, setFeaturedAlbums] = useState<MediaItem[]>([]);
   const [trendingSongs, setTrendingSongs] = useState<MediaItem[]>([]);
   const [favoriteArtists, setFavoriteArtists] = useState<Artist[]>([]);
@@ -1407,30 +1407,105 @@ const GuestWelcome = () => {
     fetchData();
   }, []);
 
-  const handlePlay = (item: MediaItem | BeatItem) => {
-    if (audioPlayerState.currentTrack?.id === item.id) {
-      // Toggle play/pause if same track
-      setAudioPlayerState(prev => ({
-        ...prev,
-        isPlaying: !prev.isPlaying
-      }));
-    } else {
-      // New track
-      setAudioPlayerState({
-        currentTrack: item,
-        isPlaying: true,
-        progress: 0,
-        duration: (item as MediaItem).duration || 0
-      });
-      setIsPlayerVisible(true);
-    }
-  };
+  const handlePlay = async (item: MediaItem | BeatItem) => {
+    try {
+      // Check if this is a downloaded track that needs DRM decryption
+      const db = await (window as any).indexedDB.open('fwaya-music-db', 1);
+      const transaction = db.result.transaction(['downloads'], 'readonly');
+      const store = transaction.objectStore('downloads');
+      const request = store.get(item.id.toString());
 
-  const handlePlayPause = () => {
-    setAudioPlayerState(prev => ({
-      ...prev,
-      isPlaying: !prev.isPlaying
-    }));
+      request.onsuccess = async () => {
+        if (request.result) {
+          // Track is downloaded, decrypt it
+          try {
+            const deviceKey = localStorage.getItem('deviceKey');
+            if (!deviceKey) {
+              console.error('No device key found for DRM decryption');
+              // Fallback to streaming
+              playTrack({
+                id: item.id.toString(),
+                title: item.title,
+                artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+                imageUrl: item.imageUrl || "/default-cover.png",
+                audioUrl: item.audioUrl || (item as MediaItem).url
+              });
+              return;
+            }
+
+            const key = await crypto.subtle.importKey(
+              'jwk',
+              JSON.parse(deviceKey),
+              { name: 'AES-GCM', length: 256 },
+              false,
+              ['decrypt']
+            );
+
+            const encryptedData = request.result.encryptedData;
+            const iv = new Uint8Array(encryptedData.slice(0, 12));
+            const encrypted = new Uint8Array(encryptedData.slice(12));
+
+            const decrypted = await crypto.subtle.decrypt(
+              { name: 'AES-GCM', iv: iv },
+              key,
+              encrypted
+            );
+
+            const blob = new Blob([decrypted], { type: 'audio/mpeg' });
+            const url = URL.createObjectURL(blob);
+
+            playTrack({
+              id: item.id.toString(),
+              title: item.title,
+              artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+              imageUrl: item.imageUrl || "/default-cover.png",
+              audioUrl: url
+            });
+          } catch (error) {
+            console.error('DRM decryption failed:', error);
+            // Fallback to streaming
+            playTrack({
+              id: item.id.toString(),
+              title: item.title,
+              artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+              imageUrl: item.imageUrl || "/default-cover.png",
+              audioUrl: item.audioUrl || (item as MediaItem).url
+            });
+          }
+        } else {
+          // Track not downloaded, use streaming URL
+          playTrack({
+            id: item.id.toString(),
+            title: item.title,
+            artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+            imageUrl: item.imageUrl || "/default-cover.png",
+            audioUrl: item.audioUrl || (item as MediaItem).url
+          });
+        }
+      };
+
+      request.onerror = () => {
+        console.error('Failed to check download status');
+        // Fallback to streaming
+        playTrack({
+          id: item.id.toString(),
+          title: item.title,
+          artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+          imageUrl: item.imageUrl || "/default-cover.png",
+          audioUrl: item.audioUrl || (item as MediaItem).url
+        });
+      };
+    } catch (error) {
+      console.error('Error in handlePlay:', error);
+      // Fallback to streaming
+      playTrack({
+        id: item.id.toString(),
+        title: item.title,
+        artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+        imageUrl: item.imageUrl || "/default-cover.png",
+        audioUrl: item.audioUrl || (item as MediaItem).url
+      });
+    }
   };
 
   const handleBannerClick = (banner: BannerItem) => {
@@ -1542,8 +1617,8 @@ const GuestWelcome = () => {
           onLike={handleLike}
           onDownload={handleDownload}
           onShare={handleShare}
-          currentTrack={audioPlayerState.currentTrack}
-          isPlaying={audioPlayerState.isPlaying}
+          currentTrack={currentTrack as MediaItem | BeatItem | null}
+          isPlaying={isPlaying}
         />
 
         {/* Trending Now */}
@@ -1555,8 +1630,8 @@ const GuestWelcome = () => {
           onLike={handleLike}
           onDownload={handleDownload}
           onShare={handleShare}
-          currentTrack={audioPlayerState.currentTrack}
-          isPlaying={audioPlayerState.isPlaying}
+          currentTrack={currentTrack}
+          isPlaying={isPlaying}
         />
 
         {/* Premium Content */}
@@ -1569,8 +1644,8 @@ const GuestWelcome = () => {
             onPlay={handlePlay}
             onPurchase={handlePurchase}
             onShare={handleShare}
-            currentTrack={audioPlayerState.currentTrack}
-            isPlaying={audioPlayerState.isPlaying}
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
           />
         )}
 
@@ -1583,8 +1658,8 @@ const GuestWelcome = () => {
           onPlay={handlePlay}
           onLike={handleFollowArtist}
           onShare={handleShare}
-          currentTrack={audioPlayerState.currentTrack}
-          isPlaying={audioPlayerState.isPlaying}
+          currentTrack={currentTrack}
+          isPlaying={isPlaying}
         />
 
         {/* Free Content */}
@@ -1596,8 +1671,8 @@ const GuestWelcome = () => {
           onLike={handleLike}
           onDownload={handleDownload}
           onShare={handleShare}
-          currentTrack={audioPlayerState.currentTrack}
-          isPlaying={audioPlayerState.isPlaying}
+          currentTrack={currentTrack}
+          isPlaying={isPlaying}
         />
 
         {/* Beats Marketplace */}
@@ -1609,16 +1684,16 @@ const GuestWelcome = () => {
           onPlay={handlePlay}
           onPurchase={handlePurchase}
           onShare={handleShare}
-          currentTrack={audioPlayerState.currentTrack}
-          isPlaying={audioPlayerState.isPlaying}
+          currentTrack={currentTrack}
+          isPlaying={isPlaying}
         />
 
         {/* Top Charts Section */}
         <TopChartsSection 
           songs={trendingSongs}
           onPlay={handlePlay}
-          currentTrack={audioPlayerState.currentTrack}
-          isPlaying={audioPlayerState.isPlaying}
+          currentTrack={currentTrack as MediaItem | BeatItem | null}
+          isPlaying={isPlaying}
         />
 
         {/* Latest News */}
@@ -1644,31 +1719,6 @@ const GuestWelcome = () => {
           </div>
         </section>
       </main>
-
-      {/* Player */}
-      <AnimatePresence>
-        {isPlayerVisible && audioPlayerState.currentTrack && (
-          <Player 
-            track={{
-              id: audioPlayerState.currentTrack.id.toString(),
-              title: audioPlayerState.currentTrack.title,
-              artist: 'artist' in audioPlayerState.currentTrack ? 
-                audioPlayerState.currentTrack.artist : 
-                'producer' in audioPlayerState.currentTrack ? 
-                (audioPlayerState.currentTrack as BeatItem).producer : 
-                "Unknown Artist",
-              imageUrl: audioPlayerState.currentTrack.imageUrl || "/default-cover.png",
-              audioUrl: audioPlayerState.currentTrack.audioUrl || (audioPlayerState.currentTrack as MediaItem).url
-            }}
-            isPlaying={audioPlayerState.isPlaying}
-            onPlayPause={handlePlayPause}
-            onClose={() => {
-              setIsPlayerVisible(false);
-              setAudioPlayerState(prev => ({ ...prev, isPlaying: false }));
-            }}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 };
