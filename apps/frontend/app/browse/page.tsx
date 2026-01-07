@@ -145,7 +145,7 @@ export default function Browse() {
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
   const [showMobileMoneyModal, setShowMobileMoneyModal] = useState(false);
   const [selectedMediaForPayment, setSelectedMediaForPayment] = useState<MediaFile | null>(null);
-  const { currentTrack, isPlaying, togglePlay, setCurrentTrack, playTrack } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
   const menuRef = useRef<HTMLDivElement>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const artistsScrollRef = useRef<HTMLDivElement>(null);
