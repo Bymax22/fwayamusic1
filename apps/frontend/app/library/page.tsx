@@ -39,7 +39,7 @@ export default function LibraryPage() {
   const [downloadedSongs, setDownloadedSongs] = useState<MediaFile[]>([]);
   const [db, setDb] = useState<IDBDatabase | null>(null);
   const [activeTab, setActiveTab] = useState<'playlists' | 'liked' | 'recent' | 'downloaded'>('playlists');
-  const { currentTrack,  setCurrentTrack, togglePlay, playTrack } = useAudioPlayer();
+  const { currentTrack, togglePlay, playTrack } = useAudioPlayer();
 
   useEffect(() => {
     const fetchData = async () => {

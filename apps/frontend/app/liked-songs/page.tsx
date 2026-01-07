@@ -23,7 +23,7 @@ interface MediaFile {
 export default function LikedSongsPage() {
   const [likedSongs, setLikedSongs] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const { currentTrack, isPlaying, setCurrentTrack, togglePlay, playTrack } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
 
   useEffect(() => {

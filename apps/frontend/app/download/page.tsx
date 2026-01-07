@@ -48,32 +48,8 @@ export default function DownloadPage() {
   const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
   const [db, setDb] = useState<IDBDatabase | null>(null);
   const [downloadedFiles, setDownloadedFiles] = useState<DownloadItem[]>([]);
-  const { currentTrack, setCurrentTrack, playTrack } = useAudioPlayer();
+  const { currentTrack, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
-
-  // Key derivation function for DRM
-  const getKey = async (deviceId: string): Promise<CryptoKey> => {
-    const encoder = new TextEncoder();
-    const keyMaterial = await crypto.subtle.importKey(
-      "raw",
-      encoder.encode(deviceId),
-      "PBKDF2",
-      false,
-      ["deriveBits", "deriveKey"]
-    );
-    return crypto.subtle.deriveKey(
-      {
-        name: "PBKDF2",
-        salt: encoder.encode("fwaya-salt"),
-        iterations: 100000,
-        hash: "SHA-256"
-      },
-      keyMaterial,
-      { name: "AES-GCM", length: 256 },
-      true,
-      ["encrypt", "decrypt"]
-    );
-  };
 
 useEffect(() => {
   const generateDeviceId = () => {
