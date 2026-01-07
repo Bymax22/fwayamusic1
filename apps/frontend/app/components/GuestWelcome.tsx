@@ -34,7 +34,7 @@ interface Track {
   title: string;
   artist: string;
   imageUrl?: string;
-  audioUrl: string;
+  audioUrl?: string;
   url?: string;
   coverArt?: string;
   duration?: number;
@@ -465,7 +465,7 @@ const MediaCard = ({
   onDownload?: (item: MediaItem) => void;
   onShare?: (item: MediaItem | Artist) => void;
   type?: 'media' | 'artist';
-  currentTrack?: MediaItem | BeatItem | null;
+  currentTrack?: Track | null;
   isPlaying?: boolean;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -649,7 +649,7 @@ const PremiumMediaCard = ({
   item: MediaItem;
   onPlay: (item: MediaItem) => void;
   onPurchase: (item: MediaItem) => void;
-  currentTrack?: MediaItem | BeatItem | null;
+  currentTrack?: Track | null;
   isPlaying?: boolean;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -754,7 +754,7 @@ const BeatCard = ({
   onPlay: (beat: BeatItem) => void;
   onPurchase: (beat: BeatItem) => void;
   onShare?: (beat: BeatItem) => void;
-  currentTrack?: MediaItem | BeatItem | null;
+  currentTrack?: Track | null;
   isPlaying?: boolean;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -1617,7 +1617,7 @@ const GuestWelcome = () => {
           onLike={handleLike}
           onDownload={handleDownload}
           onShare={handleShare}
-          currentTrack={currentTrack as MediaItem | BeatItem | null}
+          currentTrack={currentTrack}
           isPlaying={isPlaying}
         />
 
@@ -1692,7 +1692,7 @@ const GuestWelcome = () => {
         <TopChartsSection 
           songs={trendingSongs}
           onPlay={handlePlay}
-          currentTrack={currentTrack as MediaItem | BeatItem | null}
+          currentTrack={currentTrack}
           isPlaying={isPlaying}
         />
 

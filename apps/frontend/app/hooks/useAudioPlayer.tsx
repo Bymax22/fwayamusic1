@@ -6,7 +6,7 @@ interface Track {
   title: string;
   artist: string;
   imageUrl?: string;
-  audioUrl: string;
+  audioUrl?: string;
   url?: string; // For backward compatibility
   coverArt?: string;
   duration?: number;

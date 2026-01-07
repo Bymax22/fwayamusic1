@@ -150,6 +150,7 @@ export default function Browse() {
   const [artists, setArtists] = useState<Artist[]>([]);
   const artistsScrollRef = useRef<HTMLDivElement>(null);
   const [db, setDb] = useState<IDBDatabase | null>(null);
+  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
     // Set device ID if not exists
@@ -390,6 +391,7 @@ export default function Browse() {
                 id: file.id,
                 title: file.title,
                 artist: file.artist,
+                audioUrl: url,
                 url: url,
                 coverArt: file.coverArt,
                 duration: file.duration,
@@ -403,6 +405,7 @@ export default function Browse() {
                 id: file.id,
                 title: file.title,
                 artist: file.artist,
+                audioUrl: file.url,
                 url: file.url,
                 coverArt: file.coverArt,
                 duration: file.duration,
@@ -416,6 +419,7 @@ export default function Browse() {
               id: file.id,
               title: file.title,
               artist: file.artist,
+              audioUrl: file.url,
               url: file.url,
               coverArt: file.coverArt,
               duration: file.duration,
@@ -430,6 +434,7 @@ export default function Browse() {
           id: file.id,
           title: file.title,
           artist: file.artist,
+          audioUrl: file.url,
           url: file.url,
           coverArt: file.coverArt,
           duration: file.duration,
@@ -903,7 +908,7 @@ export default function Browse() {
     }
   };
 
-  const handlePlay = async (file: MediaFile) => {
+  const handlePlayDRM = async (file: MediaFile) => {
     // Check for encrypted download first
     if (db) {
       const transaction = db.transaction(["downloads"], "readonly");
@@ -923,6 +928,7 @@ export default function Browse() {
               id: file.id,
               title: file.title,
               artist: file.artist,
+              audioUrl: url,
               url: url,
               coverArt: file.coverArt,
               duration: file.duration,
@@ -935,6 +941,7 @@ export default function Browse() {
               id: file.id,
               title: file.title,
               artist: file.artist,
+              audioUrl: file.url,
               url: file.url,
               coverArt: file.coverArt,
               duration: file.duration,
@@ -947,6 +954,7 @@ export default function Browse() {
             id: file.id,
             title: file.title,
             artist: file.artist,
+            audioUrl: file.url,
             url: file.url,
             coverArt: file.coverArt,
             duration: file.duration,
@@ -960,6 +968,7 @@ export default function Browse() {
         id: file.id,
         title: file.title,
         artist: file.artist,
+        audioUrl: file.url,
         url: file.url,
         coverArt: file.coverArt,
         duration: file.duration,
