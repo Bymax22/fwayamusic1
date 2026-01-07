@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { 
   Play, Pause, Heart, Share2, Clock, Search, Filter, ListMusic, Grid, 
-  Shuffle, SkipBack, SkipForward, Volume2, Repeat, Download, Plus, 
+  Download, Plus, 
   MoreHorizontal, Eye, Crown, Users, TrendingUp, Calendar, MapPin,
   Bookmark, BookmarkCheck, ShoppingCart, DollarSign, Lock, Unlock,
   Star, Mic2, Video, Headphones, Radio, ChevronLeft, ChevronRight, UserPlus, UserCheck
@@ -150,7 +150,6 @@ export default function Browse() {
   const [artists, setArtists] = useState<Artist[]>([]);
   const artistsScrollRef = useRef<HTMLDivElement>(null);
   const [db, setDb] = useState<IDBDatabase | null>(null);
-  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
     // Set device ID if not exists
@@ -397,7 +396,6 @@ export default function Browse() {
                 duration: file.duration,
                 isDRMProtected: file.isDRMProtected
               });
-              setCurrentTime(0);
             } catch (error) {
               console.error('Decryption failed', error);
               // Fallback to original URL
@@ -411,7 +409,6 @@ export default function Browse() {
                 duration: file.duration,
                 isDRMProtected: file.isDRMProtected
               });
-              setCurrentTime(0);
             }
           } else {
             // No encrypted download, use original URL
@@ -425,7 +422,6 @@ export default function Browse() {
               duration: file.duration,
               isDRMProtected: file.isDRMProtected
             });
-            setCurrentTime(0);
           }
         };
       } else {
@@ -440,7 +436,6 @@ export default function Browse() {
           duration: file.duration,
           isDRMProtected: file.isDRMProtected
         });
-        setCurrentTime(0);
       }
 
       // Track play interaction
@@ -906,85 +901,6 @@ export default function Browse() {
     } catch (err) {
       console.error('Share error:', err);
     }
-  };
-
-  const handlePlayDRM = async (file: MediaFile) => {
-    // Check for encrypted download first
-    if (db) {
-      const transaction = db.transaction(["downloads"], "readonly");
-      const store = transaction.objectStore("downloads");
-      const request = store.get(file.id);
-      request.onsuccess = async (e: Event) => {
-        if ((e.target as IDBRequest).result) {
-          const data = (e.target as IDBRequest).result;
-          const { encrypted, iv } = data;
-          const deviceId = localStorage.getItem('deviceId') || 'web-browser';
-          const key = await getKey(deviceId);
-          try {
-            const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
-            const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
-            const url = URL.createObjectURL(decryptedBlob);
-            playTrack({
-              id: file.id,
-              title: file.title,
-              artist: file.artist,
-              audioUrl: url,
-              url: url,
-              coverArt: file.coverArt,
-              duration: file.duration,
-              isDRMProtected: file.isDRMProtected
-            });
-          } catch (error) {
-            console.error('Decryption failed', error);
-            // Fallback to original URL
-            playTrack({
-              id: file.id,
-              title: file.title,
-              artist: file.artist,
-              audioUrl: file.url,
-              url: file.url,
-              coverArt: file.coverArt,
-              duration: file.duration,
-              isDRMProtected: file.isDRMProtected
-            });
-          }
-        } else {
-          // No encrypted download, use original URL
-          playTrack({
-            id: file.id,
-            title: file.title,
-            artist: file.artist,
-            audioUrl: file.url,
-            url: file.url,
-            coverArt: file.coverArt,
-            duration: file.duration,
-            isDRMProtected: file.isDRMProtected
-          });
-        }
-      };
-    } else {
-      // No IndexedDB, use original URL
-      playTrack({
-        id: file.id,
-        title: file.title,
-        artist: file.artist,
-        audioUrl: file.url,
-        url: file.url,
-        coverArt: file.coverArt,
-        duration: file.duration,
-        isDRMProtected: file.isDRMProtected
-      });
-    }
-
-    // Track play interaction
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/play`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId: 1 }) // TODO: Get from auth context
-    }).catch(err => console.warn('Play tracking failed:', err));
   };
 
   return (

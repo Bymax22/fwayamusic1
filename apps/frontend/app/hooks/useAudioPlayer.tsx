@@ -1,4 +1,4 @@
-import { useState, useContext, createContext, useEffect, ReactNode } from 'react';
+import { useState, useContext, createContext, ReactNode } from 'react';
 
 // Track interface
 interface Track {
