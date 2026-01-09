@@ -91,7 +91,7 @@ export default function ArtistSignUp() {
       if (formData.avatarFile) {
         const formDataUpload = new FormData();
         formDataUpload.append('file', formData.avatarFile);
-        const uploadResponse = await fetch('/api/media/upload-avatar', {
+        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/upload-avatar`, {
           method: 'POST',
           body: formDataUpload,
         });
@@ -99,7 +99,7 @@ export default function ArtistSignUp() {
           throw new Error('Failed to upload avatar');
         }
         const uploadData = await uploadResponse.json();
-        avatarUrl = uploadData.url;
+        avatarUrl = uploadData.avatarUrl;
       }
 
       await signUp({
