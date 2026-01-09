@@ -127,10 +127,10 @@ const SidebarWithAuth = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
     >
       <div className="flex items-center gap-2 p-3 border-b border-white/10">
         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center text-white text-xs font-bold">
-          {user.displayName?.charAt(0) || user.username?.charAt(0) || "U"}
+          {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
         </div>
         <span className="text-white text-sm font-medium truncate mobile-text-sm">
-          {user.displayName || user.username}
+          {user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username)}
         </span>
       </div>
       <Sidebar sidebarExpanded={sidebarExpanded} />

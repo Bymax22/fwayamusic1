@@ -391,9 +391,10 @@ export default function Navbar() {
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       className="absolute top-full right-0 mt-2 w-48 bg-[#0a3747] border border-[#0a4a5f] rounded-xl shadow-2xl py-2 z-50 backdrop-blur-lg"
                     >
-                      {/* User Info */}
                       <div className="px-3 py-2 border-b border-[#0a4a5f]">
-                        <p className="font-semibold text-white text-sm truncate">{user.displayName || user.username}</p>
+                        <p className="font-semibold text-white text-sm truncate">
+                          {user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username)}
+                        </p>
                         <p className="text-xs text-gray-400 truncate">{user.email}</p>
                       </div>
 
@@ -446,7 +447,7 @@ export default function Navbar() {
                   </div>
                 )}
                 <span className="text-sm font-medium hidden lg:inline-block text-white max-w-24 truncate">
-                  {user.displayName || user.username}
+                  {user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username)}
                 </span>
               </button>
 
@@ -476,7 +477,9 @@ export default function Navbar() {
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-white truncate">{user.displayName || user.username}</p>
+                          <p className="font-semibold text-white truncate">
+                            {user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username)}
+                          </p>
                           <p className="text-xs text-gray-400 truncate">{user.email}</p>
                         </div>
                       </div>

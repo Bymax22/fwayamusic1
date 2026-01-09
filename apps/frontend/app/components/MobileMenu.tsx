@@ -144,11 +144,11 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               <div className="px-6 py-4 border-b border-white/10">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center text-white text-sm font-bold">
-                    {user.displayName?.charAt(0) || user.username?.charAt(0) || "U"}
+                    {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white truncate">
-                      {user.displayName || user.username}
+                      {user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username)}
                     </p>
                     <p className="text-xs text-gray-400 truncate">
                       {user.email}
