@@ -222,6 +222,24 @@ const signUp = async (data: SignUpData): Promise<User> => {
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Sign up error:', error);
+        
+        // Handle Firebase errors with user-friendly messages
+        if ('code' in error) {
+          const firebaseError = error as { code: string; message: string };
+          switch (firebaseError.code) {
+            case 'auth/email-already-in-use':
+              throw new Error('This email is already registered. Please try signing in instead or use a different email.');
+            case 'auth/weak-password':
+              throw new Error('Password is too weak. Please choose a stronger password.');
+            case 'auth/invalid-email':
+              throw new Error('Invalid email address. Please check and try again.');
+            case 'auth/operation-not-allowed':
+              throw new Error('Email/password accounts are not enabled. Please contact support.');
+            default:
+              throw new Error(firebaseError.message || 'Failed to create account. Please try again.');
+          }
+        }
+        
         throw error;
       } else {
         console.error('Sign up error:', error);
