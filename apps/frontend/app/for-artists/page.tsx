@@ -832,8 +832,8 @@ export default function ForArtistsPage() {
 
   return (
     <RoleGuard allowedRoles={['ARTIST']} 
-      requireKYC={true}
-      requireEmailVerification={true}>
+      requireKYC={false}
+      requireEmailVerification={false}>
           <div className="bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
         {/* Your artist dashboard content */}
         {user?.kycStatus !== 'APPROVED' && (
