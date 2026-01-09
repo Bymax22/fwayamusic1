@@ -275,8 +275,8 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
                         id: currentTrack.id,
                         title: currentTrack.title,
                         artist: currentTrack.artist,
-                        imageUrl: currentTrack.coverArt,
-                        audioUrl: currentTrack.url,
+                        imageUrl: currentTrack.imageUrl || currentTrack.coverArt,
+                        audioUrl: currentTrack.audioUrl || currentTrack.url,
                         duration: currentTrack.duration
                       }}
                       isPlaying={isPlaying}
