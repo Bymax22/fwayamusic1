@@ -91,7 +91,7 @@ export default function ArtistSignUp() {
         role: 'ARTIST',
         recaptchaToken,
       });
-      setStep('verification');
+      router.push('/for-artists');
     } catch (error: unknown) {
       if (error instanceof Error) {
         setErrors({ submit: error.message });

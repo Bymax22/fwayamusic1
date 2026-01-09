@@ -98,7 +98,7 @@ export default function ResellerSignUp() {
         role: 'RESELLER',
         recaptchaToken,
       });
-      setStep('verification');
+      router.push('/reseller-dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {
         setErrors({ submit: error.message });
