@@ -21,8 +21,9 @@ async function bootstrap() {
         'http://localhost:3000', // Frontend dev
         'http://localhost', // Local testing
         'https://fwaya-music.com',
-        'https://www.fwayainnovations.com', // add your production frontend domain here
-        'https://fwayamusic1-frontend.vercel.app'
+        'https://www.fwayainnovations.com', // Frontend production domain
+        'https://fwayamusic1-frontend.vercel.app', // Vercel frontend
+        'https://fwayamusic1-backend.vercel.app' // Vercel backend
       ];
 
   app.enableCors({
