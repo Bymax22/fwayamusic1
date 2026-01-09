@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 
 export default function ArtistSignIn() {
   const router = useRouter();
-  const { signIn, signInWithGoogle, signInWithFacebook, loading, verifyOTP, sendOTP } = useAuth();
+  const { signIn, signInWithGoogle, signInWithFacebook, loading, verifyOTP, sendOTP, user } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -33,7 +33,7 @@ export default function ArtistSignIn() {
     }
 
     try {
-      await signIn(formData.email, formData.password, 'ARTIST');
+      await signIn(formData.email, formData.password);
       // Send OTP for additional verification
       await sendOTP('email', formData.email);
       setOtpSent(true);
@@ -59,7 +59,13 @@ export default function ArtistSignIn() {
     try {
       const isValid = await verifyOTP('email', formData.otp);
       if (isValid) {
-        router.push('/for-artists');
+        // Check if user is an artist
+        const { user } = useAuth();
+        if (user?.role.toUpperCase() === 'ARTIST') {
+          router.push('/for-artists');
+        } else {
+          setErrors({ otp: 'Access denied. This account is not registered as an artist.' });
+        }
       } else {
         setErrors({ otp: 'Invalid OTP code' });
       }

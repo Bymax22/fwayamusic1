@@ -263,7 +263,7 @@ const signUp = async (data: SignUpData): Promise<User> => {
         throw new Error('Failed to load user profile after sign in.');
      }
       // Check role access
-      if (role && userData.role !== role) {
+      if (role && userData.role.toUpperCase() !== role.toUpperCase()) {
         await signOut(auth);
         throw new Error(`Access denied. This page is for ${role.toLowerCase()}s only.`);
       }
