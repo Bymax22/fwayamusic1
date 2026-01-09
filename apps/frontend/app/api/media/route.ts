@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const backendFormData = new FormData();
     backendFormData.append('file', file);
 
-    const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/upload-avatar`, {
+    const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload-avatar`, {
       method: 'POST',
       body: backendFormData,
     });
