@@ -81,6 +81,18 @@ interface Reaction {
   type: 'like' | 'love' | 'laugh' | 'angry' | 'sad' | 'surprise' | 'fire' | 'star';
 }
 
+const formatDate = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Unknown time';
+    }
+    return formatDistanceToNow(date, { addSuffix: true });
+  } catch {
+    return 'Unknown time';
+  }
+};
+
 const NewsDetailPage = () => {
   const params = useParams();
   const router = useRouter();
@@ -296,7 +308,7 @@ const NewsDetailPage = () => {
               )}
               <div className="flex items-center gap-1">
                 <FaCalendar size={14} />
-                <span>{formatDistanceToNow(new Date(news.createdAt), { addSuffix: true })}</span>
+                <span>{formatDate(news.createdAt)}</span>
               </div>
               <div className="flex items-center gap-1">
                 <FaEye size={14} />
@@ -439,7 +451,7 @@ const NewsDetailPage = () => {
                             <div className="flex items-center gap-2 mb-2">
                               <span className="font-medium text-white">{comment.user.displayName}</span>
                               <span className="text-xs text-gray-400">
-                                {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                                {formatDate(comment.createdAt)}
                               </span>
                             </div>
                             <p className="text-gray-300">{comment.text}</p>
@@ -530,7 +542,7 @@ const NewsDetailPage = () => {
                                       <div className="flex items-center gap-2 mb-1">
                                         <span className="font-medium text-white text-sm">{reply.user.displayName}</span>
                                         <span className="text-xs text-gray-400">
-                                          {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
+                                          {formatDate(reply.createdAt)}
                                         </span>
                                       </div>
                                       <p className="text-gray-300 text-sm">{reply.text}</p>
