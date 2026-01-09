@@ -8,7 +8,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  sendEmailVerification,
   updateProfile,
   sendPasswordResetEmail
 } from 'firebase/auth';
