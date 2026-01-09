@@ -1085,6 +1085,7 @@ const HorizontalScrollSection = ({
   onPurchase,
   onDownload,
   onShare,
+  onSeeAll,
   currentTrack,
   isPlaying
 }: {
@@ -1097,6 +1098,7 @@ const HorizontalScrollSection = ({
   onPurchase?: (item: MediaItem | BeatItem) => void;
   onDownload?: (item: MediaItem) => void;
   onShare?: (item: MediaItem | Artist | BeatItem) => void;
+  onSeeAll?: () => void;
   currentTrack?: Track | null;
   isPlaying?: boolean;
 }) => {
@@ -1139,7 +1141,10 @@ const HorizontalScrollSection = ({
           <h2 className="text-lg font-bold text-white mobile-text-lg">{title}</h2>
           {subtitle && <p className="text-gray-400 mt-0.5 text-xs mobile-text-xs">{subtitle}</p>}
         </div>
-        <button className="text-xs text-[#e51f48] hover:underline flex items-center gap-1 mobile-text-xs">
+        <button 
+          onClick={onSeeAll}
+          className="text-xs text-[#e51f48] hover:underline flex items-center gap-1 mobile-text-xs"
+        >
           See all <FaArrowRight size={10} />
         </button>
       </div>
