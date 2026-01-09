@@ -35,10 +35,10 @@ export default function EnhancedRoleGuard({
       let redirectPath = fallbackPath;
 
       // Check role
-      if (!allowedRoles.includes(user.role)) {
+      if (!allowedRoles.some(allowedRole => allowedRole.toUpperCase() === user.role.toUpperCase())) {
         shouldRedirect = true;
         // Redirect to appropriate dashboard based on user's actual role
-        switch (user.role) {
+        switch (user.role.toUpperCase()) {
           case 'USER':
             redirectPath = '/dashboard';
             break;
