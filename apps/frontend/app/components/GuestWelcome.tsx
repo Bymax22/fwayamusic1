@@ -1375,16 +1375,29 @@ const GuestWelcome = () => {
           playlistsRes.json()
         ]);
 
-        const featuredSongs = homepageSections.featuredSongs || [];
-        const trendingSongs = homepageSections.trendingSongs || [];
-        const topCharts = homepageSections.topCharts || [];
+        const featuredSongs = (homepageSections.featuredSongs || []).map((item: any) => ({
+          ...item,
+          artist: item.user?.displayName || item.user?.username || "Unknown Artist"
+        }));
+        const trendingSongs = (homepageSections.trendingSongs || []).map((item: any) => ({
+          ...item,
+          artist: item.user?.displayName || item.user?.username || "Unknown Artist"
+        }));
+        const topCharts = (homepageSections.topCharts || []).map((item: any) => ({
+          ...item,
+          artist: item.user?.displayName || item.user?.username || "Unknown Artist"
+        }));
+        const beats = (homepageSections.beats || []).map((item: any) => ({
+          ...item,
+          artist: item.user?.displayName || item.user?.username || "Unknown Artist"
+        }));
 
         setFeaturedAlbums(featuredSongs);
         setTrendingSongs(trendingSongs);
         setFeaturedPlaylists(playlistsData || []);
         setFavoriteArtists(artistsData || []);
         setNewsItems(newsData || []);
-        setBeatsForProducers(homepageSections.beats || []);
+        setBeatsForProducers(beats);
 
         // Filter premium content
         const allContent = [
@@ -1426,7 +1439,7 @@ const GuestWelcome = () => {
               playTrack({
                 id: item.id.toString(),
                 title: item.title,
-                artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+                artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
                 imageUrl: item.imageUrl || "/default-cover.png",
                 audioUrl: item.audioUrl || (item as MediaItem).url
               });
@@ -1457,7 +1470,7 @@ const GuestWelcome = () => {
             playTrack({
               id: item.id.toString(),
               title: item.title,
-              artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+              artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
               imageUrl: item.imageUrl || "/default-cover.png",
               audioUrl: url
             });
@@ -1477,7 +1490,7 @@ const GuestWelcome = () => {
           playTrack({
             id: item.id.toString(),
             title: item.title,
-            artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+            artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
             imageUrl: item.imageUrl || "/default-cover.png",
             audioUrl: item.audioUrl || (item as MediaItem).url
           });
@@ -1490,7 +1503,7 @@ const GuestWelcome = () => {
         playTrack({
           id: item.id.toString(),
           title: item.title,
-          artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+          artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
           imageUrl: item.imageUrl || "/default-cover.png",
           audioUrl: item.audioUrl || (item as MediaItem).url
         });
@@ -1501,7 +1514,7 @@ const GuestWelcome = () => {
       playTrack({
         id: item.id.toString(),
         title: item.title,
-        artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
+        artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
         imageUrl: item.imageUrl || "/default-cover.png",
         audioUrl: item.audioUrl || (item as MediaItem).url
       });

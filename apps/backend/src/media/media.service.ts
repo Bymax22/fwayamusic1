@@ -114,31 +114,72 @@ async getHomepageSections() {
       OR: [
         { tags: { has: "featured" } },
         { tags: { has: "new" } }
-      ]
+      ],
+      accessType: 'FREE'
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true
+        }
+      }
     },
     orderBy: { createdAt: "desc" },
     take: 8,
   });
   if (featuredSongs.length < 8) {
     const latest = await this.prisma.media.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatarUrl: true
+          }
+        }
+      },
       orderBy: { createdAt: "desc" },
       take: 8 - featuredSongs.length,
-      where: { id: { notIn: featuredSongs.map(m => m.id) } }
+      where: { id: { notIn: featuredSongs.map(m => m.id) }, accessType: 'FREE' }
     });
     featuredSongs = featuredSongs.concat(latest);
   }
 
   // Trending Songs
   let trendingSongs = await this.prisma.media.findMany({
-    where: { tags: { has: "trending" } },
+    where: { tags: { has: "trending" }, accessType: 'FREE' },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true
+        }
+      }
+    },
     orderBy: { playCount: "desc" },
     take: 8,
   });
   if (trendingSongs.length < 8) {
     const mostPlayed = await this.prisma.media.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatarUrl: true
+          }
+        }
+      },
       orderBy: { playCount: "desc" },
       take: 8 - trendingSongs.length,
-      where: { id: { notIn: trendingSongs.map(m => m.id) } }
+      where: { id: { notIn: trendingSongs.map(m => m.id) }, accessType: 'FREE' }
     });
     trendingSongs = trendingSongs.concat(mostPlayed);
   }
@@ -149,21 +190,53 @@ async getHomepageSections() {
       OR: [
         { genre: { contains: "beat", mode: "insensitive" } },
         { genre: { contains: "instrumental", mode: "insensitive" } }
-      ]
+      ],
+      accessType: 'FREE'
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true
+        }
+      }
     },
     take: 8,
   });
 
   // Top Charts
   let topCharts = await this.prisma.media.findMany({
+    where: { accessType: 'FREE' },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true
+        }
+      }
+    },
     orderBy: { playCount: "desc" },
     take: 8,
   });
   if (topCharts.length < 8) {
     const latest = await this.prisma.media.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatarUrl: true
+          }
+        }
+      },
       orderBy: { createdAt: "desc" },
       take: 8 - topCharts.length,
-      where: { id: { notIn: topCharts.map(m => m.id) } }
+      where: { id: { notIn: topCharts.map(m => m.id) }, accessType: 'FREE' }
     });
     topCharts = topCharts.concat(latest);
   }
