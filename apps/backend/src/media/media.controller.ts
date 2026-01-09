@@ -40,6 +40,24 @@ export class MediaController {
     });
   }
 
+  // Public avatar upload for signup
+  @Post('upload-avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 2 * 1024 * 1024 })], // 2MB for avatars
+      })
+    ) file: Express.Multer.File
+  ) {
+    // Upload to Cloudinary as avatar
+    const uploadResult = await this.mediaService.uploadToCloudinary(file, 'avatar');
+    return {
+      avatarUrl: uploadResult.secure_url,
+      publicId: uploadResult.public_id
+    };
+  }
+
   @Get()
   async getAllMedia() {
     return this.mediaService.getAllMedia();

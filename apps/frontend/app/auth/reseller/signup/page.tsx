@@ -30,6 +30,7 @@ export default function ResellerSignUp() {
     acceptedPrivacy: false,
     marketingEmails: false,
     dataSharing: false,
+    avatarFile: null as File | null,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState('');
@@ -93,10 +94,26 @@ export default function ResellerSignUp() {
     }
 
     try {
+      let avatarUrl = '';
+      if (formData.avatarFile) {
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', formData.avatarFile);
+        const uploadResponse = await fetch('/api/media/upload-avatar', {
+          method: 'POST',
+          body: formDataUpload,
+        });
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload avatar');
+        }
+        const uploadData = await uploadResponse.json();
+        avatarUrl = uploadData.url;
+      }
+
       await signUp({
         ...formData,
         role: 'RESELLER',
         recaptchaToken,
+        avatarUrl,
       });
       router.push('/reseller-dashboard');
     } catch (error: unknown) {
@@ -113,7 +130,7 @@ export default function ResellerSignUp() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl p-8 w-full max-w-2xl border border-gray-200 shadow-xl"
+        className="backdrop-blur-md bg-white/20 rounded-2xl p-8 w-full max-w-2xl border border-white/30 shadow-2xl"
       >
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -213,6 +230,18 @@ export default function ResellerSignUp() {
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="Your display name"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Profile Picture
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFormData({ ...formData, avatarFile: e.target.files?.[0] || null })}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
               />
             </div>
 

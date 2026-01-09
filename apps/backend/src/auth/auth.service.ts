@@ -42,6 +42,7 @@ export class AuthService {
     if (dto.phoneNumber) userData.phoneNumber = dto.phoneNumber;
     if (dto.dateOfBirth) userData.dateOfBirth = new Date(dto.dateOfBirth);
     if (dto.country) userData.country = dto.country;
+    if (dto.avatarUrl) userData.avatarUrl = dto.avatarUrl;
 
     // Artist-specific fields
     if (dto.artistName) userData.artistName = dto.artistName;

@@ -85,7 +85,7 @@ const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#0a1f29] rounded-2xl p-8 w-full max-w-md border border-[#0a3747] shadow-xl"
+        className="backdrop-blur-md bg-[#0a1f29]/80 rounded-2xl p-8 w-full max-w-md border border-white/20 shadow-2xl"
       >
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
@@ -159,21 +159,21 @@ const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
           )}
         </form>
 
-        <div className="mt-8 pt-6 border-t border-[#0a3747]">
+        <div className="mt-8 pt-6 border-t border-white/20">
           <div className="text-center mb-4">
             <span className="text-gray-400 text-sm">Or continue with</span>
           </div>
           <div className="flex gap-4">
             <button
               onClick={() => handleSocialSignIn('google')}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-800 rounded-xl hover:bg-gray-100 transition-colors font-medium"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 backdrop-blur-md bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors font-medium border border-white/20"
             >
               <FaGoogle className="w-5 h-5" />
               Google
             </button>
             <button
               onClick={() => handleSocialSignIn('facebook')}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 backdrop-blur-md bg-blue-600/80 text-white rounded-xl hover:bg-blue-600/90 transition-colors font-medium border border-blue-500/50"
             >
               <FaFacebook className="w-5 h-5" />
               Facebook

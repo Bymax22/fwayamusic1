@@ -14,6 +14,23 @@ export class MediaService {
     });
   }
 
+  // Upload avatar without creating media record
+  async uploadToCloudinary(file: Express.Multer.File, type: 'avatar' | 'media' = 'media') {
+    const folder = type === 'avatar' ? 'fwaya-avatars' : 'fwaya-media';
+    
+    const uploadResult = await cloudinary.uploader.upload(`data:${file.mimetype};base64,${file.buffer.toString('base64')}`, {
+      folder,
+      resource_type: 'image', // Avatars are images
+      public_id: `avatar_${Date.now()}_${file.originalname.replace(/\.[^/.]+$/, "")}`,
+      quality: 'auto',
+      width: type === 'avatar' ? 200 : undefined, // Resize avatars to 200px
+      height: type === 'avatar' ? 200 : undefined,
+      crop: type === 'avatar' ? 'fill' : undefined,
+    });
+
+    return uploadResult;
+  }
+
   async createMedia(file: Express.Multer.File, userId: number, metadata?: { title?: string, description?: string }) {
     try {
       // 1. Upload to Cloudinary

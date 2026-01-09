@@ -105,7 +105,7 @@ export default function ResellerSignIn() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl p-8 w-full max-w-md border border-gray-200 shadow-xl"
+        className="backdrop-blur-md bg-white/20 rounded-2xl p-8 w-full max-w-md border border-white/30 shadow-2xl"
       >
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">

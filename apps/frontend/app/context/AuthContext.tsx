@@ -81,6 +81,7 @@ interface SignUpData {
   marketingEmails: boolean;
   dataSharing: boolean;
   recaptchaToken: string;
+  avatarUrl?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
