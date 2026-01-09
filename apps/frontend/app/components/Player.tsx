@@ -216,7 +216,7 @@ export default function Player({
     <AnimatePresence>
       <motion.div
         className={`fixed bottom-0 left-0 right-0 z-50 ${
-          isExpanded ? "h-[60vh]" : "h-20" // Reduced from h-32 to h-20
+          isExpanded ? "h-[60vh]" : "h-24" // Increased from h-20 to h-24 for better mobile visibility
         } bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg ${
           className || ""
         }`}

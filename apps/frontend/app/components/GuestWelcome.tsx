@@ -1440,7 +1440,7 @@ const GuestWelcome = () => {
                 id: item.id.toString(),
                 title: item.title,
                 artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-                imageUrl: item.imageUrl || "/default-cover.png",
+                imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
                 audioUrl: item.audioUrl || (item as MediaItem).url
               });
               return;
@@ -1471,7 +1471,7 @@ const GuestWelcome = () => {
               id: item.id.toString(),
               title: item.title,
               artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-              imageUrl: item.imageUrl || "/default-cover.png",
+              imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
               audioUrl: url
             });
           } catch (error) {
@@ -1481,7 +1481,7 @@ const GuestWelcome = () => {
               id: item.id.toString(),
               title: item.title,
               artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
-              imageUrl: item.imageUrl || "/default-cover.png",
+              imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
               audioUrl: item.audioUrl || (item as MediaItem).url
             });
           }
@@ -1491,7 +1491,7 @@ const GuestWelcome = () => {
             id: item.id.toString(),
             title: item.title,
             artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-            imageUrl: item.imageUrl || "/default-cover.png",
+            imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
             audioUrl: item.audioUrl || (item as MediaItem).url
           });
         }
@@ -1504,7 +1504,7 @@ const GuestWelcome = () => {
           id: item.id.toString(),
           title: item.title,
           artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-          imageUrl: item.imageUrl || "/default-cover.png",
+          imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
           audioUrl: item.audioUrl || (item as MediaItem).url
         });
       };
@@ -1515,7 +1515,7 @@ const GuestWelcome = () => {
         id: item.id.toString(),
         title: item.title,
         artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-        imageUrl: item.imageUrl || "/default-cover.png",
+        imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
         audioUrl: item.audioUrl || (item as MediaItem).url
       });
     }
