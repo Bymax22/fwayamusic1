@@ -1,31 +1,14 @@
 import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
-import express from 'express';
-
-const server = express();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
   // Configure CORS
-  // Read allowed origins from environment variable ALLOWED_ORIGINS (comma-separated)
-  const allowedOriginsEnv = process.env.ALLOWED_ORIGINS || '';
-  const allowedOrigins = allowedOriginsEnv
-    ? allowedOriginsEnv.split(',').map(s => s.trim())
-    : [
-        'http://localhost:3000', // Frontend dev
-        'http://localhost', // Local testing
-        'https://fwaya-music.com',
-        'https://www.fwayainnovations.com', // Frontend production domain
-        'https://fwayamusic1-frontend.vercel.app', // Vercel frontend
-        'https://fwayamusic1-backend.vercel.app' // Vercel backend
-      ];
-
   app.enableCors({
     origin: true, // Allow all origins for debugging
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -33,6 +16,7 @@ async function bootstrap() {
       'Content-Type',
       'Authorization',
       'Accept',
+      'Origin',
       'X-Requested-With',
     ],
     credentials: true,
@@ -44,10 +28,29 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   await app.init();
+
+  // For Vercel, return the Express instance
+  if (process.env.VERCEL) {
+    return app.getHttpAdapter().getInstance();
+  }
+
+  // For local development, start listening
+  await app.listen(configService.get('PORT') || 3001);
+  logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 
-// Initialize for Vercel
-bootstrap();
+// For Vercel serverless
+let vercelApp: any;
+if (process.env.VERCEL) {
+  bootstrap().then(app => {
+    vercelApp = app;
+  });
+}
 
 // Export for Vercel
-export default server;
+export default vercelApp;
+
+// For local development
+if (!process.env.VERCEL) {
+  bootstrap();
+}
