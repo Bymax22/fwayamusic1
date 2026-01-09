@@ -523,7 +523,7 @@ const MediaCard = ({
 
   const getSubtitle = () => {
     if (type === 'artist') {
-      return `${Number((item as Artist).followers ?? 0).toLocaleString()} followers`;
+      return ''; // Remove followers from subtitle for artists
     }
     const media = item as MediaItem;
     return (
@@ -612,14 +612,14 @@ const MediaCard = ({
           
           {type === 'artist' && (
             <div className="flex items-center justify-between w-full">
-              <div className="flex flex-col">
+              <div className="flex items-center gap-3">
                 <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
                   <FaUserFriends size={8} />
-                  {Number((item as Artist).followers ?? 0).toLocaleString()} followers
+                  {Number((item as Artist).followers ?? 0).toLocaleString()}
                 </span>
                 <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
                   <FaMusic size={8} />
-                  {Number((item as Artist).mediaCount ?? 0).toLocaleString()} tracks
+                  {Number((item as Artist).mediaCount ?? 0).toLocaleString()}
                 </span>
               </div>
               <div className="flex items-center gap-1">
