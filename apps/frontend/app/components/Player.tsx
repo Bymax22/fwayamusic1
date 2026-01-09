@@ -121,6 +121,7 @@ export default function Player({
           }
         }
 
+        audio.preload = 'auto'; // Preload for high quality playback
         audio.src = src;
         audio.load();
         setCurrentTime(0);

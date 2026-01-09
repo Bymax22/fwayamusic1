@@ -21,6 +21,7 @@ export class MediaService {
         folder: 'fwaya-media',
         resource_type: 'auto',
         public_id: file.originalname.replace(/\.[^/.]+$/, ""),
+        quality: 'auto', // Ensure high quality upload
       });
 
       // 2. Create database record
