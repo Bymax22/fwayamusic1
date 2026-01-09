@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import { FaUserFriends } from "react-icons/fa";
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
@@ -468,6 +469,7 @@ const MediaCard = ({
   currentTrack?: Track | null;
   isPlaying?: boolean;
 }) => {
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState((item as MediaItem).liked || false);
   const [isFollowing, setIsFollowing] = useState((item as Artist).isFollowing || false);
@@ -543,6 +545,8 @@ const MediaCard = ({
       onClick={() => {
         if (type === 'media') {
           onPlay(item as MediaItem);
+        } else if (type === 'artist') {
+          router.push(`/artists/${item.id}`);
         }
       }}
     >
