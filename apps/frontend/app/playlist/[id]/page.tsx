@@ -70,18 +70,6 @@ interface Playlist {
   }[];
 }
 
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  imageUrl?: string;
-  audioUrl?: string;
-  url?: string;
-  coverArt?: string;
-  duration?: number;
-  isDRMProtected?: boolean;
-}
-
 const PlaylistDetailPage = () => {
   const params = useParams();
   const router = useRouter();

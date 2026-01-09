@@ -11,18 +11,13 @@ import {
   FaComment,
   FaEye,
   FaCalendar,
-  FaUser,
-  FaReply,
   FaThumbsUp,
-  FaThumbsDown,
   FaLaugh,
   FaAngry,
   FaFrown,
   FaSurprise,
   FaFire,
-  FaStar,
-  FaPlus,
-  FaMinus
+  FaStar
 } from 'react-icons/fa';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -125,7 +120,7 @@ const NewsDetailPage = () => {
     // TODO: Implement like functionality with API
   };
 
-  const handleReaction = (contentId: string, reactionType: string, isReply = false) => {
+  const handleReaction = (contentId: string, reactionType: string) => {
     setUserReactions(prev => ({
       ...prev,
       [contentId]: prev[contentId] === reactionType ? '' : reactionType
@@ -202,20 +197,6 @@ const NewsDetailPage = () => {
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-    }
-  };
-
-  const getReactionIcon = (type: string) => {
-    switch (type) {
-      case 'like': return <FaThumbsUp size={14} />;
-      case 'love': return <FaHeart size={14} />;
-      case 'laugh': return <FaLaugh size={14} />;
-      case 'angry': return <FaAngry size={14} />;
-      case 'sad': return <FaFrown size={14} />;
-      case 'surprise': return <FaSurprise size={14} />;
-      case 'fire': return <FaFire size={14} />;
-      case 'star': return <FaStar size={14} />;
-      default: return <FaThumbsUp size={14} />;
     }
   };
 
@@ -556,7 +537,7 @@ const NewsDetailPage = () => {
                                     </div>
                                     <div className="flex items-center gap-2 mt-1 text-xs">
                                       <button
-                                        onClick={() => handleReaction(reply.id, 'like', true)}
+                                        onClick={() => handleReaction(reply.id, 'like')}
                                         className={`flex items-center gap-1 transition-colors ${
                                           userReactions[reply.id] === 'like' ? 'text-blue-500' : 'text-gray-400 hover:text-white'
                                         }`}
