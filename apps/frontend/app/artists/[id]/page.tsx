@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import {
   FaPlay,
   FaPause,
-  FaHeart,
   FaRegHeart,
   FaShare,
   FaUserFriends,
@@ -19,7 +18,7 @@ import {
   FaCrown
 } from 'react-icons/fa';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { formatDuration, formatFileSize } from '@/lib/utils';
+import { formatDuration } from '@/lib/utils';
 
 interface Artist {
   id: string;
