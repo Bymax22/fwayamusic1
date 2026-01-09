@@ -18,6 +18,19 @@ import {
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 
+// Track interface
+interface Track {
+  id: string | number;
+  title: string;
+  artist: string;
+  imageUrl?: string;
+  audioUrl?: string;
+  url?: string;
+  coverArt?: string;
+  duration?: number;
+  isDRMProtected?: boolean;
+}
+
 interface Playlist {
   id: number;
   name: string;
@@ -100,17 +113,7 @@ const PlaylistDetailPage = () => {
     }
   }, [params.id]);
 
-  const handlePlay = (track: any, index: number = 0) => {
-    const playlistTracks = playlist?.entries.map(entry => ({
-      id: entry.media.id.toString(),
-      title: entry.media.title,
-      artist: entry.media.user?.displayName || entry.media.user?.username || "Unknown Artist",
-      imageUrl: entry.media.coverArt || entry.media.artCoverUrl || entry.media.imageUrl || "/default-cover.png",
-      audioUrl: entry.media.audioUrl || entry.media.url,
-      duration: entry.media.duration,
-      isDRMProtected: entry.media.isDRMProtected
-    })) || [];
-
+  const handlePlay = (track: Track) => {
     playTrack(track);
   };
 
@@ -303,7 +306,7 @@ const PlaylistDetailPage = () => {
                             audioUrl: track.audioUrl || track.url,
                             duration: track.duration,
                             isDRMProtected: track.isDRMProtected
-                          }, index)}
+                          })}
                         />
                       ) : (
                         <div className="flex items-center justify-center w-6 h-6">
@@ -319,7 +322,7 @@ const PlaylistDetailPage = () => {
                               audioUrl: track.audioUrl || track.url,
                               duration: track.duration,
                               isDRMProtected: track.isDRMProtected
-                            }, index)}
+                            })}
                           />
                         </div>
                       )}
