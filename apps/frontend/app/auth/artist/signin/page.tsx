@@ -60,7 +60,6 @@ export default function ArtistSignIn() {
       const isValid = await verifyOTP('email', formData.otp);
       if (isValid) {
         // Check if user is an artist
-        const { user } = useAuth();
         if (user?.role.toUpperCase() === 'ARTIST') {
           router.push('/for-artists');
         } else {
