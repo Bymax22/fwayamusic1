@@ -190,8 +190,8 @@ const signUp = async (data: SignUpData): Promise<User> => {
         });
       }
 
-   // Send email verification
-      await sendEmailVerification(firebaseUser);
+      // Temporarily deactivate email verification
+      // await sendEmailVerification(firebaseUser);
 
       // For artists and resellers, send OTP for additional verification
       if (data.role === 'ARTIST' || data.role === 'RESELLER') {
@@ -201,6 +201,10 @@ const signUp = async (data: SignUpData): Promise<User> => {
 
      // Create user in backend
       const token = await firebaseUser.getIdToken();
+      // Store token for middleware
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('authToken', token);
+      }
       const backendResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/signup`, {
         method: 'POST',
         headers: {
