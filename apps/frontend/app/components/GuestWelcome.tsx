@@ -612,15 +612,21 @@ const MediaCard = ({
           
           {type === 'artist' && (
             <div className="flex items-center justify-between w-full">
-              <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
-                <FaUserFriends size={8} />
-                {Number((item as Artist).followers ?? 0).toLocaleString()}
-              </span>
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
+                  <FaUserFriends size={8} />
+                  {Number((item as Artist).followers ?? 0).toLocaleString()} followers
+                </span>
+                <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
+                  <FaMusic size={8} />
+                  {Number((item as Artist).mediaCount ?? 0).toLocaleString()} tracks
+                </span>
+              </div>
               <div className="flex items-center gap-1">
                 <button 
                   onClick={handleFollow}
                   className={`
-                    rounded-full transition-colors text-xs px-1.5 py-0.5 touch-target mobile-text-xs
+                    rounded-full transition-colors text-xs px-1 py-0.5 touch-target mobile-text-xs
                     ${isFollowing 
                       ? 'bg-[#e51f48] text-white' 
                       : 'bg-[#0b2936] text-[#e51f48] hover:bg-[#e51f48] hover:text-white'
