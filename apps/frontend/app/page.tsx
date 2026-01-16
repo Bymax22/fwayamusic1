@@ -23,15 +23,16 @@ export default function Home() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register' | 'role'>('register');
-  const [selectedRole, setSelectedRole] = useState<'USER' | 'ARTIST' | 'RESELLER'>('RESELLER');
+  const [authMode, setAuthMode] = useState<'login' | 'register' | 'role'>('role');
+  const [selectedRole, setSelectedRole] = useState<'USER' | 'ARTIST' | 'RESELLER'>('USER');
 
   // Show auth modal for guests after 3 seconds
   useEffect(() => {
     if (!user && !loading) {
       const timer = setTimeout(() => {
-        setShowAuthModal(true);
-        setAuthMode('register');
+        // Popup disabled - don't show auth modal
+        // setShowAuthModal(true);
+        // setAuthMode('role');
       }, 3000);
       return () => clearTimeout(timer);
     }

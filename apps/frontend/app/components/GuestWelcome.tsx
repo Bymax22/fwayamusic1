@@ -1372,6 +1372,7 @@ const GuestWelcome = () => {
         // Fetch homepage media sections
         const homepageSectionsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/homepage-sections`);
         const homepageSections = await homepageSectionsRes.json();
+        console.log('Homepage sections response:', homepageSections);
 
         // Fetch other data
         const [
@@ -1407,6 +1408,7 @@ const GuestWelcome = () => {
           imageUrl: item.coverImage || item.cover || item.imageUrl || "/default-cover.png",
           artist: item.user?.displayName || item.user?.username || "Unknown Artist"
         }));
+        console.log('Beats data:', beats);
 
         setFeaturedAlbums(featuredSongs);
         setTrendingSongs(trendingSongs);
