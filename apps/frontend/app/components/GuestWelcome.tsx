@@ -783,16 +783,22 @@ const BeatCard = ({
       onHoverEnd={() => setIsHovered(false)}
       onClick={() => onPlay(beat)}
     >
-      <div className="relative aspect-square overflow-hidden rounded-lg">
-        <Image
-          src={beat.imageUrl || "/default-cover.png"}
-          alt={beat.title}
-          fill
-          className="object-cover"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = "/default-cover.png";
-          }}
-        />
+      <div className="relative aspect-square overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-pink-600">
+        {beat.imageUrl && beat.imageUrl !== "/default-cover.png" ? (
+          <Image
+            src={beat.imageUrl}
+            alt={beat.title}
+            fill
+            className="object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <FaMusic className="w-8 h-8 text-white/70" />
+          </div>
+        )}
         
         <div className="absolute top-1 left-1">
           {beat.isPremium ? (
@@ -1372,7 +1378,6 @@ const GuestWelcome = () => {
         // Fetch homepage media sections
         const homepageSectionsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/homepage-sections`);
         const homepageSections = await homepageSectionsRes.json();
-        console.log('Homepage sections response:', homepageSections);
 
         // Fetch other data
         const [
@@ -1408,7 +1413,6 @@ const GuestWelcome = () => {
           imageUrl: item.coverImage || item.cover || item.imageUrl || "/default-cover.png",
           artist: item.user?.displayName || item.user?.username || "Unknown Artist"
         }));
-        console.log('Beats data:', beats);
 
         setFeaturedAlbums(featuredSongs);
         setTrendingSongs(trendingSongs);
