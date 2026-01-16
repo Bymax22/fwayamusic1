@@ -428,10 +428,10 @@ export default function ResellerSignUp() {
                   id="terms-reseller"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-green-600 bg-white border-green-500/40 rounded focus:ring-green-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-green-500 bg-[#0a3747] border-green-500/40 rounded focus:ring-green-500 focus:ring-2"
                 />
                 <label htmlFor="terms-reseller" className="text-white text-sm">
-                  I agree to the <a href="/terms" className="text-green-600 hover:underline">Reseller Terms of Service</a> and <a href="/privacy" className="text-green-600 hover:underline">Privacy Policy</a> *
+                  I agree to the <a href="/terms" className="text-green-400 hover:text-green-300 hover:underline">Reseller Terms of Service</a> and <a href="/privacy" className="text-green-400 hover:text-green-300 hover:underline">Privacy Policy</a> *
                 </label>
               </div>
               {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
@@ -442,7 +442,7 @@ export default function ResellerSignUp() {
                   id="privacy-reseller"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-green-600 bg-white border-green-500/40 rounded focus:ring-green-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-green-500 bg-[#0a3747] border-green-500/40 rounded focus:ring-green-500 focus:ring-2"
                 />
                 <label htmlFor="privacy-reseller" className="text-white text-sm">
                   I acknowledge that I have read and understood how my personal and business data will be processed *
@@ -456,7 +456,7 @@ export default function ResellerSignUp() {
                   id="marketing-reseller"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-green-600 bg-white border-green-500/40 rounded focus:ring-green-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-green-500 bg-[#0a3747] border-green-500/40 rounded focus:ring-green-500 focus:ring-2"
                 />
                 <label htmlFor="marketing-reseller" className="text-white text-sm">
                   I agree to receive marketing emails and promotional offers
@@ -469,7 +469,7 @@ export default function ResellerSignUp() {
                   id="dataSharing-reseller"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-green-600 bg-white border-green-500/40 rounded focus:ring-green-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-green-500 bg-[#0a3747] border-green-500/40 rounded focus:ring-green-500 focus:ring-2"
                 />
                 <label htmlFor="dataSharing-reseller" className="text-white text-sm">
                   I consent to my data being shared with trusted partners for service improvement
@@ -559,7 +559,7 @@ export default function ResellerSignUp() {
         <div className="text-center mt-8 pt-6 border-t border-gray-200">
           <p className="text-gray-300">
             Already have a reseller account?{' '}
-            <Link href="/auth/reseller/signin" className="text-green-600 hover:underline font-semibold">
+            <Link href="/auth/reseller/signin" className="text-green-400 hover:text-green-300 hover:underline font-semibold">
               Sign In
             </Link>
           </p>

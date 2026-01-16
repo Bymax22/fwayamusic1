@@ -227,7 +227,7 @@ export default function UserSignUp() {
                 className="mt-1 w-4 h-4 text-blue-500 bg-[#0a3747] border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
               />
               <label htmlFor="terms" className="text-sm text-gray-300">
-                I agree to the <a href="/terms" className="text-blue-400 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-400 hover:underline">Privacy Policy</a> *
+                I agree to the <a href="/terms" className="text-blue-300 hover:text-blue-200 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-300 hover:text-blue-200 hover:underline">Privacy Policy</a> *
               </label>
             </div>
             {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
