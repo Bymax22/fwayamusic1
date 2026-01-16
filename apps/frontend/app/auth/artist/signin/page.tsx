@@ -109,34 +109,34 @@ export default function ArtistSignIn() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-white/20 rounded-2xl p-8 w-full max-w-md border border-white/30 shadow-2xl"
+        className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-purple-500/30 shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaMusic className="w-8 h-8 text-purple-600" />
+          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaMusic className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Artist Portal</h1>
-          <p className="text-gray-600">Sign in to your artist account</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Artist Portal</h1>
+          <p className="text-gray-300">Sign in to your artist account</p>
         </div>
 
         {step === 'credentials' ? (
           <form onSubmit={handleCredentialsSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-white mb-2">
                 Email Address
               </label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="your@email.com"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-white mb-2">
                 Password
               </label>
               <div className="relative">
@@ -144,18 +144,18 @@ export default function ArtistSignIn() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+                  className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <div className="flex items-center justify-between">
@@ -163,13 +163,13 @@ export default function ArtistSignIn() {
                 <input
                   type="checkbox"
                   id="remember"
-                  className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                  className="w-4 h-4 text-white bg-gray-100 border-purple-500/40 rounded focus:ring-purple-500 focus:ring-2"
                 />
-                <label htmlFor="remember" className="ml-2 text-sm text-gray-700">
+                <label htmlFor="remember" className="ml-2 text-sm text-white">
                   Remember me
                 </label>
               </div>
-              <a href="/auth/artist/forgot-password" className="text-sm text-purple-600 hover:underline">
+              <a href="/auth/artist/forgot-password" className="text-sm text-white hover:underline">
                 Forgot password?
               </a>
             </div>
@@ -177,44 +177,44 @@ export default function ArtistSignIn() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
 
             {errors.submit && (
-              <p className="text-red-500 text-sm text-center">{errors.submit}</p>
+              <p className="text-red-400 text-sm text-center">{errors.submit}</p>
             )}
           </form>
         ) : (
           <form onSubmit={handleOTPSubmit} className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Verify Your Identity</h2>
-              <p className="text-gray-600 mb-4">
+              <h2 className="text-xl font-semibold text-white mb-2">Verify Your Identity</h2>
+              <p className="text-gray-300 mb-4">
                 We sent a verification code to {formData.email}
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-white mb-2">
                 Enter OTP Code
               </label>
               <input
                 type="text"
                 value={formData.otp}
                 onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-lg font-mono"
+                className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-lg font-mono"
                 placeholder="123456"
                 maxLength={6}
               />
-              {errors.otp && <p className="text-red-500 text-sm mt-1">{errors.otp}</p>}
+              {errors.otp && <p className="text-red-400 text-sm mt-1">{errors.otp}</p>}
             </div>
 
             <div className="text-center">
               <button
                 type="button"
                 onClick={resendOTP}
-                className="text-sm text-purple-600 hover:underline"
+                className="text-sm text-white hover:underline"
                 disabled={otpSent}
               >
                 {otpSent ? 'OTP Sent!' : 'Resend OTP'}
@@ -224,7 +224,7 @@ export default function ArtistSignIn() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Verifying...' : 'Verify & Continue'}
             </button>
@@ -232,7 +232,7 @@ export default function ArtistSignIn() {
             <button
               type="button"
               onClick={() => setStep('credentials')}
-              className="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+              className="w-full px-6 py-3 border border-purple-500/40 text-white rounded-xl hover:bg-[#0a3747] transition-colors"
             >
               Back to Sign In
             </button>
@@ -241,14 +241,14 @@ export default function ArtistSignIn() {
 
         {step === 'credentials' && (
           <>
-            <div className="mt-8 pt-6 border-t border-gray-200">
+            <div className="mt-8 pt-6 border-t border-purple-500/20">
               <div className="text-center mb-4">
-                <span className="text-gray-600 text-sm">Or continue with</span>
+                <span className="text-gray-300 text-sm">Or continue with</span>
               </div>
               <div className="flex gap-4">
                 <button
                   onClick={() => handleSocialSignIn('google')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-800 rounded-xl hover:bg-gray-50 transition-colors font-medium border border-gray-300"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0a3747] text-gray-800 rounded-xl hover:bg-[#0a3747] transition-colors font-medium border border-purple-500/40"
                 >
                   <FaGoogle className="w-5 h-5" />
                   Google
@@ -263,10 +263,10 @@ export default function ArtistSignIn() {
               </div>
             </div>
 
-            <div className="text-center mt-8 pt-6 border-t border-gray-200">
-              <p className="text-gray-600">
+            <div className="text-center mt-8 pt-6 border-t border-purple-500/20">
+              <p className="text-gray-300">
                 Don&lsquo;t have an artist account?{' '}
-                <a href="/auth/artist/signup" className="text-purple-600 hover:underline font-semibold">
+                <a href="/auth/artist/signup" className="text-white hover:underline font-semibold">
                   Sign Up
                 </a>
               </p>

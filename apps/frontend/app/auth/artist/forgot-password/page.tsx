@@ -43,29 +43,29 @@ export default function ArtistForgotPassword() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="backdrop-blur-md bg-white/20 rounded-2xl p-8 w-full max-w-md border border-white/30 shadow-2xl"
+          className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-purple-500/30 shadow-2xl"
         >
           <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FaCheck className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaCheck className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Check Your Email</h1>
-            <p className="text-gray-600 mb-6">
+            <h1 className="text-2xl font-bold text-white mb-4">Check Your Email</h1>
+            <p className="text-gray-300 mb-6">
               We&lsquo;ve sent a password reset link to <strong>{email}</strong>
             </p>
-            <p className="text-gray-500 text-sm mb-6">
+            <p className="text-gray-400 text-sm mb-6">
               Click the link in the email to reset your password. The link will expire in 1 hour.
             </p>
             <div className="space-y-3">
               <Link
                 href="/auth/artist/signin"
-                className="w-full block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold text-center"
+                className="w-full block px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors font-semibold text-center"
               >
                 Back to Artist Sign In
               </Link>
               <button
                 onClick={() => setIsSubmitted(false)}
-                className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full px-4 py-2 border border-purple-500/40 text-white rounded-lg hover:bg-[#0a3747] transition-colors"
               >
                 Try Another Email
               </button>
@@ -77,52 +77,52 @@ export default function ArtistForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f2e3d] to-[#051420] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-white/20 rounded-2xl p-8 w-full max-w-md border border-white/30 shadow-2xl"
+        className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-purple-500/30 shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaMusic className="w-8 h-8 text-purple-600" />
+          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaMusic className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Reset Your Password</h1>
-          <p className="text-gray-600">Enter your artist email to receive a reset link</p>
+          <h1 className="text-2xl font-bold text-white mb-2">Reset Your Password</h1>
+          <p className="text-gray-300">Enter your artist email to receive a reset link</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-white mb-2">
               Email Address
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="your@email.com"
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
           >
             {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
           </button>
 
           {errors.submit && (
-            <p className="text-red-500 text-sm text-center">{errors.submit}</p>
+            <p className="text-red-400 text-sm text-center">{errors.submit}</p>
           )}
         </form>
 
-        <div className="text-center mt-8 pt-6 border-t border-gray-200">
+        <div className="text-center mt-8 pt-6 border-t border-purple-500/20">
           <Link
             href="/auth/artist/signin"
-            className="inline-flex items-center gap-2 text-purple-600 hover:underline font-semibold"
+            className="inline-flex items-center gap-2 text-white hover:underline font-semibold"
           >
             <FaArrowLeft className="w-4 h-4" />
             Back to Artist Sign In
