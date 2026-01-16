@@ -80,79 +80,79 @@ export default function UserSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a1f29] to-[#0a3747] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-white/20 rounded-2xl p-8 w-full max-w-md border border-white/30 shadow-2xl"
+        className="bg-gradient-to-br from-[#0f2e3d] to-[#051420] rounded-2xl p-8 w-full max-w-md border border-blue-500/30 shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaUser className="w-8 h-8 text-blue-600" />
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaUser className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Join as Listener</h1>
-          <p className="text-gray-600">Create your music listener account</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Join as Listener</h1>
+          <p className="text-gray-300">Create your music listener account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-white mb-1">
                 Email Address *
               </label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="your@email.com"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-white mb-1">
                 Username *
               </label>
               <input
                 type="text"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="username"
               />
-              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
+              {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Display Name
             </label>
             <input
               type="text"
               value={formData.displayName}
               onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Your display name"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white mb-1">
               Profile Picture
             </label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setFormData({ ...formData, avatarFile: e.target.files?.[0] || null })}
-              className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-white mb-1">
                 Password *
               </label>
               <div className="relative">
@@ -160,77 +160,77 @@ export default function UserSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                  className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-white mb-1">
                 Confirm Password *
               </label>
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="••••••••"
               />
-              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-white mb-1">
                 Phone Number
               </label>
               <input
                 type="tel"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="+260 96 123 4567"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-white mb-1">
                 Date of Birth
               </label>
               <input
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
 
           {/* Consent Section */}
-          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+          <div className="bg-[#0a2e3d]/50 rounded-lg p-4 space-y-3 border border-blue-500/30">
             <div className="flex items-start gap-3">
               <input
                 type="checkbox"
                 id="terms"
                 checked={formData.acceptedTerms}
                 onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                className="mt-1 w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-blue-500 bg-[#0a3747] border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
               />
-              <label htmlFor="terms" className="text-sm text-gray-700">
-                I agree to the <a href="/terms" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a> *
+              <label htmlFor="terms" className="text-sm text-gray-300">
+                I agree to the <a href="/terms" className="text-blue-400 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-400 hover:underline">Privacy Policy</a> *
               </label>
             </div>
-            {errors.acceptedTerms && <p className="text-red-500 text-sm">{errors.acceptedTerms}</p>}
+            {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
 
             <div className="flex items-start gap-3">
               <input
@@ -238,13 +238,13 @@ export default function UserSignUp() {
                 id="privacy"
                 checked={formData.acceptedPrivacy}
                 onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                className="mt-1 w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-blue-500 bg-[#0a3747] border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
               />
-              <label htmlFor="privacy" className="text-sm text-gray-700">
+              <label htmlFor="privacy" className="text-sm text-gray-300">
                 I acknowledge that I have read and understood how my personal data will be processed *
               </label>
             </div>
-            {errors.acceptedPrivacy && <p className="text-red-500 text-sm">{errors.acceptedPrivacy}</p>}
+            {errors.acceptedPrivacy && <p className="text-red-400 text-sm">{errors.acceptedPrivacy}</p>}
 
             <div className="flex items-start gap-3">
               <input
@@ -252,9 +252,9 @@ export default function UserSignUp() {
                 id="marketing"
                 checked={formData.marketingEmails}
                 onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                className="mt-1 w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-blue-500 bg-[#0a3747] border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
               />
-              <label htmlFor="marketing" className="text-sm text-gray-700">
+              <label htmlFor="marketing" className="text-sm text-gray-300">
                 I agree to receive marketing emails and promotional offers
               </label>
             </div>
@@ -265,9 +265,9 @@ export default function UserSignUp() {
                 id="dataSharing"
                 checked={formData.dataSharing}
                 onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                className="mt-1 w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-blue-500 bg-[#0a3747] border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
               />
-              <label htmlFor="dataSharing" className="text-sm text-gray-700">
+              <label htmlFor="dataSharing" className="text-sm text-gray-300">
                 I consent to my data being shared with trusted partners for service improvement
               </label>
             </div>
@@ -281,30 +281,30 @@ export default function UserSignUp() {
               onError={() => setErrors({ ...errors, recaptcha: 'reCAPTCHA error occurred' })}
             />
           </div>
-          {errors.recaptcha && <p className="text-red-500 text-sm text-center">{errors.recaptcha}</p>}
+          {errors.recaptcha && <p className="text-red-400 text-sm text-center">{errors.recaptcha}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow-lg"
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
 
           {errors.submit && (
-            <p className="text-red-500 text-sm text-center">{errors.submit}</p>
+            <p className="text-red-400 text-sm text-center">{errors.submit}</p>
           )}
         </form>
 
-        <div className="text-center mt-6 pt-4 border-t border-gray-200">
-          <p className="text-gray-600">
+        <div className="text-center mt-6 pt-4 border-t border-blue-500/30">
+          <p className="text-gray-300">
             Already have an account?{' '}
-            <a href="/auth/user/signin" className="text-blue-600 hover:underline font-semibold">
+            <a href="/auth/user/signin" className="text-blue-400 hover:text-blue-300 hover:underline font-semibold">
               Sign In
             </a>
           </p>
           <div className="mt-4 flex gap-4 justify-center">
-            <a href="/auth/artist/signup" className="text-sm text-purple-600 hover:underline">
+            <a href="/auth/artist/signup" className="text-sm text-purple-400 hover:text-purple-300 hover:underline">
               Artist Sign Up
             </a>
             <a href="/auth/reseller/signup" className="text-sm text-green-600 hover:underline">
