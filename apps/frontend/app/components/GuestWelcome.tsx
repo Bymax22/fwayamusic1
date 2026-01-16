@@ -1404,6 +1404,7 @@ const GuestWelcome = () => {
         }));
         const beats = (homepageSections.beats || []).map((item: any) => ({
           ...item,
+          imageUrl: item.coverImage || item.cover || item.imageUrl || "/default-cover.png",
           artist: item.user?.displayName || item.user?.username || "Unknown Artist"
         }));
 
