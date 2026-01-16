@@ -8,10 +8,10 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
-  // Configure CORS - more permissive for Vercel serverless
+  // Configure CORS - must allow all origins for Vercel serverless
   app.enableCors({
-    origin: '*', // Allow all origins for now, Vercel needs this
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    origin: '*',
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
       'Authorization',
@@ -19,13 +19,25 @@ async function bootstrap() {
       'Origin',
       'X-Requested-With',
     ],
-    credentials: false, // Set to false when using origin: '*'
+    credentials: false,
     preflightContinue: false,
-    optionsSuccessStatus: 204,
+    optionsSuccessStatus: 200,
   });
 
   // Global prefix
   app.setGlobalPrefix('api');
+
+  // Handle preflight requests explicitly
+  app.use((req: any, res: any, next: any) => {
+    if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,Origin,X-Requested-With');
+      res.header('Access-Control-Allow-Credentials', 'false');
+      return res.sendStatus(200);
+    }
+    next();
+  });
 
   await app.init();
 
