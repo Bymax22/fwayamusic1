@@ -4,11 +4,16 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 
 let app: any;
+let appInitialized = false;
 
 async function bootstrap() {
+  if (appInitialized && app) {
+    return app;
+  }
+
+  const logger = new Logger('Bootstrap');
   app = await NestFactory.create(AppModule, { bodyParser: true });
   const configService = app.get(ConfigService);
-  const logger = new Logger('Bootstrap');
 
   // CORS configuration - must be first middleware
   app.enableCors({
@@ -45,6 +50,10 @@ async function bootstrap() {
     next();
   });
 
+  // Initialize the app
+  await app.init();
+  appInitialized = true;
+
   if (!process.env.VERCEL) {
     await app.listen(configService.get('PORT') || 3001);
     logger.log(`Application is running on: ${await app.getUrl()}`);
@@ -54,11 +63,13 @@ async function bootstrap() {
 }
 
 // Start app
-bootstrap();
+bootstrap().catch(err => {
+  console.error('Failed to bootstrap app:', err);
+});
 
 // Export handler for Vercel serverless functions
 export default async (req: any, res: any) => {
-  if (!app) {
+  if (!appInitialized) {
     await bootstrap();
   }
   return app.getHttpAdapter().getInstance()(req, res);
