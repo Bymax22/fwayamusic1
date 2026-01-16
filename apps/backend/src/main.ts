@@ -3,14 +3,17 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 
+let app: any;
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  app = await NestFactory.create(AppModule, { bodyParser: true });
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
-  // Configure CORS - must allow all origins for Vercel serverless
+  // CORS configuration - must be first middleware
   app.enableCors({
-    origin: '*',
+    origin: true, // Allow any origin for preflight to work
+    credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
@@ -18,51 +21,45 @@ async function bootstrap() {
       'Accept',
       'Origin',
       'X-Requested-With',
+      'Access-Control-Request-Method',
+      'Access-Control-Request-Headers',
     ],
-    credentials: false,
-    preflightContinue: false,
-    optionsSuccessStatus: 200,
+    exposedHeaders: ['Content-Length'],
+    maxAge: 3600,
   });
 
   // Global prefix
   app.setGlobalPrefix('api');
 
-  // Handle preflight requests explicitly
+  // Handle OPTIONS requests explicitly for preflight
   app.use((req: any, res: any, next: any) => {
+    res.header('Access-Control-Allow-Origin', req.get('origin') || '*');
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin,Content-Type,Authorization,Accept,X-Requested-With,Access-Control-Request-Method,Access-Control-Request-Headers');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '3600');
+
     if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Origin', '*');
-      res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,Origin,X-Requested-With');
-      res.header('Access-Control-Allow-Credentials', 'false');
       return res.sendStatus(200);
     }
     next();
   });
 
-  await app.init();
-
-  // For Vercel, return the Express instance
-  if (process.env.VERCEL) {
-    return app.getHttpAdapter().getInstance();
+  if (!process.env.VERCEL) {
+    await app.listen(configService.get('PORT') || 3001);
+    logger.log(`Application is running on: ${await app.getUrl()}`);
   }
 
-  // For local development, start listening
-  await app.listen(configService.get('PORT') || 3001);
-  logger.log(`Application is running on: ${await app.getUrl()}`);
+  return app;
 }
 
-// For Vercel serverless
-let vercelApp: any;
-if (process.env.VERCEL) {
-  bootstrap().then(app => {
-    vercelApp = app;
-  });
-}
+// Start app
+bootstrap();
 
-// Export for Vercel
-export default vercelApp;
-
-// For local development
-if (!process.env.VERCEL) {
-  bootstrap();
-}
+// Export handler for Vercel serverless functions
+export default async (req: any, res: any) => {
+  if (!app) {
+    await bootstrap();
+  }
+  return app.getHttpAdapter().getInstance()(req, res);
+};
