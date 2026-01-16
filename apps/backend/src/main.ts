@@ -9,8 +9,21 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   // Configure CORS
+  const allowedOrigins = [
+    'http://localhost:3000', // Local development
+    'https://www.fwayainnovations.com', // Production frontend
+    'https://fwayainnovations.com', // Without www
+  ];
+
   app.enableCors({
-    origin: true, // Allow all origins for debugging
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl requests, etc)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: [
       'Content-Type',
