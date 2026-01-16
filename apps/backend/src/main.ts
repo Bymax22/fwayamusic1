@@ -4,73 +4,51 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 
 let app: any;
-let appInitialized = false;
+const logger = new Logger('Bootstrap');
 
-async function bootstrap() {
-  if (appInitialized && app) {
-    return app;
-  }
+async function initializeApp() {
+  if (app) return app;
 
-  const logger = new Logger('Bootstrap');
-  app = await NestFactory.create(AppModule, { bodyParser: true });
+  app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  // CORS configuration - must be first middleware
+  // CORS must be enabled BEFORE global prefix
   app.enableCors({
-    origin: true, // Allow any origin for preflight to work
+    origin: (origin: any, callback: any) => {
+      // Allow all origins
+      callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'Accept',
-      'Origin',
-      'X-Requested-With',
-      'Access-Control-Request-Method',
-      'Access-Control-Request-Headers',
-    ],
-    exposedHeaders: ['Content-Length'],
-    maxAge: 3600,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    optionsSuccessStatus: 200,
   });
 
-  // Global prefix
   app.setGlobalPrefix('api');
-
-  // Handle OPTIONS requests explicitly for preflight
-  app.use((req: any, res: any, next: any) => {
-    res.header('Access-Control-Allow-Origin', req.get('origin') || '*');
-    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin,Content-Type,Authorization,Accept,X-Requested-With,Access-Control-Request-Method,Access-Control-Request-Headers');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '3600');
-
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
-    next();
-  });
-
-  // Initialize the app
   await app.init();
-  appInitialized = true;
 
   if (!process.env.VERCEL) {
     await app.listen(configService.get('PORT') || 3001);
-    logger.log(`Application is running on: ${await app.getUrl()}`);
+    logger.log(`Application running on port ${configService.get('PORT') || 3001}`);
   }
 
   return app;
 }
 
-// Start app
-bootstrap().catch(err => {
-  console.error('Failed to bootstrap app:', err);
-});
+// For local development
+if (!process.env.VERCEL) {
+  initializeApp().catch(err => logger.error('Failed to initialize app:', err));
+}
 
-// Export handler for Vercel serverless functions
+// Export for Vercel serverless
 export default async (req: any, res: any) => {
-  if (!appInitialized) {
-    await bootstrap();
+  try {
+    if (!app) {
+      await initializeApp();
+    }
+    return app.getHttpAdapter().getInstance()(req, res);
+  } catch (error) {
+    logger.error('Error handling request:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-  return app.getHttpAdapter().getInstance()(req, res);
 };
