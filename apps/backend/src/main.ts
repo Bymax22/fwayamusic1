@@ -8,22 +8,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
-  // Configure CORS
-  const allowedOrigins = [
-    'http://localhost:3000', // Local development
-    'https://www.fwayainnovations.com', // Production frontend
-    'https://fwayainnovations.com', // Without www
-  ];
-
+  // Configure CORS - more permissive for Vercel serverless
   app.enableCors({
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      // Allow requests with no origin (mobile apps, curl requests, etc)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: '*', // Allow all origins for now, Vercel needs this
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: [
       'Content-Type',
@@ -32,7 +19,7 @@ async function bootstrap() {
       'Origin',
       'X-Requested-With',
     ],
-    credentials: true,
+    credentials: false, // Set to false when using origin: '*'
     preflightContinue: false,
     optionsSuccessStatus: 204,
   });
