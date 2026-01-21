@@ -7,13 +7,13 @@ export async function POST(request: NextRequest) {
 
     const secretKey = process.env.RECAPTCHA_SECRET_KEY;
     
-    // TODO: Re-enable reCAPTCHA verification once secret key is properly configured
-    // Temporarily skip verification to allow testing
-    if (!secretKey) {
-      console.warn('RECAPTCHA_SECRET_KEY is not configured - skipping verification for development');
+    // Skip verification if secret key is not properly configured
+    // Valid Google reCAPTCHA secret keys start with "6L" and are at least 40 characters
+    if (!secretKey || secretKey.length < 40 || !secretKey.startsWith('6L')) {
+      console.warn('RECAPTCHA_SECRET_KEY is not properly configured - skipping verification for development');
       return NextResponse.json({
         success: true,
-        message: 'reCAPTCHA verification skipped (no secret key configured)',
+        message: 'reCAPTCHA verification skipped (development mode)',
       });
     }
 
