@@ -229,7 +229,7 @@ export default function Navbar() {
                     className="rounded-lg"
                   />
                 </motion.div>
-                <div className="flex flex-col">
+                <div className="hidden sm:flex flex-col">
                   <span className="text-2xl font-bold text-white">
                     Fwaya<span className="text-[#e51f48]">Music</span>
                   </span>
@@ -284,15 +284,13 @@ export default function Navbar() {
                     className="flex items-center gap-2"
                   >
                     {/* Now Playing Icon */}
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#0a3747]/50 rounded-full border border-[#0a3747]/70 hover:border-[#0a4a5f] transition-colors">
-                      <Music size={16} className="text-[#e51f48]" />
-                      <span className="text-xs text-gray-300 font-medium">Now Playing</span>
+                    <div className="p-2 bg-[#0a3747]/50 rounded-full border border-[#0a3747]/70 hover:border-[#0a4a5f] transition-colors touch-target group">
+                      <Music size={18} className="text-[#e51f48] group-hover:scale-110 transition-transform" />
                     </div>
                     
                     {/* Earn Icon */}
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-500/10 rounded-full border border-amber-500/20 hover:border-amber-500/40 transition-colors">
-                      <DollarSign size={16} className="text-amber-400" />
-                      <span className="text-xs text-amber-300 font-medium">Earn</span>
+                    <div className="p-2 bg-amber-500/10 rounded-full border border-amber-500/20 hover:border-amber-500/40 transition-colors touch-target group">
+                      <DollarSign size={18} className="text-amber-400 group-hover:scale-110 transition-transform" />
                     </div>
                   </motion.div>
                 )}
@@ -335,7 +333,7 @@ export default function Navbar() {
                   className="rounded"
                 />
               </motion.div>
-              <div className="flex flex-col">
+              <div className="hidden sm:flex flex-col">
                 <span className="text-xl font-bold text-white">
                   Fwaya<span className="text-[#e51f48]">Music</span>
                 </span>
