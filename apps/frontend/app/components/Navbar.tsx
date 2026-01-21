@@ -1,7 +1,7 @@
 "use client";
 import { 
   Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play
+  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play, Coins
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -281,22 +281,16 @@ export default function Navbar() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3 }}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-1"
                   >
                     {/* Now Playing Icon */}
-                    <div className="p-2 bg-[#0a3747]/50 rounded-full border border-[#0a3747]/70 hover:border-[#0a4a5f] transition-colors touch-target group">
-                      <Music size={18} className="text-[#e51f48] group-hover:scale-110 transition-transform" />
-                    </div>
+                    <Music size={20} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
                     
                     {/* Premium Icon */}
-                    <div className="p-2 bg-amber-500/10 rounded-full border border-amber-500/20 hover:border-amber-500/40 transition-colors touch-target group">
-                      <Crown size={18} className="text-amber-400 group-hover:scale-110 transition-transform" />
-                    </div>
+                    <Crown size={20} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
                     
                     {/* Earn Icon */}
-                    <div className="p-2 bg-green-500/10 rounded-full border border-green-500/20 hover:border-green-500/40 transition-colors touch-target group">
-                      <DollarSign size={18} className="text-green-400 group-hover:scale-110 transition-transform" />
-                    </div>
+                    <Coins size={20} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
                   </motion.div>
                 )}
               </AnimatePresence>
