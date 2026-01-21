@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -406,15 +407,72 @@ export default function ResellerDashboard() {
 
   if (loading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
-        <div className="animate-pulse">
-          <div className="h-8 bg-[#0a3747] rounded w-1/4 mb-8"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-[#0a3747] rounded-xl"></div>
-            ))}
-          </div>
-          <div className="h-64 bg-[#0a3747] rounded-xl"></div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+        <div className="relative w-32 h-32">
+          <motion.div
+            animate={{
+              rotate: 360,
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              rotate: {
+                duration: 8,
+                repeat: Infinity,
+                ease: "linear",
+              },
+              scale: {
+                duration: 3,
+                repeat: Infinity,
+                repeatType: "reverse",
+              },
+            }}
+            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#e51f48]"
+            style={{
+              background: `conic-gradient(
+                from 0deg at 50% 50%,
+                rgba(229, 31, 72, 0) 0deg,
+                rgba(229, 31, 72, 0.3) 120deg,
+                rgba(229, 31, 72, 0) 240deg
+              )`,
+            }}
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+              boxShadow: [
+                '0 0 0 0 rgba(229, 31, 72, 0.4)',
+                '0 0 0 15px rgba(229, 31, 72, 0)',
+                '0 0 0 30px rgba(229, 31, 72, 0)'
+              ]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeOut"
+            }}
+            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
+              <path 
+                d="M12 3V18M9 5V16M15 7V18M18 9V16" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round"
+              />
+              <path
+                d="M6 18C6 15.7909 7.79086 14 10 14C12.2091 14 14 15.7909 14 18C14 20.2091 12.2091 22 10 22C7.79086 22 6 20.2091 6 18Z"
+                fill="currentColor"
+              />
+            </svg>
+          </motion.div>
+          <motion.span 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#e51f48]"
+          >
+            Loading your experience
+          </motion.span>
         </div>
       </div>
     );
