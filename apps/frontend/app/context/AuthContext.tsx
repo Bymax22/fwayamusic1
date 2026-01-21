@@ -27,7 +27,7 @@ interface User {
   status: 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'VERIFIED' | 'REJECTED';
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
-  kycStatus: 'NOT_SUBMITTED' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED' | 'ADDITIONAL_INFO_NEEDED';
+  kycStatus?: 'NOT_SUBMITTED' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED' | 'ADDITIONAL_INFO_NEEDED';
   isPremium: boolean;
   premiumUntil?: string | null;
   walletBalance?: number;

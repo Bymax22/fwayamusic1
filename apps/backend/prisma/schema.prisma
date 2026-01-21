@@ -181,7 +181,6 @@ model User {
 
   // KYC & Verification Fields
   status          UserStatus @default(PENDING) @map("status")
-  kycStatus       KYCStatus  @default(NOT_SUBMITTED) @map("kyc_status")
   phoneNumber     String?    @map("phone_number")
   dateOfBirth     DateTime?  @map("date_of_birth")
   address         Json?      @map("address")

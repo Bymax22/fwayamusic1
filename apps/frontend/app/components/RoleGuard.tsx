@@ -64,7 +64,7 @@ export default function EnhancedRoleGuard({
       }
 
       // Check KYC status if required (for artists/resellers)
-      if (requireKYC && user.role !== 'USER' && user.kycStatus !== 'APPROVED') {
+      if (requireKYC && user.role !== 'USER' && (!user.kycStatus || user.kycStatus !== 'APPROVED')) {
         shouldRedirect = true;
         redirectPath = `/auth/${user.role.toLowerCase()}/verification`;
       }
