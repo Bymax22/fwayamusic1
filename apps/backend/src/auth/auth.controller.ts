@@ -16,7 +16,12 @@ export class AuthController {
   @Post('signup')
   async register(@Body() dto: any) {
     // dto includes acceptedTerms, marketingEmails, etc.
-    return this.authService.register(dto);
+    try {
+      return await this.authService.register(dto);
+    } catch (error) {
+      console.error('Signup endpoint error:', error);
+      throw error;
+    }
   }
 
   @Post('social-login')

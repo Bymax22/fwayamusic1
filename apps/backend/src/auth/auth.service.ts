@@ -14,55 +14,60 @@ export class AuthService {
    * Register a new user
    */
   async register(dto: any) {
-    // Hash the password
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+    try {
+      // Hash the password
+      const saltRounds = 10;
+      const passwordHash = await bcrypt.hash(dto.password, saltRounds);
 
-    // Prepare user data
-    const userData: any = {
-      email: dto.email,
-      username: dto.username,
-      passwordHash,
-      role: (dto.role as UserRole) || UserRole.USER,
-      status: UserStatus.PENDING,
-      isEmailVerified: false,
-      isPhoneVerified: false,
-      isPremium: false,
-      walletBalance: 0,
-      totalEarnings: 0,
-      acceptedTerms: dto.acceptedTerms || false,
-      acceptedPrivacy: dto.acceptedPrivacy || false,
-      marketingEmails: dto.marketingEmails || false,
-      dataSharing: dto.dataSharing || false,
-      consentDate: new Date(),
-    };
+      // Prepare user data
+      const userData: any = {
+        email: dto.email,
+        username: dto.username,
+        passwordHash,
+        role: (dto.role as UserRole) || UserRole.USER,
+        status: UserStatus.PENDING,
+        isEmailVerified: false,
+        isPhoneVerified: false,
+        isPremium: false,
+        walletBalance: 0,
+        totalEarnings: 0,
+        acceptedTerms: dto.acceptedTerms || false,
+        acceptedPrivacy: dto.acceptedPrivacy || false,
+        marketingEmails: dto.marketingEmails || false,
+        dataSharing: dto.dataSharing || false,
+        consentDate: new Date(),
+      };
 
-    // Add optional fields if provided
-    if (dto.displayName) userData.displayName = dto.displayName;
-    if (dto.phoneNumber) userData.phoneNumber = dto.phoneNumber;
-    if (dto.dateOfBirth) userData.dateOfBirth = new Date(dto.dateOfBirth);
-    if (dto.country) userData.country = dto.country;
-    if (dto.avatarUrl) userData.avatarUrl = dto.avatarUrl;
+      // Add optional fields if provided
+      if (dto.displayName) userData.displayName = dto.displayName;
+      if (dto.phoneNumber) userData.phoneNumber = dto.phoneNumber;
+      if (dto.dateOfBirth) userData.dateOfBirth = new Date(dto.dateOfBirth);
+      if (dto.country) userData.country = dto.country;
+      if (dto.avatarUrl) userData.avatarUrl = dto.avatarUrl;
 
-    // Artist-specific fields
-    if (dto.artistName) userData.artistName = dto.artistName;
-    if (dto.stageName) userData.stageName = dto.stageName;
-    if (dto.bio) userData.bio = dto.bio;
-    if (dto.website) userData.website = dto.website;
+      // Artist-specific fields
+      if (dto.artistName) userData.artistName = dto.artistName;
+      if (dto.stageName) userData.stageName = dto.stageName;
+      if (dto.bio) userData.bio = dto.bio;
+      if (dto.website) userData.website = dto.website;
 
-    // Reseller-specific fields
-    if (dto.businessName) userData.businessName = dto.businessName;
-    if (dto.businessType) userData.businessType = dto.businessType;
-    if (dto.taxNumber) userData.taxNumber = dto.taxNumber;
+      // Reseller-specific fields
+      if (dto.businessName) userData.businessName = dto.businessName;
+      if (dto.businessType) userData.businessType = dto.businessType;
+      if (dto.taxNumber) userData.taxNumber = dto.taxNumber;
 
-    console.log('Creating user with role:', userData.role, 'Full userData:', userData);
-    
-    const createdUser = await this.prisma.user.create({
-      data: userData,
-    });
-    
-    console.log('Created user:', createdUser);
-    return createdUser;
+      console.log('Creating user with role:', userData.role, 'Full userData:', userData);
+      
+      const createdUser = await this.prisma.user.create({
+        data: userData,
+      });
+      
+      console.log('Created user:', createdUser);
+      return createdUser;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
   }
 
   /**
