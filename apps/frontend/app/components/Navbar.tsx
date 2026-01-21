@@ -1,7 +1,7 @@
 "use client";
 import { 
   Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X
+  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -9,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 // Invite Popup Component
 const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
@@ -169,6 +170,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { currentTrack, isPlaying } = useAudioPlayer();
+  const [scrollingTitle, setScrollingTitle] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -177,6 +180,13 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Update scrolling title when track changes
+  useEffect(() => {
+    if (currentTrack && currentTrack.title) {
+      setScrollingTitle(currentTrack.title);
+    }
+  }, [currentTrack]);
 
   // Navigation links for logged-in users
   const loggedInNavLinks = [
@@ -233,13 +243,7 @@ export default function Navbar() {
 
             {/* Right Section - Guest Features */}
             <div className="flex items-center gap-4">
-              {/* Invite Friends - Text Only Button */}
-              <button 
-                onClick={() => setShowInvitePopup(true)}
-                className="px-3 py-1.5 text-sm bg-[#e51f48] hover:bg-[#ff4d6d] rounded-full text-white font-semibold transition-all touch-target md:px-4 md:py-2 md:text-base"
-              >
-                Invite
-              </button>
+              {/* Placeholder - removed invite button */}
             </div>
           </div>
         </nav>
@@ -327,6 +331,22 @@ export default function Navbar() {
 
           {/* Right Section - User Actions */}
           <div className="flex items-center gap-2"> {/* Reduced gap from gap-3 to gap-2 */}
+            {/* Now Playing Section - Shows when song is playing */}
+            {currentTrack && isPlaying && (
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[#e51f48]/20 rounded-full border border-[#e51f48]/30">
+                <Play size={16} className="text-[#e51f48] fill-[#e51f48] animate-pulse" />
+                <span className="text-sm text-white font-medium max-w-[150px] truncate">
+                  {scrollingTitle}
+                </span>
+              </div>
+            )}
+
+            {/* Earn Badge - Always visible */}
+            <div className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-amber-500/20 rounded-full border border-amber-500/30">
+              <DollarSign size={16} className="text-amber-400" />
+              <span className="text-sm text-amber-400 font-medium">Earn</span>
+            </div>
+
             {/* Quick Actions - Hidden on mobile */}
             <div className="hidden md:flex items-center gap-2">
               {/* Create */}
@@ -408,6 +428,16 @@ export default function Navbar() {
                           <Settings size={16} />
                           <span>Settings</span>
                         </Link>
+                        <button 
+                          onClick={() => {
+                            setShowInvitePopup(true);
+                            setShowUserMenu(false);
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-gray-300 hover:bg-[#0a4a5f] hover:text-white transition-colors text-sm"
+                        >
+                          <Gift size={16} />
+                          <span>Invite Friends</span>
+                        </button>
                       </div>
 
                       {/* Divider */}
@@ -505,6 +535,16 @@ export default function Navbar() {
                         <Settings size={18} />
                         <span>Settings</span>
                       </Link>
+                      <button 
+                        onClick={() => {
+                          setShowInvitePopup(true);
+                          setShowUserMenu(false);
+                        }}
+                        className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-gray-300 hover:bg-[#0a4a5f] hover:text-white transition-colors"
+                      >
+                        <Gift size={18} />
+                        <span>Invite Friends</span>
+                      </button>
                     </div>
 
                     {/* Divider */}
