@@ -19,7 +19,7 @@ export class AuthService {
       const saltRounds = 10;
       const passwordHash = await bcrypt.hash(dto.password, saltRounds);
 
-      // Prepare user data
+      // Prepare user data - only include fields that exist in User model
       const userData: any = {
         email: dto.email,
         username: dto.username,
@@ -56,16 +56,23 @@ export class AuthService {
       if (dto.businessType) userData.businessType = dto.businessType;
       if (dto.taxNumber) userData.taxNumber = dto.taxNumber;
 
-      console.log('Creating user with role:', userData.role, 'Full userData:', userData);
+      // Note: recaptchaToken, avatarFile, confirmPassword are not saved to database
+      console.log('Creating user with role:', userData.role, 'Email:', userData.email);
       
       const createdUser = await this.prisma.user.create({
         data: userData,
       });
       
-      console.log('Created user:', createdUser);
+      console.log('Created user with ID:', createdUser.id, 'Role:', createdUser.role);
       return createdUser;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Registration error:', error instanceof Error ? error.message : error);
+      if (error instanceof Error && 'code' in error) {
+        const prismaError = error as any;
+        if (prismaError.code === 'P2002') {
+          throw new Error(`User with this ${prismaError.meta?.target?.[0] || 'field'} already exists`);
+        }
+      }
       throw error;
     }
   }
