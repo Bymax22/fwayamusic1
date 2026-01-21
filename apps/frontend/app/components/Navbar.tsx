@@ -1,7 +1,7 @@
 "use client";
 import { 
   Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play
+  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play, Waves
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -243,7 +243,60 @@ export default function Navbar() {
 
             {/* Right Section - Guest Features */}
             <div className="flex items-center gap-4">
-              {/* Placeholder - removed invite button */}
+              <AnimatePresence mode="wait">
+                {currentTrack && isPlaying ? (
+                  // Audio Wave - Shows when playing
+                  <motion.div
+                    key="playing"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#e51f48]/20 to-[#ff4d6d]/20 rounded-full border border-[#e51f48]/30"
+                  >
+                    <div className="flex items-center gap-0.5">
+                      <motion.div
+                        animate={{ scaleY: [1, 1.5, 1] }}
+                        transition={{ duration: 0.5, repeat: Infinity }}
+                        className="w-0.5 h-3 bg-[#e51f48] rounded-full"
+                      />
+                      <motion.div
+                        animate={{ scaleY: [1, 2, 1] }}
+                        transition={{ duration: 0.5, repeat: Infinity, delay: 0.1 }}
+                        className="w-0.5 h-4 bg-[#ff4d6d] rounded-full"
+                      />
+                      <motion.div
+                        animate={{ scaleY: [1, 1.5, 1] }}
+                        transition={{ duration: 0.5, repeat: Infinity, delay: 0.2 }}
+                        className="w-0.5 h-3 bg-[#e51f48] rounded-full"
+                      />
+                    </div>
+                    <span className="text-xs text-white font-medium">Now Playing</span>
+                  </motion.div>
+                ) : (
+                  // Now Playing & Earn Icons - Shows when not playing
+                  <motion.div
+                    key="idle"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex items-center gap-2"
+                  >
+                    {/* Now Playing Icon */}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#0a3747]/50 rounded-full border border-[#0a3747]/70 hover:border-[#0a4a5f] transition-colors">
+                      <Music size={16} className="text-[#e51f48]" />
+                      <span className="text-xs text-gray-300 font-medium">Now Playing</span>
+                    </div>
+                    
+                    {/* Earn Icon */}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-500/10 rounded-full border border-amber-500/20 hover:border-amber-500/40 transition-colors">
+                      <DollarSign size={16} className="text-amber-400" />
+                      <span className="text-xs text-amber-300 font-medium">Earn</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </nav>
