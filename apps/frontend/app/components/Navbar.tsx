@@ -274,7 +274,7 @@ export default function Navbar() {
                     <span className="text-xs text-white font-medium">Now Playing</span>
                   </motion.div>
                 ) : (
-                  // Now Playing Icon - Shows when not playing
+                  // Now Playing, Premium & Earn Icons - Shows when not playing
                   <motion.div
                     key="idle"
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -286,6 +286,16 @@ export default function Navbar() {
                     {/* Now Playing Icon */}
                     <div className="p-2 bg-[#0a3747]/50 rounded-full border border-[#0a3747]/70 hover:border-[#0a4a5f] transition-colors touch-target group">
                       <Music size={18} className="text-[#e51f48] group-hover:scale-110 transition-transform" />
+                    </div>
+                    
+                    {/* Premium Icon */}
+                    <div className="p-2 bg-amber-500/10 rounded-full border border-amber-500/20 hover:border-amber-500/40 transition-colors touch-target group">
+                      <Crown size={18} className="text-amber-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    
+                    {/* Earn Icon */}
+                    <div className="p-2 bg-green-500/10 rounded-full border border-green-500/20 hover:border-green-500/40 transition-colors touch-target group">
+                      <DollarSign size={18} className="text-green-400 group-hover:scale-110 transition-transform" />
                     </div>
                   </motion.div>
                 )}
