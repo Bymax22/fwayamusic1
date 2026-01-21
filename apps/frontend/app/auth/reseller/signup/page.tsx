@@ -98,7 +98,7 @@ export default function ResellerSignUp() {
       if (formData.avatarFile) {
         const formDataUpload = new FormData();
         formDataUpload.append('file', formData.avatarFile);
-        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/upload-avatar`, {
+        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload-avatar`, {
           method: 'POST',
           body: formDataUpload,
         });
