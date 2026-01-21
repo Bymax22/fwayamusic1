@@ -1,7 +1,7 @@
 "use client";
 import { 
   Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play, Waves
+  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
