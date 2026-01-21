@@ -1,7 +1,7 @@
 "use client";
 import { 
   Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play, Coins
+  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play, Coins, Search
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -274,7 +274,7 @@ export default function Navbar() {
                     <span className="text-xs text-white font-medium">Now Playing</span>
                   </motion.div>
                 ) : (
-                  // Now Playing, Premium & Earn Icons - Shows when not playing
+                  // Now Playing, Search & Earn Icons - Shows when not playing
                   <motion.div
                     key="idle"
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -286,8 +286,12 @@ export default function Navbar() {
                     {/* Now Playing Icon */}
                     <Music size={22} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
                     
-                    {/* Premium Icon */}
-                    <Crown size={22} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
+                    {/* Search Icon */}
+                    <Search 
+                      size={22} 
+                      className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer"
+                      onClick={() => router.push('/search')}
+                    />
                     
                     {/* Earn Icon */}
                     <Coins size={22} className="text-green-500 hover:scale-110 transition-transform cursor-pointer" />
