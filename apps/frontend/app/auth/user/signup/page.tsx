@@ -52,11 +52,13 @@ export default function UserSignUp() {
       if (formData.avatarFile) {
         const formDataUpload = new FormData();
         formDataUpload.append('file', formData.avatarFile);
-        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload-avatar`, {
+        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/upload-avatar`, {
           method: 'POST',
           body: formDataUpload,
         });
         if (!uploadResponse.ok) {
+          const errorText = await uploadResponse.text();
+          console.error('Avatar upload error:', errorText);
           throw new Error('Failed to upload avatar');
         }
         const uploadData = await uploadResponse.json();

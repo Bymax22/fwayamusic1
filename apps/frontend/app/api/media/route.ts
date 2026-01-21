@@ -21,14 +21,15 @@ export async function POST(request: Request) {
     const backendFormData = new FormData();
     backendFormData.append('file', file);
 
-    const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload-avatar`, {
+    const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/upload-avatar`, {
       method: 'POST',
       body: backendFormData,
     });
 
     if (!uploadResponse.ok) {
-      const errorData = await uploadResponse.json();
-      return NextResponse.json({ error: errorData.message || 'Upload failed' }, { status: uploadResponse.status });
+      const errorText = await uploadResponse.text();
+      console.error('Backend upload error:', errorText);
+      return NextResponse.json({ error: 'Upload failed' }, { status: uploadResponse.status });
     }
 
     const uploadData = await uploadResponse.json();
