@@ -1,7 +1,7 @@
 // app/auth/artist/signup/page.tsx
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { ReCAPTCHA } from '@/components/ReCAPTCHA';
@@ -12,7 +12,7 @@ import Link from 'next/link';
 type SignupStep = 'basic' | 'artist' | 'consent' | 'verification';
 
 export default function ArtistSignUp() {
-  const { signUp, loading } = useAuth();
+  const { signUp, loading, user } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState<SignupStep>('basic');
   const [formData, setFormData] = useState({
@@ -36,6 +36,15 @@ export default function ArtistSignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Watch for user role update after signup
+  useEffect(() => {
+    if (isRedirecting && user && user.role === 'ARTIST') {
+      console.log('User context updated with ARTIST role. Redirecting to /for-artists');
+      router.push('/for-artists');
+    }
+  }, [isRedirecting, user, router]);
 
   const validateStep = (currentStep: SignupStep): boolean => {
     const newErrors: Record<string, string> = {};
@@ -94,9 +103,13 @@ export default function ArtistSignUp() {
         avatarUrl: '',
       });
       
-      // Ensure role is correctly set to ARTIST before redirecting
+      console.log('Signup completed. Returned userData:', userData);
+      
+      // Verify the role is ARTIST
       if (userData && userData.role === 'ARTIST') {
-        router.push('/for-artists');
+        // Set flag to trigger redirect when user context updates
+        setIsRedirecting(true);
+        setStep('verification');
       } else {
         setErrors({ submit: `User role was not set to ARTIST. Got: ${userData?.role || 'undefined'}` });
       }
