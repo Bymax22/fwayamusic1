@@ -5,13 +5,6 @@ export async function POST(request: NextRequest) {
   try {
     const { token } = await request.json();
 
-    if (!token) {
-      return NextResponse.json(
-        { success: false, message: 'reCAPTCHA token is required' },
-        { status: 400 }
-      );
-    }
-
     const secretKey = process.env.RECAPTCHA_SECRET_KEY;
     
     // TODO: Re-enable reCAPTCHA verification once secret key is properly configured
@@ -22,6 +15,13 @@ export async function POST(request: NextRequest) {
         success: true,
         message: 'reCAPTCHA verification skipped (no secret key configured)',
       });
+    }
+
+    if (!token) {
+      return NextResponse.json(
+        { success: false, message: 'reCAPTCHA token is required' },
+        { status: 400 }
+      );
     }
 
     const verificationUrl = 'https://www.google.com/recaptcha/api/siteverify';

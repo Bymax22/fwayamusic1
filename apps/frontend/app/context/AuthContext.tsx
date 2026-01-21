@@ -169,12 +169,13 @@ const signUp = async (data: SignUpData): Promise<User> => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ token: data.recaptchaToken }),
+      body: JSON.stringify({ token: data.recaptchaToken || '' }),
     });
 
     const recaptchaResult = await recaptchaResponse.json();
     
     if (!recaptchaResult.success) {
+      console.error('reCAPTCHA verification failed:', recaptchaResult);
       throw new Error(recaptchaResult.message || 'reCAPTCHA verification failed');
     }
 
