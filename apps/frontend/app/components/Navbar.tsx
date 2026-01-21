@@ -214,8 +214,8 @@ export default function Navbar() {
         >
           <div className="container mx-auto px-4 h-full flex items-center justify-between">
             {/* Left Section - Bigger Logo for Guests */}
-            <div className="flex items-center gap-3">
-              <Link href="/" className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
@@ -223,17 +223,17 @@ export default function Navbar() {
                 >
                   <Image 
                     src="/Fwaya Innovations icon-01.png" 
-                    alt="Fwaya Music Logo" 
-                    width={44}
-                    height={44}
+                    alt="Fwaya Logo" 
+                    width={32}
+                    height={32}
                     className="rounded-lg"
                   />
                 </motion.div>
                 <div className="flex flex-col">
-                  <span className="text-2xl font-bold text-white">
-                    Fwaya<span className="text-[#e51f48]">Music</span>
+                  <span className="text-lg font-bold text-white">
+                    Fwaya<span className="text-[#e51f48]"></span>
                   </span>
-                  <span className="text-xs text-gray-400 -mt-1">Stream & Discover</span>
+                  <span className="text-xs text-gray-400 -mt-0.5">Stream & Discover</span>
                 </div>
               </Link>
             </div>
@@ -313,7 +313,7 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-4 h-full flex items-center justify-between">
           {/* Left Section - Logo with Tagline */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link href="/dashboard" className="flex items-center gap-2">
               <motion.div
                 animate={{ rotate: 360 }}
@@ -322,15 +322,15 @@ export default function Navbar() {
               >
                 <Image 
                   src="/Fwaya Innovations icon-01.png" 
-                  alt="Fwaya Music Logo" 
-                  width={36}
-                  height={36}
+                  alt="Fwaya Logo" 
+                  width={32}
+                  height={32}
                   className="rounded"
                 />
               </motion.div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold text-white">
-                  Fwaya<span className="text-[#e51f48]">Music</span>
+                <span className="text-lg font-bold text-white">
+                  Fwaya<span className="text-[#e51f48]"></span>
                 </span>
                 <span className="text-xs text-gray-400 -mt-1">Explore & Start Earning</span>
               </div>
