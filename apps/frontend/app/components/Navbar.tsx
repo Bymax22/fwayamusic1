@@ -229,7 +229,7 @@ export default function Navbar() {
                     className="rounded-lg"
                   />
                 </motion.div>
-                <div className="hidden sm:flex flex-col">
+                <div className="flex flex-col">
                   <span className="text-2xl font-bold text-white">
                     Fwaya<span className="text-[#e51f48]">Music</span>
                   </span>
@@ -274,7 +274,7 @@ export default function Navbar() {
                     <span className="text-xs text-white font-medium">Now Playing</span>
                   </motion.div>
                 ) : (
-                  // Now Playing & Earn Icons - Shows when not playing
+                  // Now Playing Icon - Shows when not playing
                   <motion.div
                     key="idle"
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -286,11 +286,6 @@ export default function Navbar() {
                     {/* Now Playing Icon */}
                     <div className="p-2 bg-[#0a3747]/50 rounded-full border border-[#0a3747]/70 hover:border-[#0a4a5f] transition-colors touch-target group">
                       <Music size={18} className="text-[#e51f48] group-hover:scale-110 transition-transform" />
-                    </div>
-                    
-                    {/* Earn Icon */}
-                    <div className="p-2 bg-amber-500/10 rounded-full border border-amber-500/20 hover:border-amber-500/40 transition-colors touch-target group">
-                      <DollarSign size={18} className="text-amber-400 group-hover:scale-110 transition-transform" />
                     </div>
                   </motion.div>
                 )}
@@ -333,7 +328,7 @@ export default function Navbar() {
                   className="rounded"
                 />
               </motion.div>
-              <div className="hidden sm:flex flex-col">
+              <div className="flex flex-col">
                 <span className="text-xl font-bold text-white">
                   Fwaya<span className="text-[#e51f48]">Music</span>
                 </span>
