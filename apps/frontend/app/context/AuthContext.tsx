@@ -222,6 +222,7 @@ const signUp = async (data: SignUpData): Promise<User> => {
       }
 
       const userData = await backendResponse.json();
+      console.log('Signup response userData:', userData, 'Role:', userData?.role);
       setUser(userData);
       return userData;
     } catch (error: unknown) {

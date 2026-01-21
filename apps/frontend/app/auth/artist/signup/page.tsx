@@ -87,13 +87,19 @@ export default function ArtistSignUp() {
     }
 
     try {
-      await signUp({
+      const userData = await signUp({
         ...formData,
         role: 'ARTIST',
         recaptchaToken,
         avatarUrl: '',
       });
-      router.push('/for-artists');
+      
+      // Ensure role is correctly set to ARTIST before redirecting
+      if (userData && userData.role === 'ARTIST') {
+        router.push('/for-artists');
+      } else {
+        setErrors({ submit: `User role was not set to ARTIST. Got: ${userData?.role || 'undefined'}` });
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         setErrors({ submit: error.message });

@@ -55,9 +55,14 @@ export class AuthService {
     if (dto.businessType) userData.businessType = dto.businessType;
     if (dto.taxNumber) userData.taxNumber = dto.taxNumber;
 
-    return this.prisma.user.create({
+    console.log('Creating user with role:', userData.role, 'Full userData:', userData);
+    
+    const createdUser = await this.prisma.user.create({
       data: userData,
     });
+    
+    console.log('Created user:', createdUser);
+    return createdUser;
   }
 
   /**
