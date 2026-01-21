@@ -25,6 +25,7 @@ export class AuthService {
       passwordHash,
       role: (dto.role as UserRole) || UserRole.USER,
       status: UserStatus.PENDING,
+      kycStatus: KYCStatus.NOT_SUBMITTED,
       isEmailVerified: false,
       isPhoneVerified: false,
       isPremium: false,
