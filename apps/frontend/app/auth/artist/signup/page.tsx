@@ -87,28 +87,11 @@ export default function ArtistSignUp() {
     }
 
     try {
-      let avatarUrl = '';
-      if (formData.avatarFile) {
-        const formDataUpload = new FormData();
-        formDataUpload.append('file', formData.avatarFile);
-        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload-avatar`, {
-          method: 'POST',
-          body: formDataUpload,
-        });
-        if (!uploadResponse.ok) {
-          const errorText = await uploadResponse.text();
-          console.error('Avatar upload error:', errorText);
-          throw new Error('Failed to upload avatar');
-        }
-        const uploadData = await uploadResponse.json();
-        avatarUrl = uploadData.avatarUrl;
-      }
-
       await signUp({
         ...formData,
         role: 'ARTIST',
         recaptchaToken,
-        avatarUrl,
+        avatarUrl: '',
       });
       router.push('/for-artists');
     } catch (error: unknown) {
@@ -225,18 +208,6 @@ export default function ArtistSignUp() {
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                 className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="Your display name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Profile Picture
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setFormData({ ...formData, avatarFile: e.target.files?.[0] || null })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
               />
             </div>
 
