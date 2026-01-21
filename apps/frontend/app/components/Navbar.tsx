@@ -1,7 +1,7 @@
 "use client";
 import { 
   Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play, Banknote
+  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play, Coins
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -284,13 +284,13 @@ export default function Navbar() {
                     className="flex items-center gap-3"
                   >
                     {/* Now Playing Icon */}
-                    <Music size={24} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
+                    <Music size={22} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
                     
                     {/* Premium Icon */}
-                    <Crown size={24} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
+                    <Crown size={22} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
                     
                     {/* Earn Icon */}
-                    <Banknote size={24} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
+                    <Coins size={22} className="text-green-500 hover:scale-110 transition-transform cursor-pointer" />
                   </motion.div>
                 )}
               </AnimatePresence>
