@@ -284,17 +284,25 @@ export default function Navbar() {
                     className="flex items-center gap-3"
                   >
                     {/* Now Playing Icon */}
-                    <Music size={22} className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer" />
+                    <Music 
+                      size={22} 
+                      className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer"
+                      onClick={() => router.push('/browse')}
+                    />
                     
                     {/* Search Icon */}
                     <Search 
                       size={22} 
-                      className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer"
+                      className="text-white hover:scale-110 transition-transform cursor-pointer"
                       onClick={() => router.push('/search')}
                     />
                     
                     {/* Earn Icon */}
-                    <Coins size={22} className="text-green-500 hover:scale-110 transition-transform cursor-pointer" />
+                    <Coins 
+                      size={22} 
+                      className="text-green-500 hover:scale-110 transition-transform cursor-pointer"
+                      onClick={() => router.push('/auth/signin?role=RESELLER')}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>
