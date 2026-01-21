@@ -5,22 +5,20 @@ export async function POST(request: NextRequest) {
   try {
     const { token } = await request.json();
 
-    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-    
-    // Skip verification if secret key is not properly configured
-    // Valid Google reCAPTCHA secret keys start with "6L" and are at least 40 characters
-    if (!secretKey || secretKey.length < 40 || !secretKey.startsWith('6L')) {
-      console.warn('RECAPTCHA_SECRET_KEY is not properly configured - skipping verification for development');
-      return NextResponse.json({
-        success: true,
-        message: 'reCAPTCHA verification skipped (development mode)',
-      });
-    }
-
     if (!token) {
       return NextResponse.json(
         { success: false, message: 'reCAPTCHA token is required' },
         { status: 400 }
+      );
+    }
+
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+    
+    if (!secretKey) {
+      console.error('RECAPTCHA_SECRET_KEY is not configured');
+      return NextResponse.json(
+        { success: false, message: 'Server configuration error - reCAPTCHA secret key not set' },
+        { status: 500 }
       );
     }
 
@@ -47,6 +45,17 @@ export async function POST(request: NextRequest) {
         message: 'reCAPTCHA verification successful',
       });
     }
+
+    console.error('reCAPTCHA verification failed:', data);
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'reCAPTCHA verification failed',
+        errorCodes: data['error-codes'] || null,
+        raw: data,
+      },
+      { status: 400 }
+    );
 
     console.error('reCAPTCHA verification failed:', data);
     return NextResponse.json(
