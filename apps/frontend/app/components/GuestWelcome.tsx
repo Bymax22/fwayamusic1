@@ -1009,7 +1009,7 @@ const TopChartsSection = ({
   isPlaying: boolean;
 }) => {
   return (
-    <section className="mb-8 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] p-4 rounded-xl">
+    <section className="mb-4 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] p-4 rounded-xl">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-lg font-bold text-white mobile-text-lg">Top Charts</h2>
@@ -1141,7 +1141,7 @@ const HorizontalScrollSection = ({
   }, [checkScroll]);
 
   return (
-    <section className="mb-8 relative">
+    <section className="mb-4 relative">
       <div className="flex justify-between items-center mb-4 px-1">
         <div>
           <h2 className="text-lg font-bold text-white mobile-text-lg">{title}</h2>
@@ -1248,7 +1248,7 @@ const FeaturedPlaylistsCarousel = ({
   }, [playlists.length]);
 
   return (
-    <section className="mb-8">
+    <section className="mb-4">
       <div className="flex justify-between items-center mb-4 px-1">
         <div>
           <h2 className="text-lg font-bold text-white mobile-text-lg">Featured Playlists</h2>
@@ -1619,22 +1619,6 @@ const GuestWelcome = () => {
           onPlayTrack={handlePlayTrackFromBanner}
         />
 
-        {/* Quick Stats Bar */}
-        <div className="grid grid-cols-3 gap-3 mx-2 mb-8">
-          <div className="bg-[#0a3747]/50 rounded-lg p-3 text-center backdrop-blur-sm">
-            <div className="text-2xl font-bold text-[#e51f48]">{trendingSongs.length}+</div>
-            <div className="text-xs text-gray-300">Trending Songs</div>
-          </div>
-          <div className="bg-[#0a3747]/50 rounded-lg p-3 text-center backdrop-blur-sm">
-            <div className="text-2xl font-bold text-[#e51f48]">{favoriteArtists.length}+</div>
-            <div className="text-xs text-gray-300">Artists</div>
-          </div>
-          <div className="bg-[#0a3747]/50 rounded-lg p-3 text-center backdrop-blur-sm">
-            <div className="text-2xl font-bold text-[#e51f48]">{beatsForProducers.length}+</div>
-            <div className="text-xs text-gray-300">Beats</div>
-          </div>
-        </div>
-
         {/* Featured Playlists Carousel */}
         {featuredPlaylists.length > 0 && (
           <FeaturedPlaylistsCarousel 
@@ -1732,7 +1716,7 @@ const GuestWelcome = () => {
         />
 
         {/* Latest News */}
-        <section className="mb-8">
+        <section className="mb-4">
           <div className="flex justify-between items-center mb-4 px-1">
             <div>
               <h2 className="text-lg font-bold text-white mobile-text-lg">Latest News</h2>
