@@ -15,6 +15,16 @@ export class AuthService {
    */
   async register(dto: any) {
     try {
+      // Check if user already exists (might have been created by sync)
+      const existingUser = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
+      
+      if (existingUser) {
+        console.log('User already exists, returning existing user:', existingUser.email);
+        return existingUser;
+      }
+
       // Hash the password
       const saltRounds = 10;
       const passwordHash = await bcrypt.hash(dto.password, saltRounds);
@@ -83,7 +93,16 @@ export class AuthService {
       if (error instanceof Error && 'code' in error) {
         const prismaError = error as any;
         if (prismaError.code === 'P2002') {
-          throw new Error(`User with this ${prismaError.meta?.target?.[0] || 'field'} already exists`);
+          // User already exists - this shouldn't happen now, but handle it gracefully
+          const email = prismaError.meta?.target?.[0];
+          const existingUser = await this.prisma.user.findUnique({
+            where: { email: email || dto.email },
+          });
+          if (existingUser) {
+            console.log('Returning existing user due to duplicate error:', email);
+            return existingUser;
+          }
+          throw new Error(`User with this ${email || 'field'} already exists`);
         }
       }
       throw error;
