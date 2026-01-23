@@ -118,21 +118,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
  const syncUserWithBackend = async (firebaseUser: FirebaseUser): Promise<User | null> => {
      try {
        const token = await firebaseUser.getIdToken();
+       console.log('Firebase token obtained, syncing with backend:', {
+         email: firebaseUser.email,
+         tokenLength: token.length,
+         apiUrl: process.env.NEXT_PUBLIC_API_URL,
+       });
+       
        // persist short-lived token for other components if they need it
        if (typeof window !== 'undefined' && token) localStorage.setItem('authToken', token);
        
        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
          headers: {
            'Authorization': `Bearer ${token}`,
+           'Content-Type': 'application/json',
          },
        });
 
-      if (response.ok) {
+       console.log('Backend /auth/me response status:', response.status);
+
+       if (response.ok) {
         const userData: User = await response.json();
+        console.log('Successfully synced user with backend:', userData.email);
         setUser(userData);
         return userData;
        } else {
-         // User exists in Firebase but not in our database - sign them out
+         // Try to get error details
+         let errorText = `HTTP ${response.status}`;
+         try {
+           const errorData = await response.json();
+           errorText = errorData.message || errorData.error || errorText;
+         } catch {
+           errorText = await response.text() || errorText;
+         }
+         
+         console.warn('Backend /auth/me failed:', {
+           status: response.status,
+           email: firebaseUser.email,
+           error: errorText,
+         });
+         
+         // For 401, don't automatically sign out - might be a transient issue
+         if (response.status === 401) {
+           console.warn('Unauthorized response from backend, will retry on next sync');
+           return null;
+         }
+         
+         // For other errors, sign out
          await signOut(auth);
          setUser(null);
         return null;
