@@ -36,18 +36,9 @@ export default function ArtistSignUp() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isRedirecting, setIsRedirecting] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Watch for user role update after signup
-  useEffect(() => {
-    if (isRedirecting && user && user.role === 'ARTIST') {
-      console.log('User context updated with ARTIST role. Redirecting to /for-artists');
-      router.push('/for-artists');
-    }
-  }, [isRedirecting, user, router]);
 
   const validateStep = (currentStep: SignupStep): boolean => {
     const newErrors: Record<string, string> = {};
@@ -169,9 +160,9 @@ export default function ArtistSignUp() {
       
       // Verify the role is ARTIST
       if (userData && userData.role === 'ARTIST') {
-        // Set flag to trigger redirect when user context updates
-        setIsRedirecting(true);
-        setStep('verification');
+        // Redirect immediately to artist dashboard
+        console.log('Artist signup successful, redirecting to /for-artists');
+        router.push('/for-artists');
       } else {
         setErrors({ submit: `User role was not set to ARTIST. Got: ${userData?.role || 'undefined'}` });
       }
