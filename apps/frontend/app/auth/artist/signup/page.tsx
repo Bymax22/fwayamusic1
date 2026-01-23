@@ -4,10 +4,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { ReCAPTCHA, ReCAPTCHAHandle } from '@/components/ReCAPTCHA';
-import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaArrowLeft } from 'react-icons/fa';
+import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaArrowLeft, FaCamera } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type SignupStep = 'basic' | 'artist' | 'consent' | 'verification';
 
@@ -27,6 +27,7 @@ export default function ArtistSignUp() {
     stageName: '',
     bio: '',
     website: '',
+    avatarUrl: '',
     acceptedTerms: false,
     acceptedPrivacy: false,
     marketingEmails: false,
@@ -34,10 +35,11 @@ export default function ArtistSignUp() {
     avatarFile: null as File | null,
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const recaptchaRef = useRef<ReCAPTCHAHandle>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Watch for user role update after signup
   useEffect(() => {
@@ -78,6 +80,68 @@ export default function ArtistSignUp() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const uploadAvatarToCloudinary = async (file: File): Promise<string> => {
+    const cloudinaryFormData = new FormData();
+    cloudinaryFormData.append('file', file);
+    cloudinaryFormData.append('upload_preset', 'bymaxdev1');
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: 'POST',
+          body: cloudinaryFormData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Avatar upload failed');
+      }
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      throw error;
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrors({ ...errors, avatar: 'Please select an image file' });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors({ ...errors, avatar: 'File size must be less than 5MB' });
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to Cloudinary
+    setUploading(true);
+    try {
+      const avatarUrl = await uploadAvatarToCloudinary(file);
+      setFormData({ ...formData, avatarUrl });
+      setErrors({ ...errors, avatar: '' });
+    } catch {
+      setErrors({ ...errors, avatar: 'Failed to upload avatar' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleNext = () => {
     if (validateStep(step)) {
       if (step === 'basic') setStep('artist');
@@ -91,20 +155,7 @@ export default function ArtistSignUp() {
   };
 
   const handleSubmit = async () => {
-    // Note: Token refresh disabled due to browser-error issues in production
-    // if (recaptchaRef.current) {
-    //   try {
-    //     await recaptchaRef.current.refreshToken();
-    //     console.debug('reCAPTCHA token refreshed successfully before artist signup submission');
-    //   } catch (err) {
-    //     console.error('Failed to refresh reCAPTCHA token before artist signup submission:', err);
-    //     setErrors({ ...errors, recaptcha: 'Failed to refresh reCAPTCHA. Please try again.' });
-    //     return;
-    //   }
-    // }
-
-    if (!validateStep('consent') || !recaptchaToken) {
-      setErrors({ ...errors, recaptcha: 'Please complete the reCAPTCHA' });
+    if (!validateStep('consent')) {
       return;
     }
 
@@ -112,8 +163,6 @@ export default function ArtistSignUp() {
       const userData = await signUp({
         ...formData,
         role: 'ARTIST',
-        recaptchaToken,
-        avatarUrl: '',
       });
       
       console.log('Signup completed. Returned userData:', userData);
@@ -311,6 +360,43 @@ export default function ArtistSignUp() {
               Artist Profile
             </h2>
 
+            {/* Avatar Upload */}
+            <div>
+              <label className="block text-sm font-medium text-white mb-3">
+                Profile Picture
+              </label>
+              <div className="flex items-center gap-4">
+                <div className="relative w-24 h-24 rounded-full bg-[#0a3747] border-2 border-purple-500/40 flex items-center justify-center overflow-hidden flex-shrink-0">
+                  {avatarPreview ? (
+                    <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
+                  ) : (
+                    <FaMusic className="text-3xl text-gray-400" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FaCamera className="text-sm" />
+                    {uploading ? 'Uploading...' : 'Upload Picture'}
+                  </button>
+                  <p className="text-xs text-gray-400 mt-2">JPG, PNG or GIF (Max 5MB)</p>
+                </div>
+              </div>
+              {errors.avatar && <p className="text-red-400 text-sm mt-2">{errors.avatar}</p>}
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
@@ -480,28 +566,7 @@ export default function ArtistSignUp() {
               </div>
             </div>
 
-            {/* reCAPTCHA */}
-            <div className="flex justify-center">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                onVerify={(token) => {
-                  console.debug('Artist signup: reCAPTCHA token received:', {
-                    tokenLength: token ? token.length : 0,
-                  });
-                  setRecaptchaToken(token);
-                }}
-                onExpire={() => {
-                  console.warn('Artist signup: reCAPTCHA token expired');
-                  setRecaptchaToken('');
-                }}
-                onError={(error) => {
-                  console.error('Artist signup: reCAPTCHA error:', error);
-                  setErrors({ ...errors, recaptcha: error || 'reCAPTCHA error occurred' });
-                }}
-              />
-            </div>
-            {errors.recaptcha && <p className="text-red-400 text-sm text-center">{errors.recaptcha}</p>}
-
+            {/* reCAPTCHA temporarily disabled */}
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
@@ -511,10 +576,10 @@ export default function ArtistSignUp() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || uploading}
                 className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
               >
-                {loading ? 'Creating Account...' : 'Create Artist Account'}
+                {loading ? 'Creating Account...' : uploading ? 'Uploading Avatar...' : 'Create Artist Account'}
               </button>
             </div>
 
