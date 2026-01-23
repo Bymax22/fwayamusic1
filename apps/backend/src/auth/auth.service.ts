@@ -67,13 +67,10 @@ export class AuthService {
       if (dto.taxNumber) userData.taxNumber = dto.taxNumber;
       if (dto.taxId) userData.taxId = dto.taxId;
 
-      // Address and other optional fields (handle JSON serialization)
-      if (dto.address) {
-        userData.address = typeof dto.address === 'string' ? JSON.parse(dto.address) : dto.address;
-      }
-
       // Note: recaptchaToken, avatarFile, confirmPassword are not saved to database
       console.log('Creating user with role:', userData.role, 'Email:', userData.email);
+      console.log('User data keys:', Object.keys(userData));
+      console.log('Address field:', userData.address);
       
       const createdUser = await this.prisma.user.create({
         data: userData,

@@ -226,16 +226,25 @@ const signUp = async (data: SignUpData): Promise<User> => {
         body: JSON.stringify(data),
       });
 
-
-     if (!backendResponse.ok) {
-        const errorData = await backendResponse.json();
-        throw new Error(errorData.message || 'Failed to create user in backend');
+      if (!backendResponse.ok) {
+        let errorMessage = 'Failed to create user in backend';
+        try {
+          const errorData = await backendResponse.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // If response is not JSON, try to get text
+          const errorText = await backendResponse.text();
+          errorMessage = errorText || `HTTP ${backendResponse.status}`;
+          console.error('Backend error response (text):', errorText);
+        }
+        throw new Error(errorMessage);
       }
 
       const userData = await backendResponse.json();
       console.log('Signup response userData:', userData, 'Role:', userData?.role);
       setUser(userData);
       return userData;
+
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Sign up error:', error);
