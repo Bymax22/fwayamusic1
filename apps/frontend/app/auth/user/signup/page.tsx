@@ -1,10 +1,9 @@
 // app/auth/user/signup/page.tsx
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { ReCAPTCHA, ReCAPTCHAHandle } from '@/components/ReCAPTCHA';
 import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 
@@ -27,33 +26,15 @@ export default function UserSignUp() {
     dataSharing: false,
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const recaptchaRef = useRef<ReCAPTCHAHandle>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     console.debug('User signup form submitted:', {
-      hasRecaptchaToken: !!recaptchaToken,
-      recaptchaTokenLength: recaptchaToken ? recaptchaToken.length : 0,
-      recaptchaTokenType: typeof recaptchaToken,
       email: formData.email,
       username: formData.username,
     });
-
-    // Note: Token refresh disabled due to browser-error issues in production
-    // The token is generated immediately upon page load, should be valid
-    // if (recaptchaRef.current) {
-    //   try {
-    //     await recaptchaRef.current.refreshToken();
-    //     console.debug('reCAPTCHA token refreshed successfully before submission');
-    //   } catch (err) {
-    //     console.error('Failed to refresh reCAPTCHA token before submission:', err);
-    //     setErrors({ ...errors, recaptcha: 'Failed to refresh reCAPTCHA. Please try again.' });
-    //     return;
-    //   }
-    // }
 
     const newErrors: Record<string, string> = {};
     if (!formData.email) newErrors.email = 'Email is required';
@@ -63,7 +44,6 @@ export default function UserSignUp() {
     if (!formData.username) newErrors.username = 'Username is required';
     if (!formData.acceptedTerms) newErrors.acceptedTerms = 'You must accept the terms and conditions';
     if (!formData.acceptedPrivacy) newErrors.acceptedPrivacy = 'You must accept the privacy policy';
-    if (!recaptchaToken) newErrors.recaptcha = 'Please complete the reCAPTCHA';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -74,7 +54,6 @@ export default function UserSignUp() {
       await signUp({
         ...formData,
         role: 'USER',
-        recaptchaToken,
       });
       router.push('/dashboard');
     } catch (error: unknown) {
@@ -296,29 +275,7 @@ export default function UserSignUp() {
             </div>
           </div>
 
-          {/* reCAPTCHA */}
-          <div className="flex justify-center">
-            <ReCAPTCHA
-              ref={recaptchaRef}
-              onVerify={(token) => {
-                console.debug('User signup: reCAPTCHA token received:', {
-                  tokenLength: token ? token.length : 0,
-                  tokenType: typeof token,
-                });
-                setRecaptchaToken(token);
-              }}
-              onExpire={() => {
-                console.warn('User signup: reCAPTCHA token expired');
-                setRecaptchaToken('');
-              }}
-              onError={(error) => {
-                console.error('User signup: reCAPTCHA error:', error);
-                setErrors({ ...errors, recaptcha: error || 'reCAPTCHA error occurred' });
-              }}
-            />
-          </div>
-          {errors.recaptcha && <p className="text-red-400 text-sm text-center">{errors.recaptcha}</p>}
-
+          {/* reCAPTCHA temporarily disabled */}
           <button
             type="submit"
             disabled={loading}

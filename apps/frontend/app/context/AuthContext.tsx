@@ -80,7 +80,7 @@ interface SignUpData {
   acceptedPrivacy: boolean;
   marketingEmails: boolean;
   dataSharing: boolean;
-  recaptchaToken: string;
+  recaptchaToken?: string; // Made optional - can be empty for USER role temporarily
   avatarUrl?: string;
 }
 
@@ -162,34 +162,32 @@ const signUp = async (data: SignUpData): Promise<User> => {
     try {
       setLoading(true);
 
-      // Verify reCAPTCHA token with our backend
       console.debug('SignUp called with:', {
         email: data.email,
         role: data.role,
         hasRecaptchaToken: !!data.recaptchaToken,
-        recaptchaTokenLength: data.recaptchaToken ? String(data.recaptchaToken).length : 0,
-        recaptchaTokenType: typeof data.recaptchaToken,
       });
 
-      if (!data.recaptchaToken || String(data.recaptchaToken).trim() === '') {
-        throw new Error('reCAPTCHA token is missing or empty. Please complete the reCAPTCHA verification.');
-      }
+      // reCAPTCHA verification - skipped for USER role (temporarily disabled)
+      if ((data.role === 'ARTIST' || data.role === 'RESELLER') && data.recaptchaToken) {
+        console.debug('Verifying reCAPTCHA for', data.role);
+        
+        const recaptchaResponse = await fetch('/api/auth/verify-recaptcha', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token: data.recaptchaToken }),
+        });
 
-      const recaptchaResponse = await fetch('/api/auth/verify-recaptcha', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: data.recaptchaToken }),
-      });
+        console.debug('reCAPTCHA verification response status:', recaptchaResponse.status);
 
-      console.debug('reCAPTCHA verification response status:', recaptchaResponse.status);
-
-      const recaptchaResult = await recaptchaResponse.json();
-      
-      if (!recaptchaResult.success) {
-        console.error('reCAPTCHA verification failed:', recaptchaResult);
-        throw new Error(recaptchaResult.message || 'reCAPTCHA verification failed');
+        const recaptchaResult = await recaptchaResponse.json();
+        
+        if (!recaptchaResult.success) {
+          console.error('reCAPTCHA verification failed:', recaptchaResult);
+          throw new Error(recaptchaResult.message || 'reCAPTCHA verification failed');
+        }
       }
 
 
