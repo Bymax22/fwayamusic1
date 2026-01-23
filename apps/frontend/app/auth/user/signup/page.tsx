@@ -23,7 +23,6 @@ export default function UserSignUp() {
     acceptedPrivacy: false,
     marketingEmails: false,
     dataSharing: false,
-    avatarFile: null as File | null,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState('');
@@ -48,28 +47,10 @@ export default function UserSignUp() {
     }
 
     try {
-      let avatarUrl = '';
-      if (formData.avatarFile) {
-        const formDataUpload = new FormData();
-        formDataUpload.append('file', formData.avatarFile);
-        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload-avatar`, {
-          method: 'POST',
-          body: formDataUpload,
-        });
-        if (!uploadResponse.ok) {
-          const errorText = await uploadResponse.text();
-          console.error('Avatar upload error:', errorText);
-          throw new Error('Failed to upload avatar');
-        }
-        const uploadData = await uploadResponse.json();
-        avatarUrl = uploadData.avatarUrl;
-      }
-
       await signUp({
         ...formData,
         role: 'USER',
         recaptchaToken,
-        avatarUrl,
       });
       router.push('/dashboard');
     } catch (error: unknown) {
@@ -137,18 +118,6 @@ export default function UserSignUp() {
               onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
               className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Your display name"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-white mb-1">
-              Profile Picture
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setFormData({ ...formData, avatarFile: e.target.files?.[0] || null })}
-              className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
             />
           </div>
 
