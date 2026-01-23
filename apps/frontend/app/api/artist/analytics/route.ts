@@ -1,9 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const token = request.headers.get('authorization');
-    
     // For now, return basic analytics structure
     // This would be extended to fetch from backend when analytics endpoint is created
     const analytics = {

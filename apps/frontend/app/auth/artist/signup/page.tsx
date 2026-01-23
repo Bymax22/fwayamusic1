@@ -1,7 +1,7 @@
 // app/auth/artist/signup/page.tsx
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaArrowLeft, FaCamera } from 'react-icons/fa';
@@ -12,7 +12,7 @@ import Image from 'next/image';
 type SignupStep = 'basic' | 'artist' | 'consent' | 'verification';
 
 export default function ArtistSignUp() {
-  const { signUp, loading, user } = useAuth();
+  const { signUp, loading } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState<SignupStep>('basic');
   const [formData, setFormData] = useState({
