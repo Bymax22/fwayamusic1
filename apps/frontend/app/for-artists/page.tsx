@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { auth } from '@/lib/firebase-config';
 import RoleGuard from '@/components/RoleGuard';
 
 
@@ -153,9 +154,12 @@ export default function ForArtistsPage() {
     try {
       setIsLoading(true);
       
-      // Get auth token if user is authenticated
-      const token = user ? await user.getIdToken?.() : null;
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      // Get auth token from Firebase
+      let token: string | null = null;
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken();
+      }
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
       
       const [
         statsRes,
@@ -204,12 +208,12 @@ export default function ForArtistsPage() {
       formData.append('allowReselling', newMedia.allowReselling.toString());
       formData.append('artistCommissionRate', newMedia.artistCommissionRate.toString());
 
-      // Get auth token
-      const token = user ? await user.getIdToken?.() : null;
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
+      // Get auth token from Firebase
+      let token: string | null = null;
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken();
       }
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
       const response = await fetch('/api/artist/media', {
         method: 'POST',
@@ -272,8 +276,11 @@ export default function ForArtistsPage() {
 
   const updateMediaSettings = async (mediaId: number, updates: Partial<Media>) => {
     try {
-      // Get auth token
-      const token = user ? await user.getIdToken?.() : null;
+      // Get auth token from Firebase
+      let token: string | null = null;
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken();
+      }
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
@@ -300,12 +307,12 @@ export default function ForArtistsPage() {
     if (!confirm('Are you sure you want to delete this media?')) return;
 
     try {
-      // Get auth token
-      const token = user ? await user.getIdToken?.() : null;
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
+      // Get auth token from Firebase
+      let token: string | null = null;
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken();
       }
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
       const response = await fetch(`/api/artist/media/${mediaId}`, {
         method: 'DELETE',
