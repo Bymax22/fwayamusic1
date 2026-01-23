@@ -4,10 +4,10 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { ReCAPTCHA, ReCAPTCHAHandle } from '@/components/ReCAPTCHA';
-import { FaStore, FaEye, FaEyeSlash, FaCheck, FaArrowLeft } from 'react-icons/fa';
+import { FaStore, FaEye, FaEyeSlash, FaCheck, FaArrowLeft, FaCamera } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type SignupStep = 'basic' | 'business' | 'consent' | 'verification';
 
@@ -26,6 +26,7 @@ export default function ResellerSignUp() {
     businessName: '',
     businessType: '',
     taxNumber: '',
+    avatarUrl: '',
     acceptedTerms: false,
     acceptedPrivacy: false,
     marketingEmails: false,
@@ -33,9 +34,10 @@ export default function ResellerSignUp() {
     avatarFile: null as File | null,
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const recaptchaRef = useRef<ReCAPTCHAHandle>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const businessTypes = [
     'INDIVIDUAL',
@@ -83,52 +85,80 @@ export default function ResellerSignUp() {
     }
   };
 
+  const uploadAvatarToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'bymaxdev1');
+
+    const response = await fetch('https://api.cloudinary.com/v1_1/dayn5vifn/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload avatar to Cloudinary');
+    }
+
+    const data = await response.json();
+    return data.secure_url;
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, avatar: 'Please select an image file' }));
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, avatar: 'File size must be less than 5MB' }));
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to Cloudinary
+    setUploading(true);
+    try {
+      const avatarUrl = await uploadAvatarToCloudinary(file);
+      setFormData(prev => ({ ...prev, avatarUrl, avatarFile: file }));
+      setErrors(prev => {
+        const { avatar, ...rest } = prev;
+        return rest;
+      });
+    } catch (error) {
+      setErrors(prev => ({
+        ...prev,
+        avatar: error instanceof Error ? error.message : 'Failed to upload avatar'
+      }));
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleBack = () => {
     if (step === 'business') setStep('basic');
     else if (step === 'consent') setStep('business');
   };
 
   const handleSubmit = async () => {
-    // Note: Token refresh disabled due to browser-error issues in production
-    // if (recaptchaRef.current) {
-    //   try {
-    //     await recaptchaRef.current.refreshToken();
-    //     console.debug('reCAPTCHA token refreshed successfully before reseller signup submission');
-    //   } catch (err) {
-    //     console.error('Failed to refresh reCAPTCHA token before reseller signup submission:', err);
-    //     setErrors({ ...errors, recaptcha: 'Failed to refresh reCAPTCHA. Please try again.' });
-    //     return;
-    //   }
-    // }
-
-    if (!validateStep('consent') || !recaptchaToken) {
-      setErrors({ ...errors, recaptcha: 'Please complete the reCAPTCHA' });
+    if (!validateStep('consent')) {
       return;
     }
 
     try {
-      let avatarUrl = '';
-      if (formData.avatarFile) {
-        const formDataUpload = new FormData();
-        formDataUpload.append('file', formData.avatarFile);
-        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload-avatar`, {
-          method: 'POST',
-          body: formDataUpload,
-        });
-        if (!uploadResponse.ok) {
-          const errorText = await uploadResponse.text();
-          console.error('Avatar upload error:', errorText);
-          throw new Error('Failed to upload avatar');
-        }
-        const uploadData = await uploadResponse.json();
-        avatarUrl = uploadData.avatarUrl;
-      }
-
       await signUp({
         ...formData,
         role: 'RESELLER',
-        recaptchaToken,
-        avatarUrl,
       });
       router.push('/reseller-dashboard');
     } catch (error: unknown) {
@@ -492,27 +522,38 @@ export default function ResellerSignUp() {
               </div>
             </div>
 
-            {/* reCAPTCHA */}
-            <div className="flex justify-center">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                onVerify={(token) => {
-                  console.debug('Reseller signup: reCAPTCHA token received:', {
-                    tokenLength: token ? token.length : 0,
-                  });
-                  setRecaptchaToken(token);
-                }}
-                onExpire={() => {
-                  console.warn('Reseller signup: reCAPTCHA token expired');
-                  setRecaptchaToken('');
-                }}
-                onError={(error) => {
-                  console.error('Reseller signup: reCAPTCHA error:', error);
-                  setErrors({ ...errors, recaptcha: error || 'reCAPTCHA error occurred' });
-                }}
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center gap-4 mb-6">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#2d5a6b] to-[#1a3847] border-2 border-green-500/50 flex items-center justify-center overflow-hidden">
+                {avatarPreview ? (
+                  <Image
+                    src={avatarPreview}
+                    alt="Avatar preview"
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <FaCamera className="text-3xl text-green-500/60" />
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="px-4 py-2 bg-green-500/20 border border-green-500/50 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors disabled:opacity-50"
+              >
+                {uploading ? 'Uploading...' : 'Upload Avatar'}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="hidden"
               />
+              {errors.avatar && <p className="text-red-400 text-sm">{errors.avatar}</p>}
             </div>
-            {errors.recaptcha && <p className="text-red-400 text-sm text-center">{errors.recaptcha}</p>}
 
             <div className="flex justify-between pt-4">
               <button
@@ -523,10 +564,10 @@ export default function ResellerSignUp() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || uploading}
                 className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
               >
-                {loading ? 'Creating Account...' : 'Create Reseller Account'}
+                {loading ? 'Creating Account...' : uploading ? 'Uploading Avatar...' : 'Create Reseller Account'}
               </button>
             </div>
 
