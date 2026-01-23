@@ -132,7 +132,7 @@ export default function ResellerSignUp() {
       const avatarUrl = await uploadAvatarToCloudinary(file);
       setFormData(prev => ({ ...prev, avatarUrl, avatarFile: file }));
       setErrors(prev => {
-        const { avatar, ...rest } = prev;
+        const { avatar: _, ...rest } = prev;
         return rest;
       });
     } catch (error) {
