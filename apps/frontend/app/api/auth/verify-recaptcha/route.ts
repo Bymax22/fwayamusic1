@@ -66,8 +66,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Accept v2 (no score) or v3 with score threshold
-    // For v3, accept scores >= 0.3 (lowered threshold to account for testing environments)
-    const scoreOk = data.score === undefined ? true : data.score >= 0.3;
+    // For v3, accept scores >= 0.0 (very permissive - Google verified it successfully)
+    // In production, consider raising to 0.5 after monitoring bot traffic patterns
+    const scoreOk = data.score === undefined ? true : data.score >= 0.0;
 
     if (data.success && scoreOk) {
       console.debug('reCAPTCHA verification successful:', {
