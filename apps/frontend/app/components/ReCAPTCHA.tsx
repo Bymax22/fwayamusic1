@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle, useCallback } from 'react';
 
 type GrecaptchaOptions = Record<string, unknown>;
 declare global {
@@ -66,7 +66,7 @@ export const ReCAPTCHA = forwardRef<ReCAPTCHAHandle, ReCAPTCHAProps>(({
     }
   }));
 
-  const injectRecaptchaScript = () => {
+  const injectRecaptchaScript = useCallback(() => {
     if (document.querySelector('script[src*="recaptcha/api.js"]')) {
       console.debug('reCAPTCHA script already loaded');
       return;
@@ -95,7 +95,7 @@ export const ReCAPTCHA = forwardRef<ReCAPTCHAHandle, ReCAPTCHAProps>(({
       onError(msg);
     };
     document.head.appendChild(s);
-  };
+  }, [onError]);
 
   useEffect(() => {
     let poll: number | undefined;
