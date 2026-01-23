@@ -54,7 +54,7 @@ export const ReCAPTCHA = forwardRef<ReCAPTCHAHandle, ReCAPTCHAProps>(({
               onVerify(String(token));
               resolve();
             })
-            .catch((err: any) => {
+            .catch((err: Error) => {
               console.error('Failed to refresh reCAPTCHA token:', err);
               reject(err);
             });
