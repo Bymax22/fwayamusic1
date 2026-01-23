@@ -147,11 +147,15 @@ export default function ForArtistsPage() {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [user]);
 
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
+      
+      // Get auth token if user is authenticated
+      const token = user ? await user.getIdToken?.() : null;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
       const [
         statsRes,
@@ -160,11 +164,11 @@ export default function ForArtistsPage() {
         followersRes,
         commissionsRes
       ] = await Promise.all([
-        fetch('/api/artist/stats'),
-        fetch('/api/artist/media'),
-        fetch('/api/artist/analytics'),
-        fetch('/api/artist/followers'),
-        fetch('/api/artist/commissions')
+        fetch('/api/artist/stats', { headers }),
+        fetch('/api/artist/media', { headers }),
+        fetch('/api/artist/analytics', { headers }),
+        fetch('/api/artist/followers', { headers }),
+        fetch('/api/artist/commissions', { headers })
       ]);
 
       if (statsRes.ok) setStats(await statsRes.json());
@@ -200,9 +204,17 @@ export default function ForArtistsPage() {
       formData.append('allowReselling', newMedia.allowReselling.toString());
       formData.append('artistCommissionRate', newMedia.artistCommissionRate.toString());
 
+      // Get auth token
+      const token = user ? await user.getIdToken?.() : null;
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch('/api/artist/media', {
         method: 'POST',
         body: formData,
+        headers,
       });
 
       if (response.ok) {
@@ -260,11 +272,18 @@ export default function ForArtistsPage() {
 
   const updateMediaSettings = async (mediaId: number, updates: Partial<Media>) => {
     try {
+      // Get auth token
+      const token = user ? await user.getIdToken?.() : null;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(`/api/artist/media/${mediaId}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(updates),
       });
 
@@ -281,8 +300,16 @@ export default function ForArtistsPage() {
     if (!confirm('Are you sure you want to delete this media?')) return;
 
     try {
+      // Get auth token
+      const token = user ? await user.getIdToken?.() : null;
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(`/api/artist/media/${mediaId}`, {
         method: 'DELETE',
+        headers,
       });
 
       if (response.ok) {

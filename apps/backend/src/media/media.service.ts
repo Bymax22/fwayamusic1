@@ -31,7 +31,7 @@ export class MediaService {
     return uploadResult;
   }
 
-  async createMedia(file: Express.Multer.File, userId: number, metadata?: { title?: string, description?: string }) {
+  async createMedia(file: Express.Multer.File, userId: number, createMediaDto: any) {
     try {
       // 1. Upload to Cloudinary
       const uploadResult = await cloudinary.uploader.upload(`data:${file.mimetype};base64,${file.buffer.toString('base64')}`, {
@@ -42,42 +42,60 @@ export class MediaService {
       });
 
       // 2. Create database record
-      const defaultCoverUrl = 'http://localhost:3000/default-cover.jpg'; // or your deployed frontend URL
+      const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';
+
+      // Parse tags if it's a string (JSON)
+      let tags: string[] = [];
+      if (createMediaDto.tags) {
+        try {
+          tags = typeof createMediaDto.tags === 'string' ? JSON.parse(createMediaDto.tags) : createMediaDto.tags;
+        } catch (e) {
+          tags = [];
+        }
+      }
 
       const mediaData = {
         url: uploadResult.secure_url,
         cloudinaryPublicId: uploadResult.public_id,
-        title: metadata?.title || file.originalname.replace(/\.[^/.]+$/, ""),
-        description: metadata?.description,
+        title: createMediaDto.title || file.originalname.replace(/\.[^/.]+$/, ""),
+        description: createMediaDto.description,
         format: uploadResult.format,
         duration: Math.floor(uploadResult.duration || 0),
-        type: this.determineMediaType(uploadResult.resource_type),
+        type: createMediaDto.type || this.determineMediaType(uploadResult.resource_type),
+        accessType: createMediaDto.accessType || 'FREE',
+        price: createMediaDto.price ? parseFloat(createMediaDto.price) : null,
+        isExplicit: createMediaDto.isExplicit === 'true' || createMediaDto.isExplicit === true,
+        genre: createMediaDto.genre,
+        tags,
+        allowReselling: createMediaDto.allowReselling === 'true' || createMediaDto.allowReselling === true,
+        artistCommissionRate: parseFloat(createMediaDto.artistCommissionRate) || 0.5,
+        platformCommissionRate: 0.5, // Default platform commission
         user: { connect: { id: userId } },
         artCoverUrl:
           uploadResult.thumbnail_url
             ? uploadResult.thumbnail_url
             : (uploadResult.secure_url.endsWith('.jpg') || uploadResult.secure_url.endsWith('.png'))
               ? uploadResult.secure_url
-              : defaultCoverUrl, // Use absolute URL for default
+              : defaultCoverUrl,
       };
 
       const media = await this.prisma.media.create({
         data: mediaData,
-include: {
-  user: {
-    select: {
-      id: true,
-      username: true,
-      displayName: true,
-      avatarUrl: true,
-     
-    }
-  }
-}
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatarUrl: true,
+            }
+          }
+        }
       });
 
       return media;
     } catch (error) {
+      console.error('Media creation error:', error);
       throw new InternalServerErrorException(
         error instanceof Error ? error.message : 'Media creation failed'
       );
@@ -96,20 +114,54 @@ include: {
     return this.prisma.media.findMany({
       include: {
         user: {
-          select: { id: true, username: true }
+          select: { id: true, username: true, displayName: true, avatarUrl: true }
         }
       },
       orderBy: { createdAt: 'desc' }
     });
   }
 
-  async deleteMedia(mediaId: number) {
+  async getUserMedia(userId: number) {
+    return this.prisma.media.findMany({
+      where: { userId },
+      include: {
+        user: {
+          select: { id: true, username: true, displayName: true, avatarUrl: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async getMediaById(mediaId: number) {
+    const media = await this.prisma.media.findUnique({
+      where: { id: mediaId },
+      include: {
+        user: {
+          select: { id: true, username: true, displayName: true, avatarUrl: true }
+        }
+      }
+    });
+
+    if (!media) {
+      throw new Error('Media not found');
+    }
+
+    return media;
+  }
+
+  async deleteMedia(mediaId: number, userId: number) {
     const media = await this.prisma.media.findUnique({
       where: { id: mediaId }
     });
 
     if (!media) {
       throw new Error('Media not found');
+    }
+
+    // Check if user owns this media
+    if (media.userId !== userId) {
+      throw new Error('Unauthorized: You can only delete your own media');
     }
 
     try {
@@ -120,6 +172,52 @@ include: {
     } catch (error) {
       throw new InternalServerErrorException(
         error instanceof Error ? error.message : 'Media deletion failed'
+      );
+    }
+  }
+
+  async updateMedia(mediaId: number, userId: number, updates: any) {
+    const media = await this.prisma.media.findUnique({
+      where: { id: mediaId }
+    });
+
+    if (!media) {
+      throw new Error('Media not found');
+    }
+
+    // Check if user owns this media
+    if (media.userId !== userId) {
+      throw new Error('Unauthorized: You can only update your own media');
+    }
+
+    // Prepare update data - only allow certain fields to be updated
+    const updateData: any = {};
+    
+    if (updates.title) updateData.title = updates.title;
+    if (updates.description !== undefined) updateData.description = updates.description;
+    if (updates.genre) updateData.genre = updates.genre;
+    if (updates.isExplicit !== undefined) updateData.isExplicit = updates.isExplicit;
+    if (updates.accessType) updateData.accessType = updates.accessType;
+    if (updates.price !== undefined) updateData.price = updates.price;
+    if (updates.allowReselling !== undefined) updateData.allowReselling = updates.allowReselling;
+    if (updates.artistCommissionRate !== undefined) updateData.artistCommissionRate = updates.artistCommissionRate;
+    if (updates.tags) updateData.tags = updates.tags;
+
+    try {
+      const updated = await this.prisma.media.update({
+        where: { id: mediaId },
+        data: updateData,
+        include: {
+          user: {
+            select: { id: true, username: true, displayName: true, avatarUrl: true }
+          }
+        }
+      });
+
+      return updated;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : 'Media update failed'
       );
     }
   }

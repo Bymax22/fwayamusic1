@@ -3,9 +3,6 @@ import { IsString, IsUrl, IsEnum, IsOptional, IsBoolean, IsNumber } from 'class-
 import { MediaType } from '@fwaya-music/types/enums';
 
 export class CreateMediaDto {
-  @IsUrl()
-  url!: string;
-
   @IsString()
   title!: string;
 
@@ -20,8 +17,12 @@ export class CreateMediaDto {
   @IsEnum(MediaType)
   type!: MediaType;
 
-  @IsBoolean()
-  isPremium!: boolean;
+  @IsString()
+  accessType!: string; // 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW'
+
+  @IsOptional()
+  @IsNumber()
+  price?: number;
 
   @IsBoolean()
   isExplicit!: boolean;
@@ -34,5 +35,15 @@ export class CreateMediaDto {
   @IsNumber()
   duration?: number;
 
-  // Remove userId field entirely
+  @IsBoolean()
+  allowReselling!: boolean;
+
+  @IsNumber()
+  artistCommissionRate!: number;
+
+  @IsOptional()
+  @IsString()
+  tags?: string; // JSON stringified array
+
+  // artCoverUrl will be set from file upload
 }
