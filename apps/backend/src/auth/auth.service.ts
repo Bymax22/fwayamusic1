@@ -21,8 +21,46 @@ export class AuthService {
       });
       
       if (existingUser) {
-        console.log('User already exists, returning existing user:', existingUser.email);
-        return existingUser;
+        console.log('User already exists, updating with signup data:', existingUser.email);
+        // Update user with the signup form data
+        const saltRounds = 10;
+        const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+        
+        const updatedUser = await this.prisma.user.update({
+          where: { email: dto.email },
+          data: {
+            username: dto.username,
+            passwordHash,
+            displayName: dto.displayName || existingUser.displayName,
+            phoneNumber: dto.phoneNumber || existingUser.phoneNumber,
+            dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : existingUser.dateOfBirth,
+            country: dto.country || existingUser.country,
+            avatarUrl: dto.avatarUrl || existingUser.avatarUrl,
+            role: dto.role || existingUser.role,
+            status: existingUser.status || UserStatus.PENDING,
+            acceptedTerms: dto.acceptedTerms || existingUser.acceptedTerms,
+            acceptedPrivacy: dto.acceptedPrivacy || existingUser.acceptedPrivacy,
+            marketingEmails: dto.marketingEmails !== undefined ? dto.marketingEmails : existingUser.marketingEmails,
+            dataSharing: dto.dataSharing !== undefined ? dto.dataSharing : existingUser.dataSharing,
+            consentDate: new Date(),
+            // Handle address field
+            address: dto.address ? (typeof dto.address === 'string' ? { street: dto.address } : dto.address) : existingUser.address,
+            // Artist-specific fields
+            artistName: dto.artistName || existingUser.artistName,
+            stageName: dto.stageName || existingUser.stageName,
+            bio: dto.bio || existingUser.bio,
+            website: dto.website || existingUser.website,
+            socialLinks: dto.socialLinks ? (typeof dto.socialLinks === 'string' ? JSON.parse(dto.socialLinks) : dto.socialLinks) : existingUser.socialLinks,
+            // Reseller-specific fields
+            businessName: dto.businessName || existingUser.businessName,
+            businessType: dto.businessType || existingUser.businessType,
+            taxNumber: dto.taxNumber || existingUser.taxNumber,
+            taxId: dto.taxId || existingUser.taxId,
+          },
+        });
+        
+        console.log('User updated with signup data:', updatedUser.username);
+        return updatedUser;
       }
 
       // Hash the password
