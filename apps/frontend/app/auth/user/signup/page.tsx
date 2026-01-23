@@ -383,10 +383,10 @@ export default function UserSignUp() {
           {/* reCAPTCHA temporarily disabled */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || uploading}
             className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow-lg"
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Creating Account...' : uploading ? 'Uploading Avatar...' : 'Create Account'}
           </button>
 
           {errors.submit && (
