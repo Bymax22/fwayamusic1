@@ -126,7 +126,7 @@ export const ReCAPTCHA = forwardRef<ReCAPTCHAHandle, ReCAPTCHAProps>(({
         if (typeof window.grecaptcha!.ready === 'function') {
           window.grecaptcha!.ready(async () => {
             try {
-              console.debug('Executing reCAPTCHA token generation...');
+              console.debug('Executing reCAPTCHA token generation via ready callback...');
               const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown);
               console.debug('reCAPTCHA token generated successfully:', {
                 tokenLength: String(token).length,
@@ -135,22 +135,29 @@ export const ReCAPTCHA = forwardRef<ReCAPTCHAHandle, ReCAPTCHAProps>(({
               onVerify(String(token));
               setIsLoaded(true);
             } catch (error) {
-              console.error('reCAPTCHA execute error:', error);
-              const errMsg = 'reCAPTCHA execute failed';
+              console.error('reCAPTCHA execute error in ready callback:', error);
+              const errMsg = error instanceof Error ? error.message : 'reCAPTCHA execute failed';
               setLoadError(errMsg);
               onError(errMsg);
             }
           });
         } else {
-          // fallback execute
-          console.debug('Executing reCAPTCHA token generation (fallback)...');
-          const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown);
-          console.debug('reCAPTCHA token generated successfully (fallback):', {
-            tokenLength: String(token).length,
-            tokenType: typeof token,
-          });
-          onVerify(String(token));
-          setIsLoaded(true);
+          // fallback execute without ready callback
+          try {
+            console.debug('Executing reCAPTCHA token generation (fallback - no ready callback)...');
+            const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown);
+            console.debug('reCAPTCHA token generated successfully (fallback):', {
+              tokenLength: String(token).length,
+              tokenType: typeof token,
+            });
+            onVerify(String(token));
+            setIsLoaded(true);
+          } catch (error) {
+            console.error('reCAPTCHA execute error in fallback:', error);
+            const errMsg = error instanceof Error ? error.message : 'reCAPTCHA execute failed';
+            setLoadError(errMsg);
+            onError(errMsg);
+          }
         }
         return true;
       } catch (error) {

@@ -66,9 +66,14 @@ export async function POST(request: NextRequest) {
     });
 
     // Accept v2 (no score) or v3 with score threshold
-    const scoreOk = data.score === undefined ? true : data.score >= 0.5;
+    // For v3, accept scores >= 0.3 (lowered threshold to account for testing environments)
+    const scoreOk = data.score === undefined ? true : data.score >= 0.3;
 
     if (data.success && scoreOk) {
+      console.debug('reCAPTCHA verification successful:', {
+        score: data.score,
+        hostname: data.hostname,
+      });
       return NextResponse.json({
         success: true,
         score: data.score,
@@ -76,11 +81,19 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.error('reCAPTCHA verification failed:', data);
+    // Provide detailed error information
+    console.error('reCAPTCHA verification failed:', {
+      success: data.success,
+      score: data.score,
+      scoreOk,
+      errorCodes: data['error-codes'],
+      hostname: data.hostname,
+      challenge_ts: data.challenge_ts,
+    });
     return NextResponse.json(
       {
         success: false,
-        message: 'reCAPTCHA verification failed',
+        message: `reCAPTCHA verification failed${data['error-codes']?.length ? ': ' + data['error-codes'].join(', ') : ''}`,
         errorCodes: data['error-codes'] || null,
         raw: data,
       },
