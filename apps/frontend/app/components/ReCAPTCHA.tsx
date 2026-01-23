@@ -127,16 +127,28 @@ export const ReCAPTCHA = forwardRef<ReCAPTCHAHandle, ReCAPTCHAProps>(({
           window.grecaptcha!.ready(async () => {
             try {
               console.debug('Executing reCAPTCHA token generation via ready callback...');
-              const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown);
+              // Create a timeout promise
+              const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('reCAPTCHA token generation timeout (5s)')), 5000)
+              );
+              const token = await Promise.race([
+                window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown),
+                timeoutPromise
+              ]) as string;
               console.debug('reCAPTCHA token generated successfully:', {
                 tokenLength: String(token).length,
                 tokenType: typeof token,
+                tokenPreview: String(token).substring(0, 20) + '...',
               });
               onVerify(String(token));
               setIsLoaded(true);
             } catch (error) {
-              console.error('reCAPTCHA execute error in ready callback:', error);
               const errMsg = error instanceof Error ? error.message : 'reCAPTCHA execute failed';
+              console.error('reCAPTCHA execute error in ready callback:', {
+                error: errMsg,
+                errorType: typeof error,
+                errorDetails: error,
+              });
               setLoadError(errMsg);
               onError(errMsg);
             }
@@ -145,16 +157,27 @@ export const ReCAPTCHA = forwardRef<ReCAPTCHAHandle, ReCAPTCHAProps>(({
           // fallback execute without ready callback
           try {
             console.debug('Executing reCAPTCHA token generation (fallback - no ready callback)...');
-            const token = await window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown);
+            const timeoutPromise = new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('reCAPTCHA token generation timeout (5s)')), 5000)
+            );
+            const token = await Promise.race([
+              window.grecaptcha!.execute!(siteKey, { action: 'register' } as unknown),
+              timeoutPromise
+            ]) as string;
             console.debug('reCAPTCHA token generated successfully (fallback):', {
               tokenLength: String(token).length,
               tokenType: typeof token,
+              tokenPreview: String(token).substring(0, 20) + '...',
             });
             onVerify(String(token));
             setIsLoaded(true);
           } catch (error) {
-            console.error('reCAPTCHA execute error in fallback:', error);
             const errMsg = error instanceof Error ? error.message : 'reCAPTCHA execute failed';
+            console.error('reCAPTCHA execute error in fallback:', {
+              error: errMsg,
+              errorType: typeof error,
+              errorDetails: error,
+            });
             setLoadError(errMsg);
             onError(errMsg);
           }
