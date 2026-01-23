@@ -346,9 +346,9 @@ export default function ForArtistsPage() {
                 <BarChart2 className="w-5 h-5" />
                 Total Plays
               </h3>
-              <p className="text-3xl font-bold text-white mt-2">{stats?.totalPlays.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-white mt-2">{(stats?.totalPlays || 0).toLocaleString()}</p>
               <p className="text-sm text-gray-400 mt-1">
-                <span className="text-green-500">+{stats?.monthlyPlays}</span> this month
+                <span className="text-green-500">+{stats?.monthlyPlays || 0}</span> this month
               </p>
             </div>
             
@@ -357,7 +357,7 @@ export default function ForArtistsPage() {
                 <Users className="w-5 h-5" />
                 Followers
               </h3>
-              <p className="text-3xl font-bold text-white mt-2">{stats?.followerCount.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-white mt-2">{(stats?.followerCount || 0).toLocaleString()}</p>
               <p className="text-sm text-gray-400 mt-1">
                 <span className="text-green-500">↑ 8%</span> from last month
               </p>
@@ -368,7 +368,7 @@ export default function ForArtistsPage() {
                 <Download className="w-5 h-5" />
                 Downloads
               </h3>
-              <p className="text-3xl font-bold text-white mt-2">{stats?.totalDownloads.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-white mt-2">{(stats?.totalDownloads || 0).toLocaleString()}</p>
               <p className="text-sm text-gray-400 mt-1">
                 <span className="text-green-500">↑ 15%</span> from last month
               </p>
@@ -519,8 +519,8 @@ export default function ForArtistsPage() {
                           <p className="text-xs text-gray-400 mt-1">${item.price}</p>
                         )}
                       </td>
-                      <td className="p-4 text-gray-300">{item.playCount.toLocaleString()}</td>
-                      <td className="p-4 text-gray-300">{item.downloadCount.toLocaleString()}</td>
+                      <td className="p-4 text-gray-300">{(item.playCount || 0).toLocaleString()}</td>
+                      <td className="p-4 text-gray-300">{(item.downloadCount || 0).toLocaleString()}</td>
                       <td className="p-4">
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
                           item.allowReselling ? 'bg-green-600/30 text-green-400' : 'bg-gray-600/30 text-gray-400'
@@ -587,7 +587,7 @@ export default function ForArtistsPage() {
                     {analytics?.topTracks.map((track) => (
                       <tr key={track.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
                         <td className="p-3 text-white">{track.title}</td>
-                        <td className="p-3 text-gray-300">{track.plays.toLocaleString()}</td>
+                        <td className="p-3 text-gray-300">{(track.plays || 0).toLocaleString()}</td>
                         <td className="p-3 text-green-400">${track.revenue.toFixed(2)}</td>
                         <td className="p-3">
                           <div className="w-32 bg-[#0a3747] rounded-full h-2 overflow-hidden">
@@ -619,7 +619,7 @@ export default function ForArtistsPage() {
                     {analytics?.topCountries.map((country, i) => (
                       <tr key={i} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
                         <td className="p-3 text-white">{country.country}</td>
-                        <td className="p-3 text-gray-300">{country.plays.toLocaleString()}</td>
+                        <td className="p-3 text-gray-300">{(country.plays || 0).toLocaleString()}</td>
                         <td className="p-3">
                           <div className="flex items-center gap-3">
                             <div className="w-32 bg-[#0a3747] rounded-full h-2 overflow-hidden">

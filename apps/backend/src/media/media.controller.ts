@@ -71,8 +71,11 @@ export class MediaController {
   }
 
   @Get('user/me')
-  async getUserOwnMedia(@CurrentUser() user: { sub: string }) {
+  async getUserOwnMedia(@CurrentUser() user?: { sub: string }) {
     // Return only authenticated user's media (for artist dashboard)
+    if (!user || !user.sub) {
+      return [];
+    }
     const userId = parseInt(user.sub);
     return this.mediaService.getUserMedia(userId);
   }
