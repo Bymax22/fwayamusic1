@@ -9,7 +9,9 @@ export async function POST(request: NextRequest) {
     console.debug('reCAPTCHA verification request received:', {
       hasToken: !!token,
       tokenLength: token ? String(token).length : 0,
-      requestBody: body,
+      tokenType: typeof token,
+      tokenPreview: token ? String(token).substring(0, 30) + '...' : 'NO TOKEN',
+      requestBodyKeys: Object.keys(body),
     });
 
     if (!token || typeof token !== 'string' || token.trim() === '') {
