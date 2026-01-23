@@ -3,11 +3,19 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { token } = await request.json();
+    const body = await request.json();
+    const { token } = body;
 
-    if (!token) {
+    console.debug('reCAPTCHA verification request received:', {
+      hasToken: !!token,
+      tokenLength: token ? String(token).length : 0,
+      requestBody: body,
+    });
+
+    if (!token || typeof token !== 'string' || token.trim() === '') {
+      console.error('Invalid reCAPTCHA token:', { token, type: typeof token });
       return NextResponse.json(
-        { success: false, message: 'reCAPTCHA token is required' },
+        { success: false, message: 'reCAPTCHA token is required and must be a non-empty string' },
         { status: 400 }
       );
     }
@@ -27,13 +35,35 @@ export async function POST(request: NextRequest) {
     params.append('secret', secretKey);
     params.append('response', token);
 
+    console.debug('Sending verification request to Google:', {
+      url: verificationUrl,
+      tokenLength: token.length,
+    });
+
     const resp = await fetch(verificationUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: params.toString(),
     });
 
+    if (!resp.ok) {
+      console.error('Google reCAPTCHA API returned non-200 status:', resp.status, resp.statusText);
+      const text = await resp.text();
+      console.error('Google reCAPTCHA API response:', text);
+      return NextResponse.json(
+        { success: false, message: 'reCAPTCHA verification service error' },
+        { status: 400 }
+      );
+    }
+
     const data = await resp.json();
+
+    console.debug('Google reCAPTCHA response:', {
+      success: data.success,
+      score: data.score,
+      action: data.action,
+      errorCodes: data['error-codes'],
+    });
 
     // Accept v2 (no score) or v3 with score threshold
     const scoreOk = data.score === undefined ? true : data.score >= 0.5;
@@ -45,17 +75,6 @@ export async function POST(request: NextRequest) {
         message: 'reCAPTCHA verification successful',
       });
     }
-
-    console.error('reCAPTCHA verification failed:', data);
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'reCAPTCHA verification failed',
-        errorCodes: data['error-codes'] || null,
-        raw: data,
-      },
-      { status: 400 }
-    );
 
     console.error('reCAPTCHA verification failed:', data);
     return NextResponse.json(

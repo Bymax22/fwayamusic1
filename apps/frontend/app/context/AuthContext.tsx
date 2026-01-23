@@ -162,22 +162,35 @@ const signUp = async (data: SignUpData): Promise<User> => {
     try {
       setLoading(true);
 
-     // Verify reCAPTCHA token
-    // Verify reCAPTCHA token with our backend
-    const recaptchaResponse = await fetch('/api/auth/verify-recaptcha', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token: data.recaptchaToken || '' }),
-    });
+      // Verify reCAPTCHA token with our backend
+      console.debug('SignUp called with:', {
+        email: data.email,
+        role: data.role,
+        hasRecaptchaToken: !!data.recaptchaToken,
+        recaptchaTokenLength: data.recaptchaToken ? String(data.recaptchaToken).length : 0,
+        recaptchaTokenType: typeof data.recaptchaToken,
+      });
 
-    const recaptchaResult = await recaptchaResponse.json();
-    
-    if (!recaptchaResult.success) {
-      console.error('reCAPTCHA verification failed:', recaptchaResult);
-      throw new Error(recaptchaResult.message || 'reCAPTCHA verification failed');
-    }
+      if (!data.recaptchaToken || String(data.recaptchaToken).trim() === '') {
+        throw new Error('reCAPTCHA token is missing or empty. Please complete the reCAPTCHA verification.');
+      }
+
+      const recaptchaResponse = await fetch('/api/auth/verify-recaptcha', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: data.recaptchaToken }),
+      });
+
+      console.debug('reCAPTCHA verification response status:', recaptchaResponse.status);
+
+      const recaptchaResult = await recaptchaResponse.json();
+      
+      if (!recaptchaResult.success) {
+        console.error('reCAPTCHA verification failed:', recaptchaResult);
+        throw new Error(recaptchaResult.message || 'reCAPTCHA verification failed');
+      }
 
 
 // Create Firebase user

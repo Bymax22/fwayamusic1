@@ -1,10 +1,10 @@
 // app/auth/user/signup/page.tsx
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { ReCAPTCHA } from '@/components/ReCAPTCHA';
+import { ReCAPTCHA, ReCAPTCHAHandle } from '@/components/ReCAPTCHA';
 import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 
@@ -29,10 +29,31 @@ export default function UserSignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const recaptchaRef = useRef<ReCAPTCHAHandle>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.debug('User signup form submitted:', {
+      hasRecaptchaToken: !!recaptchaToken,
+      recaptchaTokenLength: recaptchaToken ? recaptchaToken.length : 0,
+      recaptchaTokenType: typeof recaptchaToken,
+      email: formData.email,
+      username: formData.username,
+    });
+
+    // Refresh the reCAPTCHA token before submission to ensure it's not expired
+    if (recaptchaRef.current) {
+      try {
+        await recaptchaRef.current.refreshToken();
+        console.debug('reCAPTCHA token refreshed successfully before submission');
+      } catch (err) {
+        console.error('Failed to refresh reCAPTCHA token before submission:', err);
+        setErrors({ ...errors, recaptcha: 'Failed to refresh reCAPTCHA. Please try again.' });
+        return;
+      }
+    }
+
     const newErrors: Record<string, string> = {};
     if (!formData.email) newErrors.email = 'Email is required';
     if (!formData.password) newErrors.password = 'Password is required';
@@ -277,9 +298,22 @@ export default function UserSignUp() {
           {/* reCAPTCHA */}
           <div className="flex justify-center">
             <ReCAPTCHA
-              onVerify={setRecaptchaToken}
-              onExpire={() => setRecaptchaToken('')}
-              onError={() => setErrors({ ...errors, recaptcha: 'reCAPTCHA error occurred' })}
+              ref={recaptchaRef}
+              onVerify={(token) => {
+                console.debug('User signup: reCAPTCHA token received:', {
+                  tokenLength: token ? token.length : 0,
+                  tokenType: typeof token,
+                });
+                setRecaptchaToken(token);
+              }}
+              onExpire={() => {
+                console.warn('User signup: reCAPTCHA token expired');
+                setRecaptchaToken('');
+              }}
+              onError={(error) => {
+                console.error('User signup: reCAPTCHA error:', error);
+                setErrors({ ...errors, recaptcha: error || 'reCAPTCHA error occurred' });
+              }}
             />
           </div>
           {errors.recaptcha && <p className="text-red-400 text-sm text-center">{errors.recaptcha}</p>}

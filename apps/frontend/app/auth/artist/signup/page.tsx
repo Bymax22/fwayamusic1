@@ -1,10 +1,10 @@
 // app/auth/artist/signup/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { ReCAPTCHA } from '@/components/ReCAPTCHA';
+import { ReCAPTCHA, ReCAPTCHAHandle } from '@/components/ReCAPTCHA';
 import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaArrowLeft } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -37,6 +37,7 @@ export default function ArtistSignUp() {
   const [recaptchaToken, setRecaptchaToken] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const recaptchaRef = useRef<ReCAPTCHAHandle>(null);
 
   // Watch for user role update after signup
   useEffect(() => {
@@ -90,6 +91,18 @@ export default function ArtistSignUp() {
   };
 
   const handleSubmit = async () => {
+    // Refresh the reCAPTCHA token before submission
+    if (recaptchaRef.current) {
+      try {
+        await recaptchaRef.current.refreshToken();
+        console.debug('reCAPTCHA token refreshed successfully before artist signup submission');
+      } catch (err) {
+        console.error('Failed to refresh reCAPTCHA token before artist signup submission:', err);
+        setErrors({ ...errors, recaptcha: 'Failed to refresh reCAPTCHA. Please try again.' });
+        return;
+      }
+    }
+
     if (!validateStep('consent') || !recaptchaToken) {
       setErrors({ ...errors, recaptcha: 'Please complete the reCAPTCHA' });
       return;
@@ -470,9 +483,21 @@ export default function ArtistSignUp() {
             {/* reCAPTCHA */}
             <div className="flex justify-center">
               <ReCAPTCHA
-                onVerify={setRecaptchaToken}
-                onExpire={() => setRecaptchaToken('')}
-                onError={() => setErrors({ ...errors, recaptcha: 'reCAPTCHA error occurred' })}
+                ref={recaptchaRef}
+                onVerify={(token) => {
+                  console.debug('Artist signup: reCAPTCHA token received:', {
+                    tokenLength: token ? token.length : 0,
+                  });
+                  setRecaptchaToken(token);
+                }}
+                onExpire={() => {
+                  console.warn('Artist signup: reCAPTCHA token expired');
+                  setRecaptchaToken('');
+                }}
+                onError={(error) => {
+                  console.error('Artist signup: reCAPTCHA error:', error);
+                  setErrors({ ...errors, recaptcha: error || 'reCAPTCHA error occurred' });
+                }}
               />
             </div>
             {errors.recaptcha && <p className="text-red-400 text-sm text-center">{errors.recaptcha}</p>}
