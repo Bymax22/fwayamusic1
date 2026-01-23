@@ -34,6 +34,8 @@ export default function SignUp() {
     dateOfBirth: '',
     artistName: '',
     stageName: '',
+    bio: '',
+    website: '',
     businessName: '',
     businessType: '',
     acceptedTerms: false,
@@ -441,6 +443,36 @@ export default function SignUp() {
                     placeholder="Your performance name"
                   />
                   {errors.stageName && <p className="text-red-400 text-sm mt-1">{errors.stageName}</p>}
+                </div>
+              </div>
+            )}
+
+            {formData.role === 'ARTIST' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Bio (Optional)
+                  </label>
+                  <textarea
+                    value={formData.bio}
+                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                    placeholder="Tell us about yourself and your music..."
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Website (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                    placeholder="https://yourwebsite.com"
+                  />
                 </div>
               </div>
             )}

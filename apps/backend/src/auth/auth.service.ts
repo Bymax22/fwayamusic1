@@ -50,11 +50,16 @@ export class AuthService {
       if (dto.stageName) userData.stageName = dto.stageName;
       if (dto.bio) userData.bio = dto.bio;
       if (dto.website) userData.website = dto.website;
+      if (dto.socialLinks) userData.socialLinks = dto.socialLinks;
 
       // Reseller-specific fields
       if (dto.businessName) userData.businessName = dto.businessName;
       if (dto.businessType) userData.businessType = dto.businessType;
       if (dto.taxNumber) userData.taxNumber = dto.taxNumber;
+      if (dto.taxId) userData.taxId = dto.taxId;
+
+      // Address and other optional fields
+      if (dto.address) userData.address = dto.address;
 
       // Note: recaptchaToken, avatarFile, confirmPassword are not saved to database
       console.log('Creating user with role:', userData.role, 'Email:', userData.email);
