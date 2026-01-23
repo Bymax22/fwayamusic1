@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { DashboardLoading } from '@/components/DashboardLoading';
+import { getAuth } from 'firebase/auth';
 import {
   FaPlay,
   FaPause,
@@ -160,40 +161,45 @@ const UserDashboard: React.FC = () => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        const token = await fetch('/api/auth/token').then(res => res.json());
+        const auth = getAuth();
+        let token = '';
+        if (auth.currentUser) {
+          token = await auth.currentUser.getIdToken();
+        } else {
+          throw new Error('User not authenticated');
+        }
 
-        const [
-          recentPlaysRes,
-          recommendationsRes,
-          playlistsRes,
-          userMediaRes,
-          statsRes
-        ] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/recent-plays`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/recommendations`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/playlists`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/media`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${user.id}/stats`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          })
-        ]);
+        // Fetch recommendations - use homepage sections as recommendations
+        const recommendationsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/homepage-sections`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (recommendationsRes.ok) {
+          const homeData = await recommendationsRes.json();
+          // Extract recommendations from featured/trending sections
+          const allMedia = [
+            ...(homeData.featured || []),
+            ...(homeData.trending || []),
+            ...(homeData.newest || [])
+          ];
+          setRecommendations(allMedia.slice(0, 10));
+        }
 
-        if (recentPlaysRes.ok) setRecentPlays(await recentPlaysRes.json());
-        if (recommendationsRes.ok) setRecommendations(await recommendationsRes.json());
-        if (playlistsRes.ok) setUserPlaylists(await playlistsRes.json());
-        if (userMediaRes.ok) setUserMedia(await userMediaRes.json());
-        if (statsRes.ok) setLibraryStats(await statsRes.json());
+        // Fetch all media for recent plays
+        const recentPlaysRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (recentPlaysRes.ok) {
+          const allMedia = await recentPlaysRes.json();
+          setRecentPlays(allMedia.slice(0, 5));
+        }
 
       } catch (error) {
         console.error('Error fetching user data:', error);
+        // Set default empty state instead of crashing
+        setRecommendations([]);
+        setRecentPlays([]);
+        setUserPlaylists([]);
+        setUserMedia([]);
       } finally {
         setLoading(false);
       }
@@ -239,7 +245,7 @@ const UserDashboard: React.FC = () => {
   const businessStats: StatCard[] = user.role === 'ARTIST' ? [
     { 
       label: 'Earnings', 
-      value: `$${(user.totalEarnings ?? 0).toFixed(2)}`, 
+      value: `$${((user?.totalEarnings) ?? 0).toFixed(2)}`, 
       icon: <FaDollarSign />, 
       change: '+15%',
       color: 'from-green-500 to-emerald-500'
@@ -268,14 +274,14 @@ const UserDashboard: React.FC = () => {
   ] : user.role === 'RESELLER' ? [
     { 
       label: 'Commission', 
-      value: `$${(user.totalCommission ?? 0).toFixed(2)}`, 
+      value: `$${((user?.totalCommission) ?? 0).toFixed(2)}`, 
       icon: <FaDollarSign />, 
       change: '+18%',
       color: 'from-green-500 to-emerald-500'
     },
     { 
       label: 'Paid', 
-      value: `$${(user.paidCommission ?? 0).toFixed(2)}`, 
+      value: `$${((user?.paidCommission) ?? 0).toFixed(2)}`, 
       icon: <FaChartLine />, 
       change: '+12%',
       color: 'from-blue-500 to-cyan-500'
@@ -297,13 +303,15 @@ const UserDashboard: React.FC = () => {
   ] : [];
 
   const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const validSeconds = seconds || 0;
+    const mins = Math.floor(validSeconds / 60);
+    const secs = validSeconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   const formatFileSize = (bytes: number) => {
-    const mb = bytes / (1024 * 1024);
+    const validBytes = bytes || 0;
+    const mb = validBytes / (1024 * 1024);
     return `${mb.toFixed(1)} MB`;
   };
 
@@ -818,11 +826,11 @@ const UserDashboard: React.FC = () => {
                       />
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm truncate mobile-text-sm">{media.title}</h3>
-                        <p className="text-xs text-gray-400 mobile-text-xs">{media.views.toLocaleString()} plays</p>
+                        <p className="text-xs text-gray-400 mobile-text-xs">{(media.views || 0).toLocaleString()} plays</p>
                       </div>
                     </div>
                     <div className="flex justify-between items-center text-xs text-gray-400 mobile-text-xs">
-                      <span>${((media.views * 0.001) * (media.artistCommissionRate || 0.5)).toFixed(2)}</span>
+                      <span>${(((media.views || 0) * 0.001) * (media.artistCommissionRate || 0.5)).toFixed(2)}</span>
                       <span>{formatDuration(media.duration)}</span>
                     </div>
                   </motion.div>
