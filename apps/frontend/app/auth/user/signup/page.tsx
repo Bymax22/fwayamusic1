@@ -19,6 +19,8 @@ export default function UserSignUp() {
     displayName: '',
     phoneNumber: '',
     dateOfBirth: '',
+    country: '',
+    address: '',
     acceptedTerms: false,
     acceptedPrivacy: false,
     marketingEmails: false,
@@ -183,6 +185,34 @@ export default function UserSignUp() {
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
                 className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-white mb-1">
+                Country
+              </label>
+              <input
+                type="text"
+                value={formData.country}
+                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g., Zambia, USA, UK"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-1">
+                Address
+              </label>
+              <input
+                type="text"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Street address"
               />
             </div>
           </div>

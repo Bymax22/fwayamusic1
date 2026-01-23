@@ -44,6 +44,13 @@ export class AuthService {
       if (dto.dateOfBirth) userData.dateOfBirth = new Date(dto.dateOfBirth);
       if (dto.country) userData.country = dto.country;
       if (dto.avatarUrl) userData.avatarUrl = dto.avatarUrl;
+      
+      // Handle address field - convert to JSON object
+      if (dto.address) {
+        userData.address = typeof dto.address === 'string' 
+          ? { street: dto.address } 
+          : dto.address;
+      }
 
       // Artist-specific fields
       if (dto.artistName) userData.artistName = dto.artistName;
