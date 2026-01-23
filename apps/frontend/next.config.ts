@@ -20,9 +20,9 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: `
               default-src 'self';
-              script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://apis.google.com https://www.gstatic.com https://www.google.com https://cdn.jsdelivr.net https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com blob:;
-              script-src-elem 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://cdn.jsdelivr.net https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com blob:;
-              connect-src 'self' ${API_URL} https://api.cloudinary.com https://res.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://www.gstatic.com https://graph.facebook.com https://www.google.com https://www.google-analytics.com https://www.recaptcha.net https://www.google.com/recaptcha/;
+              script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'inline-speculation-rules' https://apis.google.com https://www.gstatic.com https://www.google.com https://cdn.jsdelivr.net https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live blob:;
+              script-src-elem 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://cdn.jsdelivr.net https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live blob:;
+              connect-src 'self' ${API_URL} https://api.cloudinary.com https://res.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://www.gstatic.com https://graph.facebook.com https://www.google.com https://www.google-analytics.com https://www.recaptcha.net https://www.google.com/recaptcha/ https://vercel.live;
               img-src 'self' https://res.cloudinary.com data: blob:;
               media-src 'self' https://res.cloudinary.com blob: data:;
               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
