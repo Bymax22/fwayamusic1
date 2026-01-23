@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
     const token = request.headers.get('authorization');
     
     // Get the current user's media from backend
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/user/me`, {
       headers: {
         'Authorization': token || '',
       },

@@ -58,15 +58,23 @@ export class MediaController {
     };
   }
 
+  // NEW: Homepage sections endpoint (must come before generic @Get())
+  @Get('homepage-sections')
+  async getHomepageSections() {
+    return this.mediaService.getHomepageSections();
+  }
+
   @Get()
-  async getAllMedia(@CurrentUser() user?: { sub: string }) {
-    if (user) {
-      // If authenticated, return only the user's media
-      const userId = parseInt(user.sub);
-      return this.mediaService.getUserMedia(userId);
-    }
-    // If not authenticated, return public media
+  async getAllMedia() {
+    // Return all public media (for browse page, landing page, etc)
     return this.mediaService.getAllMedia();
+  }
+
+  @Get('user/me')
+  async getUserOwnMedia(@CurrentUser() user: { sub: string }) {
+    // Return only authenticated user's media (for artist dashboard)
+    const userId = parseInt(user.sub);
+    return this.mediaService.getUserMedia(userId);
   }
 
   @Get(':id')
@@ -88,11 +96,5 @@ export class MediaController {
   ) {
     const userId = parseInt(user.sub);
     return this.mediaService.updateMedia(parseInt(id), userId, updates);
-  }
-
-  // NEW: Homepage sections endpoint
-  @Get('homepage-sections')
-  async getHomepageSections() {
-    return this.mediaService.getHomepageSections();
   }
 }
