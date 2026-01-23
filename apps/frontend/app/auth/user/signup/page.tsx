@@ -1,10 +1,10 @@
 // app/auth/user/signup/page.tsx
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaUser, FaEye, FaEyeSlash, FaCamera } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 
 export default function UserSignUp() {
@@ -20,6 +20,7 @@ export default function UserSignUp() {
     dateOfBirth: '',
     country: '',
     address: '',
+    avatarUrl: '',
     acceptedTerms: false,
     acceptedPrivacy: false,
     marketingEmails: false,
@@ -27,6 +28,71 @@ export default function UserSignUp() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const uploadAvatarToCloudinary = async (file: File): Promise<string> => {
+    const cloudinaryFormData = new FormData();
+    cloudinaryFormData.append('file', file);
+    cloudinaryFormData.append('upload_preset', 'bymaxdev1');
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: 'POST',
+          body: cloudinaryFormData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Avatar upload failed');
+      }
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      throw error;
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrors({ ...errors, avatar: 'Please select an image file' });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors({ ...errors, avatar: 'File size must be less than 5MB' });
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to Cloudinary
+    setUploading(true);
+    try {
+      const avatarUrl = await uploadAvatarToCloudinary(file);
+      setFormData({ ...formData, avatarUrl });
+      setErrors({ ...errors, avatar: '' });
+    } catch (error) {
+      setErrors({ ...errors, avatar: 'Failed to upload avatar' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,6 +254,43 @@ export default function UserSignUp() {
                 className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
+          </div>
+
+          {/* Avatar Upload */}
+          <div>
+            <label className="block text-sm font-medium text-white mb-3">
+              Profile Picture
+            </label>
+            <div className="flex items-center gap-4">
+              <div className="relative w-24 h-24 rounded-full bg-[#0a3747] border-2 border-blue-500/40 flex items-center justify-center overflow-hidden flex-shrink-0">
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
+                ) : (
+                  <FaUser className="text-3xl text-gray-400" />
+                )}
+              </div>
+              <div className="flex-1">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  disabled={uploading}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FaCamera className="text-sm" />
+                  {uploading ? 'Uploading...' : 'Upload Picture'}
+                </button>
+                <p className="text-xs text-gray-400 mt-2">JPG, PNG or GIF (Max 5MB)</p>
+              </div>
+            </div>
+            {errors.avatar && <p className="text-red-400 text-sm mt-2">{errors.avatar}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
