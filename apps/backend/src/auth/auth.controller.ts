@@ -1,6 +1,6 @@
 
 // src/auth/auth.controller.ts
-import { Controller, Post, Body, Req, UseGuards, Get } from '@nestjs/common';
+import { Controller, Post, Body, Req, UseGuards, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 
@@ -17,10 +17,12 @@ export class AuthController {
   async register(@Body() dto: any) {
     // dto includes acceptedTerms, marketingEmails, etc.
     try {
-      return await this.authService.register(dto);
+      const result = await this.authService.register(dto);
+      return result;
     } catch (error) {
       console.error('Signup endpoint error:', error);
-      throw error;
+      const message = error instanceof Error ? error.message : 'Failed to create user';
+      throw new HttpException(message, HttpStatus.BAD_REQUEST);
     }
   }
 

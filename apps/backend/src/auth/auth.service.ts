@@ -50,7 +50,9 @@ export class AuthService {
       if (dto.stageName) userData.stageName = dto.stageName;
       if (dto.bio) userData.bio = dto.bio;
       if (dto.website) userData.website = dto.website;
-      if (dto.socialLinks) userData.socialLinks = dto.socialLinks;
+      if (dto.socialLinks) {
+        userData.socialLinks = typeof dto.socialLinks === 'string' ? JSON.parse(dto.socialLinks) : dto.socialLinks;
+      }
 
       // Reseller-specific fields
       if (dto.businessName) userData.businessName = dto.businessName;
@@ -58,8 +60,10 @@ export class AuthService {
       if (dto.taxNumber) userData.taxNumber = dto.taxNumber;
       if (dto.taxId) userData.taxId = dto.taxId;
 
-      // Address and other optional fields
-      if (dto.address) userData.address = dto.address;
+      // Address and other optional fields (handle JSON serialization)
+      if (dto.address) {
+        userData.address = typeof dto.address === 'string' ? JSON.parse(dto.address) : dto.address;
+      }
 
       // Note: recaptchaToken, avatarFile, confirmPassword are not saved to database
       console.log('Creating user with role:', userData.role, 'Email:', userData.email);
