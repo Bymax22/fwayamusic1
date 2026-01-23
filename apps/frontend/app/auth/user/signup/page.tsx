@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { FaUser, FaEye, FaEyeSlash, FaCamera } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function UserSignUp() {
   const { signUp, loading } = useAuth();
@@ -84,7 +85,7 @@ export default function UserSignUp() {
       const avatarUrl = await uploadAvatarToCloudinary(file);
       setFormData({ ...formData, avatarUrl });
       setErrors({ ...errors, avatar: '' });
-    } catch (error) {
+    } catch {
       setErrors({ ...errors, avatar: 'Failed to upload avatar' });
     } finally {
       setUploading(false);
@@ -264,7 +265,7 @@ export default function UserSignUp() {
             <div className="flex items-center gap-4">
               <div className="relative w-24 h-24 rounded-full bg-[#0a3747] border-2 border-blue-500/40 flex items-center justify-center overflow-hidden flex-shrink-0">
                 {avatarPreview ? (
-                  <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
+                  <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
                 ) : (
                   <FaUser className="text-3xl text-gray-400" />
                 )}
