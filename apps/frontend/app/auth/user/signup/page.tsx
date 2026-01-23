@@ -42,17 +42,18 @@ export default function UserSignUp() {
       username: formData.username,
     });
 
-    // Refresh the reCAPTCHA token before submission to ensure it's not expired
-    if (recaptchaRef.current) {
-      try {
-        await recaptchaRef.current.refreshToken();
-        console.debug('reCAPTCHA token refreshed successfully before submission');
-      } catch (err) {
-        console.error('Failed to refresh reCAPTCHA token before submission:', err);
-        setErrors({ ...errors, recaptcha: 'Failed to refresh reCAPTCHA. Please try again.' });
-        return;
-      }
-    }
+    // Note: Token refresh disabled due to browser-error issues in production
+    // The token is generated immediately upon page load, should be valid
+    // if (recaptchaRef.current) {
+    //   try {
+    //     await recaptchaRef.current.refreshToken();
+    //     console.debug('reCAPTCHA token refreshed successfully before submission');
+    //   } catch (err) {
+    //     console.error('Failed to refresh reCAPTCHA token before submission:', err);
+    //     setErrors({ ...errors, recaptcha: 'Failed to refresh reCAPTCHA. Please try again.' });
+    //     return;
+    //   }
+    // }
 
     const newErrors: Record<string, string> = {};
     if (!formData.email) newErrors.email = 'Email is required';

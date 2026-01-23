@@ -91,17 +91,17 @@ export default function ArtistSignUp() {
   };
 
   const handleSubmit = async () => {
-    // Refresh the reCAPTCHA token before submission
-    if (recaptchaRef.current) {
-      try {
-        await recaptchaRef.current.refreshToken();
-        console.debug('reCAPTCHA token refreshed successfully before artist signup submission');
-      } catch (err) {
-        console.error('Failed to refresh reCAPTCHA token before artist signup submission:', err);
-        setErrors({ ...errors, recaptcha: 'Failed to refresh reCAPTCHA. Please try again.' });
-        return;
-      }
-    }
+    // Note: Token refresh disabled due to browser-error issues in production
+    // if (recaptchaRef.current) {
+    //   try {
+    //     await recaptchaRef.current.refreshToken();
+    //     console.debug('reCAPTCHA token refreshed successfully before artist signup submission');
+    //   } catch (err) {
+    //     console.error('Failed to refresh reCAPTCHA token before artist signup submission:', err);
+    //     setErrors({ ...errors, recaptcha: 'Failed to refresh reCAPTCHA. Please try again.' });
+    //     return;
+    //   }
+    // }
 
     if (!validateStep('consent') || !recaptchaToken) {
       setErrors({ ...errors, recaptcha: 'Please complete the reCAPTCHA' });
