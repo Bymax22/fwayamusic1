@@ -101,6 +101,7 @@ export default function UserSignUp() {
     console.debug('User signup form submitted:', {
       email: formData.email,
       username: formData.username,
+      avatarUrl: formData.avatarUrl,
     });
 
     const newErrors: Record<string, string> = {};

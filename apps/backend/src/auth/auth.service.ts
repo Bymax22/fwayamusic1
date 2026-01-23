@@ -22,6 +22,7 @@ export class AuthService {
       
       if (existingUser) {
         console.log('User already exists, updating with signup data:', existingUser.email);
+        console.log('Avatar URL from request:', dto.avatarUrl);
         // Update user with the signup form data
         const saltRounds = 10;
         const passwordHash = await bcrypt.hash(dto.password, saltRounds);
@@ -35,7 +36,7 @@ export class AuthService {
             phoneNumber: dto.phoneNumber || existingUser.phoneNumber,
             dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : existingUser.dateOfBirth,
             country: dto.country || existingUser.country,
-            avatarUrl: dto.avatarUrl || existingUser.avatarUrl,
+            avatarUrl: dto.avatarUrl && dto.avatarUrl.trim() !== '' ? dto.avatarUrl : existingUser.avatarUrl,
             role: dto.role || existingUser.role,
             status: existingUser.status || UserStatus.PENDING,
             acceptedTerms: dto.acceptedTerms || existingUser.acceptedTerms,
@@ -119,6 +120,7 @@ export class AuthService {
       console.log('Creating user with role:', userData.role, 'Email:', userData.email);
       console.log('User data keys:', Object.keys(userData));
       console.log('Address field:', userData.address);
+      console.log('Avatar URL:', userData.avatarUrl);
       
       const createdUser = await this.prisma.user.create({
         data: userData,
