@@ -11,6 +11,17 @@ const nextConfig: NextConfig = {
     domains: ["res.cloudinary.com"],
   },
 
+  // Increase body size limit for large file uploads (25MB)
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
+
+  // Configure API body size limit
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000,
+    pagesBufferLength: 5,
+  },
+
   async headers() {
     return [
       {
