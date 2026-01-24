@@ -76,6 +76,30 @@ export class MediaController {
     };
   }
 
+  // NEW: Save metadata only (file already uploaded to Cloudinary client-side)
+  @Post('save-metadata')
+  async saveMediaMetadata(
+    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string },
+    @CurrentUser() user: { sub: string }
+  ) {
+    try {
+      if (!metadata.title || !metadata.type || !metadata.url) {
+        throw new BadRequestException('Missing required fields: title, type, url');
+      }
+
+      const userId = parseInt(user.sub);
+      this.logger.log(`Saving metadata for user ${userId}, title: ${metadata.title}, url: ${metadata.url}`);
+      
+      const result = await this.mediaService.createMediaFromMetadata(userId, metadata);
+      
+      this.logger.log(`Metadata saved successfully for user ${userId}, media ID: ${result.id}`);
+      return result;
+    } catch (error) {
+      this.logger.error(`Error saving metadata: ${error instanceof Error ? error.message : error}`, error);
+      throw error;
+    }
+  }
+
   // NEW: Homepage sections endpoint (must come before generic @Get())
   @Get('homepage-sections')
   async getHomepageSections() {

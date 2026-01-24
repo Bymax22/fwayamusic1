@@ -33,58 +33,114 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('[API Route] Media upload request received');
+    console.log('[API Route] Media metadata save request received');
     const token = request.headers.get('authorization');
     const formData = await request.formData();
     
-    console.log('[API Route] FormData received, forwarding to backend');
-    const startTime = Date.now();
+    // Extract metadata (file has already been uploaded to Cloudinary)
+    const title = formData.get('title');
+    const type = formData.get('type');
+    const url = formData.get('url');
+    const cloudinaryPublicId = formData.get('cloudinaryPublicId');
+    const duration = formData.get('duration');
+    const format = formData.get('format');
+    const resourceType = formData.get('resourceType');
+    
+    console.log('[API Route] Received metadata:', { title, type, url, cloudinaryPublicId });
 
-    // Upload media to backend with longer timeout
-    const controller = new AbortController();
-    const timeout = setTimeout(() => {
-      console.error('[API Route] Request timeout after 50 seconds');
-      controller.abort();
-    }, 50000); // 50 second timeout (leaves 5 seconds buffer before Vercel 55s limit)
+    // Check if this is a file upload (old way) or metadata-only (new way)
+    const file = formData.get('file');
+    
+    if (file && file instanceof File) {
+      // Old way: File upload - shouldn't happen anymore but keep for compatibility
+      console.log('[API Route] File upload detected, forwarding to backend');
+      
+      const controller = new AbortController();
+      const timeout = setTimeout(() => {
+        console.error('[API Route] Request timeout after 50 seconds');
+        controller.abort();
+      }, 50000);
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload`, {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload`, {
+          method: 'POST',
+          headers: {
+            'Authorization': token || '',
+          },
+          body: formData,
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeout);
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error(`[API Route] Upload failed: ${res.statusText}`, errorText);
+          throw new Error(`Failed to upload media: ${res.statusText} - ${errorText}`);
+        }
+
+        const data = await res.json();
+        console.log('[API Route] Upload successful');
+        return NextResponse.json(data);
+      } catch (fetchError) {
+        clearTimeout(timeout);
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          console.error('[API Route] Request aborted - timeout or other abort');
+          return NextResponse.json(
+            { error: 'Upload request timed out - file may be too large' },
+            { status: 504 }
+          );
+        }
+        throw fetchError;
+      }
+    } else {
+      // New way: Metadata-only (file already uploaded to Cloudinary client-side)
+      console.log('[API Route] Metadata-only request, saving to database');
+      
+      if (!url || !title || !type) {
+        return NextResponse.json(
+          { error: 'Missing required fields: title, type, and url' },
+          { status: 400 }
+        );
+      }
+
+      // Create metadata object for database
+      const metadata = {
+        title,
+        type,
+        url,
+        cloudinaryPublicId,
+        duration: duration ? parseInt(duration as string) : 0,
+        format,
+        resourceType,
+      };
+
+      // Send to backend to save metadata only (no file upload)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/save-metadata`, {
         method: 'POST',
         headers: {
           'Authorization': token || '',
+          'Content-Type': 'application/json',
         },
-        body: formData,
-        signal: controller.signal,
+        body: JSON.stringify(metadata),
       });
 
-      clearTimeout(timeout);
-      const elapsed = Date.now() - startTime;
-      console.log(`[API Route] Backend response: ${res.status} ${res.statusText} (${elapsed}ms)`);
+      console.log(`[API Route] Backend metadata save response: ${res.status} ${res.statusText}`);
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error(`[API Route] Upload failed: ${res.statusText}`, errorText);
-        throw new Error(`Failed to upload media: ${res.statusText} - ${errorText}`);
+        console.error(`[API Route] Metadata save failed: ${res.statusText}`, errorText);
+        throw new Error(`Failed to save media metadata: ${res.statusText} - ${errorText}`);
       }
 
       const data = await res.json();
-      console.log('[API Route] Upload successful, returning data');
+      console.log('[API Route] Metadata save successful');
       return NextResponse.json(data);
-    } catch (fetchError) {
-      clearTimeout(timeout);
-      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        console.error('[API Route] Request aborted - timeout or other abort');
-        return NextResponse.json(
-          { error: 'Upload request timed out - file may be too large' },
-          { status: 504 }
-        );
-      }
-      throw fetchError;
     }
   } catch (error) {
     console.error('[API Route] Error:', error instanceof Error ? error.message : error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to upload media' },
+      { error: error instanceof Error ? error.message : 'Failed to process media request' },
       { status: 500 }
     );
   }

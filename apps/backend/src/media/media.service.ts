@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common
 import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { Prisma } from '@prisma/client';
-import { MediaType } from '@fwaya-music/types/enums';
+import { MediaType, MediaAccessType } from '@fwaya-music/types/enums';
 
 @Injectable()
 export class MediaService {
@@ -150,6 +150,55 @@ export class MediaService {
       const errorMsg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Media creation failed: ${errorMsg}`, error);
       throw new InternalServerErrorException(`Failed to create media: ${errorMsg}`);
+    }
+  }
+
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string }) {
+    try {
+      this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
+
+      const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';
+
+      const mediaData = {
+        url: metadata.url,
+        cloudinaryPublicId: metadata.cloudinaryPublicId,
+        title: metadata.title,
+        description: null,
+        format: metadata.format,
+        duration: Math.floor(metadata.duration || 0),
+        type: metadata.type as MediaType,
+        accessType: MediaAccessType.FREE,
+        price: null,
+        isExplicit: false,
+        genre: null,
+        tags: [],
+        allowReselling: true,
+        artistCommissionRate: 0.5,
+        platformCommissionRate: 0.5,
+        user: { connect: { id: userId } },
+        artCoverUrl: defaultCoverUrl,
+      };
+
+      const media = await this.prisma.media.create({
+        data: mediaData,
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatarUrl: true,
+            }
+          }
+        }
+      });
+
+      this.logger.log(`Media created from metadata: ${media.id}`);
+      return media;
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Media metadata creation failed: ${errorMsg}`, error);
+      throw new InternalServerErrorException(`Failed to create media from metadata: ${errorMsg}`);
     }
   }
 

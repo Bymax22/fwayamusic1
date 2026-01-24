@@ -189,31 +189,55 @@ export default function ForArtistsPage() {
       setIsUploading(true);
       setUploadProgress(0);
 
-      const formData = new FormData();
-      formData.append('file', newMedia.file);
-      formData.append('title', newMedia.title);
-      formData.append('type', newMedia.type);
+      // Step 1: Upload directly to Cloudinary (10%)
+      const cloudinaryFormData = new FormData();
+      cloudinaryFormData.append('file', newMedia.file);
+      cloudinaryFormData.append('upload_preset', 'bymaxdev1'); // Same preset as avatar
+      cloudinaryFormData.append('resource_type', 'auto'); // Auto-detect video/audio
+      
+      setUploadProgress(10);
 
-      // Get auth token from Firebase
-      let token: string | null = null;
-      if (auth.currentUser) {
-        token = await auth.currentUser.getIdToken();
+      const cloudinaryResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/auto/upload`,
+        {
+          method: 'POST',
+          body: cloudinaryFormData,
+        }
+      );
+
+      if (!cloudinaryResponse.ok) {
+        throw new Error('Cloudinary upload failed');
       }
+
+      const cloudinaryData = await cloudinaryResponse.json();
+      setUploadProgress(60);
+
+      // Step 2: Save metadata to database via backend API (70-90%)
+      const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+      
+      const dbFormData = new FormData();
+      dbFormData.append('title', newMedia.title);
+      dbFormData.append('type', newMedia.type);
+      dbFormData.append('cloudinaryPublicId', cloudinaryData.public_id);
+      dbFormData.append('url', cloudinaryData.secure_url);
+      dbFormData.append('duration', cloudinaryData.duration?.toString() || '0');
+      dbFormData.append('format', cloudinaryData.format);
+      dbFormData.append('resourceType', cloudinaryData.resource_type);
+
+      setUploadProgress(70);
+
       const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
-      // Simulate progress for base64 encoding (30% done at start of upload)
-      setUploadProgress(30);
-
-      const response = await fetch('/api/artist/media', {
+      const dbResponse = await fetch('/api/artist/media', {
         method: 'POST',
-        body: formData,
+        body: dbFormData,
         headers,
       });
 
       setUploadProgress(90);
 
-      if (response.ok) {
-        const uploadedMedia = await response.json() as Media;
+      if (dbResponse.ok) {
+        const uploadedMedia = await dbResponse.json() as Media;
         setMedia(prev => [uploadedMedia, ...prev]);
         setUploadProgress(100);
         
@@ -229,12 +253,12 @@ export default function ForArtistsPage() {
           alert('Media uploaded successfully!');
         }, 500);
       } else {
-        const errorData = await response.text();
-        throw new Error(`Upload failed: ${response.status} - ${errorData}`);
+        const errorData = await dbResponse.text();
+        throw new Error(`Failed to save media metadata: ${dbResponse.status} - ${errorData}`);
       }
     } catch (error) {
       console.error('Error uploading media:', error);
-      alert('Upload failed. Please try again.');
+      alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setUploadProgress(0);
       setIsUploading(false);
     }
