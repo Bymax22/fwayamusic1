@@ -10,9 +10,9 @@ import {
   Param,
   UseGuards,
   Req,
-  MaxFileSizeValidator,
-  ParseFilePipe,
+  BadRequestException,
   ValidationPipe,
+  Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './media.service';
@@ -23,28 +23,37 @@ import { Request } from 'express';
 
 @Controller('v1/media')
 export class MediaController {
+  private readonly logger = new Logger(MediaController.name);
+  private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
   constructor(private readonly mediaService: MediaService) {}
 
   // @UseGuards(JwtAuthGuard) // Uncomment when JwtAuthGuard is implemented
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadMedia(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 })], // 25MB for audio/video
-      })
-    ) file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File | undefined,
     @Body(new ValidationPipe({ transform: true, skipMissingProperties: true })) createMediaDto: CreateMediaDto,
     @CurrentUser() user: { sub: string }
   ) {
     try {
+      if (!file) {
+        throw new BadRequestException('No file provided');
+      }
+
+      if (file.size > this.MAX_FILE_SIZE) {
+        throw new BadRequestException(`File size exceeds limit of ${this.MAX_FILE_SIZE / 1024 / 1024}MB`);
+      }
+
       const userId = parseInt(user.sub);
-      console.log(`[Media Upload] Starting upload for user ${userId}, file: ${file.originalname}, size: ${file.size}`);
+      this.logger.log(`Starting upload for user ${userId}, file: ${file.originalname}, size: ${file.size}`);
+      
       const result = await this.mediaService.createMedia(file, userId, createMediaDto);
-      console.log(`[Media Upload] Success for user ${userId}, media ID: ${result.id}`);
+      
+      this.logger.log(`Upload success for user ${userId}, media ID: ${result.id}`);
       return result;
     } catch (error) {
-      console.error('[Media Upload] Error:', error instanceof Error ? error.message : error);
+      this.logger.error(`Upload error: ${error instanceof Error ? error.message : error}`, error);
       throw error;
     }
   }
@@ -53,12 +62,12 @@ export class MediaController {
   @Post('upload-avatar')
   @UseInterceptors(FileInterceptor('file'))
   async uploadAvatar(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 2 * 1024 * 1024 })], // 2MB for avatars
-      })
-    ) file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File | undefined
   ) {
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+    
     // Upload to Cloudinary as avatar
     const uploadResult = await this.mediaService.uploadToCloudinary(file, 'avatar');
     return {
