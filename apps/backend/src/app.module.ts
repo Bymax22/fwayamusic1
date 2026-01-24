@@ -1,6 +1,5 @@
 import { Module, Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MulterModule } from '@nestjs/platform-express';
 import * as admin from 'firebase-admin';
 import { PrismaModule } from './db/prisma.module';
 import { MediaModule } from './media/media.module';
@@ -23,12 +22,6 @@ const logger = new Logger('AppModule');
       envFilePath: ['.env', `.env.${process.env.NODE_ENV}`],
     }),
     PrismaModule,
-    MulterModule.register({
-      dest: './uploads',
-      limits: {
-        fileSize: 25 * 1024 * 1024, // 25MB
-      },
-    }),
     AuthModule,
     MediaModule,
     PaymentModule,

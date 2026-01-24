@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Configure for App Router
+// Configure for App Router - 55 seconds timeout (Vercel limit is 60s)
 export const config = {
-  maxDuration: 60,
+  maxDuration: 55,
 };
 
 export async function GET(request: NextRequest) {
@@ -38,27 +38,49 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     
     console.log('[API Route] FormData received, forwarding to backend');
+    const startTime = Date.now();
 
-    // Upload media to backend
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload`, {
-      method: 'POST',
-      headers: {
-        'Authorization': token || '',
-      },
-      body: formData,
-    });
+    // Upload media to backend with longer timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      console.error('[API Route] Request timeout after 50 seconds');
+      controller.abort();
+    }, 50000); // 50 second timeout (leaves 5 seconds buffer before Vercel 55s limit)
 
-    console.log(`[API Route] Backend response: ${res.status} ${res.statusText}`);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': token || '',
+        },
+        body: formData,
+        signal: controller.signal,
+      });
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error(`[API Route] Upload failed: ${res.statusText}`, errorText);
-      throw new Error(`Failed to upload media: ${res.statusText} - ${errorText}`);
+      clearTimeout(timeout);
+      const elapsed = Date.now() - startTime;
+      console.log(`[API Route] Backend response: ${res.status} ${res.statusText} (${elapsed}ms)`);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`[API Route] Upload failed: ${res.statusText}`, errorText);
+        throw new Error(`Failed to upload media: ${res.statusText} - ${errorText}`);
+      }
+
+      const data = await res.json();
+      console.log('[API Route] Upload successful, returning data');
+      return NextResponse.json(data);
+    } catch (fetchError: any) {
+      clearTimeout(timeout);
+      if (fetchError.name === 'AbortError') {
+        console.error('[API Route] Request aborted - timeout or other abort');
+        return NextResponse.json(
+          { error: 'Upload request timed out - file may be too large' },
+          { status: 504 }
+        );
+      }
+      throw fetchError;
     }
-
-    const data = await res.json();
-    console.log('[API Route] Upload successful, returning data');
-    return NextResponse.json(data);
   } catch (error) {
     console.error('[API Route] Error:', error instanceof Error ? error.message : error);
     return NextResponse.json(
