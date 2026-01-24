@@ -36,13 +36,17 @@ export class MediaService {
 
   async createMedia(file: Express.Multer.File, userId: number, createMediaDto: any) {
     try {
+      console.log(`[MediaService] Creating media for user ${userId}, file size: ${file.size} bytes`);
+      
       // 1. Upload to Cloudinary
+      console.log(`[MediaService] Uploading to Cloudinary...`);
       const uploadResult = await cloudinary.uploader.upload(`data:${file.mimetype};base64,${file.buffer.toString('base64')}`, {
         folder: 'fwaya-media',
         resource_type: 'auto',
         public_id: file.originalname.replace(/\.[^/.]+$/, ""),
         quality: 'auto', // Ensure high quality upload
       });
+      console.log(`[MediaService] Cloudinary upload success: ${uploadResult.public_id}`);
 
       // 2. Create database record
       const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';

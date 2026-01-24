@@ -36,8 +36,16 @@ export class MediaController {
     @Body() createMediaDto: CreateMediaDto,
     @CurrentUser() user: { sub: string }
   ) {
-    const userId = parseInt(user.sub);
-    return this.mediaService.createMedia(file, userId, createMediaDto);
+    try {
+      const userId = parseInt(user.sub);
+      console.log(`[Media Upload] Starting upload for user ${userId}, file: ${file.originalname}, size: ${file.size}`);
+      const result = await this.mediaService.createMedia(file, userId, createMediaDto);
+      console.log(`[Media Upload] Success for user ${userId}, media ID: ${result.id}`);
+      return result;
+    } catch (error) {
+      console.error('[Media Upload] Error:', error instanceof Error ? error.message : error);
+      throw error;
+    }
   }
 
   // Public avatar upload for signup
