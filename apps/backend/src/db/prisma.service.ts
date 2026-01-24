@@ -8,7 +8,18 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   private readonly maxRetries = 5;
   private readonly retryDelay = 3000; // 3 seconds
 
+  constructor() {
+    super({
+      log: [
+        { emit: 'stdout', level: 'error' },
+        { emit: 'event', level: 'warn' },
+      ],
+    });
+    this.logger.log('PrismaService instantiated, waiting for module init...');
+  }
+
   async onModuleInit() {
+    this.logger.log('PrismaService: onModuleInit called');
     await this.connectWithRetry();
   }
 

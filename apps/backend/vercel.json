@@ -3,7 +3,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist/apps/backend",
   "functions": {
-    "src/main.ts": {
+    "**/*.js": {
       "memory": 3008,
       "maxDuration": 60
     }

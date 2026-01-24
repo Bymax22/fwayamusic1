@@ -10,7 +10,8 @@ async function initializeApp() {
   if (app) return app;
 
   try {
-    app = await NestFactory.create(AppModule);
+    logger.log('Initializing NestJS application...');
+    app = await NestFactory.create(AppModule, { logger: ['log', 'error', 'warn'] });
     const configService = app.get(ConfigService);
 
     // Add global validation pipe
@@ -37,6 +38,7 @@ async function initializeApp() {
 
     app.setGlobalPrefix('api');
     await app.init();
+    logger.log('NestJS application initialized successfully');
 
     if (!process.env.VERCEL) {
       const port = configService.get('PORT') || 3001;
@@ -48,7 +50,7 @@ async function initializeApp() {
 
     return app;
   } catch (error) {
-    logger.error('Failed to initialize app:', error);
+    logger.error('Failed to initialize app:', error instanceof Error ? error.message : error);
     throw error;
   }
 }
@@ -65,13 +67,14 @@ if (!process.env.VERCEL) {
 export default async (req: any, res: any) => {
   try {
     if (!app) {
+      logger.log('Initializing app on first request');
       await initializeApp();
     }
     // Get the HTTP adapter and use it to handle the request
     const httpAdapter = app.getHttpAdapter();
     return httpAdapter.getInstance()(req, res);
   } catch (error) {
-    logger.error('Error handling request:', error);
+    logger.error('Error handling request:', error instanceof Error ? error.message : error);
     res.status(500).json({ error: 'Internal Server Error', details: error instanceof Error ? error.message : error });
   }
 };
