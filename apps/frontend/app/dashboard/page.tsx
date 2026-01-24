@@ -170,7 +170,7 @@ const UserDashboard: React.FC = () => {
         }
 
         // Fetch recommendations - use homepage sections as recommendations
-        const recommendationsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/homepage-sections`, {
+        const recommendationsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/homepage-sections`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (recommendationsRes.ok) {
@@ -185,7 +185,7 @@ const UserDashboard: React.FC = () => {
         }
 
         // Fetch all media for recent plays
-        const recentPlaysRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media`, {
+        const recentPlaysRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (recentPlaysRes.ok) {

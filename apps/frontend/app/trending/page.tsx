@@ -26,7 +26,7 @@ export default function TrendingPage() {
     const fetchTrendingMedia = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`);
         if (res.ok) {
           const data = await res.json();
           // Sort by views to get trending

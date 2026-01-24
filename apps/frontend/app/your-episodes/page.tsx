@@ -37,7 +37,7 @@ export default function YourEpisodesPage() {
             token = await auth.currentUser.getIdToken();
           }
           
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`, {
             headers: token ? { 'Authorization': `Bearer ${token}` } : {}
           });
           
