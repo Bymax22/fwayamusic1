@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
     const token = request.headers.get('authorization');
     
     // Get the current user's media from backend
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/user/me`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/user/me`, {
       headers: {
         'Authorization': token || '',
       },
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
 
     // Upload media to backend
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/upload`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload`, {
       method: 'POST',
       headers: {
         'Authorization': token || '',
@@ -71,7 +71,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete media from backend
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media/${mediaId}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${mediaId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': token || '',
