@@ -17,15 +17,17 @@ export class CreateMediaDto {
   @IsEnum(MediaType)
   type!: MediaType;
 
+  @IsOptional()
   @IsString()
-  accessType!: string; // 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW'
+  accessType?: string; // 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW'
 
   @IsOptional()
   @IsNumber()
   price?: number;
 
+  @IsOptional()
   @IsBoolean()
-  isExplicit!: boolean;
+  isExplicit?: boolean;
 
   @IsOptional()
   @IsString()
@@ -35,11 +37,13 @@ export class CreateMediaDto {
   @IsNumber()
   duration?: number;
 
+  @IsOptional()
   @IsBoolean()
-  allowReselling!: boolean;
+  allowReselling?: boolean;
 
+  @IsOptional()
   @IsNumber()
-  artistCommissionRate!: number;
+  artistCommissionRate?: number;
 
   @IsOptional()
   @IsString()
