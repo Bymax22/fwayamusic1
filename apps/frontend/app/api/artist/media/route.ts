@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Configure body size limit to 100MB
+// Configure for App Router
 export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '100mb',
-    },
-  },
+  maxDuration: 60,
 };
 
 export async function GET(request: NextRequest) {
@@ -37,8 +33,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[API Route] Media upload request received');
     const token = request.headers.get('authorization');
     const formData = await request.formData();
+    
+    console.log('[API Route] FormData received, forwarding to backend');
 
     // Upload media to backend
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload`, {
@@ -49,18 +48,21 @@ export async function POST(request: NextRequest) {
       body: formData,
     });
 
+    console.log(`[API Route] Backend response: ${res.status} ${res.statusText}`);
+
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`Upload failed: ${res.statusText}`, errorText);
-      throw new Error(`Failed to upload media: ${res.statusText}`);
+      console.error(`[API Route] Upload failed: ${res.statusText}`, errorText);
+      throw new Error(`Failed to upload media: ${res.statusText} - ${errorText}`);
     }
 
     const data = await res.json();
+    console.log('[API Route] Upload successful, returning data');
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Failed to upload media:', error);
+    console.error('[API Route] Error:', error instanceof Error ? error.message : error);
     return NextResponse.json(
-      { error: 'Failed to upload media' },
+      { error: error instanceof Error ? error.message : 'Failed to upload media' },
       { status: 500 }
     );
   }
