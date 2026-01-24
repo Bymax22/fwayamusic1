@@ -11,10 +11,8 @@ const nextConfig: NextConfig = {
     domains: ["res.cloudinary.com"],
   },
 
-  // Increase body size limit for large file uploads (25MB)
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
+  // Server external packages (moved from experimental in Next.js 15)
+  serverExternalPackages: [],
 
   // Configure API body size limit
   onDemandEntries: {

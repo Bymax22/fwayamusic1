@@ -213,7 +213,7 @@ export default function ForArtistsPage() {
       setUploadProgress(90);
 
       if (response.ok) {
-        const uploadedMedia = await response.json() as any;
+        const uploadedMedia = await response.json() as Media;
         setMedia(prev => [uploadedMedia, ...prev]);
         setUploadProgress(100);
         
