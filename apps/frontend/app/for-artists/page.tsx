@@ -379,9 +379,9 @@ export default function ForArtistsPage() {
                 <DollarSign className="w-5 h-5" />
                 Total Revenue
               </h3>
-              <p className="text-3xl font-bold text-white mt-2">${stats?.totalRevenue.toFixed(2)}</p>
+              <p className="text-3xl font-bold text-white mt-2">${(stats?.totalRevenue ?? 0).toFixed(2)}</p>
               <p className="text-sm text-gray-400 mt-1">
-                <span className="text-green-500">${stats?.monthlyRevenue.toFixed(2)}</span> this month
+                <span className="text-green-500">${(stats?.monthlyRevenue ?? 0).toFixed(2)}</span> this month
               </p>
             </div>
 
@@ -588,7 +588,7 @@ export default function ForArtistsPage() {
                       <tr key={track.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
                         <td className="p-3 text-white">{track.title}</td>
                         <td className="p-3 text-gray-300">{(track.plays || 0).toLocaleString()}</td>
-                        <td className="p-3 text-green-400">${track.revenue.toFixed(2)}</td>
+                        <td className="p-3 text-green-400">${(track.revenue ?? 0).toFixed(2)}</td>
                         <td className="p-3">
                           <div className="w-32 bg-[#0a3747] rounded-full h-2 overflow-hidden">
                             <div 
@@ -707,12 +707,12 @@ export default function ForArtistsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div className="bg-[#0a1f29] p-4 rounded-lg">
                   <h4 className="text-gray-400">Total Earnings</h4>
-                  <p className="text-2xl font-bold text-white mt-2">${stats?.totalRevenue.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-white mt-2">${(stats?.totalRevenue ?? 0).toFixed(2)}</p>
                 </div>
                 
                 <div className="bg-[#0a1f29] p-4 rounded-lg">
                   <h4 className="text-gray-400">This Month</h4>
-                  <p className="text-2xl font-bold text-white mt-2">${stats?.monthlyRevenue.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-white mt-2">${(stats?.monthlyRevenue ?? 0).toFixed(2)}</p>
                 </div>
                 
                 <div className="bg-[#0a1f29] p-4 rounded-lg">
@@ -741,7 +741,7 @@ export default function ForArtistsPage() {
                       <tr key={commission.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
                         <td className="p-3 text-white">{commission.media.title}</td>
                         <td className="p-3 text-green-400">
-                          {commission.currency} {commission.amount.toFixed(2)}
+                          {commission.currency} {(commission.amount ?? 0).toFixed(2)}
                         </td>
                         <td className="p-3">
                           <span className={`px-2 py-1 rounded-full text-xs ${
@@ -810,7 +810,7 @@ export default function ForArtistsPage() {
                     <div className="flex justify-between">
                       <span className="text-gray-400">Reseller Revenue</span>
                       <span className="text-green-400">
-                        ${commissions.reduce((sum, c) => sum + (c.status === 'PAID' ? c.amount : 0), 0).toFixed(2)}
+                        ${(commissions.reduce((sum, c) => sum + (c.status === 'PAID' ? c.amount : 0), 0) ?? 0).toFixed(2)}
                       </span>
                     </div>
                   </div>
