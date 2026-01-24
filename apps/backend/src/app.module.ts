@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import * as admin from 'firebase-admin';
@@ -14,6 +14,8 @@ import {PlaylistModule} from './playlist/playlist.module';
 import {ArtistsModule} from './artists/artists.module';
 import {UserModule} from './user/user.module';
 
+const logger = new Logger('AppModule');
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,14 +23,11 @@ import {UserModule} from './user/user.module';
       envFilePath: ['.env', `.env.${process.env.NODE_ENV}`],
     }),
     PrismaModule,
-    MulterModule.registerAsync({
-      useFactory: (config: ConfigService) => ({
-        dest: config.get<string>('UPLOAD_DIR', './uploads'),
-        limits: {
-          fileSize: config.get<number>('MAX_FILE_SIZE_MB', 25) * 1024 * 1024,
-        },
-      }),
-      inject: [ConfigService],
+    MulterModule.register({
+      dest: './uploads',
+      limits: {
+        fileSize: 25 * 1024 * 1024, // 25MB
+      },
     }),
     AuthModule,
     MediaModule,
@@ -45,15 +44,31 @@ import {UserModule} from './user/user.module';
     {
       provide: 'FIREBASE_ADMIN',
       useFactory: (config: ConfigService) => {
-        const privateKey = config.get('FIREBASE_PRIVATE_KEY');
-        return admin.initializeApp({
-          credential: admin.credential.cert({
-            projectId: config.get('FIREBASE_PROJECT_ID'),
-            clientEmail: config.get('FIREBASE_CLIENT_EMAIL'),
-            privateKey: typeof privateKey === 'string' ? privateKey.replace(/\\n/g, '\n') : undefined,
-          }),
-          storageBucket: config.get('FIREBASE_STORAGE_BUCKET'),
-        });
+        try {
+          const privateKey = config.get('FIREBASE_PRIVATE_KEY');
+          const projectId = config.get('FIREBASE_PROJECT_ID');
+          const clientEmail = config.get('FIREBASE_CLIENT_EMAIL');
+          
+          if (!privateKey || !projectId || !clientEmail) {
+            logger.warn('Firebase credentials missing, skipping Firebase initialization');
+            return null;
+          }
+
+          const app = admin.initializeApp({
+            credential: admin.credential.cert({
+              projectId,
+              clientEmail,
+              privateKey: typeof privateKey === 'string' ? privateKey.replace(/\\n/g, '\n') : undefined,
+            }),
+            storageBucket: config.get('FIREBASE_STORAGE_BUCKET'),
+          });
+          
+          logger.log('Firebase Admin initialized successfully');
+          return app;
+        } catch (error) {
+          logger.error('Failed to initialize Firebase Admin:', error instanceof Error ? error.message : error);
+          return null;
+        }
       },
       inject: [ConfigService],
     },

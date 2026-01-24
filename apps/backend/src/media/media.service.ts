@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { Prisma } from '@prisma/client';
@@ -6,12 +6,19 @@ import { MediaType } from '@fwaya-music/types/enums';
 
 @Injectable()
 export class MediaService {
+  private readonly logger = new Logger(MediaService.name);
+
   constructor(private readonly prisma: PrismaService) {
-    cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET,
-    });
+    try {
+      cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      });
+      this.logger.log('Cloudinary configured successfully');
+    } catch (error) {
+      this.logger.error('Failed to configure Cloudinary:', error);
+    }
   }
 
   // Upload file using base64 encoding (proven to work, simpler than streaming)
@@ -44,12 +51,22 @@ export class MediaService {
 
   async createMedia(file: Express.Multer.File, userId: number, createMediaDto: any) {
     try {
-      console.log(`[MediaService] Creating media for user ${userId}, file size: ${file.size} bytes`);
+      this.logger.log(`Creating media for user ${userId}, file: ${file.originalname}, size: ${file.size} bytes`);
       
+      if (!file) {
+        throw new Error('No file provided');
+      }
+
+      if (!process.env.CLOUDINARY_CLOUD_NAME) {
+        throw new Error('CLOUDINARY_CLOUD_NAME not configured');
+      }
+
       // 1. Upload to Cloudinary using base64
-      console.log(`[MediaService] Uploading to Cloudinary via base64...`);
+      this.logger.log(`Uploading to Cloudinary...`);
+      const base64Data = file.buffer.toString('base64');
+      
       const uploadResult = await cloudinary.uploader.upload(
-        `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
+        `data:${file.mimetype};base64,${base64Data}`,
         {
           folder: 'fwaya-media',
           resource_type: 'auto',
@@ -57,7 +74,7 @@ export class MediaService {
           quality: 'auto',
         }
       );
-      console.log(`[MediaService] Cloudinary upload success: ${uploadResult.public_id}`);
+      this.logger.log(`Cloudinary upload success: ${uploadResult.public_id}`);
 
       // 2. Create database record
       const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';
@@ -68,6 +85,7 @@ export class MediaService {
         try {
           tags = typeof createMediaDto.tags === 'string' ? JSON.parse(createMediaDto.tags) : createMediaDto.tags;
         } catch (e) {
+          this.logger.warn('Failed to parse tags:', e);
           tags = [];
         }
       }
@@ -87,7 +105,7 @@ export class MediaService {
         tags: tags,
         allowReselling: createMediaDto.allowReselling === 'true' || createMediaDto.allowReselling === true || true,
         artistCommissionRate: createMediaDto.artistCommissionRate ? parseFloat(createMediaDto.artistCommissionRate as any) : 0.5,
-        platformCommissionRate: 0.5, // Default platform commission
+        platformCommissionRate: 0.5,
         user: { connect: { id: userId } },
         artCoverUrl:
           uploadResult.thumbnail_url
@@ -111,12 +129,12 @@ export class MediaService {
         }
       });
 
+      this.logger.log(`Media created successfully: ${media.id}`);
       return media;
     } catch (error) {
-      console.error('Media creation error:', error);
-      throw new InternalServerErrorException(
-        error instanceof Error ? error.message : 'Media creation failed'
-      );
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Media creation failed: ${errorMsg}`, error);
+      throw new InternalServerErrorException(`Failed to create media: ${errorMsg}`);
     }
   }
 
