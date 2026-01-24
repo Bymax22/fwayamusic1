@@ -413,11 +413,11 @@ export default function ForArtistsPage() {
               <h3 className="text-gray-400 mb-4">Plays Over Time</h3>
               <div className="h-64 bg-[#0a1f29] rounded-lg p-4">
                 <div className="flex items-end h-full gap-1">
-                  {analytics?.playsByDay.map((count, i) => (
+                  {(analytics?.playsByDay || []).map((count, i) => (
                     <div 
                       key={i}
                       className="flex-1 bg-gradient-to-t from-[#e51f48] to-[#ff4d6d] rounded-t-sm"
-                      style={{ height: `${Math.min(100, (count / Math.max(...analytics.playsByDay)) * 100)}%` }}
+                      style={{ height: `${Math.min(100, (count / Math.max(...(analytics?.playsByDay || [1]))) * 100)}%` }}
                     />
                   ))}
                 </div>
@@ -473,7 +473,7 @@ export default function ForArtistsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {media.map(item => (
+                  {(media || []).map(item => (
                     <tr key={item.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -584,7 +584,7 @@ export default function ForArtistsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {analytics?.topTracks.map((track) => (
+                    {(analytics?.topTracks || []).map((track) => (
                       <tr key={track.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
                         <td className="p-3 text-white">{track.title}</td>
                         <td className="p-3 text-gray-300">{(track.plays || 0).toLocaleString()}</td>
@@ -593,7 +593,7 @@ export default function ForArtistsPage() {
                           <div className="w-32 bg-[#0a3747] rounded-full h-2 overflow-hidden">
                             <div 
                               className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full"
-                              style={{ width: `${(track.plays / Math.max(...analytics.topTracks.map(t => t.plays))) * 100}%` }}
+                              style={{ width: `${analytics?.topTracks && analytics.topTracks.length > 0 ? (track.plays / Math.max(...analytics.topTracks.map(t => t.plays))) * 100 : 0}%` }}
                             />
                           </div>
                         </td>
@@ -616,7 +616,7 @@ export default function ForArtistsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {analytics?.topCountries.map((country, i) => (
+                    {(analytics?.topCountries || []).map((country, i) => (
                       <tr key={i} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
                         <td className="p-3 text-white">{country.country}</td>
                         <td className="p-3 text-gray-300">{(country.plays || 0).toLocaleString()}</td>
@@ -661,7 +661,7 @@ export default function ForArtistsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {followers.map(follower => (
+                  {(followers || []).map(follower => (
                     <tr key={follower.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -737,7 +737,7 @@ export default function ForArtistsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {commissions.map(commission => (
+                    {(commissions || []).map(commission => (
                       <tr key={commission.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
                         <td className="p-3 text-white">{commission.media.title}</td>
                         <td className="p-3 text-green-400">
@@ -821,7 +821,7 @@ export default function ForArtistsPage() {
             <div className="bg-[#0a3747]/70 p-6 rounded-xl">
               <h3 className="text-xl font-bold text-white mb-4">Reseller Settings</h3>
               <div className="space-y-4">
-                {media.map(item => (
+                {(media || []).map(item => (
                   <div key={item.id} className="flex items-center justify-between p-4 bg-[#0a1f29] rounded-lg">
                     <div>
                       <h4 className="text-white">{item.title}</h4>
