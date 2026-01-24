@@ -70,9 +70,9 @@ export async function POST(request: NextRequest) {
       const data = await res.json();
       console.log('[API Route] Upload successful, returning data');
       return NextResponse.json(data);
-    } catch (fetchError: any) {
+    } catch (fetchError) {
       clearTimeout(timeout);
-      if (fetchError.name === 'AbortError') {
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
         console.error('[API Route] Request aborted - timeout or other abort');
         return NextResponse.json(
           { error: 'Upload request timed out - file may be too large' },
