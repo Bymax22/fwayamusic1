@@ -934,7 +934,7 @@ export default function ForArtistsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-gray-400 mb-2">File * (Max 25MB)</label>
+                    <label className="block text-gray-400 mb-2">File * (Max 10MB)</label>
                     <div className="border-2 border-dashed border-[#0a3747] rounded-lg p-6 text-center hover:border-[#e51f48] transition-colors">
                       <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
                         <Upload className="w-8 h-8" />

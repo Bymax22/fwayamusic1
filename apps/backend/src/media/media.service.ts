@@ -61,11 +61,12 @@ export class MediaService {
         throw new Error('CLOUDINARY_CLOUD_NAME not configured');
       }
 
-      // 1. Upload to Cloudinary using base64
+      // 1. Upload to Cloudinary using base64 with timeout
       this.logger.log(`Uploading to Cloudinary...`);
       const base64Data = file.buffer.toString('base64');
       
-      const uploadResult = await cloudinary.uploader.upload(
+      // Use Promise.race to implement timeout
+      const uploadPromise = cloudinary.uploader.upload(
         `data:${file.mimetype};base64,${base64Data}`,
         {
           folder: 'fwaya-media',
@@ -74,6 +75,13 @@ export class MediaService {
           quality: 'auto',
         }
       );
+
+      // 50 second timeout for upload (Vercel limit is 60s, giving 10s buffer for DB operations)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Cloudinary upload timeout after 50 seconds')), 50000)
+      );
+
+      const uploadResult = await Promise.race([uploadPromise, timeoutPromise]) as UploadApiResponse;
       this.logger.log(`Cloudinary upload success: ${uploadResult.public_id}`);
 
       // 2. Create database record
