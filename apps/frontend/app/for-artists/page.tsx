@@ -109,15 +109,7 @@ interface Stats {
 
 interface NewMedia {
   title: string;
-  description: string;
   type: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM';
-  accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
-  price: number;
-  isExplicit: boolean;
-  genre: string;
-  tags: string[];
-  allowReselling: boolean;
-  artistCommissionRate: number;
   file: File | null;
 }
 
@@ -131,17 +123,11 @@ export default function ForArtistsPage() {
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
   const [newMedia, setNewMedia] = useState<NewMedia>({
     title: '',
-    description: '',
     type: 'AUDIO',
-    accessType: 'FREE',
-    price: 0,
-    isExplicit: false,
-    genre: '',
-    tags: [],
-    allowReselling: true,
-    artistCommissionRate: 0.5, // Default 50%
     file: null
   });
 
@@ -194,19 +180,19 @@ export default function ForArtistsPage() {
       return;
     }
 
+    if (!newMedia.title.trim()) {
+      alert('Please enter a title');
+      return;
+    }
+
     try {
+      setIsUploading(true);
+      setUploadProgress(0);
+
       const formData = new FormData();
       formData.append('file', newMedia.file);
       formData.append('title', newMedia.title);
-      formData.append('description', newMedia.description);
       formData.append('type', newMedia.type);
-      formData.append('accessType', newMedia.accessType);
-      formData.append('price', newMedia.price.toString());
-      formData.append('isExplicit', newMedia.isExplicit.toString());
-      formData.append('genre', newMedia.genre);
-      formData.append('tags', JSON.stringify(newMedia.tags));
-      formData.append('allowReselling', newMedia.allowReselling.toString());
-      formData.append('artistCommissionRate', newMedia.artistCommissionRate.toString());
 
       // Get auth token from Firebase
       let token: string | null = null;
@@ -215,36 +201,42 @@ export default function ForArtistsPage() {
       }
       const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
+      // Simulate progress for base64 encoding (30% done at start of upload)
+      setUploadProgress(30);
+
       const response = await fetch('/api/artist/media', {
         method: 'POST',
         body: formData,
         headers,
       });
 
+      setUploadProgress(90);
+
       if (response.ok) {
-        const uploadedMedia = await response.json();
+        const uploadedMedia = await response.json() as any;
         setMedia(prev => [uploadedMedia, ...prev]);
-        setShowUploadModal(false);
-        setNewMedia({
-          title: '',
-          description: '',
-          type: 'AUDIO',
-          accessType: 'FREE',
-          price: 0,
-          isExplicit: false,
-          genre: '',
-          tags: [],
-          allowReselling: true,
-          artistCommissionRate: 0.5,
-          file: null
-        });
-        alert('Media uploaded successfully!');
+        setUploadProgress(100);
+        
+        setTimeout(() => {
+          setShowUploadModal(false);
+          setNewMedia({
+            title: '',
+            type: 'AUDIO',
+            file: null
+          });
+          setUploadProgress(0);
+          setIsUploading(false);
+          alert('Media uploaded successfully!');
+        }, 500);
       } else {
-        throw new Error('Upload failed');
+        const errorData = await response.text();
+        throw new Error(`Upload failed: ${response.status} - ${errorData}`);
       }
     } catch (error) {
       console.error('Error uploading media:', error);
       alert('Upload failed. Please try again.');
+      setUploadProgress(0);
+      setIsUploading(false);
     }
   };
 
@@ -885,33 +877,46 @@ export default function ForArtistsPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-[#0a3747] rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-[#0a3747] rounded-xl p-6 w-full max-w-md"
             >
-              <h2 className="text-xl font-bold text-white mb-4">Upload New Media</h2>
+              <h2 className="text-xl font-bold text-white mb-6">Upload New Media</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {isUploading ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-gray-400 mb-1">Title *</label>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-gray-400 text-sm">Uploading...</span>
+                      <span className="text-white font-medium">{uploadProgress}%</span>
+                    </div>
+                    <div className="w-full bg-[#0a1f29] rounded-full h-3 overflow-hidden border border-[#0a3747]">
+                      <motion.div 
+                        className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d]"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${uploadProgress}%` }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </div>
+                  </div>
+                  <p className="text-gray-400 text-sm text-center">
+                    {uploadProgress < 50 ? 'Preparing file...' : uploadProgress < 90 ? 'Uploading to cloud...' : 'Finalizing...'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-gray-400 mb-2">Title *</label>
                     <input
                       type="text"
                       className="w-full bg-[#0a1f29] border border-[#0a3747] rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
+                      placeholder="Enter media title"
                       value={newMedia.title}
                       onChange={(e) => setNewMedia({...newMedia, title: e.target.value})}
+                      disabled={isUploading}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-gray-400 mb-1">Description</label>
-                    <textarea
-                      className="w-full bg-[#0a1f29] border border-[#0a3747] rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48] h-24"
-                      value={newMedia.description}
-                      onChange={(e) => setNewMedia({...newMedia, description: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-gray-400 mb-1">Type *</label>
+                    <label className="block text-gray-400 mb-2">Type *</label>
                     <select
                       className="w-full bg-[#0a1f29] border border-[#0a3747] rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
                       value={newMedia.type}
@@ -919,6 +924,7 @@ export default function ForArtistsPage() {
                         ...newMedia, 
                         type: e.target.value as 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM'
                       })}
+                      disabled={isUploading}
                     >
                       <option value="AUDIO">Audio Track</option>
                       <option value="VIDEO">Video</option>
@@ -926,74 +932,10 @@ export default function ForArtistsPage() {
                       <option value="LIVE_STREAM">Live Stream</option>
                     </select>
                   </div>
-                  
+
                   <div>
-                    <label className="block text-gray-400 mb-1">Access Type *</label>
-                    <select
-                      className="w-full bg-[#0a1f29] border border-[#0a3747] rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
-                      value={newMedia.accessType}
-                      onChange={(e) => setNewMedia({
-                        ...newMedia, 
-                        accessType: e.target.value as 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW'
-                      })}
-                    >
-                      <option value="FREE">Free</option>
-                      <option value="PREMIUM">Premium</option>
-                      <option value="PAY_PER_VIEW">Pay Per View</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  {(newMedia.accessType === 'PREMIUM' || newMedia.accessType === 'PAY_PER_VIEW') && (
-                    <div>
-                      <label className="block text-gray-400 mb-1">Price ($)</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        className="w-full bg-[#0a1f29] border border-[#0a3747] rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
-                        value={newMedia.price}
-                        onChange={(e) => setNewMedia({...newMedia, price: parseFloat(e.target.value) || 0})}
-                      />
-                    </div>
-                  )}
-                  
-                  <div>
-                    <label className="block text-gray-400 mb-1">Genre</label>
-                    <input
-                      type="text"
-                      className="w-full bg-[#0a1f29] border border-[#0a3747] rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
-                      value={newMedia.genre}
-                      onChange={(e) => setNewMedia({...newMedia, genre: e.target.value})}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 text-gray-400">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 text-[#e51f48] rounded focus:ring-[#e51f48]"
-                        checked={newMedia.isExplicit}
-                        onChange={(e) => setNewMedia({...newMedia, isExplicit: e.target.checked})}
-                      />
-                      Explicit Content
-                    </label>
-                    
-                    <label className="flex items-center gap-2 text-gray-400">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 text-[#e51f48] rounded focus:ring-[#e51f48]"
-                        checked={newMedia.allowReselling}
-                        onChange={(e) => setNewMedia({...newMedia, allowReselling: e.target.checked})}
-                      />
-                      Allow Reselling
-                    </label>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-gray-400 mb-1">File *</label>
-                    <div className="border border-dashed border-[#0a3747] rounded-lg p-6 text-center">
+                    <label className="block text-gray-400 mb-2">File * (Max 25MB)</label>
+                    <div className="border-2 border-dashed border-[#0a3747] rounded-lg p-6 text-center hover:border-[#e51f48] transition-colors">
                       <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
                         <Upload className="w-8 h-8" />
                         <input
@@ -1002,37 +944,42 @@ export default function ForArtistsPage() {
                           id="file-upload"
                           onChange={handleFileSelect}
                           accept="audio/*,video/*"
+                          disabled={isUploading}
                         />
                         <label htmlFor="file-upload" className="cursor-pointer">
-                          <p>Click to select file</p>
-                          <p className="text-sm">Supports MP3, WAV, FLAC, MP4, MOV</p>
+                          <p className="text-white font-medium">Click to select or drag file</p>
+                          <p className="text-sm">MP3, WAV, FLAC, MP4, MOV</p>
                         </label>
                         {newMedia.file && (
-                          <p className="text-green-400 text-sm">
-                            Selected: {newMedia.file.name}
+                          <p className="text-green-400 text-sm mt-2">
+                            ✓ {newMedia.file.name}
                           </p>
                         )}
                       </div>
                     </div>
                   </div>
+
+                  <div className="flex justify-end gap-3 pt-4 border-t border-[#0a3747]">
+                    <button
+                      onClick={() => {
+                        setShowUploadModal(false);
+                        setNewMedia({ title: '', type: 'AUDIO', file: null });
+                      }}
+                      className="px-4 py-2 bg-[#0a1f29] text-gray-300 rounded-lg hover:bg-[#0a3747] transition-colors"
+                      disabled={isUploading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleUpload}
+                      disabled={!newMedia.title || !newMedia.file || isUploading}
+                      className="px-4 py-2 bg-[#e51f48] disabled:bg-gray-600 text-white rounded-lg hover:bg-[#ff4d6d] transition-colors disabled:cursor-not-allowed"
+                    >
+                      {isUploading ? 'Uploading...' : 'Upload'}
+                    </button>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-2 bg-[#0a1f29] text-gray-300 rounded-lg hover:bg-[#0a3747] transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpload}
-                  disabled={!newMedia.title || !newMedia.file}
-                  className="px-4 py-2 bg-[#e51f48] disabled:bg-gray-600 text-white rounded-lg hover:bg-[#ff4d6d] transition-colors"
-                >
-                  Upload
-                </button>
-              </div>
+              )}
             </motion.div>
           </div>
         )}
