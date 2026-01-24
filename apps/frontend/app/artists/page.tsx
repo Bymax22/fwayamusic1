@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useAuth } from "../context/AuthContext";
-import { Users, Play, Heart, Download, MapPin } from 'lucide-react';
+import { Users, Play, MapPin } from 'lucide-react';
 import Image from "next/image";
 import { motion } from 'framer-motion';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
@@ -36,9 +36,7 @@ interface MediaFile {
 }
 
 export default function ArtistsPage() {
-  const { user } = useAuth();
   const [media, setMedia] = useState<MediaFile[]>([]);
-  const [artists, setArtists] = useState<Map<number, Artist>>(new Map());
   const [loading, setLoading] = useState(true);
   const { playTrack } = useAudioPlayer();
 

@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { formatDuration } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
@@ -20,7 +19,6 @@ interface MediaFile {
 }
 
 export default function TrendingPage() {
-  const { user } = useAuth();
   const [media, setMedia] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
   const { playTrack } = useAudioPlayer();

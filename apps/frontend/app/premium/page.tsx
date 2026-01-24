@@ -19,7 +19,6 @@ interface MediaFile {
 }
 
 export default function PremiumPage() {
-  const { user } = useAuth();
   const [media, setMedia] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
   const { playTrack } = useAudioPlayer();

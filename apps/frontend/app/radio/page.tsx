@@ -19,7 +19,6 @@ interface MediaFile {
 }
 
 export default function RadioPage() {
-  const { user } = useAuth();
   const [media, setMedia] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
   const { playTrack } = useAudioPlayer();
