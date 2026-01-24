@@ -3,7 +3,6 @@ import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { Prisma } from '@prisma/client';
 import { MediaType } from '@fwaya-music/types/enums';
-import { Readable } from 'stream';
 
 @Injectable()
 export class MediaService {
@@ -15,17 +14,14 @@ export class MediaService {
     });
   }
 
-  // Upload file using streaming to avoid base64 overhead
+  // Upload file using base64 encoding (proven to work, simpler than streaming)
   async uploadToCloudinary(file: Express.Multer.File, type: 'avatar' | 'media' = 'media'): Promise<UploadApiResponse> {
     const folder = type === 'avatar' ? 'fwaya-avatars' : 'fwaya-media';
-    const resourceType = type === 'avatar' ? 'image' : 'auto'; // Use 'auto' for media to detect audio/video
+    const resourceType = type === 'avatar' ? 'image' : 'auto';
     
-    return new Promise((resolve, reject) => {
-      // Create a readable stream from the buffer
-      const stream = Readable.from(file.buffer);
-      
-      // Use cloudinary's upload_stream for streaming
-      const uploadStream = cloudinary.uploader.upload_stream(
+    try {
+      const uploadResult = await cloudinary.uploader.upload(
+        `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
         {
           folder,
           resource_type: resourceType,
@@ -36,62 +32,31 @@ export class MediaService {
           width: type === 'avatar' ? 200 : undefined,
           height: type === 'avatar' ? 200 : undefined,
           crop: type === 'avatar' ? 'fill' : undefined,
-        },
-        (error: any, result: UploadApiResponse | undefined) => {
-          if (error) {
-            reject(new InternalServerErrorException(`Cloudinary upload failed: ${error.message}`));
-          } else if (result) {
-            resolve(result);
-          } else {
-            reject(new InternalServerErrorException('Cloudinary upload returned no result'));
-          }
         }
       );
-
-      // Handle stream errors
-      stream.on('error', (error) => {
-        reject(new InternalServerErrorException(`Stream error: ${error.message}`));
-      });
-
-      // Pipe the buffer stream to Cloudinary
-      stream.pipe(uploadStream);
-    });
+      return uploadResult;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Cloudinary upload failed: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 
   async createMedia(file: Express.Multer.File, userId: number, createMediaDto: any) {
     try {
       console.log(`[MediaService] Creating media for user ${userId}, file size: ${file.size} bytes`);
       
-      // 1. Upload to Cloudinary using streaming
-      console.log(`[MediaService] Uploading to Cloudinary via stream...`);
-      const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
-        const stream = Readable.from(file.buffer);
-        
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            folder: 'fwaya-media',
-            resource_type: 'auto',
-            public_id: file.originalname.replace(/\.[^/.]+$/, ""),
-            quality: 'auto',
-          },
-          (error: any, result: UploadApiResponse | undefined) => {
-            if (error) {
-              reject(new InternalServerErrorException(`Cloudinary upload failed: ${error.message}`));
-            } else if (result) {
-              resolve(result);
-            } else {
-              reject(new InternalServerErrorException('Cloudinary upload returned no result'));
-            }
-          }
-        );
-
-        stream.on('error', (error) => {
-          reject(new InternalServerErrorException(`Stream error: ${error.message}`));
-        });
-
-        stream.pipe(uploadStream);
-      });
-      
+      // 1. Upload to Cloudinary using base64
+      console.log(`[MediaService] Uploading to Cloudinary via base64...`);
+      const uploadResult = await cloudinary.uploader.upload(
+        `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
+        {
+          folder: 'fwaya-media',
+          resource_type: 'auto',
+          public_id: file.originalname.replace(/\.[^/.]+$/, ""),
+          quality: 'auto',
+        }
+      );
       console.log(`[MediaService] Cloudinary upload success: ${uploadResult.public_id}`);
 
       // 2. Create database record
