@@ -25,7 +25,7 @@ import {UserModule} from './user/user.module';
       useFactory: (config: ConfigService) => ({
         dest: config.get<string>('UPLOAD_DIR', './uploads'),
         limits: {
-          fileSize: config.get<number>('MAX_FILE_SIZE_MB', 25) * 1024 * 1024,
+          fileSize: config.get<number>('MAX_FILE_SIZE_MB', 100) * 1024 * 1024,
         },
       }),
       inject: [ConfigService],
