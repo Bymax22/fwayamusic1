@@ -12,6 +12,7 @@ import {
   Req,
   MaxFileSizeValidator,
   ParseFilePipe,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './media.service';
@@ -33,7 +34,7 @@ export class MediaController {
         validators: [new MaxFileSizeValidator({ maxSize: 25 * 1024 * 1024 })], // 25MB for audio/video
       })
     ) file: Express.Multer.File,
-    @Body() createMediaDto: CreateMediaDto,
+    @Body(new ValidationPipe({ transform: true, skipMissingProperties: true })) createMediaDto: CreateMediaDto,
     @CurrentUser() user: { sub: string }
   ) {
     try {
