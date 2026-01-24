@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Configure body size limit to 100MB
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '100mb',
+    },
+  },
+};
+
 export async function GET(request: NextRequest) {
   try {
     const token = request.headers.get('authorization');
