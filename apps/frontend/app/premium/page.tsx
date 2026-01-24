@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useAuth } from "../context/AuthContext";
 import { Crown, Play, Heart, Download } from 'lucide-react';
 import Image from "next/image";
 import { motion } from 'framer-motion';

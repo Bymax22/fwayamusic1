@@ -1,22 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useAuth } from "../context/AuthContext";
 import { Users, Play, MapPin } from 'lucide-react';
 import Image from "next/image";
 import { motion } from 'framer-motion';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-
-interface Artist {
-  id: number;
-  username?: string;
-  displayName?: string;
-  avatarUrl?: string;
-  artistName?: string;
-  stageName?: string;
-  bio?: string;
-  country?: string;
-  followerCount?: number;
-}
 
 interface MediaFile {
   id: number;

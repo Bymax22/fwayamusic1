@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { motion } from 'framer-motion';
 import Image from "next/image";
-import { useAuth } from "../context/AuthContext";
 import { TrendingUp, Play, Heart, Download } from 'lucide-react';
 
 interface MediaFile {
