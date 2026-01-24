@@ -62,8 +62,11 @@ export class MediaService {
       }
 
       // 1. Upload to Cloudinary using base64 with timeout
-      this.logger.log(`Uploading to Cloudinary...`);
+      this.logger.log(`Starting Cloudinary base64 encoding...`);
+      const startTime = Date.now();
       const base64Data = file.buffer.toString('base64');
+      const encodeTime = Date.now() - startTime;
+      this.logger.log(`Base64 encoding completed in ${encodeTime}ms, uploading to Cloudinary...`);
       
       // Use Promise.race to implement timeout
       const uploadPromise = cloudinary.uploader.upload(
@@ -76,13 +79,17 @@ export class MediaService {
         }
       );
 
-      // 50 second timeout for upload (Vercel limit is 60s, giving 10s buffer for DB operations)
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Cloudinary upload timeout after 50 seconds')), 50000)
+      // 45 second timeout for upload (Vercel limit is 60s, leaving buffer)
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => {
+          const elapsed = Date.now() - startTime;
+          reject(new Error(`Cloudinary upload timeout after ${elapsed}ms (limit: 45s)`));
+        }, 45000)
       );
 
       const uploadResult = await Promise.race([uploadPromise, timeoutPromise]) as UploadApiResponse;
-      this.logger.log(`Cloudinary upload success: ${uploadResult.public_id}`);
+      const totalTime = Date.now() - startTime;
+      this.logger.log(`Cloudinary upload success: ${uploadResult.public_id} (${totalTime}ms total)`);
 
       // 2. Create database record
       const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';
