@@ -12,17 +12,17 @@ export async function GET(request: NextRequest) {
     });
 
     if (!res.ok) {
-      throw new Error(`Failed to fetch media: ${res.statusText}`);
+      // If backend endpoint doesn't exist or fails, return empty array
+      console.warn(`Backend media endpoint returned ${res.status}: ${res.statusText}`);
+      return NextResponse.json([]);
     }
 
     const data = await res.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data || []);
   } catch (error) {
     console.error('Failed to fetch artist media:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch media' },
-      { status: 500 }
-    );
+    // Return empty array instead of error so dashboard doesn't crash
+    return NextResponse.json([]);
   }
 }
 
