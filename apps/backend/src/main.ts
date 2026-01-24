@@ -67,9 +67,14 @@ export default async (req: any, res: any) => {
     if (!app) {
       await initializeApp();
     }
-    return app.getHttpAdapter().getInstance()(req, res);
+    // Get the HTTP adapter and use it to handle the request
+    const httpAdapter = app.getHttpAdapter();
+    return httpAdapter.getInstance()(req, res);
   } catch (error) {
     logger.error('Error handling request:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error', details: error instanceof Error ? error.message : error });
   }
 };
+
+// For local/testing, also export the app initialization
+export { initializeApp };
