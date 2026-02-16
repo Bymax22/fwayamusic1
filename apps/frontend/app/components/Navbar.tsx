@@ -169,6 +169,8 @@ export default function Navbar() {
   const [showInvitePopup, setShowInvitePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [searchResults, setSearchResults] = useState<Array<{id: number; title: string; type: string}>>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -210,7 +212,7 @@ export default function Navbar() {
     return (
       <>
         {/* Guest User Navbar - Bigger Logo with More Features */}
-        <nav className={`fixed top-0 left-0 w-full h-16 transition-all duration-300 z-50 
+        <nav className={`fixed top-0 left-0 w-full h-24 sm:h-16 transition-all duration-300 z-50 
           ${isScrolled ? "bg-[#0a3747] bg-opacity-95 backdrop-blur-lg" : "bg-[#0a3747] bg-opacity-90 backdrop-blur-md"}
           border-b border-[#0a3747]/30 shadow-lg`}
         >
@@ -246,7 +248,10 @@ export default function Navbar() {
                 <form
                         onSubmit={(e) => {
                     e.preventDefault();
-                    if (searchQuery.trim()) router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                    if (searchQuery.trim()) {
+                      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                      setShowSearchResults(false);
+                    }
                   }}
                   className="w-full"
                 >
@@ -254,13 +259,54 @@ export default function Navbar() {
                     <input
                       aria-label="Search"
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        if (e.target.value.trim().length > 0) {
+                          setShowSearchResults(true);
+                          setSearchResults([
+                            { id: 1, title: 'Song: ' + e.target.value, type: 'song' },
+                            { id: 2, title: 'Artist: ' + e.target.value, type: 'artist' },
+                            { id: 3, title: 'Playlist: ' + e.target.value, type: 'playlist' }
+                          ]);
+                        } else {
+                          setShowSearchResults(false);
+                        }
+                      }}
+                      onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
+                      onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
                       className="w-full max-w-none sm:max-w-lg bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 py-6 sm:py-2 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
                     </div>
+                    {/* Search Results Dropdown */}
+                    {showSearchResults && searchResults.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute top-full left-0 right-0 mt-2 bg-[#0a3747] border border-[#0a4a5f] rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto"
+                      >
+                        {searchResults.map((result) => (
+                          <button
+                            key={result.id}
+                            onClick={() => {
+                              setSearchQuery(result.title);
+                              router.push(`/search?q=${encodeURIComponent(result.title)}`);
+                              setShowSearchResults(false);
+                            }}
+                            className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#0a4a5f] transition-colors border-b border-[#0a4a5f] last:border-0"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Search size={14} className="text-gray-400" />
+                              <span>{result.title}</span>
+                              <span className="text-xs text-gray-500 ml-auto">{result.type}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
                   </div>
                 </form>
               </div>
@@ -399,7 +445,7 @@ export default function Navbar() {
   return (
     <>
       {/* Logged-in User Navbar - More Features */}
-      <nav className={`fixed top-0 left-0 w-full h-16 transition-all duration-300 z-50 
+      <nav className={`fixed top-0 left-0 w-full h-24 sm:h-16 transition-all duration-300 z-50 
         ${isScrolled ? "bg-[#0a3747] bg-opacity-95 backdrop-blur-lg" : "bg-[#0a3747] bg-opacity-90 backdrop-blur-md"}
         border-b border-[#0a3747]/30 shadow-lg`}
       >
@@ -467,7 +513,10 @@ export default function Navbar() {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    if (searchQuery.trim()) router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                    if (searchQuery.trim()) {
+                      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                      setShowSearchResults(false);
+                    }
                   }}
                   className="w-full"
                 >
@@ -475,13 +524,54 @@ export default function Navbar() {
                     <input
                       aria-label="Search"
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        if (e.target.value.trim().length > 0) {
+                          setShowSearchResults(true);
+                          setSearchResults([
+                            { id: 1, title: 'Song: ' + e.target.value, type: 'song' },
+                            { id: 2, title: 'Artist: ' + e.target.value, type: 'artist' },
+                            { id: 3, title: 'Playlist: ' + e.target.value, type: 'playlist' }
+                          ]);
+                        } else {
+                          setShowSearchResults(false);
+                        }
+                      }}
+                      onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
+                      onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
                       className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 py-6 sm:py-2 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
                     </div>
+                    {/* Search Results Dropdown */}
+                    {showSearchResults && searchResults.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute top-full left-0 right-0 mt-2 bg-[#0a3747] border border-[#0a4a5f] rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto"
+                      >
+                        {searchResults.map((result) => (
+                          <button
+                            key={result.id}
+                            onClick={() => {
+                              setSearchQuery(result.title);
+                              router.push(`/search?q=${encodeURIComponent(result.title)}`);
+                              setShowSearchResults(false);
+                            }}
+                            className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#0a4a5f] transition-colors border-b border-[#0a4a5f] last:border-0"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Search size={14} className="text-gray-400" />
+                              <span>{result.title}</span>
+                              <span className="text-xs text-gray-500 ml-auto">{result.type}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
                   </div>
                 </form>
               </div>
