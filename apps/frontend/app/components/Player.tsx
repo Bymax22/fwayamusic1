@@ -216,7 +216,7 @@ export default function Player({
   return (
     <AnimatePresence>
       <motion.div
-        className={`fixed bottom-0 left-0 right-0 z-50 ${
+        className={`fixed left-0 right-0 z-50 ${
           isExpanded ? "h-[60vh]" : "h-24" // Increased from h-20 to h-24 for better mobile visibility
         } bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg ${
           className || ""
@@ -225,6 +225,7 @@ export default function Player({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
+        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
       >
         {/* Compact Player Header */}
         <div className="flex items-center justify-between p-2 border-b border-white/10">
