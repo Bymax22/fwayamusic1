@@ -255,8 +255,8 @@ export default function Navbar() {
                       aria-label="Search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search songs, artists, playlists..."
-                            className="w-full max-w-none sm:max-w-lg bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-12 sm:pl-10 pr-4 py-2 border border-[#0a3747] text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base focus:outline-none focus:ring-0"
+                      placeholder="Search music..."
+                      className="w-full max-w-none sm:max-w-lg bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-12 sm:pl-10 pr-4 py-3 sm:py-2 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
@@ -368,7 +368,7 @@ export default function Navbar() {
                         aria-label="Search"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search songs, artists, playlists..."
+                        placeholder="Search music..."
                         className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-12 sm:pl-10 pr-4 py-2 border border-[#0a3747] text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base focus:outline-none focus:ring-0"
                       />
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
@@ -476,7 +476,7 @@ export default function Navbar() {
                       aria-label="Search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search songs, artists, playlists..."
+                      placeholder="Search music..."
                         className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-12 sm:pl-10 pr-4 py-2 border border-[#0a3747] text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base focus:outline-none focus:ring-0"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
