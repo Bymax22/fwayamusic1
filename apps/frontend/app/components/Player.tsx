@@ -11,7 +11,6 @@ import {
   SpeakerXMarkIcon,
   ArrowsPointingOutIcon,
   ArrowsPointingInIcon,
-  HeartIcon,
   XMarkIcon,
   ClockIcon,
 } from "@heroicons/react/24/solid";
