@@ -294,11 +294,11 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
                   )}
                   
                   <main
-                    className={`main-content flex-1 overflow-y-auto transition-all duration-300 ease-in-out pb-16 ${
+                    className={`main-content flex-1 overflow-y-auto transition-all duration-300 ease-in-out ${
                       showSidebar ? (sidebarExpanded ? "ml-56" : "ml-14") : "no-sidebar"
                     }`}
                     style={{ 
-                      paddingBottom: currentTrack ? '4.5rem' : '3.5rem',
+                      paddingBottom: currentTrack ? '1.5rem' : '3.5rem',
                       transition: 'padding-bottom 0.3s ease'
                     }}
                   >

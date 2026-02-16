@@ -225,13 +225,13 @@ export default function Player({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
-        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px))' }}
+        style={{ bottom: 'max(env(safe-area-inset-bottom, 0px), 3.5rem)' }}
       >
         {/* Compact Player Header - Minimal height */}
         <div className="flex items-center justify-between py-0.5 px-2 border-b border-white/10">
           <div className="flex items-center space-x-1.5">
             <div className="relative">
-              <MusicalNoteIcon className="w-3 h-3 text-[#e51f48]" />
+              <MusicalNoteIcon className="w-4 h-4 text-[#e51f48]" />
               {isPlaying && (
                 <motion.div
                   className="absolute -top-0.5 -right-0.5 w-0.5 h-0.5 bg-[#e51f48] rounded-full"
