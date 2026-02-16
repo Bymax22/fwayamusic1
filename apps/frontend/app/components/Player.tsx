@@ -240,7 +240,7 @@ export default function Player({
                 />
               )}
             </div>
-            <span className=\"text-xs font-medium text-white hidden sm:inline\">Now Playing</span>
+            <span className="text-xs font-medium text-white hidden sm:inline">Now Playing</span>
           </div>
 
           <div className="flex items-center space-x-0.5">
