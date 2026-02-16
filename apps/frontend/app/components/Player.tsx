@@ -54,11 +54,95 @@ export default function Player({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [equalizerPreset, setEqualizerPreset] = useState("default");
   const [isLoading, setIsLoading] = useState(false);
+  const [waveformData, setWaveformData] = useState<number[]>([]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const animationRef = useRef<number | null>(null);
 
-  // Audio initialization (keep your existing useEffect)
+  // Initialize audio context for waveform analysis
+  const initAudioContext = () => {
+    if (audioContextRef.current || !audioRef.current) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as unknown as Record<string, unknown>).webkitAudioContext as typeof window.AudioContext;
+      const context = new AudioContextClass();
+      const analyser = context.createAnalyser();
+      analyser.fftSize = 256;
+      
+      const source = context.createMediaElementSource(audioRef.current);
+      source.connect(analyser);
+      analyser.connect(context.destination);
+      
+      audioContextRef.current = context;
+      analyserRef.current = analyser;
+      sourceRef.current = source;
+    } catch (err) {
+      console.error('Failed to initialize audio context:', err);
+    }
+  };
+
+  // Draw waveform on canvas
+  const drawWaveform = () => {
+    const canvas = canvasRef.current;
+    const analyser = analyserRef.current;
+    if (!canvas || !analyser) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    analyser.getByteFrequencyData(dataArray);
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const barWidth = width / bufferLength * 2.5;
+    let barHeight: number;
+    let x = 0;
+
+    ctx.fillStyle = 'rgba(10, 23, 29, 1)';
+    ctx.fillRect(0, 0, width, height);
+
+    for (let i = 0; i < bufferLength; i++) {
+      barHeight = (dataArray[i] / 255) * height * 0.8;
+      
+      const hue = (i / bufferLength * 360);
+      ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+      ctx.fillRect(x, height - barHeight, barWidth, barHeight);
+      
+      x += barWidth + 1;
+    }
+
+    animationRef.current = requestAnimationFrame(drawWaveform);
+  };
+
+  // Start/stop waveform animation
+  useEffect(() => {
+    if (isPlaying && audioContextRef.current?.state === 'suspended') {
+      audioContextRef.current.resume();
+    }
+    if (isPlaying && analyserRef.current) {
+      drawWaveform();
+    } else if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isPlaying]);
+
+  // Initialize audio context on first play
+  useEffect(() => {
+    if (isPlaying && !audioContextRef.current) {
+      initAudioContext();
+    }
+  }, [isPlaying]);
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
@@ -331,15 +415,14 @@ export default function Player({
 
           {/* Compact Player Controls */}
           <div className={`${isExpanded ? "mt-auto" : "flex-1 flex flex-col justify-center"}`}>
-            {/* Compact Progress Bar */}
+            {/* Waveform Progress Visualization */}
             <div className={`relative ${isExpanded ? "my-3" : "my-1 w-full"}`} onClick={handleSeek}>
-              <div className="h-1 bg-white/10 rounded-full w-full cursor-pointer">
-                <div 
-                  ref={progressBarRef} 
-                  className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full transition-all duration-100" 
-                  style={{ width: `${progressPercentage}%` }} 
-                />
-              </div>
+              <canvas
+                ref={canvasRef}
+                width={300}
+                height={40}
+                className="w-full h-10 bg-white/5 rounded-lg cursor-pointer border border-white/10 hover:border-white/20 transition-colors"
+              />
               <div className="flex justify-between text-xs text-gray-400 mt-0.5 mobile-text-xs">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)}</span>
