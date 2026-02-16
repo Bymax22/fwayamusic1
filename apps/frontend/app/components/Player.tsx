@@ -508,15 +508,6 @@ export default function Player({
                 <h3 className={`${isExpanded ? "text-2xl" : "text-base"} font-bold text-white truncate tracking-tight`}>
                   {track.title || "Unknown Title"}
                 </h3>
-                {isLiked && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="ml-2"
-                  >
-                    <HeartIcon className="w-5 h-5 text-[#e51f48]" />
-                  </motion.div>
-                )}
               </div>
               <p className={`${isExpanded ? "text-base" : "text-sm"} text-gray-300/90 truncate`}>
                 {track.artist || "Unknown Artist"}
