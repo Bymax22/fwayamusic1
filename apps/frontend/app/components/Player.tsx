@@ -52,144 +52,10 @@ export default function Player({
   const [isLiked, setIsLiked] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [equalizerPreset, setEqualizerPreset] = useState("default");
   const [isLoading, setIsLoading] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
-  const animationRef = useRef<number | null>(null);
-  const bassFilterRef = useRef<BiquadFilterNode | null>(null);
-  const midFilterRef = useRef<BiquadFilterNode | null>(null);
-  const trebleFilterRef = useRef<BiquadFilterNode | null>(null);
-
-  // Equalizer presets
-  const EQ_PRESETS: Record<string, { bass: number; mid: number; treble: number }> = {
-    default: { bass: 0, mid: 0, treble: 0 },
-    pop: { bass: 2, mid: 3, treble: 4 },
-    rock: { bass: 5, mid: 2, treble: 3 },
-    jazz: { bass: 1, mid: 4, treble: 5 },
-    classical: { bass: 0, mid: 2, treble: 6 },
-    bassBoost: { bass: 8, mid: 1, treble: 0 },
-  };
-
-  // Initialize audio context for waveform analysis and equalizer
-  const initAudioContext = () => {
-    if (audioContextRef.current || !audioRef.current) return;
-    try {
-      const AudioContextClass = window.AudioContext || (window as unknown as Record<string, unknown>).webkitAudioContext as typeof window.AudioContext;
-      const context = new AudioContextClass();
-      const analyser = context.createAnalyser();
-      analyser.fftSize = 256;
-      
-      // Create equalizer filters
-      const bass = context.createBiquadFilter();
-      bass.type = 'lowshelf';
-      bass.frequency.value = 200;
-      bass.gain.value = 0;
-      
-      const mid = context.createBiquadFilter();
-      mid.type = 'peaking';
-      mid.frequency.value = 1000;
-      mid.Q.value = 1;
-      mid.gain.value = 0;
-      
-      const treble = context.createBiquadFilter();
-      treble.type = 'highshelf';
-      treble.frequency.value = 4000;
-      treble.gain.value = 0;
-      
-      const source = context.createMediaElementSource(audioRef.current);
-      
-      // Connect: source -> bass -> mid -> treble -> analyser -> destination
-      source.connect(bass);
-      bass.connect(mid);
-      mid.connect(treble);
-      treble.connect(analyser);
-      analyser.connect(context.destination);
-      
-      audioContextRef.current = context;
-      analyserRef.current = analyser;
-      sourceRef.current = source;
-      bassFilterRef.current = bass;
-      midFilterRef.current = mid;
-      trebleFilterRef.current = treble;
-    } catch (err) {
-      console.error('Failed to initialize audio context:', err);
-    }
-  };
-
-  // Apply equalizer preset
-  useEffect(() => {
-    if (!bassFilterRef.current || !midFilterRef.current || !trebleFilterRef.current) return;
-    
-    const preset = EQ_PRESETS[equalizerPreset] || EQ_PRESETS.default;
-    bassFilterRef.current.gain.value = preset.bass;
-    midFilterRef.current.gain.value = preset.mid;
-    trebleFilterRef.current.gain.value = preset.treble;
-  }, [equalizerPreset]);
-
-  // Draw waveform on canvas
-  const drawWaveform = useCallback(() => {
-    const canvas = canvasRef.current;
-    const analyser = analyserRef.current;
-    if (!canvas || !analyser) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-    analyser.getByteFrequencyData(dataArray);
-
-    const width = canvas.width;
-    const height = canvas.height;
-    const barWidth = width / bufferLength * 2.5;
-    let barHeight: number;
-    let x = 0;
-
-    ctx.fillStyle = 'rgba(10, 23, 29, 1)';
-    ctx.fillRect(0, 0, width, height);
-
-    for (let i = 0; i < bufferLength; i++) {
-      barHeight = (dataArray[i] / 255) * height * 0.8;
-      
-      const hue = (i / bufferLength * 360);
-      ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-      ctx.fillRect(x, height - barHeight, barWidth, barHeight);
-      
-      x += barWidth + 1;
-    }
-
-    animationRef.current = requestAnimationFrame(drawWaveform);
-  }, []);
-
-  // Start/stop waveform animation
-  useEffect(() => {
-    if (isPlaying && audioContextRef.current?.state === 'suspended') {
-      audioContextRef.current.resume();
-    }
-    if (isPlaying && analyserRef.current) {
-      drawWaveform();
-    } else if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [isPlaying, drawWaveform]);
-
-  // Initialize audio context on first play
-  useEffect(() => {
-    if (isPlaying && !audioContextRef.current) {
-      initAudioContext();
-    }
-  }, [isPlaying]);
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
@@ -354,7 +220,7 @@ export default function Player({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
-        style={{ bottom: 'max(env(safe-area-inset-bottom, 0px), 3.5rem)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        style={{ bottom: 'max(env(safe-area-inset-bottom, 0px), 3.5rem)' }}
       >
         {/* Compact Player Header - Minimal height */}
         <div className="flex items-center justify-between py-0.5 px-2 border-b border-white/10">
@@ -460,14 +326,15 @@ export default function Player({
 
           {/* Compact Player Controls */}
           <div className={`${isExpanded ? "mt-auto" : "flex-1 flex flex-col justify-center"}`}>
-            {/* Waveform Progress Visualization */}
+            {/* Compact Progress Bar */}
             <div className={`relative ${isExpanded ? "my-3" : "my-1 w-full"}`} onClick={handleSeek}>
-              <canvas
-                ref={canvasRef}
-                width={300}
-                height={40}
-                className="w-full h-10 bg-white/5 rounded-lg cursor-pointer border border-white/10 hover:border-white/20 transition-colors"
-              />
+              <div className="h-1 bg-white/10 rounded-full w-full cursor-pointer">
+                <div 
+                  ref={progressBarRef} 
+                  className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full transition-all duration-100" 
+                  style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }} 
+                />
+              </div>
               <div className="flex justify-between text-xs text-gray-400 mt-0.5 mobile-text-xs">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)}</span>
@@ -542,32 +409,14 @@ export default function Player({
 
             {/* Compact Expanded View Controls */}
             {isExpanded && (
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div>
-                  <h4 className="text-xs font-medium text-gray-300 mb-1 mobile-text-xs">Playback Speed</h4>
-                  <button 
-                    onClick={changePlaybackRate} 
-                    className="px-2 py-1 bg-white/10 rounded-full text-xs hover:bg-white/20 transition-colors touch-target mobile-text-xs"
-                  >
-                    {playbackRate}x
-                  </button>
-                </div>
-
-                <div>
-                  <h4 className="text-xs font-medium text-gray-300 mb-1 mobile-text-xs">Equalizer</h4>
-                  <select 
-                    value={equalizerPreset} 
-                    onChange={(e) => setEqualizerPreset(e.target.value)} 
-                    className="px-2 py-1 bg-white/10 rounded-full text-xs hover:bg-white/20 w-full transition-colors mobile-text-xs"
-                  >
-                    <option value="default">Default</option>
-                    <option value="pop">Pop</option>
-                    <option value="rock">Rock</option>
-                    <option value="jazz">Jazz</option>
-                    <option value="classical">Classical</option>
-                    <option value="bassBoost">Bass Boost</option>
-                  </select>
-                </div>
+              <div className="mt-4">
+                <h4 className="text-xs font-medium text-gray-300 mb-2 mobile-text-xs">Playback Speed</h4>
+                <button 
+                  onClick={changePlaybackRate} 
+                  className="px-3 py-2 bg-white/10 rounded-full text-xs hover:bg-white/20 transition-colors touch-target mobile-text-xs"
+                >
+                  {playbackRate}x
+                </button>
               </div>
             )}
           </div>
