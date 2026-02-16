@@ -242,7 +242,7 @@ export default function Navbar() {
 
             {/* Middle Section - Search (desktop) */}
             <div className="flex-1 max-w-lg mx-6">
-              <div className="hidden sm:flex items-center w-full justify-center">
+              <div className="flex items-center w-full justify-center">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -264,8 +264,7 @@ export default function Navbar() {
                   </div>
                 </form>
               </div>
-              {/* Mobile: keep spacing so right icons align*/}
-              <div className="sm:hidden flex-1" />
+              {/* Mobile: spacing handled by input */}
             </div>
 
             {/* Right Section - Guest Features */}
@@ -317,19 +316,19 @@ export default function Navbar() {
                       onClick={() => router.push('/browse')}
                     />
                     
-                    {/* Search Icon */}
-                    <Search 
-                      size={22} 
-                      className="text-white hover:scale-110 transition-transform cursor-pointer"
-                      onClick={() => setShowMobileSearch(true)}
-                    />
-                    
-                    {/* Earn Icon */}
-                    <Coins 
-                      size={22} 
-                      className="text-green-500 hover:scale-110 transition-transform cursor-pointer"
-                      onClick={() => router.push('/auth/signin?role=RESELLER')}
-                    />
+                    {/* Search & Earn hidden on small screens (space given to input) */}
+                    <div className="hidden sm:flex items-center gap-3">
+                      <Search 
+                        size={22} 
+                        className="text-white hover:scale-110 transition-transform cursor-pointer"
+                        onClick={() => setShowMobileSearch(true)}
+                      />
+                      <Coins 
+                        size={22} 
+                        className="text-green-500 hover:scale-110 transition-transform cursor-pointer"
+                        onClick={() => router.push('/auth/signin?role=RESELLER')}
+                      />
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -464,8 +463,29 @@ export default function Navbar() {
                 </button>
               </div>
 
-              {/* Search removed: reserved spacing left */}
-              <div className="flex-1 max-w-xs" />
+              {/* Search (visible on mobile and desktop) */}
+              <div className="flex-1 max-w-xs">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (searchQuery.trim()) router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                  }}
+                  className="w-full"
+                >
+                  <div className="relative">
+                    <input
+                      aria-label="Search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search songs, artists, playlists..."
+                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none"
+                    />
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
+                      <Search size={16} />
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
 
@@ -510,13 +530,6 @@ export default function Navbar() {
 
             {/* Mobile Icons - Premium, Notifications, Account (Visible on mobile) */}
             <div className="flex md:hidden items-center gap-0.5"> {/* Reduced gap from gap-2 to gap-0.5 */}
-              {/* Mobile Search Icon */}
-              <button
-                onClick={() => setShowMobileSearch(true)}
-                className="p-2.5 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group"
-              >
-                <Search size={20} className="group-hover:scale-110 transition-transform" />
-              </button>
               {/* Premium Icon */}
               <button className="p-2.5 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
                 <Crown size={22} className="text-amber-400 group-hover:scale-110 transition-transform" />
