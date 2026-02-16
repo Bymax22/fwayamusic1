@@ -36,7 +36,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     const waitForUser = async (timeout = 3000) => {
       const start = Date.now();
       while (!user && Date.now() - start < timeout) {
-        // eslint-disable-next-line no-await-in-loop
         await new Promise((r) => setTimeout(r, 100));
       }
       return user;

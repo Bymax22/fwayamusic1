@@ -12,12 +12,9 @@ import {
   ArrowsPointingOutIcon,
   ArrowsPointingInIcon,
   HeartIcon,
-  QueueListIcon,
-  MusicalNoteIcon,
   XMarkIcon,
   ClockIcon,
 } from "@heroicons/react/24/solid";
-import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 
 type TrackType = {
   id: string | number;
@@ -61,14 +58,12 @@ export default function Player({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [equalizerPreset, setEqualizerPreset] = useState("default");
   const [isLoading, setIsLoading] = useState(false);
   const [audioQuality, setAudioQuality] = useState<"low" | "medium" | "high" | "lossless">("high");
   const [showQualityMenu, setShowQualityMenu] = useState(false);
-  const [waveformData, setWaveformData] = useState<number[]>([]);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [gainNode, setGainNode] = useState<GainNode | null>(null);
@@ -80,7 +75,7 @@ export default function Player({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
 
   // Initialize Audio Context and EQ filters
@@ -89,7 +84,7 @@ export default function Player({
 
     try {
       // Create audio context with high quality
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContextClass = window.AudioContext || (window as unknown as Record<string, unknown>).webkitAudioContext as typeof window.AudioContext;
       const context = new AudioContextClass({
         latencyHint: 'playback',
         sampleRate: audioQuality === 'lossless' ? 96000 : 48000,
@@ -327,7 +322,7 @@ export default function Player({
         audioContext.resume();
       }
       
-      audio.play().catch((err) => {
+      audio.play().catch((err: Error) => {
         console.warn("Audio play() failed:", err);
         setIsLoading(false);
       });
@@ -338,7 +333,7 @@ export default function Player({
         audioContext.suspend();
       }
     }
-  }, [track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping, audioQuality, gainNode, audioContext]);
+  }, [track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping, audioQuality, gainNode, audioContext, onPlayPause, initAudioContext, isAudioContextInitialized]);
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     const audio = audioRef.current;
@@ -713,7 +708,7 @@ export default function Player({
                         <button
                           key={option.value}
                           onClick={() => {
-                            setAudioQuality(option.value as any);
+                            setAudioQuality(option.value as "low" | "medium" | "high" | "lossless");
                             setShowQualityMenu(false);
                           }}
                           className={`w-full px-3 py-2 text-left text-sm hover:bg-white/10 transition-colors ${

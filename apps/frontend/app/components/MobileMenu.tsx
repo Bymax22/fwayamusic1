@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable */
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings } from "lucide-react";
