@@ -235,20 +235,20 @@ export default function Navbar() {
                   <span className="text-lg font-bold text-white">
                     Fwaya<span className="text-[#e51f48]"></span>
                   </span>
-                  <span className="text-xs text-gray-400 -mt-0.5">Stream & Discover</span>
+                  <span className="text-xs text-gray-400 -mt-0.5">Discover</span>
                 </div>
               </Link>
             </div>
 
-            {/* Middle Section - Search (desktop) */}
-            <div className="flex-1 max-w-lg mx-6">
+            {/* Middle Section - Search (desktop + mobile) */}
+            <div className="flex-1 mx-6">
               <div className="flex items-center w-full justify-center">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     if (searchQuery.trim()) router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
                   }}
-                  className="w-full max-w-lg"
+                  className="w-full"
                 >
                   <div className="relative">
                     <input
@@ -256,7 +256,7 @@ export default function Navbar() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search songs, artists, playlists..."
-                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none focus:ring-2 focus:ring-[#e51f48]/40"
+                      className="w-full max-w-none sm:max-w-lg bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none focus:ring-0"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
@@ -264,7 +264,6 @@ export default function Navbar() {
                   </div>
                 </form>
               </div>
-              {/* Mobile: spacing handled by input */}
             </div>
 
             {/* Right Section - Guest Features */}
@@ -370,7 +369,7 @@ export default function Navbar() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search songs, artists, playlists..."
-                        className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none"
+                        className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none focus:ring-0"
                       />
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                         <Search size={16} />
@@ -464,7 +463,7 @@ export default function Navbar() {
               </div>
 
               {/* Search (visible on mobile and desktop) */}
-              <div className="flex-1 max-w-xs">
+              <div className="flex-1 max-w-none md:max-w-xs lg:max-w-2xl">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -478,7 +477,7 @@ export default function Navbar() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search songs, artists, playlists..."
-                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none"
+                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none focus:ring-0"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
