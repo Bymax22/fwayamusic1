@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlayIcon,
@@ -54,7 +54,6 @@ export default function Player({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [equalizerPreset, setEqualizerPreset] = useState("default");
   const [isLoading, setIsLoading] = useState(false);
-  const [waveformData, setWaveformData] = useState<number[]>([]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
@@ -63,8 +62,21 @@ export default function Player({
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const animationRef = useRef<number | null>(null);
+  const bassFilterRef = useRef<BiquadFilterNode | null>(null);
+  const midFilterRef = useRef<BiquadFilterNode | null>(null);
+  const trebleFilterRef = useRef<BiquadFilterNode | null>(null);
 
-  // Initialize audio context for waveform analysis
+  // Equalizer presets
+  const EQ_PRESETS: Record<string, { bass: number; mid: number; treble: number }> = {
+    default: { bass: 0, mid: 0, treble: 0 },
+    pop: { bass: 2, mid: 3, treble: 4 },
+    rock: { bass: 5, mid: 2, treble: 3 },
+    jazz: { bass: 1, mid: 4, treble: 5 },
+    classical: { bass: 0, mid: 2, treble: 6 },
+    bassBoost: { bass: 8, mid: 1, treble: 0 },
+  };
+
+  // Initialize audio context for waveform analysis and equalizer
   const initAudioContext = () => {
     if (audioContextRef.current || !audioRef.current) return;
     try {
@@ -73,20 +85,55 @@ export default function Player({
       const analyser = context.createAnalyser();
       analyser.fftSize = 256;
       
+      // Create equalizer filters
+      const bass = context.createBiquadFilter();
+      bass.type = 'lowshelf';
+      bass.frequency.value = 200;
+      bass.gain.value = 0;
+      
+      const mid = context.createBiquadFilter();
+      mid.type = 'peaking';
+      mid.frequency.value = 1000;
+      mid.Q.value = 1;
+      mid.gain.value = 0;
+      
+      const treble = context.createBiquadFilter();
+      treble.type = 'highshelf';
+      treble.frequency.value = 4000;
+      treble.gain.value = 0;
+      
       const source = context.createMediaElementSource(audioRef.current);
-      source.connect(analyser);
+      
+      // Connect: source -> bass -> mid -> treble -> analyser -> destination
+      source.connect(bass);
+      bass.connect(mid);
+      mid.connect(treble);
+      treble.connect(analyser);
       analyser.connect(context.destination);
       
       audioContextRef.current = context;
       analyserRef.current = analyser;
       sourceRef.current = source;
+      bassFilterRef.current = bass;
+      midFilterRef.current = mid;
+      trebleFilterRef.current = treble;
     } catch (err) {
       console.error('Failed to initialize audio context:', err);
     }
   };
 
+  // Apply equalizer preset
+  useEffect(() => {
+    if (!bassFilterRef.current || !midFilterRef.current || !trebleFilterRef.current) return;
+    
+    const preset = EQ_PRESETS[equalizerPreset] || EQ_PRESETS.default;
+    bassFilterRef.current.gain.value = preset.bass;
+    midFilterRef.current.gain.value = preset.mid;
+    trebleFilterRef.current.gain.value = preset.treble;
+  }, [equalizerPreset]);
+
   // Draw waveform on canvas
-  const drawWaveform = () => {
+  const drawWaveform = useCallback(() => {
     const canvas = canvasRef.current;
     const analyser = analyserRef.current;
     if (!canvas || !analyser) return;
@@ -118,7 +165,7 @@ export default function Player({
     }
 
     animationRef.current = requestAnimationFrame(drawWaveform);
-  };
+  }, []);
 
   // Start/stop waveform animation
   useEffect(() => {
@@ -135,7 +182,7 @@ export default function Player({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying]);
+  }, [isPlaying, drawWaveform]);
 
   // Initialize audio context on first play
   useEffect(() => {
@@ -231,7 +278,7 @@ export default function Player({
     } else {
       audio.pause();
     }
-  }, [track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping]);
+  }, [track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping, onPlayPause]);
 
   // Rest of your existing functions (handleSeek, handleVolumeChange, etc.)
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -295,8 +342,6 @@ export default function Player({
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
-
   return (
     <AnimatePresence>
       <motion.div
@@ -309,7 +354,7 @@ export default function Player({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
-        style={{ bottom: 'max(env(safe-area-inset-bottom, 0px), 3.5rem)' }}
+        style={{ bottom: 'max(env(safe-area-inset-bottom, 0px), 3.5rem)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         {/* Compact Player Header - Minimal height */}
         <div className="flex items-center justify-between py-0.5 px-2 border-b border-white/10">
