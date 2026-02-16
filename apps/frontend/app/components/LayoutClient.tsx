@@ -303,7 +303,7 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
                   </header>
                   
                   {/* Main content area */}
-                  <div className="flex flex-1 pt-16"> {/* Navbar is fixed, add padding for navbar height */}
+                  <div className="flex flex-1"> {/* Navbar is fixed; spacing handled by .main-content margin-top */}
                     {user && (
                       <SidebarWithAuth sidebarExpanded={sidebarExpanded} />
                     )}
