@@ -187,7 +187,7 @@ const SidebarWithAuth = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
   return (
     <aside
       id="sidebar"
-      className={`sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] z-40 transition-all duration-300 ease-in-out ${sidebarExpanded ? "w-56" : "w-14"}`}
+      className={`sidebar fixed top-20 sm:top-16 left-0 h-[calc(100vh-5rem)] sm:h-[calc(100vh-4rem)] z-40 transition-all duration-300 ease-in-out ${sidebarExpanded ? "w-56" : "w-14"}`}
       style={{ display: sidebarExpanded ? undefined : "none" }}
     >
       <div className="flex items-center gap-2 p-3 border-b border-white/10">
@@ -298,12 +298,12 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
                   <div style={{ backgroundColor: "rgb(var(--primary-accent))" }} className="w-full h-0.5 z-[9999]"></div>
                   
                   {/* Compact Navbar */}
-                  <header className="fixed top-0 left-0 right-0 h-16 z-50">
+                  <header className="fixed top-0 left-0 right-0 h-20 sm:h-16 z-50">
                     <Navbar />
                   </header>
                   
                   {/* Main content area */}
-                  <div className="flex flex-1 pt-16"> {/* Navbar is fixed, add padding for navbar height */}
+                  <div className="flex flex-1 pt-20 sm:pt-16"> {/* Navbar is fixed, add padding for navbar height */}
                     {user && (
                       <SidebarWithAuth sidebarExpanded={sidebarExpanded} />
                     )}
