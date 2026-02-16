@@ -244,7 +244,7 @@ export default function Navbar() {
             <div className="flex-1 mx-6">
               <div className="flex items-center w-full justify-center">
                 <form
-                  onSubmit={(e) => {
+                        onSubmit={(e) => {
                     e.preventDefault();
                     if (searchQuery.trim()) router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
                   }}
@@ -256,7 +256,7 @@ export default function Navbar() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search songs, artists, playlists..."
-                      className="w-full max-w-none sm:max-w-lg bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none focus:ring-0"
+                            className="w-full max-w-none sm:max-w-lg bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-12 sm:pl-10 pr-4 py-2 border border-[#0a3747] text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base focus:outline-none focus:ring-0"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
@@ -369,7 +369,7 @@ export default function Navbar() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search songs, artists, playlists..."
-                        className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none focus:ring-0"
+                        className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-12 sm:pl-10 pr-4 py-2 border border-[#0a3747] text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base focus:outline-none focus:ring-0"
                       />
                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                         <Search size={16} />
@@ -477,7 +477,7 @@ export default function Navbar() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search songs, artists, playlists..."
-                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none focus:ring-0"
+                        className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-12 sm:pl-10 pr-4 py-2 border border-[#0a3747] text-sm sm:text-base placeholder:text-sm sm:placeholder:text-base focus:outline-none focus:ring-0"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
