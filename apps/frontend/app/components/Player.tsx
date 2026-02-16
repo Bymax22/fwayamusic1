@@ -217,7 +217,7 @@ export default function Player({
     <AnimatePresence>
       <motion.div
         className={`fixed left-0 right-0 z-50 ${
-          isExpanded ? "h-[60vh]" : "h-20"
+          isExpanded ? "h-[60vh]" : "h-24"
         } bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg ${
           className || ""
         }`}
@@ -228,10 +228,10 @@ export default function Player({
         style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px))' }}
       >
         {/* Compact Player Header - Minimal height */}
-        <div className="flex items-center justify-between py-0.5 px-2 border-b border-white/10 h-auto min-h-0">
-          <div className="flex items-center space-x-1">
+        <div className="flex items-center justify-between py-0.5 px-2 border-b border-white/10">
+          <div className="flex items-center space-x-1.5">
             <div className="relative">
-              <MusicalNoteIcon className="w-2.5 h-2.5 text-[#e51f48]" />
+              <MusicalNoteIcon className="w-3 h-3 text-[#e51f48]" />
               {isPlaying && (
                 <motion.div
                   className="absolute -top-0.5 -right-0.5 w-0.5 h-0.5 bg-[#e51f48] rounded-full"
@@ -240,7 +240,7 @@ export default function Player({
                 />
               )}
             </div>
-            <span className="text-xs font-medium text-white hidden sm:inline">Now Playing</span>
+            <span className="text-xs font-medium text-white">Now Playing</span>
           </div>
 
           <div className="flex items-center space-x-0.5">
@@ -250,9 +250,9 @@ export default function Player({
               aria-label={isExpanded ? "Minimize player" : "Expand player"}
             >
               {isExpanded ? (
-                <ArrowsPointingInIcon className="w-2.5 h-2.5 text-white" />
+                <ArrowsPointingInIcon className="w-3 h-3 text-white" />
               ) : (
-                <ArrowsPointingOutIcon className="w-2.5 h-2.5 text-white" />
+                <ArrowsPointingOutIcon className="w-3 h-3 text-white" />
               )}
             </button>
             <button
@@ -260,14 +260,14 @@ export default function Player({
               className="p-0.5 rounded-full hover:bg-white/10 transition-colors touch-target"
               aria-label="Close player"
             >
-              <XMarkIcon className="w-2.5 h-2.5 text-white" />
+              <XMarkIcon className="w-3 h-3 text-white" />
             </button>
           </div>
         </div>
 
         {/* Compact Player Content */}
         <div
-          className={`flex ${isExpanded ? "flex-col h-[calc(100%-1rem)]" : "flex-row h-[calc(100%-1rem)]"} p-2 overflow-y-auto`}
+          className={`flex ${isExpanded ? "flex-col h-[calc(100%-1.5rem)]" : "flex-row h-[calc(100%-1.5rem)]"} p-2 overflow-y-auto`}
         >
           {/* Compact Track Info */}
           <div className={`flex items-center ${isExpanded ? "mb-4" : "flex-1 min-w-0"}`}>
