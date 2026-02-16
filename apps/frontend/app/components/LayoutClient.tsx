@@ -274,88 +274,72 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <html lang="en" suppressHydrationWarning>
-          <head>
-            <title>FwayaMusic | Modern Music Experience</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <meta name="description" content="Discover and stream your favorite music" />
-            <link rel="icon" href="/Fwaya Innovations icon 1-01.png" />
-            {nonce && (
-              <script
-                nonce={nonce}
-                dangerouslySetInnerHTML={{
-                  __html: `console.log("Secure script execution enabled");`,
-                }}
-              />
-            )}
-          </head>
-          <body className="bg-background text-foreground antialiased">
-            <HolographicPreloader />
-            <PaymentProvider>
-              <AuthWrapper>
-                <div className="flex flex-col h-screen">
-                  {/* Top Accent Bar - Made thinner */}
-                  <div style={{ backgroundColor: "rgb(var(--primary-accent))" }} className="w-full h-0.5 z-[9999]"></div>
-                  
-                  {/* Compact Navbar */}
-                  <header className="fixed top-0 left-0 right-0 h-16 z-50">
-                    <Navbar />
-                  </header>
-                  
-                  {/* Main content area */}
-                  <div className="flex flex-1"> {/* Navbar is fixed; spacing handled by .main-content margin-top */}
-                    {user && (
-                      <SidebarWithAuth sidebarExpanded={sidebarExpanded} />
-                    )}
-                    
-                    <main
-                      className={`main-content flex-1 overflow-y-auto transition-all duration-300 ease-in-out pb-16 ${
-                        showSidebar ? (sidebarExpanded ? "ml-56" : "ml-14") : "no-sidebar"
-                      }`}
-                      style={{ 
-                        paddingBottom: currentTrack ? '4.5rem' : '3.5rem',
-                        transition: 'padding-bottom 0.3s ease'
-                      }}
-                    >
-                      {children}
-                    </main>
-                  </div>
-
-                  {/* Bottom Navigation - Auto-hides when player opens */}
-                  <BottomNav 
-                    isVisible={!currentTrack}
-                    onMenuOpen={handleMobileMenuOpen}
-                  />
-
-                  {/* Mobile Menu - Beautiful glassmorphic popup */}
-                  <MobileMenu 
-                    isOpen={isMobileMenuOpen}
-                    onClose={handleMobileMenuClose}
-                  />
-
-                  {/* Player - Now with auto-hide functionality */}
-                  {currentTrack && (
-                    <Player
-                      track={{
-                        id: currentTrack.id,
-                        title: currentTrack.title,
-                        artist: currentTrack.artist,
-                        imageUrl: currentTrack.imageUrl || currentTrack.coverArt,
-                        audioUrl: currentTrack.audioUrl || currentTrack.url,
-                        duration: currentTrack.duration
-                      }}
-                      isPlaying={isPlaying}
-                      onPlayPause={togglePlay}
-                      onClose={() => {
-                        setCurrentTrack(null);
-                      }}
-                    />
+        <div className="bg-background text-foreground antialiased">
+          <HolographicPreloader />
+          <PaymentProvider>
+            <AuthWrapper>
+              <div className="flex flex-col h-screen">
+                {/* Top Accent Bar - Made thinner */}
+                <div style={{ backgroundColor: "rgb(var(--primary-accent))" }} className="w-full h-0.5 z-[9999]"></div>
+                
+                {/* Compact Navbar */}
+                <header className="fixed top-0 left-0 right-0 h-16 z-50">
+                  <Navbar />
+                </header>
+                
+                {/* Main content area */}
+                <div className="flex flex-1"> {/* Navbar is fixed; spacing handled by .main-content margin-top */}
+                  {user && (
+                    <SidebarWithAuth sidebarExpanded={sidebarExpanded} />
                   )}
+                  
+                  <main
+                    className={`main-content flex-1 overflow-y-auto transition-all duration-300 ease-in-out pb-16 ${
+                      showSidebar ? (sidebarExpanded ? "ml-56" : "ml-14") : "no-sidebar"
+                    }`}
+                    style={{ 
+                      paddingBottom: currentTrack ? '4.5rem' : '3.5rem',
+                      transition: 'padding-bottom 0.3s ease'
+                    }}
+                  >
+                    {children}
+                  </main>
                 </div>
-              </AuthWrapper>
-            </PaymentProvider>
-          </body>
-        </html>
+
+                {/* Bottom Navigation - Auto-hides when player opens */}
+                <BottomNav 
+                  isVisible={!currentTrack}
+                  onMenuOpen={handleMobileMenuOpen}
+                />
+
+                {/* Mobile Menu - Beautiful glassmorphic popup */}
+                <MobileMenu 
+                  isOpen={isMobileMenuOpen}
+                  onClose={handleMobileMenuClose}
+                />
+
+                {/* Player - Now with auto-hide functionality */}
+                {currentTrack && (
+                  <Player
+                    track={{
+                      id: currentTrack.id,
+                      title: currentTrack.title,
+                      artist: currentTrack.artist,
+                      imageUrl: currentTrack.imageUrl || currentTrack.coverArt,
+                      audioUrl: currentTrack.audioUrl || currentTrack.url,
+                      duration: currentTrack.duration
+                    }}
+                    isPlaying={isPlaying}
+                    onPlayPause={togglePlay}
+                    onClose={() => {
+                      setCurrentTrack(null);
+                    }}
+                  />
+                )}
+              </div>
+            </AuthWrapper>
+          </PaymentProvider>
+        </div>
       </AuthProvider>
     </ThemeProvider>
   );
