@@ -212,7 +212,7 @@ export default function Navbar() {
     return (
       <>
         {/* Guest User Navbar - Bigger Logo with More Features */}
-        <nav className={`fixed top-0 left-0 w-full h-24 sm:h-16 transition-all duration-300 z-50 
+        <nav className={`fixed top-0 left-0 w-full h-16 transition-all duration-300 z-50 
           ${isScrolled ? "bg-[#0a3747] bg-opacity-95 backdrop-blur-lg" : "bg-[#0a3747] bg-opacity-90 backdrop-blur-md"}
           border-b border-[#0a3747]/30 shadow-lg`}
         >
@@ -277,9 +277,13 @@ export default function Navbar() {
                       placeholder="Search music..."
                       className="w-full max-w-none sm:max-w-lg bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 py-6 sm:py-2 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
                     />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300">
+                    <button
+                      type="submit"
+                      disabled={!searchQuery.trim()}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
                       <Search size={16} />
-                    </div>
+                    </button>
                     {/* Search Results Dropdown */}
                     {showSearchResults && searchResults.length > 0 && (
                       <motion.div
@@ -445,7 +449,7 @@ export default function Navbar() {
   return (
     <>
       {/* Logged-in User Navbar - More Features */}
-      <nav className={`fixed top-0 left-0 w-full h-24 sm:h-16 transition-all duration-300 z-50 
+      <nav className={`fixed top-0 left-0 w-full h-16 transition-all duration-300 z-50 
         ${isScrolled ? "bg-[#0a3747] bg-opacity-95 backdrop-blur-lg" : "bg-[#0a3747] bg-opacity-90 backdrop-blur-md"}
         border-b border-[#0a3747]/30 shadow-lg`}
       >
@@ -538,9 +542,13 @@ export default function Navbar() {
                         }
                       }}
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
-                      onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
-                      placeholder="Search music..."
-                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 py-6 sm:py-2 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
+                     button
+                      type="submit"
+                      disabled={!searchQuery.trim()}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Search size={16} />
+                    </buttonssName="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 py-6 sm:py-2 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
