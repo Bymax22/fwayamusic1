@@ -394,6 +394,12 @@
   }
 }
 
+/* Safety: ensure fixed-position elements (Player, overlays) are not clipped by root containers */
+html, body, #__next, #root {
+  overflow: visible !important;
+  height: 100%;
+}
+
 /* Utility Styles */
 @layer utilities {
   /* Background utilities */
