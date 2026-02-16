@@ -228,13 +228,13 @@ export default function Player({
         style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1.5rem)' }}
       >
         {/* Compact Player Header */}
-        <div className="flex items-center justify-between p-2 border-b border-white/10">
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between py-1 px-2 border-b border-white/10">
+          <div className="flex items-center space-x-1.5">
             <div className="relative">
-              <MusicalNoteIcon className="w-4 h-4 text-[#e51f48]" />
+              <MusicalNoteIcon className="w-3 h-3 text-[#e51f48]" />
               {isPlaying && (
                 <motion.div
-                  className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-[#e51f48] rounded-full"
+                  className="absolute -top-0.5 -right-0.5 w-1 h-1 bg-[#e51f48] rounded-full"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 />
@@ -243,10 +243,10 @@ export default function Player({
             <span className="text-xs font-medium text-white mobile-text-xs">Now Playing</span>
           </div>
 
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-0.5">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1 rounded-full hover:bg-white/10 transition-colors touch-target"
+              className="p-0.5 rounded-full hover:bg-white/10 transition-colors touch-target"
               aria-label={isExpanded ? "Minimize player" : "Expand player"}
             >
               {isExpanded ? (
@@ -257,7 +257,7 @@ export default function Player({
             </button>
             <button
               onClick={onClose}
-              className="p-1 rounded-full hover:bg-white/10 transition-colors touch-target"
+              className="p-0.5 rounded-full hover:bg-white/10 transition-colors touch-target"
               aria-label="Close player"
             >
               <XMarkIcon className="w-3 h-3 text-white" />
@@ -267,7 +267,7 @@ export default function Player({
 
         {/* Compact Player Content */}
         <div
-          className={`flex ${isExpanded ? "flex-col h-[calc(100%-2rem)]" : "flex-row h-[calc(100%-2rem)]"} p-2 overflow-y-auto`}
+          className={`flex ${isExpanded ? "flex-col h-[calc(100%-1.5rem)]" : "flex-row h-[calc(100%-1.5rem)]"} p-2 overflow-y-auto`}
         >
           {/* Compact Track Info */}
           <div className={`flex items-center ${isExpanded ? "mb-4" : "flex-1 min-w-0"}`}>
