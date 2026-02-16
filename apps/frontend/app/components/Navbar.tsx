@@ -167,6 +167,8 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showInvitePopup, setShowInvitePopup] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -238,8 +240,33 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Middle Section - reserved spacing */}
-            <div className="flex-1 max-w-lg mx-6" />
+            {/* Middle Section - Search (desktop) */}
+            <div className="flex-1 max-w-lg mx-6">
+              <div className="hidden sm:flex items-center w-full justify-center">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (searchQuery.trim()) router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                  }}
+                  className="w-full max-w-lg"
+                >
+                  <div className="relative">
+                    <input
+                      aria-label="Search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search songs, artists, playlists..."
+                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none focus:ring-2 focus:ring-[#e51f48]/40"
+                    />
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
+                      <Search size={16} />
+                    </div>
+                  </div>
+                </form>
+              </div>
+              {/* Mobile: keep spacing so right icons align*/}
+              <div className="sm:hidden flex-1" />
+            </div>
 
             {/* Right Section - Guest Features */}
             <div className="flex items-center gap-4">
@@ -294,7 +321,7 @@ export default function Navbar() {
                     <Search 
                       size={22} 
                       className="text-white hover:scale-110 transition-transform cursor-pointer"
-                      onClick={() => router.push('/search')}
+                      onClick={() => setShowMobileSearch(true)}
                     />
                     
                     {/* Earn Icon */}
@@ -309,6 +336,57 @@ export default function Navbar() {
             </div>
           </div>
         </nav>
+
+        {/* Mobile Search Overlay */}
+        <AnimatePresence>
+          {showMobileSearch && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-start p-4 pt-24"
+              onClick={() => setShowMobileSearch(false)}
+            >
+              <motion.div
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -10, opacity: 0 }}
+                className="w-full max-w-md mx-auto bg-[#0a3747] rounded-xl p-4 border border-[#0a4a5f]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (searchQuery.trim()) {
+                      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                      setShowMobileSearch(false);
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        autoFocus
+                        aria-label="Search"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search songs, artists, playlists..."
+                        className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none"
+                      />
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
+                        <Search size={16} />
+                      </div>
+                    </div>
+                    <button type="submit" className="px-3 py-2 bg-[#e51f48] rounded-full text-white font-semibold">Search</button>
+                    <button type="button" onClick={() => setShowMobileSearch(false)} className="p-2 rounded-full text-gray-300">
+                      <X size={18} />
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Invite Popup */}
         <InvitePopup isOpen={showInvitePopup} onClose={() => setShowInvitePopup(false)} />
@@ -432,6 +510,13 @@ export default function Navbar() {
 
             {/* Mobile Icons - Premium, Notifications, Account (Visible on mobile) */}
             <div className="flex md:hidden items-center gap-0.5"> {/* Reduced gap from gap-2 to gap-0.5 */}
+              {/* Mobile Search Icon */}
+              <button
+                onClick={() => setShowMobileSearch(true)}
+                className="p-2.5 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group"
+              >
+                <Search size={20} className="group-hover:scale-110 transition-transform" />
+              </button>
               {/* Premium Icon */}
               <button className="p-2.5 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
                 <Crown size={22} className="text-amber-400 group-hover:scale-110 transition-transform" />
@@ -627,6 +712,57 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
+
+      {/* Mobile Search Overlay */}
+      <AnimatePresence>
+        {showMobileSearch && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-sm flex items-start p-4 pt-24"
+            onClick={() => setShowMobileSearch(false)}
+          >
+            <motion.div
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -10, opacity: 0 }}
+              className="w-full max-w-md mx-auto bg-[#0a3747] rounded-xl p-4 border border-[#0a4a5f]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim()) {
+                    router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                    setShowMobileSearch(false);
+                  }
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      autoFocus
+                      aria-label="Search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search songs, artists, playlists..."
+                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none"
+                    />
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
+                      <Search size={16} />
+                    </div>
+                  </div>
+                  <button type="submit" className="px-3 py-2 bg-[#e51f48] rounded-full text-white font-semibold">Search</button>
+                  <button type="button" onClick={() => setShowMobileSearch(false)} className="p-2 rounded-full text-gray-300">
+                    <X size={18} />
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Invite Popup */}
       <InvitePopup isOpen={showInvitePopup} onClose={() => setShowInvitePopup(false)} />
