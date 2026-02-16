@@ -225,7 +225,7 @@ export default function Player({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
-        style={{ bottom: 'env(safe-area-inset-bottom, 0px)' }}
+        style={{ bottom: 'max(env(safe-area-inset-bottom, 0px), 3.5rem)' }}
       >
         {/* Compact Player Header - Minimal height */}
         <div className="flex items-center justify-between py-0.5 px-2 border-b border-white/10">
