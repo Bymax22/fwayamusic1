@@ -331,12 +331,9 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
                 {currentTrack && (
                   <Player
                     track={{
-                      id: currentTrack.id,
-                      title: currentTrack.title,
-                      artist: currentTrack.artist,
+                      ...currentTrack,
                       imageUrl: currentTrack.imageUrl || currentTrack.coverArt,
                       audioUrl: currentTrack.audioUrl || currentTrack.url,
-                      duration: currentTrack.duration
                     }}
                     isPlaying={isPlaying}
                     onPlayPause={togglePlay}
