@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlayIcon,
@@ -86,7 +86,7 @@ export default function Player({
       audio.removeEventListener("canplaythrough", handleCanPlay);
       audio.pause();
     };
-  }, []);
+  }, [onPlayPause]);
 
   // Audio playback logic (keep your existing useEffect)
   useEffect(() => {
