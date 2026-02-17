@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { MobileMoneyPaymentModal } from "./modal/MobileMoneyPaymentModal";
 import {
   PlayIcon,
   PauseIcon,
@@ -58,6 +59,7 @@ export default function Player({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
   const previewTimerRef = useRef<number | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -97,6 +99,11 @@ export default function Player({
       }
     };
   }, [onPlayPause]);
+
+  // Reset unlocked when the track changes
+  useEffect(() => {
+    setUnlocked(false);
+  }, [track?.id]);
 
   // Audio playback logic (keep your existing useEffect)
   useEffect(() => {
@@ -156,8 +163,8 @@ export default function Player({
         setIsLoading(false);
       });
 
-      // If premium, ensure we only play a 30-second preview
-      if (isPremiumTrack) {
+      // If premium and not unlocked, ensure we only play a 30-second preview
+      if (isPremiumTrack && !unlocked) {
         if (previewTimerRef.current) {
           window.clearTimeout(previewTimerRef.current);
         }
@@ -238,14 +245,25 @@ export default function Player({
   };
 
   const handlePurchase = () => {
-    // Emit an event so a higher-level payment flow can catch it, or fallback to an alert
-      if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('player:purchase', { detail: { id: track.id, title: track.title, price: track.price } }));
-    }
-    // For now just close the modal
+    // Open the mobile money payment modal
+    setShowPurchaseModal(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    // mark current track as unlocked and resume playback
+    setUnlocked(true);
     setShowPurchaseModal(false);
-    // Optionally notify user
-    setTimeout(() => alert('Purchase flow started for ' + (track.title || 'this track')), 50);
+    if (previewTimerRef.current) {
+      window.clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+    const audio = audioRef.current;
+    if (audio) {
+      audio.play().catch(() => {});
+    }
+    if (!isPlaying && onPlayPause) {
+      onPlayPause();
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -606,28 +624,18 @@ export default function Player({
         </div>
 
         {/* Purchase modal for premium preview */}
-        {showPurchaseModal && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/60" onClick={handleClosePurchaseModal} />
-            <div className="relative z-70 bg-[#0b2630] rounded-xl p-4 w-11/12 max-w-md shadow-2xl border border-white/10">
-              <div className="flex items-center gap-3">
-                <Image src={track?.imageUrl || '/default-cover.jpg'} alt={track?.title || 'cover'} width={64} height={64} className="w-16 h-16 rounded-lg object-cover" />
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-white font-semibold truncate">{track.title}</h3>
-                  <p className="text-sm text-gray-300 truncate">{track.artist}</p>
-                  <p className="text-sm text-gray-400 mt-2">Preview ended — purchase full track to continue listening.</p>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm text-gray-200">Price: <span className="font-semibold">{track?.price ? `${track?.currency || 'ZMW'}${track.price}` : 'N/A'}</span></div>
-                <div className="flex items-center gap-2">
-                  <button onClick={handleClosePurchaseModal} className="px-3 py-1 rounded-md bg-white/5 text-gray-300">Close</button>
-                  <button onClick={handlePurchase} className="px-3 py-1 rounded-md bg-[#e5b64d] text-black font-semibold">Purchase</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <MobileMoneyPaymentModal
+          isOpen={showPurchaseModal}
+          onClose={handleClosePurchaseModal}
+          media={{
+            id: Number(track.id),
+            title: track.title || "",
+            artist: track.artist || "",
+            price: track.price || 0,
+            currency: track.currency || "ZMW",
+          }}
+          onSuccess={handlePaymentSuccess}
+        />
       </motion.div>
       )}
     </AnimatePresence>

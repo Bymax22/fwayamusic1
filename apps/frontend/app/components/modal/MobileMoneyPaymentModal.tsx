@@ -15,12 +15,14 @@ interface MobileMoneyPaymentModalProps {
     price: number;
     currency: string;
   };
+  onSuccess?: () => void;
 }
 
 export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = ({
   isOpen,
   onClose,
   media,
+  onSuccess,
 }) => {
   const { initiateMobileMoneyPayment, isProcessing } = usePayment();
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -36,6 +38,17 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
       setTransactionId(null);
     }
   }, [isOpen]);
+
+  // notify parent when payment succeeded
+  useEffect(() => {
+    if (step === 'success' && typeof onSuccess === 'function') {
+      try {
+        onSuccess();
+      } catch (err) {
+        console.warn('onSuccess handler threw', err);
+      }
+    }
+  }, [step, onSuccess]);
 
   const validatePhoneNumber = (phone: string): boolean => {
     // Zambian MTN number validation
