@@ -5,7 +5,7 @@ import {
   Download, Plus, 
   MoreHorizontal, Eye, Crown, Users, TrendingUp, Calendar, MapPin,
   Bookmark, BookmarkCheck, ShoppingCart, DollarSign, Lock, Unlock,
-  Star, Mic2, Video, Headphones, Radio, ChevronLeft, ChevronRight, UserPlus, UserCheck
+  Star, Mic2, Video, Headphones, Radio
 } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import Waveform from '@/components/Waveform';
@@ -131,7 +131,6 @@ export default function Browse() {
   const [filteredFiles, setFilteredFiles] = useState<MediaFile[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(20); // new: how many items to show
   const PAGE_SIZE = 10;
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<{message: string; details?: string} | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -148,8 +147,6 @@ export default function Browse() {
   const [selectedMediaForPayment, setSelectedMediaForPayment] = useState<MediaFile | null>(null);
   const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
   const menuRef = useRef<HTMLDivElement>(null);
-  const [artists, setArtists] = useState<Artist[]>([]);
-  const artistsScrollRef = useRef<HTMLDivElement>(null);
   const [db, setDb] = useState<IDBDatabase | null>(null);
 
   useEffect(() => {
@@ -184,20 +181,12 @@ export default function Browse() {
         setLoading(true);
         setError(null);
 
-        const [mediaResponse, playlistsResponse, userPlaylistsResponse, artistsResponse] = await Promise.all([
+        const [mediaResponse, userPlaylistsResponse] = await Promise.all([
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`, {
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
           }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=SYSTEM`, {
-            credentials: 'include',
-            headers: { 'Accept': 'application/json' }
-          }),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=USER`, {
-            credentials: 'include',
-            headers: { 'Accept': 'application/json' }
-          }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/artists`, { 
             credentials: 'include',
             headers: { 'Accept': 'application/json' }
           })
@@ -253,27 +242,6 @@ export default function Browse() {
         setMediaFiles(formattedData);
         setFilteredFiles(formattedData);
         setVisibleCount(PAGE_SIZE); // reset visible count on initial load
-
-        // Process artists data
-        if (artistsResponse.ok) {
-          const artistsData = await artistsResponse.json();
-          setArtists(artistsData);
-        }
-
-        // Process playlists (SYSTEM) and user playlists (USER)
-        if (playlistsResponse.ok) {
-          const playlistsDataRaw = await playlistsResponse.json().catch(() => []);
-          const playlistsData = (playlistsDataRaw || []).map((p: PlaylistAPI) => ({
-            id: p.id ?? 0,
-            name: p.name ?? 'Untitled',
-            description: p.description,
-            coverUrl: p.coverUrl || p.imageUrl || '/default-playlist.png',
-            isPublic: p.isPublic ?? true,
-            type: (p.type as Playlist['type']) || 'SYSTEM',
-            mediaCount: p.entries?.length ?? p.mediaCount ?? 0
-          }));
-          setPlaylists(playlistsData);
-        }
 
         if (userPlaylistsResponse.ok) {
           const userPlaylistsRaw = await userPlaylistsResponse.json().catch(() => []);
@@ -833,76 +801,7 @@ export default function Browse() {
     );
   }
 
-   // Artist section functions
-  const scrollArtists = (direction: 'left' | 'right') => {
-    if (artistsScrollRef.current) {
-      const scrollAmount = 300;
-      const newScrollLeft = artistsScrollRef.current.scrollLeft + 
-        (direction === 'right' ? scrollAmount : -scrollAmount);
-      
-      artistsScrollRef.current.scrollTo({
-        left: newScrollLeft,
-        behavior: 'smooth'
-      });
-    }
-  };
 
-  const handleFollowArtist = async (artistId: number) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/artists/${artistId}/follow`, {
-        method: 'POST',
-        credentials: 'include'
-      });
-
-      if (response.ok) {
-        setArtists(artists.map(artist => 
-          artist.id === artistId 
-            ? { ...artist, isFollowing: true, followerCount: artist.followerCount + 1 }
-            : artist
-        ));
-      }
-    } catch (err) {
-      console.error('Follow error:', err);
-    }
-  };
-
-  const handleUnfollowArtist = async (artistId: number) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/artists/${artistId}/unfollow`, {
-        method: 'POST',
-        credentials: 'include'
-      });
-
-      if (response.ok) {
-        setArtists(artists.map(artist => 
-          artist.id === artistId 
-            ? { ...artist, isFollowing: false, followerCount: artist.followerCount - 1 }
-            : artist
-        ));
-      }
-    } catch (err) {
-      console.error('Unfollow error:', err);
-    }
-  };
-
-  const handleShareArtist = async (artist: Artist) => {
-    try {
-      const shareUrl = `${window.location.origin}/artist/${artist.id}`;
-      
-      if (navigator.share) {
-        await navigator.share({
-          title: artist.displayName,
-          text: `Check out ${artist.displayName} on our platform`,
-          url: shareUrl,
-        });
-      } else {
-        await navigator.clipboard.writeText(shareUrl);
-        alert('Artist link copied to clipboard!');
-      }
-    } catch (err) {
-      console.error('Share error:', err);
-    }
-  };
 
   return (
     <ThemeProvider>
