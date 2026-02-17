@@ -4,6 +4,7 @@ import { Play, Heart,  List, Shuffle, X } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from "next/image";
+import Waveform from '@/components/Waveform';
 
 interface QueueItem {
   id: number;
@@ -186,7 +187,15 @@ export default function QueuePage() {
                     />
                     
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white truncate">{track.title}</p>
+                      <p className="font-medium text-white truncate">
+                        <span className="inline-flex items-center gap-2">
+                          {currentTrack?.id === track.id ? (
+                            //@ts-ignore
+                            <Waveform playing={true} />
+                          ) : null}
+                          <span>{track.title}</span>
+                        </span>
+                      </p>
                       <p className="text-sm text-gray-400 truncate">{track.artist}</p>
                     </div>
                     

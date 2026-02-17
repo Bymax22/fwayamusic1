@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fa';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
+import Waveform from '@/components/Waveform';
 
 // Track interface
 interface Track {
@@ -344,7 +345,14 @@ const PlaylistDetailPage = () => {
                     {/* Track Info */}
                     <div className="flex-1 min-w-0">
                       <h3 className={`font-medium truncate ${isCurrent ? 'text-[#e51f48]' : 'text-white'}`}>
-                        {track.title}
+                        <span className="inline-flex items-center gap-2">
+                          {isCurrent ? (
+                            // show waveform when this is the playing track
+                            //@ts-ignore
+                            <Waveform playing={isCurrent && isPlaying} />
+                          ) : null}
+                          <span>{track.title}</span>
+                        </span>
                       </h3>
                       <p className="text-sm text-gray-400 truncate">
                         {track.user?.displayName || track.user?.username || "Unknown Artist"}
