@@ -135,7 +135,7 @@ export default function Browse() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<{message: string; details?: string} | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'compact'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'compact'>('grid');
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -1053,52 +1053,6 @@ export default function Browse() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-[#0a3747]/70 p-4 rounded-xl">
-                <div className="flex items-center gap-3">
-                  <Headphones className="w-8 h-8 text-[#e51f48]" />
-                  <div>
-                    <p className="text-2xl font-bold text-white">{mediaFiles.length}</p>
-                    <p className="text-sm text-gray-400">Total Tracks</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-[#0a3747]/70 p-4 rounded-xl">
-                <div className="flex items-center gap-3">
-                  <Users className="w-8 h-8 text-green-400" />
-                  <div>
-                    <p className="text-2xl font-bold text-white">
-                      {new Set(mediaFiles.map(f => f.user?.id)).size}
-                    </p>
-                    <p className="text-sm text-gray-400">Artists</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-[#0a3747]/70 p-4 rounded-xl">
-                <div className="flex items-center gap-3">
-                  <Download className="w-8 h-8 text-blue-400" />
-                  <div>
-                    <p className="text-2xl font-bold text-white">
-                      {mediaFiles.reduce((sum, file) => sum + file.downloadCount, 0)}
-                    </p>
-                    <p className="text-sm text-gray-400">Total Downloads</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-[#0a3747]/70 p-4 rounded-xl">
-                <div className="flex items-center gap-3">
-                  <Heart className="w-8 h-8 text-pink-400" />
-                  <div>
-                    <p className="text-2xl font-bold text-white">
-                      {mediaFiles.reduce((sum, file) => sum + file.likes, 0)}
-                    </p>
-                    <p className="text-sm text-gray-400">Total Likes</p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Media list / grid / compact — show displayedFiles (paginated slice) */}
