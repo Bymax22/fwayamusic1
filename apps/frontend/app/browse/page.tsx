@@ -28,6 +28,7 @@ interface MediaFile {
   createdAt: string;
   coverArt: string;
   views: number;
+  playCount?: number;
   likes: number;
   genre?: string;
   interactions?: { liked: boolean; saved: boolean }[]; // <-- replaced below via Interaction type
@@ -1225,20 +1226,20 @@ export default function Browse() {
           )}
         </div>
       ) : (
-        // Compact view
-        <div className="space-y-2">
+        // Compact view - Mobile optimized
+        <div className="space-y-1">
           {filteredFiles.length > 0 ? (
             filteredFiles.map(file => (
               <div 
                 key={file.id} 
-                className={`flex items-start gap-3 p-3 rounded-xl transition-colors min-w-0 ${
+                className={`flex items-start gap-2 p-2 rounded-xl transition-colors min-w-0 ${
                   String(currentTrack?.id) === String(file.id) 
                     ? 'bg-[#0a3747]' 
                     : 'hover:bg-[#0a3747]/50'
                 }`}
               >
                 {/* Album cover with play button on top */}
-                <div className="relative flex-shrink-0">
+                <div className="relative flex-shrink-0 mt-0.5">
                   <Image 
                     src={file.coverArt} 
                     alt={file.title} 
@@ -1258,25 +1259,51 @@ export default function Browse() {
                   </button>
                 </div>
 
-                {/* Track info - expanded for full visibility */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white text-sm line-clamp-1">{file.title}</p>
-                  <p className="text-xs text-gray-400 line-clamp-1">{file.artist}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                    <span>{file.genre}</span>
+                {/* Track info - 2 lines only */}
+                <div className="flex-1 min-w-0 py-0.5">
+                  {/* Line 1: Title - Artist (with horizontal scroll animation when playing) */}
+                  <div className="overflow-hidden">
+                    <p 
+                      className={`font-medium text-white text-sm whitespace-nowrap ${
+                        String(currentTrack?.id) === String(file.id) && isPlaying
+                          ? 'animate-scroll'
+                          : ''
+                      }`}
+                      style={
+                        String(currentTrack?.id) === String(file.id) && isPlaying
+                          ? {
+                              animation: 'scroll-left 8s linear infinite',
+                              paddingRight: '2rem'
+                            }
+                          : {}
+                      }
+                    >
+                      {file.title} <span className="text-gray-400">• {file.artist}</span>
+                    </p>
+                  </div>
+
+                  {/* Line 2: Access Type | Genre | Duration | Play Count */}
+                  <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
+                    <span className="font-semibold text-[#e51f48]">
+                      {file.accessType === 'FREE' ? 'FREE' : 'PREMIUM'}
+                    </span>
+                    <span>•</span>
+                    <span className="truncate">{file.genre}</span>
                     <span>•</span>
                     <span>{formatDuration(file.duration)}</span>
+                    <span>•</span>
+                    <span>{file.playCount || 0}</span>
                   </div>
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
                   <button 
                     onClick={() => handleLike(file.id)}
                     className="text-gray-400 hover:text-[#e51f48] transition-colors"
                   >
                     <Heart 
-                      className="w-4 h-4" 
+                      className="w-3.5 h-3.5" 
                       fill={file.likes > 0 ? 'currentColor' : 'none'} 
                     />
                   </button>
@@ -1287,7 +1314,7 @@ export default function Browse() {
                     }}
                     className="text-gray-400 hover:text-[#e51f48] transition-colors"
                   >
-                    <MoreHorizontal className="w-4 h-4" />
+                    <MoreHorizontal className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>

@@ -603,6 +603,25 @@ html, body, #__next, #root {
   }
 }
 
+/* Scrolling title animation for playing track */
+.animate-scroll {
+  display: inline-block;
+  will-change: transform;
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(0%); }
+  10% { transform: translateX(0%); }
+  90% { transform: translateX(-50%); }
+  100% { transform: translateX(-50%); }
+}
+
+/* utility to reduce vertical spacing between compact rows */
+.compact-row-tight > * {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+}
+
 @media (min-width: 1025px) and (max-width: 1280px) {
   .horizontal-section .media-item {
     min-width: calc(20% - var(--gap-sm));
