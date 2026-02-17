@@ -196,7 +196,12 @@ export default function Navbar() {
 
   // Listen for player minimize events to show running title/artist in header
   useEffect(() => {
-    const handler = (e: any) => {
+    const handler = (evt: Event) => {
+      const e = evt as CustomEvent<{
+        minimized?: boolean;
+        title?: string;
+        artist?: string;
+      }>;
       const minimized = !!e?.detail?.minimized;
       const title = e?.detail?.title || currentTrack?.title || "";
       const artist = e?.detail?.artist || currentTrack?.artist || "";
@@ -208,8 +213,8 @@ export default function Navbar() {
         setForcedInfo("");
       }
     };
-    window.addEventListener("player:minimized", handler);
-    return () => window.removeEventListener("player:minimized", handler);
+    window.addEventListener("player:minimized", handler as EventListener);
+    return () => window.removeEventListener("player:minimized", handler as EventListener);
   }, [currentTrack]);
 
   // Navigation links for logged-in users
