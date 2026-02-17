@@ -257,7 +257,7 @@ export default function Navbar() {
                   <span className="text-lg font-bold text-white">
                     Fwaya<span className="text-[#e51f48]"></span>
                   </span>
-                  <span className="text-xs text-gray-400 -mt-0.5">Discover</span>
+                  <span className="text-xs text-gray-400">Discover</span>
                 </div>
               </Link>
             </div>
@@ -503,7 +503,7 @@ export default function Navbar() {
                 <span className="text-lg font-bold text-white">
                   Fwaya<span className="text-[#e51f48]"></span>
                 </span>
-                <span className="text-xs text-gray-400 -mt-1">Explore & Start Earning</span>
+                  <span className="text-xs text-gray-400">Explore & Start Earning</span>
               </div>
             </Link>
           </div>
