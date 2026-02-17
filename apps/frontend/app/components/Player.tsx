@@ -212,7 +212,7 @@ export default function Player({
     <AnimatePresence>
       <motion.div
         className={`fixed left-0 right-0 z-50 ${
-          isExpanded ? "h-[60vh]" : "h-24"
+          isExpanded ? "h-[60vh]" : "h-28 sm:h-24"
         } bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg ${
           className || ""
         }`}
@@ -223,9 +223,9 @@ export default function Player({
         style={{ bottom: 'max(env(safe-area-inset-bottom, 0px), 3.5rem)' }}
       >
         {/* Compact Player Header - Minimal height */}
-        <div className="flex items-center justify-between py-0.5 px-2 border-b border-white/10">
-          <div className="flex items-center space-x-1.5">
-            <div className="relative">
+        <div className="flex items-center justify-between py-1.5 px-3 sm:py-1 sm:px-2 border-b border-white/10">
+          <div className="flex items-center space-x-2 sm:space-x-1.5 min-w-0">
+            <div className="relative flex-shrink-0">
               <MusicalNoteIcon className="w-4 h-4 text-[#e51f48]" />
               {isPlaying && (
                 <motion.div
@@ -235,45 +235,45 @@ export default function Player({
                 />
               )}
             </div>
-            <span className="text-xs font-medium text-white">Now Playing</span>
+            <span className="text-sm sm:text-xs font-medium text-white hidden sm:inline">Now Playing</span>
           </div>
 
-          <div className="flex items-center space-x-0.5">
+          <div className="flex items-center space-x-1">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-0.5 rounded-full hover:bg-white/10 transition-colors touch-target"
+              className="p-2 sm:p-1.5 rounded-full hover:bg-white/10 transition-colors active:bg-white/20"
               aria-label={isExpanded ? "Minimize player" : "Expand player"}
             >
               {isExpanded ? (
-                <ArrowsPointingInIcon className="w-3 h-3 text-white" />
+                <ArrowsPointingInIcon className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
               ) : (
-                <ArrowsPointingOutIcon className="w-3 h-3 text-white" />
+                <ArrowsPointingOutIcon className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
               )}
             </button>
             <button
               onClick={onClose}
-              className="p-0.5 rounded-full hover:bg-white/10 transition-colors touch-target"
+              className="p-2 sm:p-1.5 rounded-full hover:bg-white/10 transition-colors active:bg-white/20"
               aria-label="Close player"
             >
-              <XMarkIcon className="w-3 h-3 text-white" />
+              <XMarkIcon className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
             </button>
           </div>
         </div>
 
         {/* Compact Player Content */}
         <div
-          className={`flex ${isExpanded ? "flex-col h-[calc(100%-1.5rem)]" : "flex-row h-[calc(100%-1.5rem)]"} p-2 overflow-y-auto`}
+          className={`flex ${isExpanded ? "flex-col h-[calc(100%-2.5rem)] sm:h-[calc(100%-1.5rem)]" : "flex-row h-[calc(100%-2.5rem)] sm:h-[calc(100%-1.5rem)]"} p-3 sm:p-2 overflow-y-auto gap-2 sm:gap-1`}
         >
           {/* Compact Track Info */}
-          <div className={`flex items-center ${isExpanded ? "mb-4" : "flex-1 min-w-0"}`}>
+          <div className={`flex items-center ${isExpanded ? "mb-4" : "flex-1 min-w-0"} gap-2 sm:gap-1.5`}>
             <div className="relative flex-shrink-0 group">
               <Image
                 src={track.imageUrl || "/default-cover.jpg"}
                 alt={track.title || "Track cover"}
-                width={isExpanded ? 120 : 48} // Reduced sizes
-                height={isExpanded ? 120 : 48}
+                width={isExpanded ? 120 : 56} // Increased compact size for mobile
+                height={isExpanded ? 120 : 56}
                 className={`rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#e51f48]/50 ${
-                  isExpanded ? "w-30 h-30" : "w-12 h-12" // Reduced sizes
+                  isExpanded ? "w-30 h-30" : "w-14 h-14 sm:w-12 sm:h-12" // Responsive sizes
                 }`}
               />
               {isLoading ? (
@@ -291,33 +291,33 @@ export default function Player({
               ) : null}
             </div>
 
-            <div className={`ml-2 ${isExpanded ? "flex-1" : "flex-1 min-w-0"}`}>
-              <div className="flex items-center">
-                <h3 className={`${isExpanded ? "text-lg" : "text-sm"} font-bold text-white truncate mobile-text-sm`}>
+            <div className={`${isExpanded ? "flex-1" : "flex-1 min-w-0"}`}>
+              <div className="flex items-center gap-1 sm:gap-0.5">
+                <h3 className={`${isExpanded ? "text-lg" : "text-base sm:text-sm"} font-bold text-white truncate`}>
                     {track.title || "Unknown Title"}
                   </h3>
-                {isLiked && <HeartIcon className="ml-1 w-3 h-3 text-[#e51f48]" />}
+                {isLiked && <HeartIcon className="flex-shrink-0 w-3.5 h-3.5 sm:w-3 sm:h-3 text-[#e51f48]" />}
               </div>
-              <p className={`${isExpanded ? "text-sm" : "text-xs"} text-gray-300 truncate mobile-text-xs`}>
+              <p className={`${isExpanded ? "text-sm" : "text-sm sm:text-xs"} text-gray-300 truncate`}>
                 {track.artist || "Unknown Artist"}
               </p>
               {isExpanded && track.album && (
-                <p className="text-xs text-gray-400 mt-0.5 mobile-text-xs">{track.album}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{track.album}</p>
               )}
 
               {isExpanded && (
-                <div className="flex items-center mt-2 space-x-3">
+                <div className="flex items-center mt-3 space-x-4">
                   <button 
                     onClick={() => setIsLiked(!isLiked)} 
-                    className="flex items-center text-xs hover:text-[#e51f48] transition-colors touch-target"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm hover:bg-white/10 hover:text-[#e51f48] transition-colors active:bg-white/20"
                   >
                     {isLiked ? <HeartIcon className="w-4 h-4 text-[#e51f48]" /> : <HeartOutline className="w-4 h-4 text-gray-400" />}
-                    <span className="ml-1 mobile-text-xs">Like</span>
+                    <span>Like</span>
                   </button>
 
-                  <button className="flex items-center text-xs text-gray-400 hover:text-white transition-colors touch-target">
+                  <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/10 transition-colors active:bg-white/20">
                     <QueueListIcon className="w-4 h-4" />
-                    <span className="ml-1 mobile-text-xs">Queue</span>
+                    <span>Queue</span>
                   </button>
                 </div>
               )}
@@ -325,9 +325,9 @@ export default function Player({
           </div>
 
           {/* Compact Player Controls */}
-          <div className={`${isExpanded ? "mt-auto" : "flex-1 flex flex-col justify-center"}`}>
+          <div className={`${isExpanded ? "mt-auto w-full" : "flex-1 flex flex-col justify-center w-full"}`}>
             {/* Compact Progress Bar */}
-            <div className={`relative ${isExpanded ? "my-3" : "my-1 w-full"}`} onClick={handleSeek}>
+            <div className={`relative ${isExpanded ? "my-3" : "my-2 sm:my-1 w-full"}`} onClick={handleSeek}>
               <div className="h-1 bg-white/10 rounded-full w-full cursor-pointer">
                 <div 
                   ref={progressBarRef} 
@@ -335,21 +335,21 @@ export default function Player({
                   style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }} 
                 />
               </div>
-              <div className="flex justify-between text-xs text-gray-400 mt-0.5 mobile-text-xs">
+              <div className="flex justify-between text-xs text-gray-400 mt-1 sm:mt-0.5">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
             </div>
 
             {/* Compact Main Controls */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between gap-3 sm:gap-2 mt-2 sm:mt-1">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <button 
                   onClick={toggleLoop} 
-                  className={`p-1.5 rounded-full ${isLooping ? "text-[#e51f48]" : "text-gray-400 hover:text-white"} transition-colors touch-target`} 
+                  className={`p-2 sm:p-1.5 rounded-full ${isLooping ? "text-[#e51f48] bg-white/10" : "text-gray-400 hover:text-white hover:bg-white/10"} transition-colors active:bg-white/20`} 
                   aria-label={isLooping ? "Disable loop" : "Enable loop"}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-4 sm:h-4">
                     <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
                     <path d="M21 3v5h-5" />
                   </svg>
@@ -357,41 +357,41 @@ export default function Player({
 
                 <button 
                   onClick={() => { if (audioRef.current) audioRef.current.currentTime = Math.max(0, currentTime - 10); }} 
-                  className="p-1.5 text-gray-400 hover:text-white rounded-full hover:bg-white/10 transition-colors touch-target" 
+                  className="p-2 sm:p-1.5 text-gray-400 hover:text-white rounded-full hover:bg-white/10 transition-colors active:bg-white/20" 
                   aria-label="Rewind 10 seconds"
                 >
-                  <BackwardIcon className="w-4 h-4" />
+                  <BackwardIcon className="w-5 h-5 sm:w-4 sm:h-4" />
                 </button>
               </div>
 
               <button 
                 onClick={onPlayPause} 
                 disabled={isLoading} 
-                className="p-2.5 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] rounded-full hover:shadow-lg hover:shadow-[#e51f48]/30 transition-all shadow-md disabled:opacity-50 touch-target" 
+                className="p-3 sm:p-2.5 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] rounded-full hover:shadow-lg hover:shadow-[#e51f48]/30 transition-all shadow-md disabled:opacity-50 active:scale-95" 
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
-                {isPlaying ? <PauseIcon className="w-4 h-4 text-white" /> : <PlayIcon className="w-4 h-4 text-white" />}
+                {isPlaying ? <PauseIcon className="w-5 h-5 sm:w-4 sm:h-4 text-white" /> : <PlayIcon className="w-5 h-5 sm:w-4 sm:h-4 text-white" />}
               </button>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <button 
                   onClick={() => { if (audioRef.current) audioRef.current.currentTime = Math.min(duration, currentTime + 10); }} 
-                  className="p-1.5 text-gray-400 hover:text-white rounded-full hover:bg-white/10 transition-colors touch-target" 
+                  className="p-2 sm:p-1.5 text-gray-400 hover:text-white rounded-full hover:bg-white/10 transition-colors active:bg-white/20" 
                   aria-label="Forward 10 seconds"
                 >
-                  <ForwardIcon className="w-4 h-4" />
+                  <ForwardIcon className="w-5 h-5 sm:w-4 sm:h-4" />
                 </button>
 
                 <div className="relative group">
                   <button 
                     onClick={toggleMute} 
-                    className="p-1.5 text-gray-400 hover:text-white rounded-full transition-colors touch-target" 
+                    className="p-2 sm:p-1.5 text-gray-400 hover:text-white rounded-full transition-colors hover:bg-white/10 active:bg-white/20" 
                     aria-label={isMuted ? "Unmute" : "Mute"}
                   >
-                    {isMuted || volume === 0 ? <SpeakerXMarkIcon className="w-4 h-4" /> : <SpeakerWaveIcon className="w-4 h-4" />}
+                    {isMuted || volume === 0 ? <SpeakerXMarkIcon className="w-5 h-5 sm:w-4 sm:h-4" /> : <SpeakerWaveIcon className="w-5 h-5 sm:w-4 sm:h-4" />}
                   </button>
 
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 hidden group-hover:block bg-[#0a3747] p-1.5 rounded-lg shadow-lg z-10">
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#0a3747] p-2 rounded-lg shadow-lg z-10">
                     <input 
                       type="range" 
                       min="0" 
@@ -409,11 +409,11 @@ export default function Player({
 
             {/* Compact Expanded View Controls */}
             {isExpanded && (
-              <div className="mt-4">
-                <h4 className="text-xs font-medium text-gray-300 mb-2 mobile-text-xs">Playback Speed</h4>
+              <div className="mt-4 w-full">
+                <h4 className="text-sm font-medium text-gray-300 mb-3">Playback Speed</h4>
                 <button 
                   onClick={changePlaybackRate} 
-                  className="px-3 py-2 bg-white/10 rounded-full text-xs hover:bg-white/20 transition-colors touch-target mobile-text-xs"
+                  className="px-4 py-2.5 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-colors active:bg-white/30 font-medium"
                 >
                   {playbackRate}x
                 </button>
