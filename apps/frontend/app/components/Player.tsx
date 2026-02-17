@@ -118,9 +118,10 @@ export default function Player({
           }
         }
 
-        audio.preload = 'auto'; // Preload for high quality playback
+        audio.preload = 'metadata'; // Preload metadata for better handling
+        audio.crossOrigin = 'anonymous'; // Enable CORS for streaming
         audio.src = src;
-        audio.load();
+        // Don't call load() - the browser will handle it automatically
         setCurrentTime(0);
         setDuration(0);
       }
@@ -220,11 +221,11 @@ export default function Player({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
-        style={{ bottom: 'max(env(safe-area-inset-bottom, 0px), 3.5rem)' }}
+        style={{ bottom: 0 }}
       >
         {/* Compact Player Header - Minimal height */}
         <div className="flex items-center justify-between py-1.5 px-3 sm:py-1 sm:px-2 border-b border-white/10">
-          <div className="flex items-center space-x-2 sm:space-x-1.5 min-w-0">
+          <div className="flex items-center gap-3 sm:gap-2 min-w-0 flex-1">
             <div className="relative flex-shrink-0">
               <MusicalNoteIcon className="w-4 h-4 text-[#e51f48]" />
               {isPlaying && (
@@ -235,7 +236,34 @@ export default function Player({
                 />
               )}
             </div>
-            <span className="text-sm sm:text-xs font-medium text-white hidden sm:inline">Now Playing</span>
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <motion.div
+                className="flex gap-3"
+                animate={{ x: isPlaying ? [`0%`, `-100%`] : 0 }}
+                transition={
+                  isPlaying ? { duration: 8, repeat: Infinity, ease: "linear" } : { duration: 0 }
+                }
+              >
+                <div className="flex-shrink-0 whitespace-nowrap">
+                  <p className="text-xs font-bold text-white truncate">
+                    {track.title || "Unknown Title"}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate">
+                    {track.artist || "Unknown Artist"}
+                  </p>
+                </div>
+                {isPlaying && (
+                  <div className="flex-shrink-0 whitespace-nowrap">
+                    <p className="text-xs font-bold text-white truncate">
+                      {track.title || "Unknown Title"}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {track.artist || "Unknown Artist"}
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            </div>
           </div>
 
           <div className="flex items-center space-x-1">
@@ -264,68 +292,36 @@ export default function Player({
         <div
           className={`flex ${isExpanded ? "flex-col h-[calc(100%-2.5rem)] sm:h-[calc(100%-1.5rem)]" : "flex-row h-[calc(100%-2.5rem)] sm:h-[calc(100%-1.5rem)]"} p-3 sm:p-2 overflow-y-auto gap-2 sm:gap-1`}
         >
-          {/* Compact Track Info */}
-          <div className={`flex items-center ${isExpanded ? "mb-4" : "flex-1 min-w-0"} gap-2 sm:gap-1.5`}>
-            <div className="relative flex-shrink-0 group">
-              <Image
-                src={track.imageUrl || "/default-cover.jpg"}
-                alt={track.title || "Track cover"}
-                width={isExpanded ? 120 : 56} // Increased compact size for mobile
-                height={isExpanded ? 120 : 56}
-                className={`rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#e51f48]/50 ${
-                  isExpanded ? "w-30 h-30" : "w-14 h-14 sm:w-12 sm:h-12" // Responsive sizes
-                }`}
-              />
-              {isLoading ? (
-                <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#e51f48]"></div>
-                </div>
-              ) : isPlaying ? (
-                <motion.div
-                  className="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center"
-                  animate={{ opacity: [0.3, 0.5, 0.3] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  <PlayIcon className="w-4 h-4 text-white" />
-                </motion.div>
-              ) : null}
-            </div>
-
-            <div className={`${isExpanded ? "flex-1" : "flex-1 min-w-0"}`}>
-              <div className="flex items-center gap-1 sm:gap-0.5">
-                <h3 className={`${isExpanded ? "text-lg" : "text-base sm:text-sm"} font-bold text-white truncate`}>
-                    {track.title || "Unknown Title"}
-                  </h3>
-                {isLiked && <HeartIcon className="flex-shrink-0 w-3.5 h-3.5 sm:w-3 sm:h-3 text-[#e51f48]" />}
-              </div>
-              <p className={`${isExpanded ? "text-sm" : "text-sm sm:text-xs"} text-gray-300 truncate`}>
-                {track.artist || "Unknown Artist"}
-              </p>
-              {isExpanded && track.album && (
-                <p className="text-xs text-gray-400 mt-0.5">{track.album}</p>
-              )}
-
-              {isExpanded && (
-                <div className="flex items-center mt-3 space-x-4">
-                  <button 
-                    onClick={() => setIsLiked(!isLiked)} 
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm hover:bg-white/10 hover:text-[#e51f48] transition-colors active:bg-white/20"
+          {/* Album Cover - Only in compact mode */}
+          {!isExpanded && (
+            <div className="flex-shrink-0">
+              <div className="relative flex-shrink-0 group">
+                <Image
+                  src={track.imageUrl || "/default-cover.jpg"}
+                  alt={track.title || "Track cover"}
+                  width={56}
+                  height={56}
+                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#e51f48]/50 w-14 h-14 sm:w-12 sm:h-12"
+                />
+                {isLoading ? (
+                  <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#e51f48]"></div>
+                  </div>
+                ) : isPlaying ? (
+                  <motion.div
+                    className="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center"
+                    animate={{ opacity: [0.3, 0.5, 0.3] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
                   >
-                    {isLiked ? <HeartIcon className="w-4 h-4 text-[#e51f48]" /> : <HeartOutline className="w-4 h-4 text-gray-400" />}
-                    <span>Like</span>
-                  </button>
-
-                  <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/10 transition-colors active:bg-white/20">
-                    <QueueListIcon className="w-4 h-4" />
-                    <span>Queue</span>
-                  </button>
-                </div>
-              )}
+                    <PlayIcon className="w-4 h-4 text-white" />
+                  </motion.div>
+                ) : null}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Compact Player Controls */}
-          <div className={`${isExpanded ? "mt-auto w-full" : "flex-1 flex flex-col justify-center w-full"}`}>
+          <div className={`${isExpanded ? "mt-auto w-full" : "flex-1 flex flex-col justify-center"}`}>
             {/* Compact Progress Bar */}
             <div className={`relative ${isExpanded ? "my-3" : "my-2 sm:my-1 w-full"}`} onClick={handleSeek}>
               <div className="h-1 bg-white/10 rounded-full w-full cursor-pointer">
@@ -420,6 +416,64 @@ export default function Player({
               </div>
             )}
           </div>
+
+          {/* Album Cover Section - Expanded View */}
+          {isExpanded && (
+            <div className="flex items-center mb-4 gap-4">
+              <div className="relative flex-shrink-0 group">
+                <Image
+                  src={track.imageUrl || "/default-cover.jpg"}
+                  alt={track.title || "Track cover"}
+                  width={120}
+                  height={120}
+                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#e51f48]/50 w-30 h-30"
+                />
+                {isLoading ? (
+                  <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#e51f48]"></div>
+                  </div>
+                ) : isPlaying ? (
+                  <motion.div
+                    className="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center"
+                    animate={{ opacity: [0.3, 0.5, 0.3] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <PlayIcon className="w-4 h-4 text-white" />
+                  </motion.div>
+                ) : null}
+              </div>
+
+              <div className="flex-1">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-lg font-bold text-white truncate">
+                      {track.title || "Unknown Title"}
+                    </h3>
+                  {isLiked && <HeartIcon className="flex-shrink-0 w-4 h-4 text-[#e51f48]" />}
+                </div>
+                <p className="text-sm text-gray-300 truncate">
+                  {track.artist || "Unknown Artist"}
+                </p>
+                {track.album && (
+                  <p className="text-xs text-gray-400 mt-0.5">{track.album}</p>
+                )}
+
+                <div className="flex items-center mt-4 space-x-4">
+                  <button 
+                    onClick={() => setIsLiked(!isLiked)} 
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm hover:bg-white/10 hover:text-[#e51f48] transition-colors active:bg-white/20"
+                  >
+                    {isLiked ? <HeartIcon className="w-4 h-4 text-[#e51f48]" /> : <HeartOutline className="w-4 h-4 text-gray-400" />}
+                    <span>Like</span>
+                  </button>
+
+                  <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/10 transition-colors active:bg-white/20">
+                    <QueueListIcon className="w-4 h-4" />
+                    <span>Queue</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </AnimatePresence>
