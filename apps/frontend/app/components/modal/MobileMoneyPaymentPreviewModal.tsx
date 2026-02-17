@@ -65,7 +65,7 @@ export const MobileMoneyPaymentPreviewModal: React.FC<MobileMoneyPaymentPreviewM
     return cleaned;
   };
 
-  const pollPaymentStatus = async (_txId: number) => {
+  const pollPaymentStatus = async () => {
     const maxAttempts = 30;
     let attempts = 0;
 
@@ -120,7 +120,7 @@ export const MobileMoneyPaymentPreviewModal: React.FC<MobileMoneyPaymentPreviewM
 
       if (result && result.transactionId) {
         setTransactionId(result.transactionId);
-        await pollPaymentStatus(result.transactionId);
+        pollPaymentStatus();
       } else {
         throw new Error('Invalid response from payment service');
       }
