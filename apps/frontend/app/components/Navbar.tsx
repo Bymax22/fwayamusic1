@@ -175,7 +175,6 @@ export default function Navbar() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { currentTrack, isPlaying } = useAudioPlayer();
-  const [scrollingTitle, setScrollingTitle] = useState("");
   const [forcedNowPlaying, setForcedNowPlaying] = useState(false);
   const [forcedInfo, setForcedInfo] = useState("");
   const showNowPlaying = forcedNowPlaying || (currentTrack && isPlaying);
@@ -188,12 +187,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Update scrolling title when track changes
-  useEffect(() => {
-    if (currentTrack && currentTrack.title) {
-      setScrollingTitle(currentTrack.title);
-    }
-  }, [currentTrack]);
+  
 
   // Listen for player minimize events to show running title/artist in header
   useEffect(() => {
