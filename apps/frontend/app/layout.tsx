@@ -2,6 +2,7 @@ import LayoutClient from "./components/LayoutClient";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { PaymentProvider } from "./context/PaymentContext";
+import { GlobalPlayerProvider } from "./hooks/useAudioPlayer";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -17,9 +18,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ThemeProvider>
       <AuthProvider>
         <PaymentProvider>
-          <LayoutClient>
-            {children}
-          </LayoutClient>
+          <GlobalPlayerProvider>
+            <LayoutClient>
+              {children}
+            </LayoutClient>
+          </GlobalPlayerProvider>
         </PaymentProvider>
       </AuthProvider>
     </ThemeProvider>

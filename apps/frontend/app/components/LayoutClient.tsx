@@ -11,7 +11,7 @@ import { ThemeProvider } from "../context/ThemeContext";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Player from "../components/Player";
-import { GlobalPlayerProvider, useAudioPlayer } from "../hooks/useAudioPlayer";
+import { useAudioPlayer } from "../hooks/useAudioPlayer";
 const HolographicPreloader = () => {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -356,12 +356,8 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
   );
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <GlobalPlayerProvider>
-      <LayoutContent>{children}</LayoutContent>
-    </GlobalPlayerProvider>
-  );
+export default function LayoutClient({ children }: { children: React.ReactNode }) {
+  return <LayoutContent>{children}</LayoutContent>;
 }
 
 
