@@ -49,6 +49,7 @@ export default function Player({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
@@ -209,20 +210,74 @@ export default function Player({
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
+  // Waveform component
+  const Waveform = () => (
+    <div className="flex items-center justify-center gap-0.5 h-6">
+      {[0, 1, 2, 3].map((i) => (
+        <motion.div
+          key={i}
+          className="w-1 bg-gradient-to-t from-[#e51f48] to-[#ff4d6d] rounded-full"
+          animate={{
+            height: isPlaying ? [8, 20, 12, 16, 10] : 8,
+          }}
+          transition={{
+            duration: 0.6,
+            delay: i * 0.1,
+            repeat: isPlaying ? Infinity : 0,
+          }}
+        />
+      ))}
+    </div>
+  );
+
   return (
     <AnimatePresence>
-      <motion.div
-        className={`fixed left-0 right-0 z-50 ${
-          isExpanded ? "h-[60vh]" : "h-32 sm:h-28"
-        } bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg ${
-          className || ""
-        }`}
-        initial={{ y: "100%" }}
-        animate={{ y: 0 }}
-        exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 25, stiffness: 120 }}
-        style={{ bottom: 0 }}
-      >
+      {/* Minimized Floating Button */}
+      {isMinimized && (
+        <motion.button
+          onClick={() => setIsMinimized(false)}
+          className="fixed bottom-20 right-4 z-40 rounded-full shadow-2xl overflow-hidden focus:outline-none active:scale-95 transition-transform"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+          aria-label="Open player"
+        >
+          <div className="relative w-16 h-16 rounded-full overflow-hidden">
+            {/* Album Art Background */}
+            <Image
+              src={track.imageUrl || "/default-cover.jpg"}
+              alt={track.title || "Track cover"}
+              width={64}
+              height={64}
+              className="w-full h-full object-cover"
+            />
+            
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-black/40" />
+            
+            {/* Waveform */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Waveform />
+            </div>
+          </div>
+        </motion.button>
+      )}
+
+      {/* Main Player */}
+      {!isMinimized && (
+        <motion.div
+          className={`fixed left-0 right-0 z-50 ${
+            isExpanded ? "h-[60vh]" : "h-32 sm:h-28"
+          } bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg ${
+            className || ""
+          }`}
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 120 }}
+          style={{ bottom: 0 }}
+        >
         {/* Compact Player Header - Minimal height */}
         <div className="flex items-center justify-between py-1 px-3 sm:py-0.5 sm:px-2 border-b border-white/10">
           <div className="flex items-center gap-3 sm:gap-2 min-w-0 flex-1">
@@ -267,6 +322,17 @@ export default function Player({
           </div>
 
           <div className="flex items-center space-x-1">
+            <button
+              onClick={() => setIsMinimized(true)}
+              className="p-2 sm:p-1.5 rounded-full hover:bg-white/10 transition-colors active:bg-white/20"
+              aria-label="Minimize player"
+              title="Minimize"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 sm:w-3 sm:h-3 text-white">
+                <path d="M12 9v6m-6 0v-6m12 0v6" />
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+            </button>
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="p-2 sm:p-1.5 rounded-full hover:bg-white/10 transition-colors active:bg-white/20"
@@ -476,6 +542,7 @@ export default function Player({
           )}
         </div>
       </motion.div>
+      )}
     </AnimatePresence>
   );
 }
