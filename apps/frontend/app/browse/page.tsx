@@ -112,19 +112,6 @@ interface PlaylistAPI {
   mediaCount?: number;
 }
 
-interface Artist {
-  id: number;
-  username: string;
-  displayName: string;
-  avatarUrl?: string;
-  isVerified?: boolean;
-  followerCount: number;
-  mediaCount: number;
-  isFollowing?: boolean;
-  bio?: string;
-  socialLinks?: string[];
-}
-
 export default function Browse() {
   const { getToken } = useAuth();
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
