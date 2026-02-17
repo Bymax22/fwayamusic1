@@ -26,6 +26,9 @@ type TrackType = {
   imageUrl?: string;
   audioUrl?: string;
   duration?: number;
+  accessType?: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
+  price?: number;
+  currency?: string;
  
 };
 
@@ -145,7 +148,7 @@ export default function Player({
     audio.loop = isLooping;
 
     // Handle preview behavior for premium/pay-per-view tracks: play only first 30s
-    const isPremiumTrack = (track as any)?.accessType === 'PREMIUM' || (track as any)?.accessType === 'PAY_PER_VIEW';
+    const isPremiumTrack = track?.accessType === 'PREMIUM' || track?.accessType === 'PAY_PER_VIEW';
 
     if (isPlaying) {
       audio.play().catch((err) => {
@@ -173,7 +176,7 @@ export default function Player({
         previewTimerRef.current = null;
       }
     }
-  }, [track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping, onPlayPause]);
+  }, [track, track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping, onPlayPause]);
 
   // Rest of your existing functions (handleSeek, handleVolumeChange, etc.)
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -236,8 +239,8 @@ export default function Player({
 
   const handlePurchase = () => {
     // Emit an event so a higher-level payment flow can catch it, or fallback to an alert
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('player:purchase', { detail: { id: track.id, title: track.title, price: (track as any).price } }));
+      if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('player:purchase', { detail: { id: track.id, title: track.title, price: track.price } }));
     }
     // For now just close the modal
     setShowPurchaseModal(false);
@@ -608,7 +611,7 @@ export default function Player({
             <div className="absolute inset-0 bg-black/60" onClick={handleClosePurchaseModal} />
             <div className="relative z-70 bg-[#0b2630] rounded-xl p-4 w-11/12 max-w-md shadow-2xl border border-white/10">
               <div className="flex items-center gap-3">
-                <Image src={(track as any).imageUrl || '/default-cover.jpg'} alt={track.title || 'cover'} width={64} height={64} className="w-16 h-16 rounded-lg object-cover" />
+                <Image src={track?.imageUrl || '/default-cover.jpg'} alt={track?.title || 'cover'} width={64} height={64} className="w-16 h-16 rounded-lg object-cover" />
                 <div className="flex-1 min-w-0">
                   <h3 className="text-white font-semibold truncate">{track.title}</h3>
                   <p className="text-sm text-gray-300 truncate">{track.artist}</p>
@@ -616,7 +619,7 @@ export default function Player({
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm text-gray-200">Price: <span className="font-semibold">{(track as any).price ? `${(track as any).currency || 'ZMW'}${(track as any).price}` : 'N/A'}</span></div>
+                <div className="text-sm text-gray-200">Price: <span className="font-semibold">{track?.price ? `${track?.currency || 'ZMW'}${track.price}` : 'N/A'}</span></div>
                 <div className="flex items-center gap-2">
                   <button onClick={handleClosePurchaseModal} className="px-3 py-1 rounded-md bg-white/5 text-gray-300">Close</button>
                   <button onClick={handlePurchase} className="px-3 py-1 rounded-md bg-[#e5b64d] text-black font-semibold">Purchase</button>
