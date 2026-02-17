@@ -301,7 +301,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
-                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none my-auto ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
+                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none my-auto ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
@@ -548,7 +548,7 @@ export default function Navbar() {
               </div>
 
               {/* Search (visible on mobile and desktop) */}
-              <div className="flex-1 max-w-none md:max-w-xs lg:max-w-2xl">
+              <div className="flex-1 max-w-none md:max-w-xs lg:max-w-2xl h-full flex items-center">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -579,7 +579,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
-                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
+                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none my-auto ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
