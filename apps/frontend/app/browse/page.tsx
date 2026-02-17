@@ -1231,41 +1231,45 @@ export default function Browse() {
             filteredFiles.map(file => (
               <div 
                 key={file.id} 
-                className={`flex items-center gap-4 p-3 rounded-xl transition-colors ${
+                className={`flex items-start gap-3 p-3 rounded-xl transition-colors min-w-0 ${
                   String(currentTrack?.id) === String(file.id) 
                     ? 'bg-[#0a3747]' 
                     : 'hover:bg-[#0a3747]/50'
                 }`}
               >
-                <button
-                  onClick={() => handlePlay(file)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full text-[#e51f48] hover:text-white transition-colors flex-shrink-0"
-                >
-                  {String(currentTrack?.id) === String(file.id) && isPlaying ? (
-                    <Waveform playing={true} className="w-4 h-4" />
-                  ) : (
-                    <Play className="w-3 h-3" />
-                  )}
-                </button>
+                {/* Album cover with play button on top */}
+                <div className="relative flex-shrink-0">
+                  <Image 
+                    src={file.coverArt} 
+                    alt={file.title} 
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 rounded-lg object-cover"
+                  />
+                  <button
+                    onClick={() => handlePlay(file)}
+                    className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/40 hover:bg-black/60 transition-colors text-[#e51f48] hover:text-white"
+                  >
+                    {String(currentTrack?.id) === String(file.id) && isPlaying ? (
+                      <Waveform playing={true} className="w-5 h-5" />
+                    ) : (
+                      <Play className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
 
-                <Image 
-                  src={file.coverArt} 
-                  alt={file.title} 
-                  width={40}
-                  height={40}
-                  className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
-                />
-
+                {/* Track info - expanded for full visibility */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white truncate text-sm">{file.title}</p>
-                  <p className="text-xs text-gray-400 truncate">{file.artist}</p>
+                  <p className="font-medium text-white text-sm line-clamp-1">{file.title}</p>
+                  <p className="text-xs text-gray-400 line-clamp-1">{file.artist}</p>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                    <span>{file.genre}</span>
+                    <span>•</span>
+                    <span>{formatDuration(file.duration)}</span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs text-gray-400 flex-shrink-0">
-                  <span>{file.genre}</span>
-                  <span>{formatDuration(file.duration)}</span>
-                </div>
-
+                {/* Action buttons */}
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button 
                     onClick={() => handleLike(file.id)}
