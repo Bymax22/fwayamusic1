@@ -1227,19 +1227,15 @@ export default function Browse() {
         </div>
       ) : (
         // Compact view - Mobile optimized
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {filteredFiles.length > 0 ? (
             filteredFiles.map(file => (
               <div 
                 key={file.id} 
-                className={`flex items-start gap-2 p-2 rounded-xl transition-colors min-w-0 ${
-                  String(currentTrack?.id) === String(file.id) 
-                    ? 'bg-[#0a3747]' 
-                    : 'hover:bg-[#0a3747]/50'
-                }`}
+                className={`flex items-start gap-2 px-1 py-1 rounded-xl transition-colors min-w-0 hover:bg-[#0a3747]/50`}
               >
                 {/* Album cover with play button on top */}
-                <div className="relative flex-shrink-0 mt-0.5">
+                <div className="relative flex-shrink-0">
                   <Image 
                     src={file.coverArt} 
                     alt={file.title} 
@@ -1297,7 +1293,7 @@ export default function Browse() {
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
+                <div className="flex items-center gap-1 flex-shrink-0">
                   <button 
                     onClick={() => handleLike(file.id)}
                     className="text-gray-400 hover:text-[#e51f48] transition-colors"
