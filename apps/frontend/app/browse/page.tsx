@@ -351,7 +351,10 @@ export default function Browse() {
                 url: url,
                 coverArt: file.coverArt,
                 duration: file.duration,
-                isDRMProtected: file.isDRMProtected
+                isDRMProtected: file.isDRMProtected,
+                accessType: file.accessType,
+                price: file.price,
+                currency: file.currency
               });
             } catch (error) {
               console.error('Decryption failed', error);
@@ -364,7 +367,10 @@ export default function Browse() {
                 url: file.url,
                 coverArt: file.coverArt,
                 duration: file.duration,
-                isDRMProtected: file.isDRMProtected
+                isDRMProtected: file.isDRMProtected,
+                accessType: file.accessType,
+                price: file.price,
+                currency: file.currency
               });
             }
           } else {
@@ -377,7 +383,10 @@ export default function Browse() {
               url: file.url,
               coverArt: file.coverArt,
               duration: file.duration,
-              isDRMProtected: file.isDRMProtected
+              isDRMProtected: file.isDRMProtected,
+              accessType: file.accessType,
+              price: file.price,
+              currency: file.currency
             });
           }
         };
@@ -1280,8 +1289,8 @@ export default function Browse() {
 
                   {/* Line 2: Access Type | Genre | Duration | Play Count */}
                   <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
-                    <span className="font-semibold text-[#e51f48]">
-                      {file.accessType === 'FREE' ? 'FREE' : 'PREMIUM'}
+                    <span className={file.accessType === 'FREE' ? 'text-gray-400 font-semibold' : 'text-[#d4af37] font-semibold'}>
+                      {file.accessType === 'FREE' ? 'FREE' : (file.accessType === 'PAY_PER_VIEW' ? 'PAY_PER_VIEW' : 'PREMIUM')}
                     </span>
                     <span>•</span>
                     <span className="truncate">{file.genre}</span>
