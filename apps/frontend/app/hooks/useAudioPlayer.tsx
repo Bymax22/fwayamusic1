@@ -12,6 +12,9 @@ interface Track {
   coverArt?: string;
   duration?: number;
   isDRMProtected?: boolean;
+  accessType?: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
+  price?: number;
+  currency?: string;
 }
 
 // Create a context for global player state
@@ -20,7 +23,8 @@ interface GlobalPlayerContextType {
   isPlaying: boolean;
   setCurrentTrack: (track: Track | null) => void;
   togglePlay: () => void;
-  playTrack: (track: Track) => void;
+  // Accept Track plus optional extra metadata (accessType, price, etc.) to allow callers to pass richer objects
+  playTrack: (track: Track & Record<string, unknown>) => void;
 }
 
 const GlobalPlayerContext = createContext<GlobalPlayerContextType | null>(null);
@@ -34,7 +38,12 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const playTrack = (track: Track) => {
-    setCurrentTrack(track);
+    setCurrentTrack({
+      ...track,
+      accessType: track.accessType ?? 'FREE',
+      price: track.price,
+      currency: track.currency ?? 'ZMW'
+    });
     setIsPlaying(true);
   };
 
