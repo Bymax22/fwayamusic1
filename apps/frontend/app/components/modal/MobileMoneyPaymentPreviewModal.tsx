@@ -65,7 +65,7 @@ export const MobileMoneyPaymentPreviewModal: React.FC<MobileMoneyPaymentPreviewM
     return cleaned;
   };
 
-  const pollPaymentStatus = async (txId: number) => {
+  const pollPaymentStatus = async (_txId: number) => {
     const maxAttempts = 30;
     let attempts = 0;
 
@@ -218,7 +218,7 @@ export const MobileMoneyPaymentPreviewModal: React.FC<MobileMoneyPaymentPreviewM
                 <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto"><CheckCircle2 className="w-10 h-10 text-white" /></div>
                 <div>
                   <h3 className="text-white font-semibold text-lg mb-2">Payment Successful!</h3>
-                  <p className="text-gray-400">Your purchase of <span className="text-white font-medium">'{media.title}'</span> has been completed.</p>
+                  <p className="text-gray-400">Your purchase of <span className="text-white font-medium">&apos;{media.title}&apos;</span> has been completed.</p>
                 </div>
                 <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
                   <p className="text-green-400 text-sm">The song has been added to your library. You can now download and stream it anytime.</p>

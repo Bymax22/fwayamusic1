@@ -2,7 +2,6 @@
 import Image from 'next/image';
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MobileMoneyPaymentModal } from "./modal/MobileMoneyPaymentModal";
 import { MobileMoneyPaymentPreviewModal } from "./modal/MobileMoneyPaymentPreviewModal";
 import {
   PlayIcon,
@@ -184,7 +183,7 @@ export default function Player({
         previewTimerRef.current = null;
       }
     }
-  }, [track, track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping, onPlayPause]);
+  }, [track, track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping, onPlayPause, unlocked]);
 
   // Rest of your existing functions (handleSeek, handleVolumeChange, etc.)
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -245,10 +244,7 @@ export default function Player({
     setShowPurchaseModal(false);
   };
 
-  const handlePurchase = () => {
-    // Open the mobile money payment modal
-    setShowPurchaseModal(true);
-  };
+  
 
   const handlePaymentSuccess = () => {
     // mark current track as unlocked and resume playback
