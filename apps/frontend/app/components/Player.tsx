@@ -230,12 +230,27 @@ export default function Player({
     </div>
   );
 
+  const notifyMinimized = (minimized: boolean) => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("player:minimized", {
+          detail: { minimized, title: track?.title, artist: track?.artist },
+        })
+      );
+      // Request opening/closing of bottom header in the app layout
+      window.dispatchEvent(new CustomEvent("player:openBottomHeader", { detail: { open: minimized } }));
+    }
+  };
+
   return (
     <AnimatePresence>
       {/* Minimized Floating Button */}
       {isMinimized && (
         <motion.button
-          onClick={() => setIsMinimized(false)}
+          onClick={() => {
+            setIsMinimized(false);
+            notifyMinimized(false);
+          }}
           className="fixed bottom-20 right-4 z-40 rounded-full shadow-2xl overflow-hidden focus:outline-none active:scale-95 transition-transform"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -253,8 +268,8 @@ export default function Player({
               className="w-full h-full object-cover"
             />
             
-            {/* Dark overlay */}
-            <div className="absolute inset-0 bg-black/40" />
+            {/* Light overlay */}
+            <div className="absolute inset-0 bg-black/20" />
             
             {/* Waveform */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -323,7 +338,10 @@ export default function Player({
 
           <div className="flex items-center space-x-1">
             <button
-              onClick={() => setIsMinimized(true)}
+              onClick={() => {
+                setIsMinimized(true);
+                notifyMinimized(true);
+              }}
               className="p-2 sm:p-1.5 rounded-full hover:bg-white/10 transition-colors active:bg-white/20"
               aria-label="Minimize player"
               title="Minimize"
