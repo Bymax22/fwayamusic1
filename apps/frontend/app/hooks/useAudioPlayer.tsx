@@ -37,7 +37,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     setIsPlaying(!isPlaying);
   };
 
-  const playTrack = (track: Track) => {
+  const playTrack = (track: Track | Record<string, unknown>) => {
     // Accept incoming partial/extended objects; coerce to Partial<Track> for safe merging
     const incoming = track as Partial<Track> & Record<string, unknown>;
     setCurrentTrack({
