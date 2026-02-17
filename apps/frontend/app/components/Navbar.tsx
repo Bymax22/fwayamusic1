@@ -475,7 +475,7 @@ export default function Navbar() {
         <InvitePopup isOpen={showInvitePopup} onClose={() => setShowInvitePopup(false)} />
 
         {/* Spacer for fixed navbar */}
-        <div className="h-16"></div>
+        
       </>
     );
   }
@@ -623,14 +623,36 @@ export default function Navbar() {
 
           {/* Right Section - User Actions */}
           <div className="flex items-center gap-2"> {/* Reduced gap from gap-3 to gap-2 */}
-            {/* Now Playing Section - Shows when song is playing */}
-            {currentTrack && isPlaying && (
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[#e51f48]/20 rounded-full border border-[#e51f48]/30">
-                <Play size={16} className="text-[#e51f48] fill-[#e51f48] animate-pulse" />
-                <span className="text-sm text-white font-medium max-w-[150px] truncate">
-                  {scrollingTitle}
-                </span>
-              </div>
+            {/* Now Playing Section - Shows when song is playing or player minimized */}
+            {currentTrack && (isPlaying || forcedNowPlaying) && (
+              <button
+                onClick={() => {
+                  // Open the bottom header / reveal player when clicked
+                  window.dispatchEvent(new CustomEvent('player:openBottomHeader', { detail: { open: true } }));
+                }}
+                className="flex items-center gap-2 px-3 py-1.5 bg-[#e51f48]/10 rounded-full border border-[#e51f48]/20 touch-target"
+              >
+                {/* Album art */}
+                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                  {currentTrack.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={currentTrack.imageUrl as string} alt={currentTrack.title || 'cover'} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-[#0a3747] flex items-center justify-center text-xs text-gray-300"> 
+                      <Play size={12} className="text-[#e51f48]" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs sm:text-sm text-white font-medium truncate">
+                    {forcedNowPlaying ? forcedInfo.split(' — ')[0] || currentTrack.title : currentTrack.title}
+                  </span>
+                  <span className="text-[10px] sm:text-xs text-gray-300 truncate">
+                    {forcedNowPlaying ? forcedInfo.split(' — ')[1] || currentTrack.artist : currentTrack.artist}
+                  </span>
+                </div>
+              </button>
             )}
 
             {/* Earn Badge - Always visible */}
@@ -913,7 +935,7 @@ export default function Navbar() {
       <InvitePopup isOpen={showInvitePopup} onClose={() => setShowInvitePopup(false)} />
 
       {/* Spacer for fixed navbar */}
-      <div className="h-16"></div>
+      
     </>
   );
 }

@@ -294,9 +294,7 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
                 <div style={{ backgroundColor: "rgb(var(--primary-accent))" }} className="w-full h-0.5 z-[9999]"></div>
                 
                 {/* Compact Navbar */}
-                <header className="fixed top-0 left-0 right-0 h-16 z-50">
-                  <Navbar />
-                </header>
+                <Navbar />
                 
                 {/* Main content area */}
                 <div className="flex flex-1"> {/* Navbar is fixed; spacing handled by .main-content margin-top */}
