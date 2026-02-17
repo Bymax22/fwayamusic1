@@ -23,8 +23,8 @@ interface GlobalPlayerContextType {
   isPlaying: boolean;
   setCurrentTrack: (track: Track | null) => void;
   togglePlay: () => void;
-  // Accept Track plus optional extra metadata (accessType, price, etc.) to allow callers to pass richer objects
-  playTrack: (track: Track & Record<string, unknown>) => void;
+  // Accept Track or a plain object with extra metadata (accessType, price, etc.)
+  playTrack: (track: Track | Record<string, unknown>) => void;
 }
 
 const GlobalPlayerContext = createContext<GlobalPlayerContextType | null>(null);
@@ -38,11 +38,19 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const playTrack = (track: Track) => {
+    // Accept incoming partial/extended objects; coerce to Partial<Track> for safe merging
+    const incoming = track as Partial<Track> & Record<string, unknown>;
     setCurrentTrack({
-      ...track,
-      accessType: track.accessType ?? 'FREE',
-      price: track.price,
-      currency: track.currency ?? 'ZMW'
+      id: incoming.id as string | number,
+      title: incoming.title || '',
+      artist: incoming.artist || '',
+      imageUrl: (incoming.imageUrl as string) || (incoming.coverArt as string) || undefined,
+      audioUrl: (incoming.audioUrl as string) || (incoming.url as string) || undefined,
+      duration: incoming.duration as number | undefined,
+      isDRMProtected: incoming.isDRMProtected as boolean | undefined,
+      accessType: (incoming.accessType as Track['accessType']) ?? 'FREE',
+      price: incoming.price as number | undefined,
+      currency: (incoming.currency as string) ?? 'ZMW'
     });
     setIsPlaying(true);
   };
