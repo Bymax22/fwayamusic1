@@ -213,7 +213,7 @@ export default function Player({
     <AnimatePresence>
       <motion.div
         className={`fixed left-0 right-0 z-50 ${
-          isExpanded ? "h-[60vh]" : "h-28 sm:h-24"
+          isExpanded ? "h-[60vh]" : "h-32 sm:h-28"
         } bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg ${
           className || ""
         }`}
@@ -224,7 +224,7 @@ export default function Player({
         style={{ bottom: 0 }}
       >
         {/* Compact Player Header - Minimal height */}
-        <div className="flex items-center justify-between py-1.5 px-3 sm:py-1 sm:px-2 border-b border-white/10">
+        <div className="flex items-center justify-between py-1 px-3 sm:py-0.5 sm:px-2 border-b border-white/10">
           <div className="flex items-center gap-3 sm:gap-2 min-w-0 flex-1">
             <div className="relative flex-shrink-0">
               <MusicalNoteIcon className="w-4 h-4 text-[#e51f48]" />
@@ -290,7 +290,7 @@ export default function Player({
 
         {/* Compact Player Content */}
         <div
-          className={`flex ${isExpanded ? "flex-col h-[calc(100%-2.5rem)] sm:h-[calc(100%-1.5rem)]" : "flex-row h-[calc(100%-2.5rem)] sm:h-[calc(100%-1.5rem)]"} p-3 sm:p-2 overflow-y-auto gap-2 sm:gap-1`}
+          className={`flex ${isExpanded ? "flex-col h-[calc(100%-2rem)] sm:h-[calc(100%-1.5rem)]" : "flex-row h-[calc(100%-1.5rem)]"} px-3 sm:px-2 py-2 sm:py-1 gap-2 sm:gap-1 ${!isExpanded ? "overflow-hidden" : "overflow-y-auto"}`}
         >
           {/* Album Cover - Only in compact mode */}
           {!isExpanded && (
@@ -323,7 +323,7 @@ export default function Player({
           {/* Compact Player Controls */}
           <div className={`${isExpanded ? "mt-auto w-full" : "flex-1 flex flex-col justify-center"}`}>
             {/* Compact Progress Bar */}
-            <div className={`relative ${isExpanded ? "my-3" : "my-2 sm:my-1 w-full"}`} onClick={handleSeek}>
+            <div className={`relative ${isExpanded ? "my-3" : "my-1 sm:my-0.5 w-full"}`} onClick={handleSeek}>
               <div className="h-1 bg-white/10 rounded-full w-full cursor-pointer">
                 <div 
                   ref={progressBarRef} 
@@ -338,7 +338,7 @@ export default function Player({
             </div>
 
             {/* Compact Main Controls */}
-            <div className="flex items-center justify-between gap-3 sm:gap-2 mt-2 sm:mt-1">
+            <div className="flex items-center justify-between gap-2 sm:gap-1.5 mt-1 sm:mt-0.5">
               <div className="flex items-center gap-1 sm:gap-1.5">
                 <button 
                   onClick={toggleLoop} 
