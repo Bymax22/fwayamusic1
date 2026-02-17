@@ -8,6 +8,7 @@ import {
   Star, Mic2, Video, Headphones, Radio, ChevronLeft, ChevronRight, UserPlus, UserCheck
 } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import Waveform from '@/components/Waveform';
 import { formatDuration, formatFileSize } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
@@ -368,7 +369,7 @@ export default function Browse() {
   };
 
   const handlePlay = async (file: MediaFile) => {
-    if (currentTrack?.id === file.id) {
+    if (String(currentTrack?.id) === String(file.id)) {
       togglePlay();
     } else {
       // Check for encrypted download first
@@ -1122,7 +1123,7 @@ export default function Browse() {
                       <div 
                         key={file.id} 
                         className={`grid grid-cols-12 gap-4 items-center p-4 transition-colors ${
-                          currentTrack?.id === file.id 
+                          String(currentTrack?.id) === String(file.id) 
                             ? 'bg-[#0a3747]' 
                             : 'hover:bg-[#0a3747]/50'
                         }`}
@@ -1133,14 +1134,14 @@ export default function Browse() {
                   </div>
 
                   {/* Play/Pause Button */}
-                  <div className="col-span-1 flex justify-center items-center">
+                    <div className="col-span-1 flex justify-center items-center">
                     <button
                       onClick={() => handlePlay(file)}
                       className="w-8 h-8 flex items-center justify-center rounded-full bg-[#e51f48] hover:bg-[#ff4d6d] text-white transition-colors"
-                      aria-label={currentTrack?.id === file.id && isPlaying ? 'Pause' : 'Play'}
+                        aria-label={String(currentTrack?.id) === String(file.id) && isPlaying ? 'Pause' : 'Play'}
                     >
-                      {currentTrack?.id === file.id && isPlaying ? (
-                        <Pause className="w-4 h-4" />
+                      {String(currentTrack?.id) === String(file.id) && isPlaying ? (
+                        <Waveform playing={true} className="w-4 h-4" />
                       ) : (
                         <Play className="w-4 h-4" />
                       )}
@@ -1161,7 +1162,7 @@ export default function Browse() {
                     />
                     <div className="flex-1 min-w-0">
                       <p className={`font-medium flex items-center gap-2 ${
-                        currentTrack?.id === file.id 
+                        String(currentTrack?.id) === String(file.id) 
                           ? 'text-[#e51f48]' 
                           : 'text-white'
                       }`}>
@@ -1275,18 +1276,18 @@ export default function Browse() {
                     }}
                   />
                   <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all ${
-                    currentTrack?.id === file.id && isPlaying ? 'bg-opacity-30' : ''
+                    String(currentTrack?.id) === String(file.id) && isPlaying ? 'bg-opacity-30' : ''
                   }`}>
                     <div className="flex gap-2">
                       <button 
                         onClick={() => handlePlay(file)}
                         className={`opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all ${
-                          currentTrack?.id === file.id && isPlaying ? 'opacity-100 translate-y-0' : ''
+                          String(currentTrack?.id) === String(file.id) && isPlaying ? 'opacity-100 translate-y-0' : ''
                         }`}
                       >
                         <div className="w-12 h-12 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
-                          {currentTrack?.id === file.id && isPlaying ? (
-                            <Pause className="w-5 h-5 text-white" />
+                          {String(currentTrack?.id) === String(file.id) && isPlaying ? (
+                            <Waveform playing={true} className="w-6 h-6" />
                           ) : (
                             <Play className="w-5 h-5 text-white" />
                           )}
@@ -1391,7 +1392,7 @@ export default function Browse() {
               <div 
                 key={file.id} 
                 className={`flex items-center gap-4 p-3 rounded-xl transition-colors ${
-                  currentTrack?.id === file.id 
+                  String(currentTrack?.id) === String(file.id) 
                     ? 'bg-[#0a3747]' 
                     : 'hover:bg-[#0a3747]/50'
                 }`}
@@ -1400,8 +1401,8 @@ export default function Browse() {
                   onClick={() => handlePlay(file)}
                   className="w-8 h-8 flex items-center justify-center rounded-full bg-[#e51f48] hover:bg-[#ff4d6d] text-white transition-colors flex-shrink-0"
                 >
-                  {currentTrack?.id === file.id && isPlaying ? (
-                    <Pause className="w-3 h-3" />
+                  {String(currentTrack?.id) === String(file.id) && isPlaying ? (
+                    <Waveform playing={true} className="w-4 h-4" />
                   ) : (
                     <Play className="w-3 h-3" />
                   )}

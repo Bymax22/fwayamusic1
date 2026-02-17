@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import { FaUserFriends } from "react-icons/fa";
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import Waveform from '@/components/Waveform';
 import { 
   FaPlay, 
   FaPause,
@@ -470,7 +471,7 @@ const MediaCard = ({
   const [isLiked, setIsLiked] = useState((item as MediaItem).liked || false);
   const [isFollowing, setIsFollowing] = useState((item as Artist).isFollowing || false);
   
-  const isCurrentTrack = currentTrack?.id === item.id;
+  const isCurrentTrack = String(currentTrack?.id) === String((item as any).id);
   
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -572,7 +573,7 @@ const MediaCard = ({
                 }}
                 className="bg-[#e51f48] p-2 rounded-full touch-target"
               >
-                {isCurrentTrack && isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
+                          {isCurrentTrack && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
               </button>
               {(item as MediaItem).accessType === 'FREE' && (
                 <button 
@@ -659,7 +660,7 @@ const PremiumMediaCard = ({
   isPlaying?: boolean;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const isCurrent = currentTrack?.id === item.id;
+  const isCurrent = String(currentTrack?.id) === String((item as any).id);
 
   return (
     <motion.div
@@ -708,7 +709,7 @@ const PremiumMediaCard = ({
                 }}
                 className="bg-[#e51f48] p-2 rounded-full touch-target"
               >
-                {isCurrent && isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
+                {isCurrent && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
               </button>
               <button 
                 onClick={(e) => {
@@ -764,7 +765,7 @@ const BeatCard = ({
   isPlaying?: boolean;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const isCurrent = currentTrack?.id === beat.id;
+  const isCurrent = String(currentTrack?.id) === String(beat.id);
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -824,7 +825,7 @@ const BeatCard = ({
                 }}
                 className="bg-[#e51f48] p-2 rounded-full touch-target"
               >
-                {isCurrent && isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
+                {isCurrent && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
               </button>
               <button 
                 onClick={(e) => {
@@ -1015,7 +1016,7 @@ const TopChartsSection = ({
       </div>
       <div className="space-y-1">
         {songs.slice(0, 3).map((song, index) => {
-          const isCurrent = currentTrack?.id === song.id;
+          const isCurrent = String(currentTrack?.id) === String(song.id);
           return (
             <div 
               key={song.id} 
@@ -1065,7 +1066,7 @@ const TopChartsSection = ({
                     onPlay(song);
                   }}
                 >
-                  {isCurrent && isPlaying ? <FaPause size={10} /> : <FaPlay size={10} />}
+                  {isCurrent && isPlaying ? <Waveform playing={true} className="w-4 h-4" /> : <FaPlay size={10} />}
                 </button>
               </div>
             </div>
