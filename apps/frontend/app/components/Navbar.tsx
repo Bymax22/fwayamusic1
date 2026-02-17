@@ -301,7 +301,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
-                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 ${showNowPlaying ? 'max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
+                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 ${showNowPlaying ? 'max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
@@ -353,7 +353,7 @@ export default function Navbar() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3 }}
-                    className="flex items-center gap-3 px-3 py-1.5 bg-gradient-to-r from-[#e51f48]/20 to-[#ff4d6d]/20 rounded-full border border-[#e51f48]/30"
+                    className="flex items-center gap-3 px-3 py-1.5 bg-gradient-to-r from-[#e51f48]/20 to-[#ff4d6d]/20 rounded-full border border-[#e51f48]/30 max-w-[150px]"
                   >
                     <div className="flex items-center gap-0.5">
                       <motion.div
@@ -373,7 +373,7 @@ export default function Navbar() {
                       />
                     </div>
 
-                    <div className="overflow-hidden max-w-[160px] sm:max-w-[160px]">
+                    <div className="overflow-hidden w-full">
                       <motion.div
                         className="whitespace-nowrap text-xs text-white font-medium"
                         animate={forcedNowPlaying ? { x: ["0%", "-100%"] } : { x: 0 }}
@@ -579,7 +579,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
-                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 ${showNowPlaying ? 'max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
+                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 ${showNowPlaying ? 'max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
