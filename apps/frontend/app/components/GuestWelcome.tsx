@@ -564,21 +564,21 @@ const MediaCard = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-1"
+              className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-2"
             >
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onPlay(item as MediaItem);
                 }}
-                className="bg-[#e51f48] p-2 rounded-full touch-target"
+                className="p-2 rounded-full touch-target text-[#e51f48] hover:text-white transition-colors"
               >
                           {isCurrentTrack && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
               </button>
               {(item as MediaItem).accessType === 'FREE' && (
                 <button 
                   onClick={handleDownload}
-                  className="bg-green-600 p-2 rounded-full touch-target"
+                  className="p-2 rounded-full touch-target text-[#e51f48] hover:text-white transition-colors"
                 >
                   <FaDownload size={10} />
                 </button>
@@ -600,13 +600,21 @@ const MediaCard = ({
                 {Number((item as MediaItem).plays ?? (item as MediaItem).views ?? 0).toLocaleString()}
               </span>
               
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <button 
                   onClick={handleLike}
                   className="text-[#e51f48] hover:scale-110 transition-transform touch-target"
                 >
                   {isLiked ? <FaHeart size={12} /> : <FaRegHeart size={12} />}
                 </button>
+                {(item as MediaItem).accessType === 'FREE' && (
+                  <button 
+                    onClick={handleDownload}
+                    className="text-gray-400 hover:text-[#e51f48] transition-colors touch-target"
+                  >
+                    <FaDownload size={10} />
+                  </button>
+                )}
               </div>
             </>
           )}
@@ -700,14 +708,14 @@ const PremiumMediaCard = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-1"
+              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-2"
             >
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   onPlay(item);
                 }}
-                className="bg-[#e51f48] p-2 rounded-full touch-target"
+                className="p-2 rounded-full touch-target text-[#e51f48] hover:text-white transition-colors"
               >
                 {isCurrent && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
               </button>
@@ -716,7 +724,7 @@ const PremiumMediaCard = ({
                   e.stopPropagation();
                   onPurchase(item);
                 }}
-                className="bg-green-600 p-2 rounded-full text-white text-xs font-bold touch-target"
+                className="p-2 rounded-full touch-target text-[#e51f48] hover:text-white transition-colors"
               >
                 <FaShoppingCart size={12} />
               </button>
@@ -816,14 +824,14 @@ const BeatCard = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-1"
+              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-2"
             >
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   onPlay(beat);
                 }}
-                className="bg-[#e51f48] p-2 rounded-full touch-target"
+                className="p-2 rounded-full touch-target text-[#e51f48] hover:text-white transition-colors"
               >
                 {isCurrent && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
               </button>
@@ -832,7 +840,7 @@ const BeatCard = ({
                   e.stopPropagation();
                   onPurchase(beat);
                 }}
-                className="bg-green-600 p-2 rounded-full text-white text-xs font-bold touch-target"
+                className="p-2 rounded-full touch-target text-[#e51f48] hover:text-white transition-colors"
               >
                 <FaShoppingCart size={12} />
               </button>

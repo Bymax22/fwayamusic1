@@ -1137,7 +1137,7 @@ export default function Browse() {
                     <div className="col-span-1 flex justify-center items-center">
                     <button
                       onClick={() => handlePlay(file)}
-                      className="w-8 h-8 flex items-center justify-center rounded-full bg-[#e51f48] hover:bg-[#ff4d6d] text-white transition-colors"
+                      className="w-8 h-8 flex items-center justify-center rounded-full text-[#e51f48] hover:text-white transition-colors"
                         aria-label={String(currentTrack?.id) === String(file.id) && isPlaying ? 'Pause' : 'Play'}
                     >
                       {String(currentTrack?.id) === String(file.id) && isPlaying ? (
@@ -1285,11 +1285,11 @@ export default function Browse() {
                           String(currentTrack?.id) === String(file.id) && isPlaying ? 'opacity-100 translate-y-0' : ''
                         }`}
                       >
-                        <div className="w-12 h-12 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg text-[#e51f48] hover:text-white transition-colors">
                           {String(currentTrack?.id) === String(file.id) && isPlaying ? (
                             <Waveform playing={true} className="w-6 h-6" />
                           ) : (
-                            <Play className="w-5 h-5 text-white" />
+                            <Play className="w-5 h-5" />
                           )}
                         </div>
                       </button>
@@ -1399,7 +1399,7 @@ export default function Browse() {
               >
                 <button
                   onClick={() => handlePlay(file)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-[#e51f48] hover:bg-[#ff4d6d] text-white transition-colors flex-shrink-0"
+                  className="w-8 h-8 flex items-center justify-center rounded-full text-[#e51f48] hover:text-white transition-colors flex-shrink-0"
                 >
                   {String(currentTrack?.id) === String(file.id) && isPlaying ? (
                     <Waveform playing={true} className="w-4 h-4" />
