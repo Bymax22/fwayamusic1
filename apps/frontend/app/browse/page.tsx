@@ -745,7 +745,7 @@ export default function Browse() {
 
   if (loading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
+      <div className="py-6 px-0 sm:px-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-white">Browse Music</h1>
           <div className="flex gap-2">
@@ -771,7 +771,7 @@ export default function Browse() {
 
   if (error) {
     return (
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
+      <div className="py-6 px-0 sm:px-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
         <h1 className="text-3xl font-bold text-white mb-8">Browse Music</h1>
         <div className="bg-[#0a3747] border border-[#0a3747] p-6 rounded-xl">
           <h3 className="text-[#e51f48] font-medium text-lg">{error.message}</h3>
@@ -795,7 +795,7 @@ export default function Browse() {
     <ThemeProvider>
       <AuthProvider>
         <PaymentProvider>
-         <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+         <div className="py-6 px-0 sm:px-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
 
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-3xl font-bold text-white">Browse Music</h1>
@@ -1241,7 +1241,7 @@ export default function Browse() {
                     alt={file.title} 
                     width={48}
                     height={48}
-                    className="w-12 h-12 rounded-lg object-cover"
+                    className="w-12 h-12 rounded-full object-cover"
                   />
                   <button
                     onClick={() => handlePlay(file)}
