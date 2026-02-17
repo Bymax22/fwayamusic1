@@ -295,7 +295,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search Songs, Artists..."
-                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none my-auto ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
+                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none my-auto self-center ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
@@ -573,7 +573,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
-                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none my-auto ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
+                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none my-auto self-center ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
@@ -908,7 +908,7 @@ export default function Navbar() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search songs, artists, playlists..."
-                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none"
+                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none self-center"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
