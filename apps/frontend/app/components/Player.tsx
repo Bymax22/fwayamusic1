@@ -54,6 +54,8 @@ export default function Player({
   const [isLooping, setIsLooping] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const previewTimerRef = useRef<number | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
@@ -86,6 +88,10 @@ export default function Player({
       audio.removeEventListener("canplay", handleCanPlay);
       audio.removeEventListener("canplaythrough", handleCanPlay);
       audio.pause();
+      if (previewTimerRef.current) {
+        window.clearTimeout(previewTimerRef.current);
+        previewTimerRef.current = null;
+      }
     };
   }, [onPlayPause]);
 
@@ -138,13 +144,34 @@ export default function Player({
     audio.playbackRate = playbackRate;
     audio.loop = isLooping;
 
+    // Handle preview behavior for premium/pay-per-view tracks: play only first 30s
+    const isPremiumTrack = (track as any)?.accessType === 'PREMIUM' || (track as any)?.accessType === 'PAY_PER_VIEW';
+
     if (isPlaying) {
       audio.play().catch((err) => {
         console.warn("Audio play() failed:", err);
         setIsLoading(false);
       });
+
+      // If premium, ensure we only play a 30-second preview
+      if (isPremiumTrack) {
+        if (previewTimerRef.current) {
+          window.clearTimeout(previewTimerRef.current);
+        }
+        previewTimerRef.current = window.setTimeout(() => {
+          // Pause playback and notify parent
+          audio.pause();
+          if (onPlayPause) onPlayPause();
+          // Show purchase modal
+          setShowPurchaseModal(true);
+        }, 30000);
+      }
     } else {
       audio.pause();
+      if (previewTimerRef.current) {
+        window.clearTimeout(previewTimerRef.current);
+        previewTimerRef.current = null;
+      }
     }
   }, [track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping, onPlayPause]);
 
@@ -201,6 +228,21 @@ export default function Player({
 
     setPlaybackRate(newRate);
     if (audioRef.current) audioRef.current.playbackRate = newRate;
+  };
+
+  const handleClosePurchaseModal = () => {
+    setShowPurchaseModal(false);
+  };
+
+  const handlePurchase = () => {
+    // Emit an event so a higher-level payment flow can catch it, or fallback to an alert
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('player:purchase', { detail: { id: track.id, title: track.title, price: (track as any).price } }));
+    }
+    // For now just close the modal
+    setShowPurchaseModal(false);
+    // Optionally notify user
+    setTimeout(() => alert('Purchase flow started for ' + (track.title || 'this track')), 50);
   };
 
   const formatTime = (seconds: number) => {
@@ -559,6 +601,30 @@ export default function Player({
             </div>
           )}
         </div>
+
+        {/* Purchase modal for premium preview */}
+        {showPurchaseModal && (
+          <div className="fixed inset-0 z-60 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/60" onClick={handleClosePurchaseModal} />
+            <div className="relative z-70 bg-[#0b2630] rounded-xl p-4 w-11/12 max-w-md shadow-2xl border border-white/10">
+              <div className="flex items-center gap-3">
+                <Image src={(track as any).imageUrl || '/default-cover.jpg'} alt={track.title || 'cover'} width={64} height={64} className="w-16 h-16 rounded-lg object-cover" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-white font-semibold truncate">{track.title}</h3>
+                  <p className="text-sm text-gray-300 truncate">{track.artist}</p>
+                  <p className="text-sm text-gray-400 mt-2">Preview ended — purchase full track to continue listening.</p>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center justify-between">
+                <div className="text-sm text-gray-200">Price: <span className="font-semibold">{(track as any).price ? `${(track as any).currency || 'ZMW'}${(track as any).price}` : 'N/A'}</span></div>
+                <div className="flex items-center gap-2">
+                  <button onClick={handleClosePurchaseModal} className="px-3 py-1 rounded-md bg-white/5 text-gray-300">Close</button>
+                  <button onClick={handlePurchase} className="px-3 py-1 rounded-md bg-[#e5b64d] text-black font-semibold">Purchase</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </motion.div>
       )}
     </AnimatePresence>

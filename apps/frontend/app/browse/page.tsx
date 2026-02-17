@@ -722,7 +722,7 @@ export default function Browse() {
     switch (file.accessType) {
       case 'PREMIUM':
         return (
-          <div className="flex items-center gap-1 px-2 py-1 bg-amber-500/20 text-amber-400 rounded-full text-xs">
+          <div className="flex items-center gap-1 px-2 py-1 bg-[#2b5060]/20 text-[#d4af37] rounded-full text-xs">
             <Crown className="w-3 h-3" />
             Premium
           </div>
@@ -736,7 +736,7 @@ export default function Browse() {
         );
       default:
         return (
-          <div className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">
+          <div className="px-2 py-1 bg-[#0a3747] text-gray-300 rounded-full text-xs">
             Free
           </div>
         );
