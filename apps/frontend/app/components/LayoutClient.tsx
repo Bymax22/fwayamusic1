@@ -228,6 +228,7 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
   const { currentTrack, isPlaying, togglePlay, setCurrentTrack } = useAudioPlayer();
+  const [bottomHeaderOpenOverride, setBottomHeaderOpenOverride] = useState(false);
 
   // Responsive sidebar
   useEffect(() => {
@@ -241,6 +242,16 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Listen for player events to open/close bottom header when minimized
+  useEffect(() => {
+    const handler = (e: any) => {
+      const open = e?.detail?.open;
+      setBottomHeaderOpenOverride(!!open);
+    };
+    window.addEventListener("player:openBottomHeader", handler);
+    return () => window.removeEventListener("player:openBottomHeader", handler);
   }, []);
 
   // Fetch nonce for CSP
@@ -298,7 +309,7 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
                       showSidebar ? (sidebarExpanded ? "ml-56" : "ml-14") : "no-sidebar"
                     }`}
                     style={{ 
-                      paddingBottom: currentTrack ? '1.5rem' : '3.5rem',
+                      paddingBottom: currentTrack && !bottomHeaderOpenOverride ? '1.5rem' : '3.5rem',
                       transition: 'padding-bottom 0.3s ease'
                     }}
                   >

@@ -176,6 +176,8 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { currentTrack, isPlaying } = useAudioPlayer();
   const [scrollingTitle, setScrollingTitle] = useState("");
+  const [forcedNowPlaying, setForcedNowPlaying] = useState(false);
+  const [forcedInfo, setForcedInfo] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -190,6 +192,24 @@ export default function Navbar() {
     if (currentTrack && currentTrack.title) {
       setScrollingTitle(currentTrack.title);
     }
+  }, [currentTrack]);
+
+  // Listen for player minimize events to show running title/artist in header
+  useEffect(() => {
+    const handler = (e: any) => {
+      const minimized = !!e?.detail?.minimized;
+      const title = e?.detail?.title || currentTrack?.title || "";
+      const artist = e?.detail?.artist || currentTrack?.artist || "";
+      if (minimized) {
+        setForcedNowPlaying(true);
+        setForcedInfo(`${title} — ${artist}`);
+      } else {
+        setForcedNowPlaying(false);
+        setForcedInfo("");
+      }
+    };
+    window.addEventListener("player:minimized", handler);
+    return () => window.removeEventListener("player:minimized", handler);
   }, [currentTrack]);
 
   // Navigation links for logged-in users
@@ -319,15 +339,15 @@ export default function Navbar() {
             {/* Right Section - Guest Features */}
             <div className="flex items-center gap-4">
               <AnimatePresence mode="wait">
-                {currentTrack && isPlaying ? (
-                  // Audio Wave - Shows when playing
+                {(forcedNowPlaying || (currentTrack && isPlaying)) ? (
+                  // Audio Wave + Now Playing text (forced or normal)
                   <motion.div
                     key="playing"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3 }}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#e51f48]/20 to-[#ff4d6d]/20 rounded-full border border-[#e51f48]/30"
+                    className="flex items-center gap-3 px-3 py-1.5 bg-gradient-to-r from-[#e51f48]/20 to-[#ff4d6d]/20 rounded-full border border-[#e51f48]/30"
                   >
                     <div className="flex items-center gap-0.5">
                       <motion.div
@@ -346,7 +366,16 @@ export default function Navbar() {
                         className="w-0.5 h-3 bg-[#e51f48] rounded-full"
                       />
                     </div>
-                    <span className="text-xs text-white font-medium">Now Playing</span>
+
+                    <div className="overflow-hidden max-w-[220px]">
+                      <motion.div
+                        className="whitespace-nowrap text-xs text-white font-medium"
+                        animate={forcedNowPlaying ? { x: ["0%", "-100%"] } : { x: 0 }}
+                        transition={forcedNowPlaying ? { duration: 8, repeat: Infinity, ease: "linear" } : { duration: 0 }}
+                      >
+                        {forcedNowPlaying ? forcedInfo : `${currentTrack?.title || "Now Playing"}${currentTrack?.artist ? ` — ${currentTrack.artist}` : ""}`}
+                      </motion.div>
+                    </div>
                   </motion.div>
                 ) : (
                   // Now Playing, Search & Earn Icons - Shows when not playing
