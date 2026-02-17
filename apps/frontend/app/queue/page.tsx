@@ -190,7 +190,6 @@ export default function QueuePage() {
                       <p className="font-medium text-white truncate">
                         <span className="inline-flex items-center gap-2">
                           {currentTrack?.id === track.id ? (
-                            //@ts-ignore
                             <Waveform playing={true} />
                           ) : null}
                           <span>{track.title}</span>

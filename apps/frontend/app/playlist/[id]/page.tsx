@@ -348,7 +348,6 @@ const PlaylistDetailPage = () => {
                         <span className="inline-flex items-center gap-2">
                           {isCurrent ? (
                             // show waveform when this is the playing track
-                            //@ts-ignore
                             <Waveform playing={isCurrent && isPlaying} />
                           ) : null}
                           <span>{track.title}</span>
