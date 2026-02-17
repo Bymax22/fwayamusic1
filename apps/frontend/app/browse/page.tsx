@@ -135,7 +135,7 @@ export default function Browse() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<{message: string; details?: string} | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'compact'>('grid');
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'compact'>('compact');
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -1420,137 +1420,6 @@ export default function Browse() {
                 >
                   Load more
                 </button>
-              </div>
-            )}
-
-                  {/* Artists Section */}
-            {artists.length > 0 && (
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-white">Popular Artists</h2>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => scrollArtists('left')}
-                      className="p-2 bg-[#0a3747] hover:bg-[#0a3747]/80 text-white rounded-lg transition-colors"
-                      aria-label="Scroll left"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <button 
-                      onClick={() => scrollArtists('right')}
-                      className="p-2 bg-[#0a3747] hover:bg-[#0a3747]/80 text-white rounded-lg transition-colors"
-                      aria-label="Scroll right"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-                
-                <div 
-                  ref={artistsScrollRef}
-                  className="flex gap-4 overflow-x-auto scrollbar-hide pb-4"
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                  {artists.map(artist => (
-                    <div 
-                      key={artist.id}
-                      className="flex-shrink-0 w-48 bg-[#0a3747]/70 rounded-xl p-4 hover:bg-[#0a3747]/90 transition-colors"
-                    >
-                      <div className="flex flex-col items-center text-center">
-                        {/* Artist Avatar */}
-                        <div className="relative mb-3">
-                          <Image
-                            src={artist.avatarUrl || '/default-avatar.jpg'}
-                            alt={artist.displayName}
-                            width={80}
-                            height={80}
-                            className="w-20 h-20 rounded-full object-cover"
-                          />
-                          {artist.isVerified && (
-                            <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1">
-                              <Star className="w-3 h-3 text-white fill-current" />
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Artist Info */}
-                        <h3 className="font-medium text-white text-sm mb-1 truncate w-full">
-                          {artist.displayName}
-                        </h3>
-                        <p className="text-xs text-gray-400 mb-3">
-                          {artist.followerCount} followers
-                        </p>
-                        
-                        {/* Stats */}
-                        <div className="flex justify-between w-full text-xs text-gray-400 mb-3">
-                          <span>{artist.mediaCount} tracks</span>
-                          <span>•</span>
-                          <span>{artist.followerCount} fans</span>
-                        </div>
-                        
-                        {/* Action Buttons */}
-                        <div className="flex gap-2 w-full">
-                          <button
-                            onClick={() => artist.isFollowing ? handleUnfollowArtist(artist.id) : handleFollowArtist(artist.id)}
-                            className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs transition-colors ${
-                              artist.isFollowing
-                                ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                                : 'bg-[#e51f48] text-white hover:bg-[#ff4d6d]'
-                            }`}
-                          >
-                            {artist.isFollowing ? (
-                              <>
-                                <UserCheck className="w-3 h-3" />
-                                Following
-                              </>
-                            ) : (
-                              <>
-                                <UserPlus className="w-3 h-3" />
-                                Follow
-                              </>
-                            )}
-                          </button>
-                          
-                          <button
-                            onClick={() => handleShareArtist(artist)}
-                            className="p-2 bg-[#0a3747] hover:bg-[#0a3747]/80 text-gray-300 rounded-lg transition-colors"
-                            aria-label="Share artist"
-                          >
-                            <Share2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Featured Playlists Section */}
-            {playlists.length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-xl font-bold text-white mb-4">Featured Playlists</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {playlists.map((playlist) => (
-                    <div key={playlist.id} className="bg-[#0a3747]/70 rounded-xl p-4">
-                      <div className="flex items-center gap-3">
-                        {playlist.coverUrl && (
-                          <Image
-                            src={playlist.coverUrl}
-                            alt={playlist.name}
-                            width={48}
-                            height={48}
-                            className="rounded-lg"
-                          />
-                        )}
-                        <div>
-                          <p className="font-medium text-white">{playlist.name}</p>
-                          <p className="text-sm text-gray-400">{playlist.mediaCount} tracks</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
 
