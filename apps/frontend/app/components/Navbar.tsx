@@ -178,6 +178,7 @@ export default function Navbar() {
   const [scrollingTitle, setScrollingTitle] = useState("");
   const [forcedNowPlaying, setForcedNowPlaying] = useState(false);
   const [forcedInfo, setForcedInfo] = useState("");
+  const showNowPlaying = forcedNowPlaying || (currentTrack && isPlaying);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -269,7 +270,7 @@ export default function Navbar() {
 
             {/* Middle Section - Search (desktop + mobile) */}
             <div className="flex-1 mx-6">
-              <div className="flex items-center w-full justify-center">
+              <div className="flex items-center w-full justify-center h-full">
                 <form
                         onSubmit={(e) => {
                     e.preventDefault();
@@ -300,7 +301,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
-                      className="w-full max-w-none sm:max-w-lg bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
+                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 ${showNowPlaying ? 'max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
@@ -372,7 +373,7 @@ export default function Navbar() {
                       />
                     </div>
 
-                    <div className="overflow-hidden max-w-[160px] sm:max-w-[220px]">
+                    <div className="overflow-hidden max-w-[160px] sm:max-w-[160px]">
                       <motion.div
                         className="whitespace-nowrap text-xs text-white font-medium"
                         animate={forcedNowPlaying ? { x: ["0%", "-100%"] } : { x: 0 }}
@@ -515,7 +516,7 @@ export default function Navbar() {
 
           {/* Middle Section - Navigation & Search */}
           <div className="flex-1 max-w-2xl mx-6">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 h-full">
               {/* Navigation Links - Hidden on mobile */}
               <div className="hidden lg:flex items-center gap-1">
                 {loggedInNavLinks.map((link) => (
@@ -578,7 +579,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
-                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
+                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 ${showNowPlaying ? 'max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
