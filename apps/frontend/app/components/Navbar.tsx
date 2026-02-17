@@ -281,7 +281,7 @@ export default function Navbar() {
                   }}
                   className="w-full h-full flex items-center"
                 >
-                  <div className="relative">
+                  <div className="relative h-full flex items-center">
                     <input
                       aria-label="Search"
                       value={searchQuery}
@@ -559,7 +559,7 @@ export default function Navbar() {
                   }}
                   className="w-full"
                 >
-                  <div className="relative">
+                  <div className="relative h-full flex items-center">
                     <input
                       aria-label="Search"
                       value={searchQuery}
