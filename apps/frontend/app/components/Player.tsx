@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileMoneyPaymentModal } from "./modal/MobileMoneyPaymentModal";
+import { MobileMoneyPaymentPreviewModal } from "./modal/MobileMoneyPaymentPreviewModal";
 import {
   PlayIcon,
   PauseIcon,
@@ -624,7 +625,8 @@ export default function Player({
         </div>
 
         {/* Purchase modal for premium preview */}
-        <MobileMoneyPaymentModal
+        {/* Use the preview-specific modal for premium preview flows */}
+        <MobileMoneyPaymentPreviewModal
           isOpen={showPurchaseModal}
           onClose={handleClosePurchaseModal}
           media={{
