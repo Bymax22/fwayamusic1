@@ -372,7 +372,7 @@ export default function Navbar() {
                       />
                     </div>
 
-                    <div className="overflow-hidden max-w-[220px]">
+                    <div className="overflow-hidden max-w-[160px] sm:max-w-[220px]">
                       <motion.div
                         className="whitespace-nowrap text-xs text-white font-medium"
                         animate={forcedNowPlaying ? { x: ["0%", "-100%"] } : { x: 0 }}

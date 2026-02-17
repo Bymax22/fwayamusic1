@@ -319,7 +319,7 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
 
                 {/* Bottom Navigation - Auto-hides when player opens */}
                 <BottomNav 
-                  isVisible={!currentTrack}
+                  isVisible={bottomHeaderOpenOverride || !currentTrack}
                   onMenuOpen={handleMobileMenuOpen}
                 />
 
