@@ -237,7 +237,10 @@ async findOrCreateUser(decodedFirebaseUser: any) {
 
   /**
    * Send OTP for a given identifier (email or phone).
-   * This creates/updates a Verification record and (for now) logs the code.
+   * Uses Brevo (formerly Sendinblue) for email delivery.
+   * - Magic-link (signup): 24-byte hex token valid for 10 minutes
+   * - 6-digit OTP (signin): Random numeric code valid for 10 minutes
+   * This creates/updates a Verification record and sends via Brevo API.
    */
   async sendOtp(identifier: string, method: 'email' | 'phone' | 'link') {
     // lookup user by identifier
