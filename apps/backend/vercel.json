@@ -1,5 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build && node ./scripts/fix-entrypoint.js || true",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist/apps/backend"
 }
