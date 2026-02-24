@@ -38,7 +38,6 @@ export default function ArtistSignUp() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [otp, setOtp] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateStep = (currentStep: SignupStep): boolean => {
@@ -173,33 +172,6 @@ export default function ArtistSignUp() {
         setErrors({ submit: error.message });
       } else {
         setErrors({ submit: 'An unexpected error occurred.' });
-      }
-    }
-  };
-
-  const handleVerifyOTP = async () => {
-    if (!otp) {
-      setErrors({ otp: 'OTP is required' });
-      return;
-    }
-
-    try {
-      console.log('Verifying OTP...');
-      const isValid = await verifyOTP('email', otp);
-      console.log('OTP verification result:', isValid);
-      
-      if (isValid) {
-        console.log('OTP verified successfully, redirecting to /for-artists');
-        router.push('/for-artists');
-      } else {
-        setErrors({ otp: 'Invalid OTP code' });
-      }
-    } catch (error: unknown) {
-      console.error('OTP verification error:', error);
-      if (error instanceof Error) {
-        setErrors({ otp: error.message });
-      } else {
-        setErrors({ otp: 'An unexpected error occurred.' });
       }
     }
   };
@@ -597,10 +569,25 @@ export default function ArtistSignUp() {
             {errors.submit && (
               <p className="text-red-400 text-sm text-center">{errors.submit}</p>
             )}
+          </motion.div>
+        )}
 
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-              <p className="text-yellow-800 text-sm">
-                <strong>Important:</strong> After email verification, you&lsquo;ll need to complete KYC document verification to upload music and access all artist features.
+        {/* Step 4: Verification */}
+        {step === 'verification' && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-4 text-center"
+          >
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaCheck className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Check Your Email</h3>
+            <p className="text-sm text-gray-300">We&apos;ve sent a verification link to <strong>{formData.email}</strong></p>
+            <p className="text-sm text-gray-400">Click the link in your email to verify your account and get started.</p>
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mt-4">
+              <p className="text-yellow-400 text-xs">
+                <strong>Note:</strong> After email verification, you&apos;ll need to complete KYC document verification to upload music.
               </p>
             </div>
           </motion.div>
