@@ -17,7 +17,6 @@ export default function ArtistSignIn() {
     otp: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [step] = useState<'credentials' | 'otp'>('credentials');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showOtpModal, setShowOtpModal] = useState(false);
 
@@ -134,7 +133,7 @@ export default function ArtistSignIn() {
           <p className="text-gray-300">Sign in to your artist account</p>
         </div>
 
-        {step === 'credentials' ? (
+        {!showOtpModal ? (
           <form onSubmit={handleCredentialsSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-white mb-2">
@@ -215,7 +214,7 @@ export default function ArtistSignIn() {
           error={errors.otp}
         />
 
-        {step === 'credentials' && (
+        {!showOtpModal && (
           <>
             <div className="mt-8 pt-6 border-t border-purple-500/20">
               <div className="text-center mb-4">
