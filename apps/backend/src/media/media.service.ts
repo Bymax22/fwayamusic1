@@ -153,7 +153,7 @@ export class MediaService {
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; coverUrl?: string }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
@@ -176,7 +176,7 @@ export class MediaService {
         artistCommissionRate: 0.5,
         platformCommissionRate: 0.5,
         user: { connect: { id: userId } },
-        artCoverUrl: defaultCoverUrl,
+        artCoverUrl: metadata.coverUrl || defaultCoverUrl,
       };
 
       const media = await this.prisma.media.create({

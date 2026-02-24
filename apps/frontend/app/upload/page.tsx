@@ -16,6 +16,7 @@ interface UploadMetadata {
   type: "AUDIO" | "VIDEO" | "PODCAST" | "LIVE_STREAM";
   isPremium: boolean;
   isExplicit: boolean;
+  coverUrl?: string;
 }
 
 const validAudioTypes = ["audio/mpeg", "audio/wav", "audio/mp3", "audio/aac", "audio/flac"];
@@ -24,6 +25,7 @@ const maxFileSize = 25 * 1024 * 1024; // 25MB
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   
@@ -34,6 +36,7 @@ export default function UploadPage() {
     type: "AUDIO",
     isPremium: false,
     isExplicit: false,
+    coverUrl: undefined,
   });
   const [error, setError] = useState<string | null>(null);
   const [success] = useState(false);
@@ -69,6 +72,29 @@ export default function UploadPage() {
     [metadata.type, metadata.title]
   );
 
+  const handleCoverChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setError(null);
+      if (e.target.files?.length) {
+        const selectedFile = e.target.files[0];
+        const validImageTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+        if (!validImageTypes.includes(selectedFile.type)) {
+          setError("Please upload a valid image file (JPEG, PNG, WebP, or GIF)");
+          return;
+        }
+
+        if (selectedFile.size > 5 * 1024 * 1024) {
+          setError("Cover image size exceeds 5MB limit");
+          return;
+        }
+
+        setCoverFile(selectedFile);
+      }
+    },
+    []
+  );
+
 const uploadToCloudinary = async (file: File): Promise<CloudinaryUploadWidgetInfo> => {
   return new Promise((resolve, reject) => {
     const formData = new FormData();
@@ -77,8 +103,33 @@ const uploadToCloudinary = async (file: File): Promise<CloudinaryUploadWidgetInf
     formData.append("resource_type", metadata.type === "VIDEO" ? "video" : "auto");
 
     const xhr = new XMLHttpRequest();
+const uploadCoverToCloudinary = async (file: File): Promise<CloudinaryUploadWidgetInfo> => {
+  return new Promise((resolve, reject) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "bymaxdev1");
+    formData.append("resource_type", "image");
 
-    xhr.upload.addEventListener("progress", (event) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          resolve(JSON.parse(xhr.responseText));
+        } else {
+          reject(new Error(xhr.statusText || "Cover upload to Cloudinary failed"));
+        }
+      }
+    };
+
+    xhr.open("POST", "https://api.cloudinary.com/v1_1/dayn5vifn/upload");
+    xhr.send(formData);
+  });
+};
+
+// Reference it to avoid unused warning
+void uploadToCloudinary;
+void uploadCoveroad.addEventListener("progress", (event) => {
       if (event.lengthComputable) {
         const percent = Math.round((event.loaded / event.total) * 100);
         setUploadProgress(percent);
@@ -114,13 +165,13 @@ void uploadToCloudinary;
     setError(null);
 
     try {
-      // 1. Create FormData for Cloudinary upload
+      // 1. Create FormData for Cloudinary upload (main media file)
       const cloudinaryFormData = new FormData();
       cloudinaryFormData.append("file", file);
       cloudinaryFormData.append("upload_preset", "bymaxdev1");
       cloudinaryFormData.append("resource_type", metadata.type === "VIDEO" ? "video" : "auto");
 
-      // 2. Upload to Cloudinary using fetch instead of XMLHttpRequest
+      // 2. Upload main media to Cloudinary
       const cloudinaryResponse = await fetch(
         "https://api.cloudinary.com/v1_1/dayn5vifn/upload",
         {
@@ -135,7 +186,19 @@ void uploadToCloudinary;
 
       const cloudinaryData = await cloudinaryResponse.json();
 
-      // 3. Save to your backend via Next.js proxy
+      // 3. Upload cover image if provided
+      let coverUrl: string | undefined = undefined;
+      if (coverFile) {
+        try {
+          const coverData = await uploadCoverToCloudinary(coverFile);
+          coverUrl = coverData.secure_url;
+        } catch (err) {
+          console.warn("Cover upload warning:", err);
+          // Don't fail the whole upload if cover fails
+        }
+      }
+
+      // 4. Save to backend
       const backendResponse = await fetch(
         `/api/v1/media/save-metadata`,
         {
@@ -156,6 +219,7 @@ void uploadToCloudinary;
             type: metadata.type,
             isPremium: metadata.isPremium,
             isExplicit: metadata.isExplicit,
+            coverUrl: coverUrl,
             originalFilename: file.name,
             fileSize: file.size,
           }),
@@ -169,7 +233,7 @@ void uploadToCloudinary;
 
       const savedMedia = await backendResponse.json();
       
-      // 4. Redirect to success page
+      // 5. Redirect to success page
       window.location.href = `/upload/success?id=${savedMedia.id}`;
       
     } catch (err) {
@@ -309,6 +373,57 @@ void uploadToCloudinary;
                     {metadata.type === "VIDEO" 
                       ? "Supports MP4, MOV, AVI (Max 100MB)"
                       : "Supports MP3, WAV, AAC, FLAC (Max 100MB)"}
+                  </p>
+                </div>
+              )}
+            </label>
+          </div>
+        </div>
+
+        {/* Cover Image Upload Section */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Cover Art (Album/Podcast Art)
+          </label>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+            <input
+              type="file"
+              id="cover-upload"
+              accept="image/*"
+              onChange={handleCoverChange}
+              className="hidden"
+              disabled={uploading}
+            />
+            <label
+              htmlFor="cover-upload"
+              className={`cursor-pointer flex flex-col items-center justify-center gap-2 ${uploading ? "opacity-50" : ""}`}
+            >
+              {coverFile ? (
+                <div className="text-center">
+                  <div className="mb-2 w-16 h-16 mx-auto rounded border border-gray-300 overflow-hidden">
+                    <img
+                      src={URL.createObjectURL(coverFile)}
+                      alt="Cover preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="font-medium text-sm">{coverFile.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {(coverFile.size / (1024 * 1024)).toFixed(2)} MB
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <div className="mb-2 w-12 h-12 mx-auto text-gray-400">
+                    <svg className="w-full h-full" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-600">
+                    Click to select cover image
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    JPEG, PNG, WebP, GIF (Max 5MB)
                   </p>
                 </div>
               )}

@@ -84,7 +84,7 @@ export class MediaController {
   @UseGuards(FirebaseAuthGuard)
   @Post('save-metadata')
   async saveMediaMetadata(
-    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean },
+    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; coverUrl?: string },
     @CurrentUser() user: any
   ) {
     try {
@@ -97,7 +97,7 @@ export class MediaController {
       }
 
       const userId = user.id;
-      this.logger.log(`Saving metadata for user ${userId}, title: ${metadata.title}, url: ${metadata.url}`);
+      this.logger.log(`Saving metadata for user ${userId}, title: ${metadata.title}, url: ${metadata.url}, coverUrl: ${metadata.coverUrl || 'none'}`);
       
       const result = await this.mediaService.createMediaFromMetadata(userId, metadata);
       
