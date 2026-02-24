@@ -12,8 +12,7 @@ import Image from 'next/image';
 type SignupStep = 'basic' | 'artist' | 'consent' | 'verification';
 
 export default function ArtistSignUp() {
-  const { signUp, loading, verifyOTP } = useAuth();
-  const router = useRouter();
+  const { signUp, loading } = useAuth();
   const [step, setStep] = useState<SignupStep>('basic');
   const [formData, setFormData] = useState({
     email: '',
