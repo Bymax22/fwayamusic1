@@ -5,7 +5,6 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaArrowLeft, FaCamera } from 'react-icons/fa';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
