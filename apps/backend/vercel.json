@@ -2,10 +2,5 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist/apps/backend",
-  "functions": {
-    "**/*.js": {
-      "memory": 2048,
-      "maxDuration": 60
-    }
-  }
+  
 }
