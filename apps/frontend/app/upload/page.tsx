@@ -95,66 +95,62 @@ export default function UploadPage() {
     []
   );
 
-const uploadToCloudinary = async (file: File): Promise<CloudinaryUploadWidgetInfo> => {
-  return new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "bymaxdev1");
-    formData.append("resource_type", metadata.type === "VIDEO" ? "video" : "auto");
+  const uploadToCloudinary = async (file: File): Promise<CloudinaryUploadWidgetInfo> => {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "bymaxdev1");
+      formData.append("resource_type", metadata.type === "VIDEO" ? "video" : "auto");
 
-    const xhr = new XMLHttpRequest();
-const uploadCoverToCloudinary = async (file: File): Promise<CloudinaryUploadWidgetInfo> => {
-  return new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "bymaxdev1");
-    formData.append("resource_type", "image");
+      const xhr = new XMLHttpRequest();
 
-    const xhr = new XMLHttpRequest();
-
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          resolve(JSON.parse(xhr.responseText));
-        } else {
-          reject(new Error(xhr.statusText || "Cover upload to Cloudinary failed"));
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          const percent = Math.round((event.loaded / event.total) * 100);
+          setUploadProgress(percent);
         }
-      }
-    };
+      });
 
-    xhr.open("POST", "https://api.cloudinary.com/v1_1/dayn5vifn/upload");
-    xhr.send(formData);
-  });
-};
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(xhr.statusText || "Cloudinary upload failed"));
+          }
+        }
+      };
 
-// Reference it to avoid unused warning
-void uploadToCloudinary;
-void uploadCoveroad.addEventListener("progress", (event) => {
-      if (event.lengthComputable) {
-        const percent = Math.round((event.loaded / event.total) * 100);
-        setUploadProgress(percent);
-      }
+      xhr.open("POST", "https://api.cloudinary.com/v1_1/dayn5vifn/upload");
+      xhr.send(formData);
     });
+  };
 
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          resolve(JSON.parse(xhr.responseText));
-        } else {
-          reject(new Error(xhr.statusText || "Cloudinary upload failed"));
+  const uploadCoverToCloudinary = async (file: File): Promise<CloudinaryUploadWidgetInfo> => {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "bymaxdev1");
+      formData.append("resource_type", "image");
+
+      const xhr = new XMLHttpRequest();
+
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(xhr.statusText || "Cover upload to Cloudinary failed"));
+          }
         }
-      }
-    };
+      };
 
-    xhr.open("POST", "https://api.cloudinary.com/v1_1/dayn5vifn/upload");
-    xhr.send(formData);
-  });
-};
+      xhr.open("POST", "https://api.cloudinary.com/v1_1/dayn5vifn/upload");
+      xhr.send(formData);
+    });
+  };
 
-// Reference it to avoid unused warning
-void uploadToCloudinary;
-
-  const handleUpload = async () => {
+const handleUpload = async () => {
     if (!file) {
       setError("Please select a file to upload");
       return;
@@ -401,6 +397,7 @@ void uploadToCloudinary;
               {coverFile ? (
                 <div className="text-center">
                   <div className="mb-2 w-16 h-16 mx-auto rounded border border-gray-300 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={URL.createObjectURL(coverFile)}
                       alt="Cover preview"
