@@ -95,6 +95,7 @@ export default function UploadPage() {
     []
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const uploadToCloudinary = async (file: File): Promise<CloudinaryUploadWidgetInfo> => {
     return new Promise((resolve, reject) => {
       const formData = new FormData();
@@ -150,7 +151,7 @@ export default function UploadPage() {
     });
   };
 
-const handleUpload = async () => {
+  const handleUpload = async () => {
     if (!file) {
       setError("Please select a file to upload");
       return;
