@@ -3,8 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UserStatus, UserRole, KYCStatus } from '@prisma/client';
 import { VerificationMethod } from '@prisma/client';
 import { randomBytes } from 'crypto';
-import sgMail from '@sendgrid/mail';
 import * as bcrypt from 'bcrypt';
+import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -284,64 +284,71 @@ async findOrCreateUser(decodedFirebaseUser: any) {
     // Send via email for email method or link method; otherwise just log for phone (or integrate SMS provider)
     if (method === 'email' || method === 'link') {
       try {
-        const apiKey = process.env.SENDGRID_API_KEY;
-        const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@fwayamusic.com';
+        const apiKey = process.env.BREVO_API_KEY;
+        const fromEmail = process.env.BREVO_FROM_EMAIL || 'noreply@fwayamusic.com';
         
         console.log(`[sendOtp] Attempting to send ${method} OTP to ${user.email}`);
         console.log(`[sendOtp] From email: ${fromEmail}`);
         console.log(`[sendOtp] API Key configured: ${!!apiKey}`);
         
         if (!apiKey) {
-          console.error('[sendOtp] SENDGRID_API_KEY not set; OTP will be logged to console instead');
+          console.error('[sendOtp] BREVO_API_KEY not set; OTP will be logged to console instead');
           console.log(`[sendOtp] OTP for user(${user.email}) [${method}]: ${code} (expires ${expiresAt.toISOString()})`);
           return { success: true };
         }
         
-        sgMail.setApiKey(apiKey);
-        let msg: any;
+        let subject: string;
+        let htmlContent: string;
 
         if (method === 'link') {
           const frontend = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
           const verifyUrl = `${frontend.replace(/\/$/, '')}/auth/verify-email?token=${token}`;
-          msg = {
-            to: user.email,
-            from: fromEmail,
-            subject: 'Verify your Fwaya Music account',
-            text: `Click the following link to verify your account: ${verifyUrl}`,
-            html: `<div style="font-family: Arial, sans-serif; line-height:1.4;">
+          subject = 'Verify your Fwaya Music account';
+          htmlContent = `<div style="font-family: Arial, sans-serif; line-height:1.4;">
                     <h2 style="color:#0a3747">Verify your email</h2>
                     <p>Click the link below to verify your Fwaya Music account. This link expires in 10 minutes.</p>
                     <a href="${verifyUrl}" style="display:inline-block;padding:10px 16px;background:#0a3747;color:white;border-radius:6px;text-decoration:none;margin-top:12px;">Verify Email</a>
                     <p style="margin-top:12px;color:#666;">If you did not request this, please ignore this email.</p>
-                   </div>`,
-          };
+                   </div>`;
         } else {
-          msg = {
-            to: user.email,
-            from: fromEmail,
-            subject: 'Your Fwaya Music verification code',
-            text: `Your verification code is ${code}. It expires in 10 minutes.`,
-            html: `<div style="font-family: Arial, sans-serif; line-height:1.4;">
+          subject = 'Your Fwaya Music verification code';
+          htmlContent = `<div style="font-family: Arial, sans-serif; line-height:1.4;">
                     <h2 style="color:#0a3747">Fwaya Music Verification</h2>
                     <p>Your verification code is:</p>
                     <div style="font-size:22px; font-weight:700; margin:12px 0; color:#e51f48">${code}</div>
                     <p>This code expires in 10 minutes.</p>
                     <p>If you did not request this, please ignore this email.</p>
-                   </div>`,
-          };
+                   </div>`;
         }
 
-        console.log(`[sendOtp] Sending email via SendGrid to: ${msg.to}`);
-        await sgMail.send(msg);
+        const payload = {
+          sender: {
+            email: fromEmail,
+            name: 'Fwaya Music',
+          },
+          to: [
+            {
+              email: user.email,
+            },
+          ],
+          subject,
+          htmlContent,
+        };
+
+        console.log(`[sendOtp] Sending email via Brevo to: ${user.email}`);
+        const response = await axios.post('https://api.brevo.com/v3/smtp/email', payload, {
+          headers: {
+            'api-key': apiKey,
+            'Content-Type': 'application/json',
+          },
+        });
         console.log(`[sendOtp] Email sent successfully to ${user.email}`);
       } catch (err: any) {
-        // Log full provider response when available for debugging
-        console.error('[sendOtp] Failed to send OTP email via SendGrid');
+        console.error('[sendOtp] Failed to send OTP email via Brevo');
         console.error('[sendOtp] Error message:', err?.message || JSON.stringify(err));
-        if (err?.response?.body) console.error('[sendOtp] SendGrid response body:', err.response.body);
-        if (err?.response?.status) console.error('[sendOtp] SendGrid response status:', err.response.status);
-        // Rethrow with provider message so frontend sees a descriptive error
-        throw new Error(`Failed to send OTP: ${err?.message || 'SendGrid error'}`);
+        if (err?.response?.data) console.error('[sendOtp] Brevo response data:', err.response.data);
+        if (err?.response?.status) console.error('[sendOtp] Brevo response status:', err.response.status);
+        throw new Error(`Failed to send OTP: ${err?.message || 'Brevo error'}`);
       }
     } else {
       // For phone method: TODO integrate SMS provider like Twilio. For now log the code.
