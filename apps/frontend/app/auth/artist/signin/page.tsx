@@ -19,7 +19,6 @@ export default function ArtistSignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [step] = useState<'credentials' | 'otp'>('credentials');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [otpSent, setOtpSent] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
@@ -43,8 +42,6 @@ export default function ArtistSignIn() {
       console.log('Sending OTP...');
       await sendOTP('email', formData.email);
       console.log('OTP sent');
-      
-      setOtpSent(true);
       setShowOtpModal(true);
       console.log('OTP modal opened');
     } catch (error: unknown) {
@@ -57,8 +54,8 @@ export default function ArtistSignIn() {
     }
   };
 
-  const handleOTPSubmit = async (e: React.FormEvent) => {
-    if ((e as any)?.preventDefault) (e as any).preventDefault();
+  const handleOTPSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     
     if (!formData.otp) {
       setErrors({ otp: 'OTP is required' });
@@ -211,7 +208,7 @@ export default function ArtistSignIn() {
           email={formData.email}
           otp={formData.otp}
           setOtp={(v) => setFormData({ ...formData, otp: v })}
-          onVerify={async () => await handleOTPSubmit({} as any)}
+          onVerify={() => handleOTPSubmit()}
           onResend={resendOTP}
           onClose={() => setShowOtpModal(false)}
           loading={loading}

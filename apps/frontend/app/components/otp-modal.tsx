@@ -27,7 +27,7 @@ export default function OtpModal({ isOpen, email, otp, setOtp, onVerify, onResen
         </button>
 
         <h3 className="text-xl font-semibold mb-2">Enter verification code</h3>
-        <p className="text-sm text-gray-300 mb-4">We've sent a 6-digit code to <strong>{email}</strong>. Enter it below to continue.</p>
+        <p className="text-sm text-gray-300 mb-4">We&apos;ve sent a 6-digit code to <strong>{email}</strong>. Enter it below to continue.</p>
 
         <input
           type="text"
