@@ -17,8 +17,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './media.service';
 import { CreateMediaDto } from './dto/create-media.dto';
-// TODO: Implement JwtAuthGuard for authentication
 import { CurrentUser } from '../decorators/user.decorator';
+import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { Request } from 'express';
 
 @Controller('v1/media')
@@ -28,13 +28,13 @@ export class MediaController {
 
   constructor(private readonly mediaService: MediaService) {}
 
-  // @UseGuards(JwtAuthGuard) // Uncomment when JwtAuthGuard is implemented
+  @UseGuards(FirebaseAuthGuard)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadMedia(
     @UploadedFile() file: Express.Multer.File | undefined,
     @Body(new ValidationPipe({ transform: true, skipMissingProperties: true })) createMediaDto: CreateMediaDto,
-    @CurrentUser() user: { sub: string }
+    @CurrentUser() user: any
   ) {
     try {
       if (!file) {
@@ -45,7 +45,11 @@ export class MediaController {
         throw new BadRequestException(`File size exceeds limit of ${this.MAX_FILE_SIZE / 1024 / 1024}MB`);
       }
 
-      const userId = parseInt(user.sub);
+      if (!user || !user.id) {
+        throw new BadRequestException('User authentication required');
+      }
+
+      const userId = user.id;
       this.logger.log(`Starting upload for user ${userId}, file: ${file.originalname}, size: ${file.size}`);
       
       const result = await this.mediaService.createMedia(file, userId, createMediaDto);
@@ -77,17 +81,22 @@ export class MediaController {
   }
 
   // NEW: Save metadata only (file already uploaded to Cloudinary client-side)
+  @UseGuards(FirebaseAuthGuard)
   @Post('save-metadata')
   async saveMediaMetadata(
     @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean },
-    @CurrentUser() user: { sub: string }
+    @CurrentUser() user: any
   ) {
     try {
       if (!metadata.title || !metadata.type || !metadata.url) {
         throw new BadRequestException('Missing required fields: title, type, url');
       }
 
-      const userId = parseInt(user.sub);
+      if (!user || !user.id) {
+        throw new BadRequestException('User authentication required');
+      }
+
+      const userId = user.id;
       this.logger.log(`Saving metadata for user ${userId}, title: ${metadata.title}, url: ${metadata.url}`);
       
       const result = await this.mediaService.createMediaFromMetadata(userId, metadata);
@@ -112,13 +121,14 @@ export class MediaController {
     return this.mediaService.getAllMedia();
   }
 
+  @UseGuards(FirebaseAuthGuard)
   @Get('user/me')
-  async getUserOwnMedia(@CurrentUser() user?: { sub: string }) {
+  async getUserOwnMedia(@CurrentUser() user: any) {
     // Return only authenticated user's media (for artist dashboard)
-    if (!user || !user.sub) {
-      return [];
+    if (!user || !user.id) {
+      throw new BadRequestException('User authentication required');
     }
-    const userId = parseInt(user.sub);
+    const userId = user.id;
     return this.mediaService.getUserMedia(userId);
   }
 
@@ -127,19 +137,27 @@ export class MediaController {
     return this.mediaService.getMediaById(parseInt(id));
   }
 
+  @UseGuards(FirebaseAuthGuard)
   @Delete(':id')
-  async deleteMedia(@Param('id') id: string, @CurrentUser() user: { sub: string }) {
-    const userId = parseInt(user.sub);
+  async deleteMedia(@Param('id') id: string, @CurrentUser() user: any) {
+    if (!user || !user.id) {
+      throw new BadRequestException('User authentication required');
+    }
+    const userId = user.id;
     return this.mediaService.deleteMedia(parseInt(id), userId);
   }
 
+  @UseGuards(FirebaseAuthGuard)
   @Patch(':id')
   async updateMedia(
     @Param('id') id: string,
     @Body() updates: Partial<CreateMediaDto>,
-    @CurrentUser() user: { sub: string }
+    @CurrentUser() user: any
   ) {
-    const userId = parseInt(user.sub);
+    if (!user || !user.id) {
+      throw new BadRequestException('User authentication required');
+    }
+    const userId = user.id;
     return this.mediaService.updateMedia(parseInt(id), userId, updates);
   }
 }
