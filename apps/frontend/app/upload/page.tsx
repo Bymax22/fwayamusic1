@@ -135,9 +135,9 @@ void uploadToCloudinary;
 
       const cloudinaryData = await cloudinaryResponse.json();
 
-      // 3. Save to your backend
+      // 3. Save to your backend via Next.js proxy
       const backendResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/save-metadata`,
+        `/api/v1/media/save-metadata`,
         {
           method: "POST",
           headers: {

@@ -12,7 +12,7 @@ import Image from 'next/image';
 type SignupStep = 'basic' | 'artist' | 'consent' | 'verification';
 
 export default function ArtistSignUp() {
-  const { signUp, loading } = useAuth();
+  const { signUp, loading, verifyOTP } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState<SignupStep>('basic');
   const [formData, setFormData] = useState({
@@ -38,6 +38,8 @@ export default function ArtistSignUp() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateStep = (currentStep: SignupStep): boolean => {
@@ -151,6 +153,7 @@ export default function ArtistSignUp() {
     }
 
     try {
+      console.log('Starting artist signup...');
       const userData = await signUp({
         ...formData,
         role: 'ARTIST',
@@ -160,9 +163,10 @@ export default function ArtistSignUp() {
       
       // Verify the role is ARTIST
       if (userData && userData.role === 'ARTIST') {
-        // Redirect immediately to artist dashboard
-        console.log('Artist signup successful, redirecting to /for-artists');
-        router.push('/for-artists');
+        console.log('Artist signup successful, moving to OTP verification step');
+        // Move to verification step instead of redirecting immediately
+        setStep('verification');
+        setOtpSent(true);
       } else {
         setErrors({ submit: `User role was not set to ARTIST. Got: ${userData?.role || 'undefined'}` });
       }
@@ -171,6 +175,33 @@ export default function ArtistSignUp() {
         setErrors({ submit: error.message });
       } else {
         setErrors({ submit: 'An unexpected error occurred.' });
+      }
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!otp) {
+      setErrors({ otp: 'OTP is required' });
+      return;
+    }
+
+    try {
+      console.log('Verifying OTP...');
+      const isValid = await verifyOTP('email', otp);
+      console.log('OTP verification result:', isValid);
+      
+      if (isValid) {
+        console.log('OTP verified successfully, redirecting to /for-artists');
+        router.push('/for-artists');
+      } else {
+        setErrors({ otp: 'Invalid OTP code' });
+      }
+    } catch (error: unknown) {
+      console.error('OTP verification error:', error);
+      if (error instanceof Error) {
+        setErrors({ otp: error.message });
+      } else {
+        setErrors({ otp: 'An unexpected error occurred.' });
       }
     }
   };
@@ -558,35 +589,52 @@ export default function ArtistSignUp() {
             </div>
 
             {/* reCAPTCHA temporarily disabled */}
-            <div className="flex justify-between pt-4">
+            <div className="flex justify-blue-500 rounded-full flex items-center justify-center mx-auto">
+              <FaCheck className="w-10 h-10 text-white" />
+            </div>
+            
+            <div>
+              <h2 className="text-2xl font-semibold text-white mb-4">
+                Verify Your Account
+              </h2>
+              <p className="text-gray-300 mb-2">
+                We&lsquo;ve sent a verification code to <strong>{formData.email}</strong>
+              </p>
+              <p className="text-gray-500 text-sm">
+                Enter the code below to verify your account
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => {
+                  setOtp(e.target.value);
+                  setErrors({});
+                }}
+                placeholder="Enter 6-digit code"
+                maxLength={6}
+                className="w-full text-center text-2xl tracking-widest px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+              {errors.otp && <p className="text-red-400 text-sm">{errors.otp}</p>}
+              
               <button
-                onClick={handleBack}
-                className="px-6 py-3 border border-purple-500/40 text-white rounded-xl hover:bg-[#0a3747] transition-colors"
+                onClick={handleVerifyOTP}
+                disabled={loading || !otp}
+                className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
               >
-                Back
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={loading || uploading}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
-              >
-                {loading ? 'Creating Account...' : uploading ? 'Uploading Avatar...' : 'Create Artist Account'}
+                {loading ? 'Verifying...' : 'Verify Code'}
               </button>
             </div>
 
-            {errors.submit && (
-              <p className="text-red-400 text-sm text-center">{errors.submit}</p>
-            )}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+              <p className="text-yellow-800 text-sm">
+                <strong>Important:</strong> After email verification, you&lsquo;ll need to complete KYC document verification to upload music and access all artist features.
+              </p>
+            </div>
           </motion.div>
         )}
-
-        {/* Step 4: Verification */}
-        {step === 'verification' && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-center space-y-6"
-          >
             <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto">
               <FaCheck className="w-10 h-10 text-white" />
             </div>
