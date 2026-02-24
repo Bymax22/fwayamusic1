@@ -40,9 +40,9 @@ export default function ArtistSignIn() {
       // Send OTP for additional verification
       console.log('Sending OTP...');
       await sendOTP('email', formData.email);
-      console.log('OTP sent');
+      console.log('OTP sent, setting showOtpModal to true');
       setShowOtpModal(true);
-      console.log('OTP modal opened');
+      console.log('OTP modal state updated');
     } catch (error: unknown) {
       console.error('handleCredentialsSubmit error', error);
       if (error instanceof Error) {
@@ -119,12 +119,13 @@ export default function ArtistSignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-primary-gradient flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-purple-500/30 shadow-2xl"
-      >
+    <>
+      <div className="min-h-screen bg-primary-gradient flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-purple-500/30 shadow-2xl"
+        >
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaMusic className="w-8 h-8 text-white" />
@@ -202,18 +203,6 @@ export default function ArtistSignIn() {
           </form>
         ) : null}
 
-        <OtpModal
-          isOpen={showOtpModal}
-          email={formData.email}
-          otp={formData.otp}
-          setOtp={(v) => setFormData({ ...formData, otp: v })}
-          onVerify={() => handleOTPSubmit()}
-          onResend={resendOTP}
-          onClose={() => setShowOtpModal(false)}
-          loading={loading}
-          error={errors.otp}
-        />
-
         {!showOtpModal && (
           <>
             <div className="mt-8 pt-6 border-t border-purple-500/20">
@@ -258,6 +247,19 @@ export default function ArtistSignIn() {
         )}
       </motion.div>
     </div>
+
+    <OtpModal
+      isOpen={showOtpModal}
+      email={formData.email}
+      otp={formData.otp}
+      setOtp={(v) => setFormData({ ...formData, otp: v })}
+      onVerify={() => handleOTPSubmit()}
+      onResend={resendOTP}
+      onClose={() => setShowOtpModal(false)}
+      loading={loading}
+      error={errors.otp}
+    />
+  </>
   );
 }
 
