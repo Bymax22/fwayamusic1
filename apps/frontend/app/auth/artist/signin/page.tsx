@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { FaGoogle, FaFacebook, FaEye, FaEyeSlash, FaMusic } from 'react-icons/fa';
+import OtpModal from '@/components/otp-modal';
 import { useRouter } from 'next/navigation';
 
 export default function ArtistSignIn() {
@@ -16,9 +17,10 @@ export default function ArtistSignIn() {
     otp: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [step, setStep] = useState<'credentials' | 'otp'>('credentials');
+  const [step] = useState<'credentials' | 'otp'>('credentials');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [otpSent, setOtpSent] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,8 +45,8 @@ export default function ArtistSignIn() {
       console.log('OTP sent');
       
       setOtpSent(true);
-      setStep('otp');
-      console.log('Step changed to otp');
+      setShowOtpModal(true);
+      console.log('OTP modal opened');
     } catch (error: unknown) {
       console.error('handleCredentialsSubmit error', error);
       if (error instanceof Error) {
@@ -56,7 +58,7 @@ export default function ArtistSignIn() {
   };
 
   const handleOTPSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if ((e as any)?.preventDefault) (e as any).preventDefault();
     
     if (!formData.otp) {
       setErrors({ otp: 'OTP is required' });
@@ -75,6 +77,7 @@ export default function ArtistSignIn() {
         // RoleGuard on the page will verify the user is actually an ARTIST
         router.push('/for-artists');
         console.log('Router.push called');
+        setShowOtpModal(false);
       } else {
         console.log('OTP verification failed');
         setErrors({ otp: 'Invalid OTP code' });
@@ -201,58 +204,19 @@ export default function ArtistSignIn() {
               <p className="text-red-400 text-sm text-center">{errors.submit}</p>
             )}
           </form>
-        ) : (
-          <form onSubmit={handleOTPSubmit} className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold text-white mb-2">Verify Your Identity</h2>
-              <p className="text-gray-300 mb-4">
-                We sent a verification code to {formData.email}
-              </p>
-            </div>
+        ) : null}
 
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Enter OTP Code
-              </label>
-              <input
-                type="text"
-                value={formData.otp}
-                onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-lg font-mono"
-                placeholder="123456"
-                maxLength={6}
-              />
-              {errors.otp && <p className="text-red-400 text-sm mt-1">{errors.otp}</p>}
-            </div>
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={resendOTP}
-                className="text-sm text-white hover:underline"
-                disabled={otpSent}
-              >
-                {otpSent ? 'OTP Sent!' : 'Resend OTP'}
-              </button>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
-            >
-              {loading ? 'Verifying...' : 'Verify & Continue'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setStep('credentials')}
-              className="w-full px-6 py-3 border border-purple-500/40 text-white rounded-xl hover:bg-[#0a3747] transition-colors"
-            >
-              Back to Sign In
-            </button>
-          </form>
-        )}
+        <OtpModal
+          isOpen={showOtpModal}
+          email={formData.email}
+          otp={formData.otp}
+          setOtp={(v) => setFormData({ ...formData, otp: v })}
+          onVerify={async () => await handleOTPSubmit({} as any)}
+          onResend={resendOTP}
+          onClose={() => setShowOtpModal(false)}
+          loading={loading}
+          error={errors.otp}
+        />
 
         {step === 'credentials' && (
           <>
