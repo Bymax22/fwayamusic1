@@ -635,44 +635,6 @@ export default function ArtistSignUp() {
             </div>
           </motion.div>
         )}
-            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto">
-              <FaCheck className="w-10 h-10 text-white" />
-            </div>
-            
-            <div>
-              <h2 className="text-2xl font-semibold text-white mb-4">
-                Verify Your Email!
-              </h2>
-              <p className="text-gray-300 mb-2">
-                We&lsquo;ve sent a verification link to <strong>{formData.email}</strong>
-              </p>
-              <p className="text-gray-500 text-sm">
-                Click the link in the email to verify your account and complete your artist registration.
-              </p>
-            </div>
-
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-              <p className="text-yellow-800 text-sm">
-                <strong>Important:</strong> After email verification, you&lsquo;ll need to complete KYC document verification to upload music and access all artist features.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => router.push('/auth/artist/signin')}
-                className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-semibold"
-              >
-                Go to Artist Sign In
-              </button>
-              <button
-                onClick={() => setStep('basic')}
-                className="w-full px-6 py-3 border border-purple-500/40 text-white rounded-xl hover:bg-[#0a3747] transition-colors"
-              >
-                Create Another Account
-              </button>
-            </div>
-          </motion.div>
-        )}
 
         {/* Navigation Links */}
         <div className="text-center mt-8 pt-6 border-t border-gray-200">

@@ -238,7 +238,7 @@ async findOrCreateUser(decodedFirebaseUser: any) {
    * Send OTP for a given identifier (email or phone).
    * This creates/updates a Verification record and (for now) logs the code.
    */
-  async sendOtp(identifier: string, method: 'email' | 'phone') {
+  async sendOtp(identifier: string, method: 'email' | 'phone' | 'link') {
     // lookup user by identifier
     const user = await this.prisma.user.findUnique({ where: { email: identifier } });
 
@@ -247,15 +247,22 @@ async findOrCreateUser(decodedFirebaseUser: any) {
       return { success: true };
     }
 
-    // generate 6-digit numeric code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    // token can be a random string used for lookup (not exposed to client here)
-    const token = randomBytes(16).toString('hex');
+    // For email OTPs we generate a 6-digit code; for magic-links we generate a token only
+    const token = randomBytes(24).toString('hex');
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    let code: string | null = null;
+
+    if (method === 'email') {
+      // generate 6-digit numeric code
+      code = Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    // Determine verification method enum
+    const dbMethod = method === 'phone' ? VerificationMethod.PHONE : VerificationMethod.EMAIL;
 
     // upsert verification record per user+method
     await this.prisma.verification.upsert({
-      where: { userId_method: { userId: user.id, method: method === 'email' ? VerificationMethod.EMAIL : VerificationMethod.PHONE } },
+      where: { userId_method: { userId: user.id, method: dbMethod } },
       update: {
         code,
         token,
@@ -266,7 +273,7 @@ async findOrCreateUser(decodedFirebaseUser: any) {
       },
       create: {
         userId: user.id,
-        method: method === 'email' ? VerificationMethod.EMAIL : VerificationMethod.PHONE,
+        method: dbMethod,
         code,
         token,
         expiresAt,
@@ -274,27 +281,46 @@ async findOrCreateUser(decodedFirebaseUser: any) {
       },
     });
 
-    // Send via email for email method, otherwise just log for phone (or integrate SMS provider)
-    if (method === 'email') {
+    // Send via email for email method or link method; otherwise just log for phone (or integrate SMS provider)
+    if (method === 'email' || method === 'link') {
       try {
         const apiKey = process.env.SENDGRID_API_KEY;
         if (!apiKey) {
           console.error('SENDGRID_API_KEY not set; OTP will be logged to console instead');
         } else {
           sgMail.setApiKey(apiKey);
-          const msg = {
-            to: user.email,
-            from: process.env.SENDGRID_FROM_EMAIL || 'no-reply@fwayamusic.com',
-            subject: 'Your Fwaya Music verification code',
-            text: `Your verification code is ${code}. It expires in 10 minutes.`,
-            html: `<div style="font-family: Arial, sans-serif; line-height:1.4;">
-                    <h2 style="color:#0a3747">Fwaya Music Verification</h2>
-                    <p>Your verification code is:</p>
-                    <div style="font-size:22px; font-weight:700; margin:12px 0; color:#e51f48">${code}</div>
-                    <p>This code expires in 10 minutes.</p>
-                    <p>If you did not request this, please ignore this email.</p>
-                   </div>`,
-          } as any;
+          let msg: any;
+
+          if (method === 'link') {
+            const frontend = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
+            const verifyUrl = `${frontend.replace(/\/$/, '')}/auth/verify-email?token=${token}`;
+            msg = {
+              to: user.email,
+              from: process.env.SENDGRID_FROM_EMAIL || 'no-reply@fwayamusic.com',
+              subject: 'Verify your Fwaya Music account',
+              text: `Click the following link to verify your account: ${verifyUrl}`,
+              html: `<div style="font-family: Arial, sans-serif; line-height:1.4;">
+                      <h2 style="color:#0a3747">Verify your email</h2>
+                      <p>Click the link below to verify your Fwaya Music account. This link expires in 10 minutes.</p>
+                      <a href="${verifyUrl}" style="display:inline-block;padding:10px 16px;background:#0a3747;color:white;border-radius:6px;text-decoration:none;margin-top:12px;">Verify Email</a>
+                      <p style="margin-top:12px;color:#666;">If you did not request this, please ignore this email.</p>
+                     </div>`,
+            };
+          } else {
+            msg = {
+              to: user.email,
+              from: process.env.SENDGRID_FROM_EMAIL || 'no-reply@fwayamusic.com',
+              subject: 'Your Fwaya Music verification code',
+              text: `Your verification code is ${code}. It expires in 10 minutes.`,
+              html: `<div style="font-family: Arial, sans-serif; line-height:1.4;">
+                      <h2 style="color:#0a3747">Fwaya Music Verification</h2>
+                      <p>Your verification code is:</p>
+                      <div style="font-size:22px; font-weight:700; margin:12px 0; color:#e51f48">${code}</div>
+                      <p>This code expires in 10 minutes.</p>
+                      <p>If you did not request this, please ignore this email.</p>
+                     </div>`,
+            };
+          }
 
           await sgMail.send(msg);
         }
@@ -345,6 +371,35 @@ async findOrCreateUser(decodedFirebaseUser: any) {
       await this.prisma.user.update({ where: { id: user.id }, data: { isEmailVerified: true } });
     } else {
       await this.prisma.user.update({ where: { id: user.id }, data: { isPhoneVerified: true } });
+    }
+
+    return { success: true };
+  }
+
+  /**
+   * Verify email using a magic link token (unauthenticated)
+   */
+  async verifyEmailToken(token: string) {
+    // find a verification record by token that isn't expired
+    const now = new Date();
+    const verification = await this.prisma.verification.findFirst({
+      where: {
+        token,
+        expiresAt: { gte: now },
+      },
+    });
+
+    if (!verification) return { success: false, message: 'Invalid or expired token' };
+    if (verification.isVerified) return { success: true };
+
+    // mark verification as used
+    await this.prisma.verification.update({ where: { id: verification.id }, data: { isVerified: true, verifiedAt: new Date() } });
+
+    // update the user
+    if (verification.method === VerificationMethod.EMAIL) {
+      await this.prisma.user.update({ where: { id: verification.userId }, data: { isEmailVerified: true } });
+    } else {
+      await this.prisma.user.update({ where: { id: verification.userId }, data: { isPhoneVerified: true } });
     }
 
     return { success: true };

@@ -12,9 +12,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Forward to backend
+    // Forward to backend (include /api prefix expected by deployed backend)
     const backendResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/v1/media/save-metadata`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/save-metadata`,
       {
         method: 'POST',
         headers: {

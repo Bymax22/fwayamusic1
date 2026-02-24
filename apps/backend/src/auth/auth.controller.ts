@@ -1,6 +1,7 @@
 
 // src/auth/auth.controller.ts
-import { Controller, Post, Body, Req, UseGuards, Get, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Req, UseGuards, Get, HttpException, HttpStatus, Query, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 
@@ -32,9 +33,33 @@ export class AuthController {
   }
 
   @Post('send-otp')
-  async sendOtp(@Body() body: { method: 'email' | 'phone'; identifier: string }) {
+  async sendOtp(@Body() body: { method: 'email' | 'phone' | 'link'; identifier: string }) {
     const { method, identifier } = body;
-    return this.authService.sendOtp(identifier, method);
+    return this.authService.sendOtp(identifier, method as any);
+  }
+
+  // Magic link verification endpoint - unauthenticated
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string, @Query('redirect') redirect: string | undefined, @Res() res: Response) {
+    if (!token) {
+      return res.status(400).send('Missing token');
+    }
+
+    try {
+      const result = await this.authService.verifyEmailToken(token);
+      const frontend = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
+      const safeRedirect = redirect && redirect.startsWith('/') ? `${frontend.replace(/\/$/, '')}${redirect}` : `${frontend.replace(/\/$/, '')}/for-artists`;
+
+      if (!result.success) {
+        // Redirect to a friendly error page or show message
+        return res.redirect(`${frontend.replace(/\/$/, '')}/auth/verify-failed`);
+      }
+
+      return res.redirect(safeRedirect);
+    } catch (err) {
+      console.error('verify-email error', err);
+      return res.redirect(`${process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/auth/verify-failed`);
+    }
   }
 
   @UseGuards(FirebaseAuthGuard)

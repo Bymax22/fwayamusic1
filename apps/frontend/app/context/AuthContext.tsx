@@ -61,7 +61,7 @@ interface AuthContextType {
   getToken: () => Promise<string | null>;
   forgotPassword: (email: string) => Promise<void>;
   verifyOTP: (method: 'email' | 'phone', code: string) => Promise<boolean>;
-  sendOTP: (method: 'email' | 'phone', identifier: string) => Promise<void>;
+  sendOTP: (method: 'email' | 'phone' | 'link', identifier: string) => Promise<void>;
 }
 
 interface SignUpData {
@@ -236,11 +236,6 @@ const signUp = async (data: SignUpData): Promise<User> => {
       // Temporarily deactivate email verification
       // await sendEmailVerification(firebaseUser);
 
-      // For artists and resellers, send OTP for additional verification
-      if (data.role === 'ARTIST' || data.role === 'RESELLER') {
-        await sendOTP('email', data.email);
-      }
-
 
      // Create user in backend
       const token = await firebaseUser.getIdToken();
@@ -274,6 +269,18 @@ const signUp = async (data: SignUpData): Promise<User> => {
       const userData = await backendResponse.json();
       console.log('Signup response userData:', userData, 'Role:', userData?.role);
       setUser(userData);
+
+      // After backend user is created, send magic-link for ARTIST/RESELLER so Verification record exists
+      if (data.role === 'ARTIST' || data.role === 'RESELLER') {
+        try {
+          await sendOTP('link', data.email);
+          console.debug('Magic link sent after backend signup for', data.email);
+        } catch (otpErr) {
+          console.error('Failed to send magic link after signup:', otpErr);
+          // do not block signup success — surface later in UI if needed
+        }
+      }
+
       return userData;
 
     } catch (error: unknown) {
@@ -334,7 +341,7 @@ const signUp = async (data: SignUpData): Promise<User> => {
     }
   };
 
-  const sendOTP = async (method: 'email' | 'phone', identifier: string): Promise<void> => {
+  const sendOTP = async (method: 'email' | 'phone' | 'link', identifier: string): Promise<void> => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/send-otp`, {
         method: 'POST',
