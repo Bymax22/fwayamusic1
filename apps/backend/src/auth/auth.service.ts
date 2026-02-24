@@ -6,6 +6,7 @@ import { randomBytes } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
 
+// Using Brevo for email delivery (OTP and magic-link)
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaService) {}
