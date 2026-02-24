@@ -285,49 +285,63 @@ async findOrCreateUser(decodedFirebaseUser: any) {
     if (method === 'email' || method === 'link') {
       try {
         const apiKey = process.env.SENDGRID_API_KEY;
+        const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@fwayamusic.com';
+        
+        console.log(`[sendOtp] Attempting to send ${method} OTP to ${user.email}`);
+        console.log(`[sendOtp] From email: ${fromEmail}`);
+        console.log(`[sendOtp] API Key configured: ${!!apiKey}`);
+        
         if (!apiKey) {
-          console.error('SENDGRID_API_KEY not set; OTP will be logged to console instead');
-        } else {
-          sgMail.setApiKey(apiKey);
-          let msg: any;
-
-          if (method === 'link') {
-            const frontend = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
-            const verifyUrl = `${frontend.replace(/\/$/, '')}/auth/verify-email?token=${token}`;
-            msg = {
-              to: user.email,
-              from: process.env.SENDGRID_FROM_EMAIL || 'no-reply@fwayamusic.com',
-              subject: 'Verify your Fwaya Music account',
-              text: `Click the following link to verify your account: ${verifyUrl}`,
-              html: `<div style="font-family: Arial, sans-serif; line-height:1.4;">
-                      <h2 style="color:#0a3747">Verify your email</h2>
-                      <p>Click the link below to verify your Fwaya Music account. This link expires in 10 minutes.</p>
-                      <a href="${verifyUrl}" style="display:inline-block;padding:10px 16px;background:#0a3747;color:white;border-radius:6px;text-decoration:none;margin-top:12px;">Verify Email</a>
-                      <p style="margin-top:12px;color:#666;">If you did not request this, please ignore this email.</p>
-                     </div>`,
-            };
-          } else {
-            msg = {
-              to: user.email,
-              from: process.env.SENDGRID_FROM_EMAIL || 'no-reply@fwayamusic.com',
-              subject: 'Your Fwaya Music verification code',
-              text: `Your verification code is ${code}. It expires in 10 minutes.`,
-              html: `<div style="font-family: Arial, sans-serif; line-height:1.4;">
-                      <h2 style="color:#0a3747">Fwaya Music Verification</h2>
-                      <p>Your verification code is:</p>
-                      <div style="font-size:22px; font-weight:700; margin:12px 0; color:#e51f48">${code}</div>
-                      <p>This code expires in 10 minutes.</p>
-                      <p>If you did not request this, please ignore this email.</p>
-                     </div>`,
-            };
-          }
-
-          await sgMail.send(msg);
+          console.error('[sendOtp] SENDGRID_API_KEY not set; OTP will be logged to console instead');
+          console.log(`[sendOtp] OTP for user(${user.email}) [${method}]: ${code} (expires ${expiresAt.toISOString()})`);
+          return { success: true };
         }
-      } catch (err) {
-        console.error('Failed to send OTP email via SendGrid:', err);
-        // Surface a failure so frontend can react (do not silently succeed)
-        throw new Error('Failed to send OTP');
+        
+        sgMail.setApiKey(apiKey);
+        let msg: any;
+
+        if (method === 'link') {
+          const frontend = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
+          const verifyUrl = `${frontend.replace(/\/$/, '')}/auth/verify-email?token=${token}`;
+          msg = {
+            to: user.email,
+            from: fromEmail,
+            subject: 'Verify your Fwaya Music account',
+            text: `Click the following link to verify your account: ${verifyUrl}`,
+            html: `<div style="font-family: Arial, sans-serif; line-height:1.4;">
+                    <h2 style="color:#0a3747">Verify your email</h2>
+                    <p>Click the link below to verify your Fwaya Music account. This link expires in 10 minutes.</p>
+                    <a href="${verifyUrl}" style="display:inline-block;padding:10px 16px;background:#0a3747;color:white;border-radius:6px;text-decoration:none;margin-top:12px;">Verify Email</a>
+                    <p style="margin-top:12px;color:#666;">If you did not request this, please ignore this email.</p>
+                   </div>`,
+          };
+        } else {
+          msg = {
+            to: user.email,
+            from: fromEmail,
+            subject: 'Your Fwaya Music verification code',
+            text: `Your verification code is ${code}. It expires in 10 minutes.`,
+            html: `<div style="font-family: Arial, sans-serif; line-height:1.4;">
+                    <h2 style="color:#0a3747">Fwaya Music Verification</h2>
+                    <p>Your verification code is:</p>
+                    <div style="font-size:22px; font-weight:700; margin:12px 0; color:#e51f48">${code}</div>
+                    <p>This code expires in 10 minutes.</p>
+                    <p>If you did not request this, please ignore this email.</p>
+                   </div>`,
+          };
+        }
+
+        console.log(`[sendOtp] Sending email via SendGrid to: ${msg.to}`);
+        await sgMail.send(msg);
+        console.log(`[sendOtp] Email sent successfully to ${user.email}`);
+      } catch (err: any) {
+        // Log full provider response when available for debugging
+        console.error('[sendOtp] Failed to send OTP email via SendGrid');
+        console.error('[sendOtp] Error message:', err?.message || JSON.stringify(err));
+        if (err?.response?.body) console.error('[sendOtp] SendGrid response body:', err.response.body);
+        if (err?.response?.status) console.error('[sendOtp] SendGrid response status:', err.response.status);
+        // Rethrow with provider message so frontend sees a descriptive error
+        throw new Error(`Failed to send OTP: ${err?.message || 'SendGrid error'}`);
       }
     } else {
       // For phone method: TODO integrate SMS provider like Twilio. For now log the code.
