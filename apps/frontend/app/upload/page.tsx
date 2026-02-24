@@ -137,7 +137,7 @@ void uploadToCloudinary;
 
       // 3. Save to your backend
       const backendResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/media`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/save-metadata`,
         {
           method: "POST",
           headers: {
@@ -146,8 +146,10 @@ void uploadToCloudinary;
           },
           body: JSON.stringify({
             url: cloudinaryData.secure_url,
+            cloudinaryPublicId: cloudinaryData.public_id,
             format: cloudinaryData.format,
             duration: cloudinaryData.duration ? Math.round(Number(cloudinaryData.duration)) : null,
+            resourceType: cloudinaryData.resource_type,
             title: metadata.title,
             description: metadata.description,
             genre: metadata.genre,
@@ -168,7 +170,7 @@ void uploadToCloudinary;
       const savedMedia = await backendResponse.json();
       
       // 4. Redirect to success page
-      window.location.href = `/upload/success?id=${savedMedia.data.id}`;
+      window.location.href = `/upload/success?id=${savedMedia.id}`;
       
     } catch (err) {
       console.error("Upload error:", err);

@@ -79,7 +79,7 @@ export class MediaController {
   // NEW: Save metadata only (file already uploaded to Cloudinary client-side)
   @Post('save-metadata')
   async saveMediaMetadata(
-    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string },
+    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean },
     @CurrentUser() user: { sub: string }
   ) {
     try {

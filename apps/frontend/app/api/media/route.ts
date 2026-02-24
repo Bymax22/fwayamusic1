@@ -2,10 +2,10 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/media`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/media`);
   if (!res.ok) throw new Error('Failed to fetch media');
   const media = await res.json();
-  return NextResponse.json({ media });
+  return NextResponse.json(media);
 }
 
 export async function POST(request: Request) {

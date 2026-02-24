@@ -153,7 +153,7 @@ export class MediaService {
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
@@ -163,14 +163,14 @@ export class MediaService {
         url: metadata.url,
         cloudinaryPublicId: metadata.cloudinaryPublicId,
         title: metadata.title,
-        description: null,
+        description: metadata.description || null,
         format: metadata.format,
         duration: Math.floor(metadata.duration || 0),
         type: metadata.type as MediaType,
-        accessType: MediaAccessType.FREE,
-        price: null,
-        isExplicit: false,
-        genre: null,
+        accessType: metadata.isPremium ? MediaAccessType.PREMIUM : MediaAccessType.FREE,
+        price: metadata.isPremium ? 2.99 : null, // Default price for premium
+        isExplicit: metadata.isExplicit || false,
+        genre: metadata.genre || null,
         tags: [],
         allowReselling: true,
         artistCommissionRate: 0.5,
