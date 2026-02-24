@@ -112,7 +112,7 @@ export default function ArtistSignIn() {
   const resendOTP = async () => {
     try {
       await sendOTP('email', formData.email);
-      setOtpSent(true);
+      setShowOtpModal(true);
     } catch (error) {
        console.error('resendOTP error', error);
       setErrors({ submit: 'Failed to resend OTP' });
