@@ -1,5 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build && cp dist/apps/backend/src/main.js dist/apps/backend/main.js || true",
   "outputDirectory": "dist/apps/backend"
 }
