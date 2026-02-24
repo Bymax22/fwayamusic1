@@ -33,11 +33,18 @@ export default function ArtistSignIn() {
     }
 
     try {
+      console.log('Starting sign in for:', formData.email);
       await signIn(formData.email, formData.password);
+      console.log('Sign in successful, current user:', user?.email, 'role:', user?.role);
+      
       // Send OTP for additional verification
+      console.log('Sending OTP...');
       await sendOTP('email', formData.email);
+      console.log('OTP sent');
+      
       setOtpSent(true);
       setStep('otp');
+      console.log('Step changed to otp');
     } catch (error: unknown) {
       console.error('handleCredentialsSubmit error', error);
       if (error instanceof Error) {
@@ -57,18 +64,23 @@ export default function ArtistSignIn() {
     }
 
     try {
+      console.log('Verifying OTP...', formData.otp);
       const isValid = await verifyOTP('email', formData.otp);
+      console.log('OTP verification result:', isValid);
+      
       if (isValid) {
-        // Check if user is an artist
-        if (user?.role.toUpperCase() === 'ARTIST') {
-          router.push('/for-artists');
-        } else {
-          setErrors({ otp: 'Access denied. This account is not registered as an artist.' });
-        }
+        console.log('OTP valid, redirecting to /for-artists');
+        console.log('Current user state:', { user: user?.email, role: user?.role });
+        // OTP verified successfully - redirect to artist dashboard
+        // RoleGuard on the page will verify the user is actually an ARTIST
+        router.push('/for-artists');
+        console.log('Router.push called');
       } else {
+        console.log('OTP verification failed');
         setErrors({ otp: 'Invalid OTP code' });
       }
     } catch (error: unknown) {
+      console.error('OTP verification error:', error);
       if (error instanceof Error) {
         setErrors({ submit: error.message });
       } else {
@@ -79,13 +91,16 @@ export default function ArtistSignIn() {
 
   const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
     try {
+      console.log('Starting social signin with:', provider);
       if (provider === 'google') {
         await signInWithGoogle('ARTIST');
       } else {
         await signInWithFacebook('ARTIST');
       }
+      console.log('Social signin successful, redirecting to /for-artists');
       router.push('/for-artists');
     } catch (error: unknown) {
+      console.error('Social signin error:', error);
       if (error instanceof Error) {
         setErrors({ submit: error.message });
       } else {
