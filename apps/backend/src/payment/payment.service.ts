@@ -76,6 +76,38 @@ export class PaymentService {
     }
   }
 
+  public async getZamtelAccessToken(): Promise<string> {
+    const clientId = process.env.ZAMTEL_MONEY_CLIENT_ID!;
+    const clientSecret = process.env.ZAMTEL_MONEY_CLIENT_SECRET!;
+    const apiUrl = process.env.ZAMTEL_MONEY_API_URL!;
+
+    const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+
+    try {
+      const response = await axios.post(
+        `${apiUrl}/auth/token`,
+        new URLSearchParams({ grant_type: 'client_credentials' }),
+        {
+          headers: {
+            Authorization: `Basic ${basicAuth}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
+
+      return response.data.access_token;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        this.logger.error('Error fetching Zamtel access token:', error.response?.data || error.message);
+      } else if (error instanceof Error) {
+        this.logger.error('Error fetching Zamtel access token:', error.message);
+      } else {
+        this.logger.error('Error fetching Zamtel access token:', error);
+      }
+      throw new Error('Failed to get Zamtel access token');
+    }
+  }
+
   async createTransaction(createTransactionDto: CreateTransactionDto, userId: number) {
     const { mediaId, resellerLinkCode, deviceInfo } = createTransactionDto;
 
@@ -211,6 +243,9 @@ export class PaymentService {
           break;
         case 'AIRTEL_MONEY':
           paymentResult = await this.processAirtelMoney(transaction, providerData);
+          break;
+        case 'ZAMTEL_MONEY':
+          paymentResult = await this.processZamtelMoney(transaction, providerData);
           break;
         default:
           throw new BadRequestException('Unsupported payment provider');
@@ -350,6 +385,47 @@ export class PaymentService {
         this.logger.error('Airtel Money payment failed:', error);
       }
       throw new Error('Airtel Money payment processing failed');
+    }
+  }
+
+  private async processZamtelMoney(transaction: any, providerData: { phoneNumber?: string }) {
+    const zamtelApiUrl = process.env.ZAMTEL_MONEY_API_URL!;
+    const merchantCode = process.env.ZAMTEL_MONEY_MERCHANT_CODE!;
+    const accessToken = await this.getZamtelAccessToken();
+
+    const payload = {
+      merchantCode,
+      transactionId: transaction.reference,
+      amount: transaction.amount,
+      currency: transaction.currency,
+      phoneNumber: providerData.phoneNumber,
+      description: `Payment for ${transaction.media?.title ?? ''}`,
+      callbackUrl: process.env.ZAMTEL_MONEY_CALLBACK_URL,
+    };
+
+    try {
+      const response = await axios.post(`${zamtelApiUrl}/payments/initiate`, payload, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      return {
+        success: true,
+        reference: transaction.reference,
+        message: 'Payment processed successfully',
+        data: response.data,
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        this.logger.error('Zamtel Money payment failed:', error.response?.data || error.message);
+      } else if (error instanceof Error) {
+        this.logger.error('Zamtel Money payment failed:', error.message);
+      } else {
+        this.logger.error('Zamtel Money payment failed:', error);
+      }
+      throw new Error('Zamtel Money payment processing failed');
     }
   }
 
