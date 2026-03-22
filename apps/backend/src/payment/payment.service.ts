@@ -535,6 +535,8 @@ export class PaymentService {
         return await this.executeMTNMoneyPayout(paymentAccount, amount, currency, description);
       case 'AIRTEL_MONEY':
         return await this.executeAirtelMoneyPayout(paymentAccount, amount, currency, description);
+      case 'ZAMTEL_MONEY':
+        return await this.executeZamtelMoneyPayout(paymentAccount, amount, currency, description);
       default:
         this.logger.warn(`Payout provider ${paymentAccount.provider} not implemented`);
     }
@@ -546,6 +548,57 @@ export class PaymentService {
 
   private async executeAirtelMoneyPayout(paymentAccount: any, amount: number, currency: string, description: string) {
     // Implement Airtel Money payout logic here
+  }
+
+  private async executeZamtelMoneyPayout(paymentAccount: any, amount: number, currency: string, description: string) {
+    const zamtelApiUrl = process.env.ZAMTEL_MONEY_API_URL!;
+    const merchantCode = process.env.ZAMTEL_MONEY_MERCHANT_CODE!;
+
+    try {
+      const accessToken = await this.getZamtelAccessToken();
+
+      const payload = {
+        merchantCode,
+        recipientPhone: paymentAccount.accountNumber, // Phone number stored in accountNumber field
+        amount,
+        currency,
+        transactionId: `POUT-${this.generateReference()}`,
+        description: description || 'Artist payout',
+        callbackUrl: process.env.ZAMTEL_MONEY_CALLBACK_URL,
+      };
+
+      const response = await axios.post(`${zamtelApiUrl}/payouts/send`, payload, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      this.logger.log(
+        `Zamtel payout successful: ${amount} ${currency} to ${paymentAccount.accountNumber}. Reference: ${response.data.reference}`
+      );
+
+      return {
+        success: true,
+        reference: response.data.reference,
+        message: 'Payout processed successfully',
+        data: response.data,
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        this.logger.error(
+          `Zamtel payout failed: ${error.response?.data?.message || error.message}`,
+          error.response?.data || error.message
+        );
+        throw new Error(`Zamtel payout failed: ${error.response?.data?.message || error.message}`);
+      } else if (error instanceof Error) {
+        this.logger.error(`Zamtel payout failed: ${error.message}`);
+        throw new Error(`Zamtel payout failed: ${error.message}`);
+      } else {
+        this.logger.error(`Zamtel payout failed with unknown error`);
+        throw new Error('Zamtel payout failed with unknown error');
+      }
+    }
   }
 
   async getTransaction(id: number) {

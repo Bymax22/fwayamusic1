@@ -37,6 +37,12 @@ async createTransaction(
     return { token };
   }
 
+  @Get('test-zamtel-token')
+  async testZamtelToken(): Promise<any> {
+    const token = await this.paymentService.getZamtelAccessToken();
+    return { token };
+  }
+
   @Get('transaction/:id')
   async getTransaction(@Param('id') id: string) {
     return this.paymentService.getTransaction(parseInt(id));
