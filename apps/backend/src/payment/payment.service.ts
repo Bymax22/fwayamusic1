@@ -436,37 +436,69 @@ export class PaymentService {
       throw new Error('No calculated amounts found');
     }
 
+    // Check float account balance before attempting payouts
+    const totalPayoutAmount = calculatedAmounts.artistAmount + (calculatedAmounts.resellerAmount || 0);
+    const floatBalance = await this.getFloatAccountBalance(transaction.currency);
+
+    if (floatBalance < totalPayoutAmount) {
+      this.logger.warn(
+        `Insufficient float balance for payouts. Required: ${totalPayoutAmount}, Available: ${floatBalance}. Queueing payouts.`
+      );
+
+      // Queue payouts for later processing
+      await this.queuePayoutsForLater(transaction);
+      return;
+    }
+
     // Payout to artist
     if (calculatedAmounts.artistAmount > 0 && transaction.media?.userId) {
-      await this.payoutToUser(
-        transaction.media.userId,
-        calculatedAmounts.artistAmount,
-        transaction.currency,
-        `Commission for ${transaction.media?.title ?? ''}`,
-        transaction.id
-      );
+      try {
+        await this.payoutToUser(
+          transaction.media.userId,
+          calculatedAmounts.artistAmount,
+          transaction.currency,
+          `Commission for ${transaction.media?.title ?? ''}`,
+          transaction.id
+        );
+
+        // Deduct from float account
+        await this.deductFromFloatAccount(calculatedAmounts.artistAmount, transaction.currency, 'ARTIST_PAYOUT');
+      } catch (error) {
+        this.logger.error(`Artist payout failed for transaction ${transaction.id}:`, error);
+        // Queue for retry
+        await this.queuePayoutForRetry(transaction.id, transaction.media.userId, calculatedAmounts.artistAmount, transaction.currency);
+      }
     }
 
     // Payout to reseller if applicable
     if (transaction.isResellerSale && calculatedAmounts.resellerAmount > 0) {
       const commission = transaction.commissions?.[0];
       if (commission) {
-        await this.payoutToUser(
-          commission.resellerId,
-          calculatedAmounts.resellerAmount,
-          transaction.currency,
-          `Reseller commission for ${transaction.media?.title ?? ''}`,
-          transaction.id
-        );
+        try {
+          await this.payoutToUser(
+            commission.resellerId,
+            calculatedAmounts.resellerAmount,
+            transaction.currency,
+            `Reseller commission for ${transaction.media?.title ?? ''}`,
+            transaction.id
+          );
 
-        await this.prisma.commission.update({
-          where: { id: commission.id },
-          data: {
-            status: 'PAID',
-            isPaid: true,
-            paidAt: new Date(),
-          },
-        });
+          // Deduct from float account
+          await this.deductFromFloatAccount(calculatedAmounts.resellerAmount, transaction.currency, 'RESELLER_PAYOUT');
+
+          await this.prisma.commission.update({
+            where: { id: commission.id },
+            data: {
+              status: 'PAID',
+              isPaid: true,
+              paidAt: new Date(),
+            },
+          });
+        } catch (error) {
+          this.logger.error(`Reseller payout failed for transaction ${transaction.id}:`, error);
+          // Queue for retry
+          await this.queuePayoutForRetry(transaction.id, commission.resellerId, calculatedAmounts.resellerAmount, transaction.currency);
+        }
       }
     }
 
@@ -474,6 +506,18 @@ export class PaymentService {
     if (calculatedAmounts.artistAmount > 0 && transaction.media?.userId) {
       await this.prisma.user.update({
         where: { id: transaction.media.userId },
+        data: {
+          totalEarnings: { increment: calculatedAmounts.artistAmount },
+        },
+      });
+    }
+
+    // Check if float balance is low and send alert
+    const newFloatBalance = await this.getFloatAccountBalance(transaction.currency);
+    if (newFloatBalance < 100000) { // ZMW 100,000 threshold
+      await this.sendFloatBalanceAlert(transaction.currency, newFloatBalance);
+    }
+  }
         data: {
           totalEarnings: { increment: calculatedAmounts.artistAmount },
         },
@@ -550,53 +594,212 @@ export class PaymentService {
     // Implement Airtel Money payout logic here
   }
 
-  private async executeZamtelMoneyPayout(paymentAccount: any, amount: number, currency: string, description: string) {
-    const zamtelApiUrl = process.env.ZAMTEL_MONEY_API_URL!;
-    const merchantCode = process.env.ZAMTEL_MONEY_MERCHANT_CODE!;
+  private async getFloatAccountBalance(currency: string): Promise<number> {
+    // Get current float balance for the currency
+    const floatAccount = await this.prisma.floatAccount.findUnique({
+      where: { currency },
+    });
 
-    try {
-      const accessToken = await this.getZamtelAccessToken();
+    return floatAccount?.balance ?? 0;
+  }
 
-      const payload = {
-        merchantCode,
-        recipientPhone: paymentAccount.accountNumber, // Phone number stored in accountNumber field
-        amount,
-        currency,
-        transactionId: `POUT-${this.generateReference()}`,
-        description: description || 'Artist payout',
-        callbackUrl: process.env.ZAMTEL_MONEY_CALLBACK_URL,
-      };
+  private async deductFromFloatAccount(amount: number, currency: string, reason: string): Promise<void> {
+    await this.prisma.floatAccount.update({
+      where: { currency },
+      data: {
+        balance: { decrement: amount },
+      },
+    });
 
-      const response = await axios.post(`${zamtelApiUrl}/payouts/send`, payload, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+    // Log the deduction
+    await this.prisma.floatTransaction.create({
+      data: {
+        amount: -amount,
+        currency: currency as any,
+        type: 'DEDUCTION',
+        reason,
+        balanceAfter: await this.getFloatAccountBalance(currency),
+      },
+    });
+  }
+
+  private async queuePayoutsForLater(transaction: any): Promise<void> {
+    const calculatedAmounts = transaction.metadata?.calculatedAmounts;
+
+    // Queue artist payout
+    if (calculatedAmounts.artistAmount > 0 && transaction.media?.userId) {
+      await this.prisma.queuedPayout.create({
+        data: {
+          userId: transaction.media.userId,
+          transactionId: transaction.id,
+          amount: calculatedAmounts.artistAmount,
+          currency: transaction.currency,
+          type: 'ARTIST_PAYOUT',
+          status: 'QUEUED',
+          reason: 'Insufficient float balance',
+          retryCount: 0,
         },
       });
+    }
 
-      this.logger.log(
-        `Zamtel payout successful: ${amount} ${currency} to ${paymentAccount.accountNumber}. Reference: ${response.data.reference}`
-      );
+    // Queue reseller payout
+    if (transaction.isResellerSale && calculatedAmounts.resellerAmount > 0) {
+      const commission = transaction.commissions?.[0];
+      if (commission) {
+        await this.prisma.queuedPayout.create({
+          data: {
+            userId: commission.resellerId,
+            transactionId: transaction.id,
+            amount: calculatedAmounts.resellerAmount,
+            currency: transaction.currency,
+            type: 'RESELLER_PAYOUT',
+            status: 'QUEUED',
+            reason: 'Insufficient float balance',
+            retryCount: 0,
+          },
+        });
+      }
+    }
+  }
 
-      return {
-        success: true,
-        reference: response.data.reference,
-        message: 'Payout processed successfully',
-        data: response.data,
-      };
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        this.logger.error(
-          `Zamtel payout failed: ${error.response?.data?.message || error.message}`,
-          error.response?.data || error.message
-        );
-        throw new Error(`Zamtel payout failed: ${error.response?.data?.message || error.message}`);
-      } else if (error instanceof Error) {
-        this.logger.error(`Zamtel payout failed: ${error.message}`);
-        throw new Error(`Zamtel payout failed: ${error.message}`);
+  private async queuePayoutForRetry(transactionId: number, userId: number, amount: number, currency: string): Promise<void> {
+    await this.prisma.queuedPayout.create({
+      data: {
+        userId,
+        transactionId,
+        amount,
+        currency: currency as any,
+        type: 'RETRY_PAYOUT',
+        status: 'QUEUED',
+        reason: 'Payout execution failed',
+        retryCount: 0,
+      },
+    });
+  }
+
+  private async sendFloatBalanceAlert(currency: string, balance: number): Promise<void> {
+    // Send alert to admin/support team
+    this.logger.warn(`⚠️ LOW FLOAT BALANCE ALERT: ${currency} ${balance} remaining`);
+
+    // In production, this would send email/SMS to admins
+    // For now, just log it
+    await this.prisma.systemAlert.create({
+      data: {
+        type: 'FLOAT_BALANCE_LOW',
+        message: `Float account balance low: ${currency} ${balance}`,
+        severity: 'HIGH',
+        resolved: false,
+      },
+    });
+  }
+
+  // Method to fund float account when settlement funds become available
+  async fundFloatAccount(amount: number, currency: string, settlementReference: string): Promise<void> {
+    await this.prisma.floatAccount.upsert({
+      where: { currency },
+      update: {
+        balance: { increment: amount },
+      },
+      create: {
+        currency: currency as any,
+        balance: amount,
+      },
+    });
+
+    // Log the funding
+    await this.prisma.floatTransaction.create({
+      data: {
+        amount,
+        currency: currency as any,
+        type: 'FUNDING',
+        reason: `Settlement funds: ${settlementReference}`,
+        balanceAfter: await this.getFloatAccountBalance(currency),
+      },
+    });
+
+    this.logger.log(`✅ Float account funded: +${currency} ${amount}. New balance: ${await this.getFloatAccountBalance(currency)}`);
+
+    // Process queued payouts now that funds are available
+    await this.processQueuedPayouts(currency);
+  }
+
+  // Process payouts that were queued due to insufficient float balance
+  async processQueuedPayouts(currency: string): Promise<void> {
+    const queuedPayouts = await this.prisma.queuedPayout.findMany({
+      where: {
+        currency,
+        status: 'QUEUED',
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    for (const payout of queuedPayouts) {
+      const currentBalance = await this.getFloatAccountBalance(currency);
+
+      if (currentBalance >= payout.amount) {
+        try {
+          await this.payoutToUser(
+            payout.userId,
+            payout.amount,
+            payout.currency,
+            `Delayed payout for transaction ${payout.transactionId}`,
+            payout.transactionId
+          );
+
+          await this.deductFromFloatAccount(payout.amount, currency, `QUEUED_${payout.type}`);
+
+          await this.prisma.queuedPayout.update({
+            where: { id: payout.id },
+            data: {
+              status: 'COMPLETED',
+              processedAt: new Date(),
+            },
+          });
+
+          // Update user earnings if artist payout
+          if (payout.type === 'ARTIST_PAYOUT') {
+            await this.prisma.user.update({
+              where: { id: payout.userId },
+              data: {
+                totalEarnings: { increment: payout.amount },
+              },
+            });
+          }
+
+          // Update commission if reseller payout
+          if (payout.type === 'RESELLER_PAYOUT') {
+            const commission = await this.prisma.commission.findFirst({
+              where: { resellerId: payout.userId, transactionId: payout.transactionId },
+            });
+
+            if (commission) {
+              await this.prisma.commission.update({
+                where: { id: commission.id },
+                data: {
+                  status: 'PAID',
+                  isPaid: true,
+                  paidAt: new Date(),
+                },
+              });
+            }
+          }
+
+          this.logger.log(`✅ Processed queued payout: ${payout.type} for user ${payout.userId}, amount ${payout.amount}`);
+        } catch (error) {
+          this.logger.error(`Failed to process queued payout ${payout.id}:`, error);
+
+          await this.prisma.queuedPayout.update({
+            where: { id: payout.id },
+            data: {
+              status: 'FAILED',
+              retryCount: { increment: 1 },
+              lastError: error instanceof Error ? error.message : 'Unknown error',
+            },
+          });
+        }
       } else {
-        this.logger.error(`Zamtel payout failed with unknown error`);
-        throw new Error('Zamtel payout failed with unknown error');
+        this.logger.warn(`Still insufficient balance for queued payout ${payout.id}. Required: ${payout.amount}, Available: ${currentBalance}`);
+        break; // Stop processing if we don't have enough for the next payout
       }
     }
   }

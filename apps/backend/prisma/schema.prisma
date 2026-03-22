@@ -198,6 +198,11 @@ model User {
   // Reseller-specific fields
   businessName String? @map("business_name")
   businessType String? @map("business_type")
+
+  // Relations for float account system
+  queuedPayouts QueuedPayout[]
+
+  // Other relations...
   taxNumber    String? @map("tax_number")
 
   // Consent fields
@@ -598,6 +603,7 @@ model Transaction {
 
   commissions        Commission[]
   payoutTransactions PayoutTransaction[]
+  queuedPayouts      QueuedPayout[]
   libraryItems       LibraryItem[]
   user               User                @relation(fields: [userId], references: [id])
   media              Media?              @relation(fields: [mediaId], references: [id])
@@ -873,4 +879,73 @@ model AuditLog {
   @@index([userId, action])
   @@index([resource, resourceId])
   @@map("audit_logs")
+}
+
+// ==================== FLOAT ACCOUNT SYSTEM ====================
+
+model FloatAccount {
+  id        Int      @id @default(autoincrement())
+  currency  Currency @unique
+  balance   Float    @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  transactions FloatTransaction[]
+
+  @@map("float_accounts")
+}
+
+model FloatTransaction {
+  id          Int      @id @default(autoincrement())
+  floatAccountId Int   @map("float_account_id")
+  amount      Float    // Positive for funding, negative for deductions
+  currency    Currency
+  type        String   // FUNDING, DEDUCTION, ADJUSTMENT
+  reason      String
+  balanceAfter Float   @map("balance_after")
+  reference   String?  @unique
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  floatAccount FloatAccount @relation(fields: [floatAccountId], references: [id])
+
+  @@index([floatAccountId, createdAt])
+  @@map("float_transactions")
+}
+
+model QueuedPayout {
+  id           Int               @id @default(autoincrement())
+  userId       Int               @map("user_id")
+  transactionId Int              @map("transaction_id")
+  amount       Float
+  currency     Currency
+  type         String            // ARTIST_PAYOUT, RESELLER_PAYOUT, RETRY_PAYOUT
+  status       String            // QUEUED, PROCESSING, COMPLETED, FAILED
+  reason       String
+  retryCount   Int               @default(0) @map("retry_count")
+  lastError    String?           @map("last_error")
+  processedAt  DateTime?         @map("processed_at")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  user        User        @relation(fields: [userId], references: [id])
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([userId, status])
+  @@map("queued_payouts")
+}
+
+model SystemAlert {
+  id        Int      @id @default(autoincrement())
+  type      String   // FLOAT_BALANCE_LOW, PAYOUT_FAILED, SETTLEMENT_DELAYED
+  message   String
+  severity  String   // LOW, MEDIUM, HIGH, CRITICAL
+  resolved  Boolean  @default(false)
+  resolvedAt DateTime? @map("resolved_at")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([type, resolved])
+  @@index([severity, createdAt])
+  @@map("system_alerts")
 }

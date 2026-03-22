@@ -47,4 +47,29 @@ async createTransaction(
   async getTransaction(@Param('id') id: string) {
     return this.paymentService.getTransaction(parseInt(id));
   }
+
+  // Float Account Management Endpoints
+  @Get('float/balance/:currency')
+  async getFloatBalance(@Param('currency') currency: string) {
+    const balance = await this.paymentService.getFloatAccountBalance(currency.toUpperCase());
+    return { currency: currency.toUpperCase(), balance };
+  }
+
+  @Post('float/fund')
+  async fundFloatAccount(
+    @Body() body: { amount: number; currency: string; settlementReference: string }
+  ) {
+    await this.paymentService.fundFloatAccount(
+      body.amount,
+      body.currency.toUpperCase(),
+      body.settlementReference
+    );
+    return { message: 'Float account funded successfully' };
+  }
+
+  @Post('float/process-queued')
+  async processQueuedPayouts(@Body() body: { currency: string }) {
+    await this.paymentService.processQueuedPayouts(body.currency.toUpperCase());
+    return { message: 'Queued payouts processed' };
+  }
 }
