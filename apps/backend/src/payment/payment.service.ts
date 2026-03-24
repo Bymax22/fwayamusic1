@@ -1,5 +1,6 @@
 
 import { Injectable, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Currency } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTransactionDto, ProcessPaymentDto, CurrencyConversionDto } from './dto/create-transaction.dto';
 import { CommissionService } from '../commission/commission.service';
@@ -119,7 +120,7 @@ export class PaymentService {
     }
 
     try {
-      return await this.prisma.$transaction(async (tx) => {
+      return await this.prisma.$transaction(async (tx: import('@prisma/client').Prisma.TransactionClient) => {
         // Get media details
         const media = await tx.media.findUnique({
           where: { id: mediaId },
@@ -517,7 +518,11 @@ export class PaymentService {
     if (newFloatBalance < 100000) { // ZMW 100,000 threshold
       await this.sendFloatBalanceAlert(transaction.currency, newFloatBalance);
     }
-  }
+
+    // Update user earnings
+    if (calculatedAmounts.artistAmount > 0 && transaction.media?.userId) {
+      await this.prisma.user.update({
+        where: { id: transaction.media.userId },
         data: {
           totalEarnings: { increment: calculatedAmounts.artistAmount },
         },
@@ -594,7 +599,11 @@ export class PaymentService {
     // Implement Airtel Money payout logic here
   }
 
-  private async getFloatAccountBalance(currency: string): Promise<number> {
+  private async executeZamtelMoneyPayout(paymentAccount: any, amount: number, currency: string, description: string) {
+    // Implement Zamtel Money payout logic here
+  }
+
+  async getFloatAccountBalance(currency: Currency): Promise<number> {
     // Get current float balance for the currency
     const floatAccount = await this.prisma.floatAccount.findUnique({
       where: { currency },
@@ -603,8 +612,8 @@ export class PaymentService {
     return floatAccount?.balance ?? 0;
   }
 
-  private async deductFromFloatAccount(amount: number, currency: string, reason: string): Promise<void> {
-    await this.prisma.floatAccount.update({
+  private async deductFromFloatAccount(amount: number, currency: Currency, reason: string): Promise<void> {
+    const updatedAccount = await this.prisma.floatAccount.update({
       where: { currency },
       data: {
         balance: { decrement: amount },
@@ -614,11 +623,12 @@ export class PaymentService {
     // Log the deduction
     await this.prisma.floatTransaction.create({
       data: {
+        floatAccount: { connect: { id: updatedAccount.id } },
         amount: -amount,
-        currency: currency as any,
+        currency,
         type: 'DEDUCTION',
         reason,
-        balanceAfter: await this.getFloatAccountBalance(currency),
+        balanceAfter: updatedAccount.balance,
       },
     });
   }
@@ -694,14 +704,14 @@ export class PaymentService {
   }
 
   // Method to fund float account when settlement funds become available
-  async fundFloatAccount(amount: number, currency: string, settlementReference: string): Promise<void> {
-    await this.prisma.floatAccount.upsert({
+  async fundFloatAccount(amount: number, currency: Currency, settlementReference: string): Promise<void> {
+    const updatedAccount = await this.prisma.floatAccount.upsert({
       where: { currency },
       update: {
         balance: { increment: amount },
       },
       create: {
-        currency: currency as any,
+        currency,
         balance: amount,
       },
     });
@@ -709,11 +719,12 @@ export class PaymentService {
     // Log the funding
     await this.prisma.floatTransaction.create({
       data: {
+        floatAccount: { connect: { id: updatedAccount.id } },
         amount,
-        currency: currency as any,
+        currency,
         type: 'FUNDING',
         reason: `Settlement funds: ${settlementReference}`,
-        balanceAfter: await this.getFloatAccountBalance(currency),
+        balanceAfter: updatedAccount.balance,
       },
     });
 
@@ -724,7 +735,7 @@ export class PaymentService {
   }
 
   // Process payouts that were queued due to insufficient float balance
-  async processQueuedPayouts(currency: string): Promise<void> {
+  async processQueuedPayouts(currency: Currency): Promise<void> {
     const queuedPayouts = await this.prisma.queuedPayout.findMany({
       where: {
         currency,

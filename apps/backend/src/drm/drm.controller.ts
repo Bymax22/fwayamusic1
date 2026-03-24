@@ -20,8 +20,17 @@ export class DrmController {
     @Param('mediaId') mediaId: string,
     @Body() deviceInfo: any,
     @Headers('user-id') userId: string,
+    @Res() res: Response,
   ) {
-    return this.drmService.createProtectedDownload(parseInt(mediaId), parseInt(userId), deviceInfo);
+    const result = await this.drmService.createProtectedDownload(parseInt(mediaId), parseInt(userId), deviceInfo);
+
+    // Set headers for file download
+    res.setHeader('Content-Type', result.mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.fileName}"`);
+    res.setHeader('Content-Length', result.fwayaFile.length);
+
+    // Send the .fwaya file
+    res.send(result.fwayaFile);
   }
 
   @Get('stream/:mediaId')

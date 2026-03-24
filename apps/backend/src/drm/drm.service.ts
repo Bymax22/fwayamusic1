@@ -162,6 +162,20 @@ const license = await this.prisma.deviceLicense.create({
         },
         isActive: true,
       },
+      include: {
+        device: true,
+        media: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                displayName: true,
+              }
+            }
+          }
+        },
+      },
     });
 
     if (!license) {
@@ -169,10 +183,7 @@ const license = await this.prisma.deviceLicense.create({
     }
 
     // Get media file path
-    const media = await this.prisma.media.findUnique({
-      where: { id: mediaId },
-    });
-
+    const media = license.media;
     if (!media) {
       throw new Error('Media not found');
     }
@@ -180,35 +191,57 @@ const license = await this.prisma.deviceLicense.create({
     // Encrypt the file for download
     const encryptedFile = await this.encryptMediaFile(media.url, license.licenseKey);
 
+    // Create .fwaya file with metadata and player URL
+    const fwayaFile = await this.createFwayaFile(
+      encryptedFile.encryptedData,
+      {
+        version: '1.0',
+        mediaId,
+        licenseKey: license.licenseKey,
+        deviceId: deviceInfo.deviceId,
+        encryption: {
+          algorithm: this.algorithm,
+          iv: encryptedFile.iv,
+          authTag: encryptedFile.authTag,
+        },
+        mediaInfo: {
+          title: media.title,
+          artist: media.user.displayName || media.user.username || 'Unknown Artist',
+          duration: media.duration || 0,
+          format: media.format || 'mp3',
+          coverUrl: media.artCoverUrl,
+        },
+        playerUrl: `${process.env.PLAYER_URL || 'https://player.fwaya.com'}/player`,
+        downloadedAt: new Date().toISOString(),
+      }
+    );
+
     // Create download record
-const download = await this.prisma.download.create({
-  data: {
-    mediaId,
-    userId,
-    deviceId: deviceInfo.deviceId,
-    isDRMProtected: true,
-    licenseKey: license.licenseKey,
-    accessType: 'OFFLINE',
-    // If you have extraData: Json? in your schema, use it:
-    extraData: {
-      encryption: {
-        iv: encryptedFile.iv,
-        authTag: encryptedFile.authTag,
-        algorithm: this.algorithm,
+    const download = await this.prisma.download.create({
+      data: {
+        mediaId,
+        userId,
+        deviceId: deviceInfo.deviceId,
+        isDRMProtected: true,
+        licenseKey: license.licenseKey,
+        accessType: 'OFFLINE',
+        extraData: {
+          encryption: {
+            iv: encryptedFile.iv,
+            authTag: encryptedFile.authTag,
+            algorithm: this.algorithm,
+          },
+          deviceInfo,
+          fwayaFileSize: fwayaFile.length,
+        },
       },
-      deviceInfo,
-    },
-    // Otherwise, remove metadata entirely
-  },
-});
+    });
 
     return {
       download,
-      encryptedData: encryptedFile.encryptedData,
-      encryptionInfo: {
-        iv: encryptedFile.iv,
-        authTag: encryptedFile.authTag,
-      },
+      fwayaFile, // Return the complete .fwaya file buffer
+      fileName: `${media.title.replace(/[^a-z0-9]/gi, '_')}.fwaya`,
+      mimeType: 'application/fwaya',
     };
   }
 
@@ -234,6 +267,30 @@ const download = await this.prisma.download.create({
 
   private generateLicenseKey(): string {
     return `LIC-${Date.now()}-${randomBytes(16).toString('hex')}`;
+  }
+
+  private async createFwayaFile(
+    encryptedData: Buffer,
+    metadata: any
+  ): Promise<Buffer> {
+    // Create JSON metadata
+    const metadataJson = JSON.stringify(metadata, null, 2);
+    const separator = 'FWAYA_FILE_SEPARATOR\n';
+
+    // Combine metadata + separator + encrypted data
+    const metadataBuffer = Buffer.from(metadataJson, 'utf8');
+    const separatorBuffer = Buffer.from(separator, 'utf8');
+
+    // Create final buffer
+    const totalLength = metadataBuffer.length + separatorBuffer.length + encryptedData.length;
+    const fwayaFile = Buffer.alloc(totalLength);
+
+    // Copy each part
+    metadataBuffer.copy(fwayaFile, 0);
+    separatorBuffer.copy(fwayaFile, metadataBuffer.length);
+    encryptedData.copy(fwayaFile, metadataBuffer.length + separatorBuffer.length);
+
+    return fwayaFile;
   }
 
   private async getSecureStream(filePath: string, range?: string) {

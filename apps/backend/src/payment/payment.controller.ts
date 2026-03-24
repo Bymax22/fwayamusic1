@@ -1,4 +1,5 @@
 import { Controller, Post, Body, Get, Param, Query, Headers } from '@nestjs/common';
+import { Currency } from '@prisma/client';
 import { PaymentService } from './payment.service';
 import { CreateTransactionDto, ProcessPaymentDto, CurrencyConversionDto } from './dto/create-transaction.dto';
 
@@ -51,17 +52,19 @@ async createTransaction(
   // Float Account Management Endpoints
   @Get('float/balance/:currency')
   async getFloatBalance(@Param('currency') currency: string) {
-    const balance = await this.paymentService.getFloatAccountBalance(currency.toUpperCase());
-    return { currency: currency.toUpperCase(), balance };
+    const normalizedCurrency = currency.toUpperCase() as Currency;
+    const balance = await this.paymentService.getFloatAccountBalance(normalizedCurrency);
+    return { currency: normalizedCurrency, balance };
   }
 
   @Post('float/fund')
   async fundFloatAccount(
     @Body() body: { amount: number; currency: string; settlementReference: string }
   ) {
+    const normalizedCurrency = body.currency.toUpperCase() as Currency;
     await this.paymentService.fundFloatAccount(
       body.amount,
-      body.currency.toUpperCase(),
+      normalizedCurrency,
       body.settlementReference
     );
     return { message: 'Float account funded successfully' };
@@ -69,7 +72,8 @@ async createTransaction(
 
   @Post('float/process-queued')
   async processQueuedPayouts(@Body() body: { currency: string }) {
-    await this.paymentService.processQueuedPayouts(body.currency.toUpperCase());
+    const normalizedCurrency = body.currency.toUpperCase() as Currency;
+    await this.paymentService.processQueuedPayouts(normalizedCurrency);
     return { message: 'Queued payouts processed' };
   }
 }
