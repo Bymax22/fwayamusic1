@@ -1673,12 +1673,12 @@ const GuestWelcome = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a0a33] to-[#240e47]">
+    <div className="min-h-screen bg-gradient-to-b from-[#090512] to-[#1a0a33]">
       {/* Welcome Notification */}
       <WelcomeNotification />
 
       {/* Main Content */}
-      <main className="pt-16 pb-24 px-2 max-w-7xl mx-auto">
+      <main className="pt-4 md:pt-6 pb-24 px-2 max-w-7xl mx-auto">
         {/* Hero Banner Section */}
         <HeroBanner 
           banners={banners}

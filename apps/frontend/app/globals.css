@@ -14,11 +14,11 @@
   --primary-light: 206, 127, 22;
 
   /* Darker background variants for layering */
-  --primary-dark-darker: 28, 11, 56;  /* Even darker purple for backgrounds */
+  --primary-dark-darker: 16, 8, 43;  /* Even deeper purple for backgrounds */
   --primary-accent-darker: 165, 102, 18; /* Darker gold for backgrounds */
 
   /* Backgrounds - using darker variants for depth */
-  --dark-bg: 28, 11, 56;  /* Darker purple background */
+  --dark-bg: 16, 8, 43;  /* Deeper purple background */
   --light-bg: 248, 250, 252;
   
   /* Semantic variables */
