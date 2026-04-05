@@ -119,18 +119,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Fix for white background flash */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgb(var(--background));
-    z-index: -1;
-  }
-  
   /* Enhanced focus states for accessibility */
   button:focus-visible,
   a:focus-visible,
