@@ -9,9 +9,9 @@
 /* 🌈 Root Theme Variables - Mobile First */
 :root {
   /* Core brand colors */
-  --primary-dark: 10, 55, 71;    /* RGB values */
-  --primary-accent: 229, 31, 72; /* RGB values */
-  --primary-light: 26, 90, 114;
+  --primary-dark: 36, 14, 71;    /* RGB values */
+  --primary-accent: 206, 127, 22; /* RGB values */
+  --primary-light: 206, 127, 22;
   --accent-light: 255, 77, 109;
   
   /* Backgrounds */
