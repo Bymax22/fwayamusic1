@@ -91,13 +91,13 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-gradient-to-br from-[#0a3747] to-[#0a1f29] rounded-2xl p-6 max-w-md w-full border border-[#0a4a5f] shadow-2xl"
+        className="bg-gradient-to-br from-[#240e47] to-[#240e47] rounded-2xl p-6 max-w-md w-full border border-[#ce7f16]/30 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#ce7f16] to-[#ce7f16] rounded-lg flex items-center justify-center">
               <Gift size={24} className="text-white" />
             </div>
             <div>
@@ -152,7 +152,7 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
             </p>
             <button 
               onClick={() => window.open(inviteUrl, '_blank')}
-              className="w-full bg-[#e51f48] hover:bg-[#ff4d6d] text-white py-2 rounded-lg font-semibold transition-colors"
+              className="w-full bg-[#ce7f16] hover:bg-[#ce7f16]/80 text-white py-2 rounded-lg font-semibold transition-colors"
             >
               Visit Fwaya Music
             </button>
@@ -233,18 +233,14 @@ export default function Navbar() {
       <>
         {/* Guest User Navbar - Bigger Logo with More Features */}
         <nav className={`relative w-full h-16 transition-all duration-300 z-50 
-          ${isScrolled ? "bg-[#0a3747] bg-opacity-95 backdrop-blur-lg" : "bg-[#0a3747] bg-opacity-90 backdrop-blur-md"}
-          border-b border-[#0a3747]/30 shadow-lg`}
+          ${isScrolled ? "bg-[#240e47] bg-opacity-95 backdrop-blur-lg" : "bg-[#240e47] bg-opacity-90 backdrop-blur-md"}
+          border-b border-[#240e47]/30 shadow-lg`}
         >
           <div className="container mx-auto px-4 h-full flex items-center justify-between">
             {/* Left Section - Bigger Logo for Guests */}
             <div className="flex items-center gap-2">
               <Link href="/" className="flex items-center gap-2">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                  className="shadow-lg"
-                >
+                <div className="shadow-lg">
                   <Image 
                     src="/Fwaya Innovations icon-01.png" 
                     alt="Fwaya Logo" 
@@ -252,10 +248,10 @@ export default function Navbar() {
                     height={32}
                     className="rounded-lg"
                   />
-                </motion.div>
+                </div>
                 <div className="flex flex-col">
                   <span className="text-lg font-bold text-white">
-                    Fwaya<span className="text-[#e51f48]"></span>
+                    Fwaya<span className="text-[#ce7f16]"></span>
                   </span>
                   <span className="text-xs text-gray-400">Discover</span>
                 </div>
@@ -295,7 +291,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search Songs, Artists..."
-                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none self-center ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
+                        className={`w-full bg-[#240e47]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#240e47] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none self-center ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
@@ -310,7 +306,7 @@ export default function Navbar() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-full left-0 right-0 mt-2 bg-[#0a3747] border border-[#0a4a5f] rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto"
+                        className="absolute top-full left-0 right-0 mt-2 bg-[#240e47] border border-[#ce7f16]/30 rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto"
                       >
                         {searchResults.map((result) => (
                           <button
@@ -320,7 +316,7 @@ export default function Navbar() {
                               router.push(`/search?q=${encodeURIComponent(result.title)}`);
                               setShowSearchResults(false);
                             }}
-                            className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#0a4a5f] transition-colors border-b border-[#0a4a5f] last:border-0"
+                            className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#ce7f16]/20 transition-colors border-b border-[#ce7f16]/30 last:border-0"
                           >
                             <div className="flex items-center gap-2">
                               <Search size={14} className="text-gray-400" />
@@ -347,23 +343,23 @@ export default function Navbar() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3 }}
-                    className="hidden sm:flex items-center gap-3 px-3 py-1.5 bg-gradient-to-r from-[#e51f48]/20 to-[#ff4d6d]/20 rounded-full border border-[#e51f48]/30 max-w-[150px]"
+                    className="hidden sm:flex items-center gap-3 px-3 py-1.5 bg-gradient-to-r from-[#ce7f16]/20 to-[#ce7f16]/20 rounded-full border border-[#ce7f16]/30 max-w-[150px]"
                   >
                     <div className="flex items-center gap-0.5">
                       <motion.div
                         animate={{ scaleY: [1, 1.5, 1] }}
                         transition={{ duration: 0.5, repeat: Infinity }}
-                        className="w-0.5 h-3 bg-[#e51f48] rounded-full"
+                        className="w-0.5 h-3 bg-[#ce7f16] rounded-full"
                       />
                       <motion.div
                         animate={{ scaleY: [1, 2, 1] }}
                         transition={{ duration: 0.5, repeat: Infinity, delay: 0.1 }}
-                        className="w-0.5 h-4 bg-[#ff4d6d] rounded-full"
+                        className="w-0.5 h-4 bg-[#ce7f16] rounded-full"
                       />
                       <motion.div
                         animate={{ scaleY: [1, 1.5, 1] }}
                         transition={{ duration: 0.5, repeat: Infinity, delay: 0.2 }}
-                        className="w-0.5 h-3 bg-[#e51f48] rounded-full"
+                        className="w-0.5 h-3 bg-[#ce7f16] rounded-full"
                       />
                     </div>
 
@@ -390,7 +386,7 @@ export default function Navbar() {
                     {/* Now Playing Icon */}
                     <Music 
                       size={22} 
-                      className="text-[#e51f48] hover:scale-110 transition-transform cursor-pointer"
+                      className="text-[#ce7f16] hover:scale-110 transition-transform cursor-pointer"
                       onClick={() => router.push('/browse')}
                     />
                     
@@ -428,7 +424,7 @@ export default function Navbar() {
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -10, opacity: 0 }}
-                className="w-full max-w-md mx-auto bg-[#0a3747] rounded-xl p-4 border border-[#0a4a5f]"
+                className="w-full max-w-md mx-auto bg-[#240e47] rounded-xl p-4 border border-[#ce7f16]/30"
                 onClick={(e) => e.stopPropagation()}
               >
                 <form
@@ -448,13 +444,13 @@ export default function Navbar() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search music..."
-                        className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-12 sm:h-8 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
+                        className="w-full bg-[#240e47]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-12 sm:h-8 border border-[#240e47] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0"
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                         <Search size={16} />
                       </div>
                     </div>
-                    <button type="submit" className="px-3 py-2 bg-[#e51f48] rounded-full text-white font-semibold">Search</button>
+                    <button type="submit" className="px-3 py-2 bg-[#ce7f16] rounded-full text-white font-semibold">Search</button>
                     <button type="button" onClick={() => setShowMobileSearch(false)} className="p-2 rounded-full text-gray-300">
                       <X size={18} />
                     </button>
@@ -479,18 +475,14 @@ export default function Navbar() {
     <>
       {/* Logged-in User Navbar - More Features */}
       <nav className={`relative w-full h-16 transition-all duration-300 z-50 
-        ${isScrolled ? "bg-[#0a3747] bg-opacity-95 backdrop-blur-lg" : "bg-[#0a3747] bg-opacity-90 backdrop-blur-md"}
-        border-b border-[#0a3747]/30 shadow-lg`}
+        ${isScrolled ? "bg-[#240e47] bg-opacity-95 backdrop-blur-lg" : "bg-[#240e47] bg-opacity-90 backdrop-blur-md"}
+        border-b border-[#240e47]/30 shadow-lg`}
       >
         <div className="container mx-auto px-4 h-full flex items-center justify-between">
           {/* Left Section - Logo with Tagline */}
           <div className="flex items-center gap-2">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                className="shadow-lg"
-              >
+              <div className="shadow-lg">
                 <Image 
                   src="/Fwaya Innovations icon-01.png" 
                   alt="Fwaya Logo" 
@@ -498,10 +490,10 @@ export default function Navbar() {
                   height={32}
                   className="rounded"
                 />
-              </motion.div>
+              </div>
               <div className="flex flex-col">
                 <span className="text-lg font-bold text-white">
-                  Fwaya<span className="text-[#e51f48]"></span>
+                  Fwaya<span className="text-[#ce7f16]"></span>
                 </span>
                   <span className="text-xs text-gray-400">Explore & Start Earning</span>
               </div>
@@ -517,8 +509,8 @@ export default function Navbar() {
                   <Link key={link.name} href={link.href} passHref>
                     <button className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all touch-target group ${
                       pathname.startsWith(link.href) 
-                        ? "bg-[#e51f48] text-white shadow-lg" 
-                        : "text-gray-300 hover:text-white hover:bg-[#0a3747]/50"
+                        ? "bg-[#ce7f16] text-white shadow-lg" 
+                        : "text-gray-300 hover:text-white hover:bg-[#240e47]/50"
                     }`}>
                       <span className="group-hover:scale-110 transition-transform">
                         {link.icon}
@@ -529,13 +521,13 @@ export default function Navbar() {
                 ))}
                 
                 {/* Explore Icon */}
-                <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all touch-target group text-gray-300 hover:text-white hover:bg-[#0a3747]/50">
+                <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all touch-target group text-gray-300 hover:text-white hover:bg-[#240e47]/50">
                   <Compass size={20} className="group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-medium">Explore</span>
                 </button>
                 
                 {/* Earn Icon */}
-                <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all touch-target group text-gray-300 hover:text-white hover:bg-[#0a3747]/50">
+                <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all touch-target group text-gray-300 hover:text-white hover:bg-[#240e47]/50">
                   <DollarSign size={20} className="group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-medium">Earn</span>
                 </button>
@@ -573,7 +565,7 @@ export default function Navbar() {
                       onFocus={() => searchQuery.trim().length > 0 && setShowSearchResults(true)}
                       onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                       placeholder="Search music..."
-                        className={`w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#0a3747] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none self-center ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
+                        className={`w-full bg-[#240e47]/60 text-white placeholder-gray-400 rounded-full pl-4 sm:pl-4 pr-12 sm:pr-4 h-10 sm:h-8 py-0 border border-[#240e47] text-xs sm:text-base placeholder:text-xs sm:placeholder:text-base focus:outline-none focus:ring-0 leading-none self-center ${showNowPlaying ? 'md:max-w-[150px]' : 'max-w-none md:max-w-xs lg:max-w-2xl'}`}
                     />
                     <button
                       type="submit"
@@ -588,7 +580,7 @@ export default function Navbar() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-full left-0 right-0 mt-2 bg-[#0a3747] border border-[#0a4a5f] rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto"
+                        className="absolute top-full left-0 right-0 mt-2 bg-[#240e47] border border-[#ce7f16]/30 rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto"
                       >
                         {searchResults.map((result) => (
                           <button
@@ -598,7 +590,7 @@ export default function Navbar() {
                               router.push(`/search?q=${encodeURIComponent(result.title)}`);
                               setShowSearchResults(false);
                             }}
-                            className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#0a4a5f] transition-colors border-b border-[#0a4a5f] last:border-0"
+                            className="w-full px-4 py-3 text-left text-sm text-white hover:bg-[#ce7f16]/20 transition-colors border-b border-[#ce7f16]/30 last:border-0"
                           >
                             <div className="flex items-center gap-2">
                               <Search size={14} className="text-gray-400" />
@@ -624,7 +616,7 @@ export default function Navbar() {
                   // Open the bottom header / reveal player when clicked
                   window.dispatchEvent(new CustomEvent('player:openBottomHeader', { detail: { open: true } }));
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 bg-[#e51f48]/10 rounded-full border border-[#e51f48]/20 touch-target"
+                className="flex items-center gap-2 px-3 py-1.5 bg-[#ce7f16]/10 rounded-full border border-[#ce7f16]/20 touch-target"
               >
                 {/* Album art */}
                 <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
@@ -632,8 +624,8 @@ export default function Navbar() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={currentTrack.imageUrl as string} alt={currentTrack.title || 'cover'} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-[#0a3747] flex items-center justify-center text-xs text-gray-300"> 
-                      <Play size={12} className="text-[#e51f48]" />
+                    <div className="w-full h-full bg-[#240e47] flex items-center justify-center text-xs text-gray-300"> 
+                      <Play size={12} className="text-[#ce7f16]" />
                     </div>
                   )}
                 </div>
@@ -658,19 +650,19 @@ export default function Navbar() {
             {/* Quick Actions - Hidden on mobile */}
             <div className="hidden md:flex items-center gap-2">
               {/* Create */}
-              <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+              <button className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target group">
                 <Plus size={20} className="group-hover:scale-110 transition-transform" />
               </button>
               
               {/* Favorites */}
-              <button className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+              <button className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target group">
                 <Heart size={20} className="group-hover:scale-110 transition-transform" />
               </button>
               
               {/* Share */}
               <button 
                 onClick={() => setShowInvitePopup(true)}
-                className="p-2 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group"
+                className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target group"
               >
                 <Share2 size={20} className="group-hover:scale-110 transition-transform" />
               </button>
@@ -679,21 +671,21 @@ export default function Navbar() {
             {/* Mobile Icons - Premium, Notifications, Account (Visible on mobile) */}
             <div className="flex md:hidden items-center gap-0.5"> {/* Reduced gap from gap-2 to gap-0.5 */}
               {/* Premium Icon */}
-              <button className="p-2.5 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+              <button className="p-2.5 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target group">
                 <Crown size={22} className="text-amber-400 group-hover:scale-110 transition-transform" />
               </button>
 
               {/* Notifications */}
-              <button className="relative p-2.5 rounded-full hover:bg-[#0a3747]/50 text-white transition-colors touch-target group">
+              <button className="relative p-2.5 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target group">
                 <Bell size={22} className="group-hover:scale-110 transition-transform" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#e51f48] rounded-full border border-[#0a3747]"></div>
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#ce7f16] rounded-full border border-[#240e47]"></div>
               </button>
 
               {/* User Account */}
               <div className="relative">
                 <button 
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="p-2.5 rounded-full hover:bg-[#0a3747]/50 transition-all touch-target group"
+                  className="p-2.5 rounded-full hover:bg-[#240e47]/50 transition-all touch-target group"
                 >
                   {user.avatarUrl ? (
                     <Image
@@ -704,7 +696,7 @@ export default function Navbar() {
                       className="rounded-full group-hover:scale-110 transition-transform"
                     />
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#ce7f16] to-[#240e47] flex items-center justify-center group-hover:scale-110 transition-transform">
                       <User size={16} className="text-white" />
                     </div>
                   )}
@@ -717,9 +709,9 @@ export default function Navbar() {
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute top-full right-0 mt-2 w-48 bg-[#0a3747] border border-[#0a4a5f] rounded-xl shadow-2xl py-2 z-50 backdrop-blur-lg"
+                      className="absolute top-full right-0 mt-2 w-48 bg-[#240e47] border border-[#ce7f16]/30 rounded-xl shadow-2xl py-2 z-50 backdrop-blur-lg"
                     >
-                      <div className="px-3 py-2 border-b border-[#0a4a5f]">
+                      <div className="px-3 py-2 border-b border-[#ce7f16]/30">
                         <p className="font-semibold text-white text-sm truncate">
                           {user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username)}
                         </p>
@@ -728,11 +720,11 @@ export default function Navbar() {
 
                       {/* Quick Actions */}
                       <div className="px-1 py-1">
-                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-[#0a4a5f] hover:text-white transition-colors text-sm">
+                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-[#ce7f16]/20 hover:text-white transition-colors text-sm">
                           <User size={16} />
                           <span>Profile</span>
                         </Link>
-                        <Link href="/settings" className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-[#0a4a5f] hover:text-white transition-colors text-sm">
+                        <Link href="/settings" className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-[#ce7f16]/20 hover:text-white transition-colors text-sm">
                           <Settings size={16} />
                           <span>Settings</span>
                         </Link>
@@ -769,7 +761,7 @@ export default function Navbar() {
             <div className="hidden md:block relative">
               <button 
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 p-1.5 bg-[#0a3747]/70 rounded-full hover:bg-[#0a3747] transition-all touch-target group"
+                className="flex items-center gap-2 p-1.5 bg-[#240e47]/70 rounded-full hover:bg-[#240e47] transition-all touch-target group"
               >
                 {user.avatarUrl ? (
                   <Image
@@ -780,7 +772,7 @@ export default function Navbar() {
                     className="rounded-full group-hover:scale-110 transition-transform"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ce7f16] to-[#240e47] flex items-center justify-center group-hover:scale-110 transition-transform">
                     <User size={18} className="text-white" />
                   </div>
                 )}
@@ -796,10 +788,10 @@ export default function Navbar() {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute top-full right-0 mt-2 w-64 bg-[#0a3747] border border-[#0a4a5f] rounded-xl shadow-2xl py-2 z-50 backdrop-blur-lg"
+                    className="absolute top-full right-0 mt-2 w-64 bg-[#240e47] border border-[#ce7f16]/30 rounded-xl shadow-2xl py-2 z-50 backdrop-blur-lg"
                   >
                     {/* User Info Header */}
-                    <div className="px-4 py-3 border-b border-[#0a4a5f]">
+                    <div className="px-4 py-3 border-b border-[#ce7f16]/30">
                       <div className="flex items-center gap-3 mb-2">
                         {user.avatarUrl ? (
                           <Image
@@ -810,7 +802,7 @@ export default function Navbar() {
                             className="rounded-full"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ce7f16] to-[#240e47] flex items-center justify-center">
                             <User size={20} className="text-white" />
                           </div>
                         )}
@@ -848,7 +840,7 @@ export default function Navbar() {
                           setShowInvitePopup(true);
                           setShowUserMenu(false);
                         }}
-                        className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-gray-300 hover:bg-[#0a4a5f] hover:text-white transition-colors"
+                        className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-gray-300 hover:bg-[#ce7f16]/20 hover:text-white transition-colors"
                       >
                         <Gift size={18} />
                         <span>Invite Friends</span>
@@ -856,12 +848,12 @@ export default function Navbar() {
                     </div>
 
                     {/* Divider */}
-                    <div className="border-t border-[#0a4a5f] my-1"></div>
+                    <div className="border-t border-[#ce7f16]/30 my-1"></div>
 
                     {/* Sign Out */}
                     <button 
                       onClick={handleLogout}
-                      className="flex items-center gap-3 w-full px-3 py-2 text-gray-300 hover:bg-[#0a4a5f] hover:text-white transition-colors rounded-lg"
+                      className="flex items-center gap-3 w-full px-3 py-2 text-gray-300 hover:bg-[#ce7f16]/20 hover:text-white transition-colors rounded-lg"
                     >
                       <LogOut size={18} />
                       <span>Sign Out</span>
@@ -888,7 +880,7 @@ export default function Navbar() {
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -10, opacity: 0 }}
-              className="w-full max-w-md mx-auto bg-[#0a3747] rounded-xl p-4 border border-[#0a4a5f]"
+              className="w-full max-w-md mx-auto bg-[#240e47] rounded-xl p-4 border border-[#ce7f16]/30"
               onClick={(e) => e.stopPropagation()}
             >
               <form
@@ -908,13 +900,13 @@ export default function Navbar() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search songs, artists, playlists..."
-                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#0a3747] focus:outline-none self-center"
+                      className="w-full bg-[#07202a]/60 text-white placeholder-gray-400 rounded-full pl-10 pr-4 py-2 border border-[#240e47] focus:outline-none self-center"
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300">
                       <Search size={16} />
                     </div>
                   </div>
-                  <button type="submit" className="px-3 py-2 bg-[#e51f48] rounded-full text-white font-semibold">Search</button>
+                  <button type="submit" className="px-3 py-2 bg-[#ce7f16] rounded-full text-white font-semibold">Search</button>
                   <button type="button" onClick={() => setShowMobileSearch(false)} className="p-2 rounded-full text-gray-300">
                     <X size={18} />
                   </button>

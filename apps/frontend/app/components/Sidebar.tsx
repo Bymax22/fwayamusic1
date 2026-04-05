@@ -44,7 +44,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
 
   // Custom icon wrapper with red color
   const Icon = ({ children }: { children: React.ReactNode }) => (
-    <span className="text-[#e51f48]">{children}</span>
+    <span className="text-[#ce7f16]">{children}</span>
   );
 
   // Main navigation items
@@ -180,9 +180,9 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             </div>
 
             {/* Progress Bar */}
-            <div className="mt-1.5 w-full bg-[#0a3747] rounded-full h-1">
+            <div className="mt-1.5 w-full bg-[#240e47] rounded-full h-1">
               <div
-                className="bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] h-1 rounded-full"
+                className="bg-gradient-to-r from-[#ce7f16] to-[#240e47] h-1 rounded-full"
                 style={{ width: `${currentSong.progress}%` }}
               />
             </div>
@@ -193,7 +193,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
                 <div
                   key={index}
                   style={{ height: `${height}%` }}
-                  className="w-0.5 bg-gradient-to-t from-[#e51f48] to-[#ff4d6d] rounded-full transition-all duration-300"
+                  className="w-0.5 bg-gradient-to-t from-[#ce7f16] to-[#240e47] rounded-full transition-all duration-300"
                 />
               ))}
             </div>
@@ -201,7 +201,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             {/* Controls */}
             <div className="flex items-center mt-1.5 gap-1.5">
               <button
-                className="flex-1 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] p-1 rounded flex justify-center items-center text-xs hover:opacity-90 transition-all mobile-text-xs"
+                className="flex-1 bg-gradient-to-r from-[#ce7f16] to-[#240e47] p-1 rounded flex justify-center items-center text-xs hover:opacity-90 transition-all mobile-text-xs"
                 onClick={() => setIsPlaying(!isPlaying)}
               >
                 {isPlaying ? (
@@ -214,7 +214,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
                 </span>
               </button>
 
-              <button className="p-1 text-[#e51f48] hover:text-[#ff4d6d]">
+              <button className="p-1 text-[#ce7f16] hover:text-[#240e47]">
                 <FaVolumeUp size={12} />
               </button>
             </div>

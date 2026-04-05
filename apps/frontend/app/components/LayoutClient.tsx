@@ -47,13 +47,13 @@ const HolographicPreloader = () => {
                   repeatType: "reverse",
                 },
               }}
-              className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#e51f48]"
+              className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#ce7f16]"
               style={{
                 background: `conic-gradient(
                   from 0deg at 50% 50%,
-                  rgba(229, 31, 72, 0) 0deg,
-                  rgba(229, 31, 72, 0.3) 120deg,
-                  rgba(229, 31, 72, 0) 240deg
+                  rgba(206, 127, 22, 0) 0deg,
+                  rgba(206, 127, 22, 0.3) 120deg,
+                  rgba(206, 127, 22, 0) 240deg
                 )`,
               }}
             />
@@ -71,7 +71,7 @@ const HolographicPreloader = () => {
                 repeat: Infinity,
                 ease: "easeOut"
               }}
-              className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center"
+              className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#ce7f16] to-[#240e47] flex items-center justify-center"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
                 <path 
@@ -90,7 +90,7 @@ const HolographicPreloader = () => {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#e51f48]"
+              className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#ce7f16]"
             >
               Loading your experience
             </motion.span>
@@ -125,13 +125,13 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
                 repeatType: "reverse",
               },
             }}
-            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#e51f48]"
+            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#ce7f16]"
             style={{
               background: `conic-gradient(
                 from 0deg at 50% 50%,
-                rgba(229, 31, 72, 0) 0deg,
-                rgba(229, 31, 72, 0.3) 120deg,
-                rgba(229, 31, 72, 0) 240deg
+                rgba(206, 127, 22, 0) 0deg,
+                rgba(206, 127, 22, 0.3) 120deg,
+                rgba(206, 127, 22, 0) 240deg
               )`,
             }}
           />
@@ -149,7 +149,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
               repeat: Infinity,
               ease: "easeOut"
             }}
-            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center"
+            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#ce7f16] to-[#240e47] flex items-center justify-center"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
               <path 
@@ -168,7 +168,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#e51f48]"
+            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#ce7f16]"
           >
             Loading your experience
           </motion.span>
@@ -191,7 +191,7 @@ const SidebarWithAuth = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
       style={{ display: sidebarExpanded ? undefined : "none" }}
     >
       <div className="flex items-center gap-2 p-3 border-b border-white/10">
-        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center text-white text-xs font-bold">
+        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#ce7f16] to-[#240e47] flex items-center justify-center text-white text-xs font-bold">
           {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
         </div>
         <span className="text-white text-sm font-medium truncate mobile-text-sm">

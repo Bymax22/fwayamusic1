@@ -62,7 +62,7 @@ export default function YourEpisodesPage() {
   if (loading) return <div className="p-4 text-center">Loading episodes...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#050d12] p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#240e47] to-[#ce7f16] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <History className="w-8 h-8 text-cyan-500" />
@@ -113,7 +113,7 @@ export default function YourEpisodesPage() {
                   <button className="p-2 bg-cyan-500/20 text-cyan-400 rounded hover:bg-cyan-500/30 transition-colors">
                     <Heart className="w-4 h-4" />
                   </button>
-                  <button className="p-2 bg-[#0a3747] text-gray-300 rounded hover:bg-[#0f4a5f] transition-colors">
+                  <button className="p-2 bg-[#240e47] text-gray-300 rounded hover:bg-[#ce7f16]/50 transition-colors">
                     <Download className="w-4 h-4" />
                   </button>
                 </div>
