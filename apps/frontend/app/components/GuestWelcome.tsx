@@ -256,7 +256,7 @@ const HeroBanner = ({
 
   return (
     <section 
-      className="relative h-[400px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden mb-8
+      className="relative h-[300px] md:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden mb-8 -mt-4
         mx-0 w-full
         sm:mx-2
         sm:w-auto
@@ -304,7 +304,7 @@ const HeroBanner = ({
           </div>
 
           {/* Content */}
-          <div className="relative z-10 h-full flex flex-col justify-end p-4 md:p-6 lg:p-8">
+          <div className="relative z-10 h-full flex flex-col justify-center p-4 md:p-6 lg:p-8">
             {/* Badge */}
             <div className="flex items-center gap-2 mb-4">
               <div className={`flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r ${getBadgeColor(currentBanner.type)} text-white text-xs font-bold`}>
