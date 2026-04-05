@@ -712,7 +712,6 @@ html, body, #__next, #root {
     border-bottom-width: 2px;
   }
 }
-}
 
 /* Dark mode support (if needed in future) */
 @media (prefers-color-scheme: dark) {
@@ -742,7 +741,6 @@ html, body, #__next, #root {
   .navbar {
     background-color: rgb(var(--primary-dark));
   }
-}
 }
 
 /* Add to your existing animations in globals.css */

@@ -256,7 +256,7 @@ const HeroBanner = ({
 
   return (
     <section 
-      className="relative h-[400px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden mb-8 -mt-12
+      className="relative h-[400px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden mb-8
         mx-0 w-full
         sm:mx-2
         sm:w-auto
@@ -1673,7 +1673,7 @@ const GuestWelcome = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#240e47] to-[#ce7f16]">
+    <div className="min-h-screen bg-gradient-to-b from-[#240e47] to-[#1a0a33]">
       {/* Welcome Notification */}
       <WelcomeNotification />
 

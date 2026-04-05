@@ -106,7 +106,7 @@ export default function ExplorePage() {
   const popularGenres = Array.from(new Set(mediaFiles.map(file => file.genre))).slice(0, 6);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#240e47]/95 to-[#ce7f16]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#240e47]/95 to-[#1a0a33]/95 min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Explore</h1>
