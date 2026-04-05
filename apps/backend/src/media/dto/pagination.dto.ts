@@ -1,5 +1,5 @@
 import { IsOptional, IsEnum, IsNumber } from 'class-validator';
-import { MediaType } from '@fwaya-music/types/enums';
+import { MediaType } from '@prisma/client';
 import { IsString } from 'class-validator';
 
 export class PaginationDto {

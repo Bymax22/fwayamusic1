@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsOptional, IsBoolean, IsEnum, IsArray } from 'class-validator'
-import { MediaType } from '@fwaya-music/types/enums';
+import { MediaType } from '@prisma/client';
 
 export class UpdateMediaDto {
   @IsOptional()

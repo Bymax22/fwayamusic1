@@ -1,3 +1,4 @@
+import "./globals.css";
 import LayoutClient from "./components/LayoutClient";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";

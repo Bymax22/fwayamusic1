@@ -1,7 +1,7 @@
 // create-media.dto.ts
 import { IsString, IsEnum, IsOptional, IsBoolean, IsNumber } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
-import { MediaType } from '@fwaya-music/types/enums';
+import { MediaType } from '@prisma/client';
 
 export class CreateMediaDto {
   @IsString()

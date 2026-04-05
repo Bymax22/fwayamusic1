@@ -4,7 +4,7 @@ import {
   MediaType,
   MediaAccessType,
   TransactionStatus
-} from '@fwaya-music/types/enums';
+} from '@prisma/client';
 import prisma from './db';
 
 // Extended Admin Stats

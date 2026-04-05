@@ -1,7 +1,6 @@
 "use client";
 /* eslint-disable */
 import { PaymentProvider } from '../context/PaymentContext';
-import "../globals.css";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import MobileMenu from "../components/MobileMenu";

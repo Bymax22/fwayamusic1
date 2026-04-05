@@ -1,8 +1,7 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
-import { Prisma } from '@prisma/client';
-import { MediaType, MediaAccessType } from '@fwaya-music/types/enums';
+import { Prisma, MediaType, MediaAccessType } from '@prisma/client';
 
 @Injectable()
 export class MediaService {
