@@ -40,7 +40,7 @@
   --radius-xl: 0.75rem;
   
   /* Mobile-first layout */
-  --navbar-height: 3rem;
+  --navbar-height: 3.5rem;
   --player-height: 4.5rem;
   --sidebar-width: 14rem;
   --sidebar-collapsed: 4rem;
@@ -82,7 +82,7 @@
 /* Large screen adjustments */
 @media (min-width: 1024px) {
   :root {
-    --navbar-height: 4rem;
+    --navbar-height: 4.5rem;
   }
 }
 

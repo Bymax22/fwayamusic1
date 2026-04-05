@@ -332,7 +332,7 @@ export default function Navbar() {
             </div>
 
             {/* Right Section - Guest Features */}
-            <div className="flex items-center gap-1"> {/* Reduced gap from gap-4 to gap-1 */}
+            <div className="flex items-center gap-2"> {/* Consistent gap-2 spacing */}
               {/* Navigation Icons */}
               <Link href="/" className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target">
                 <Home size={20} />
@@ -515,7 +515,7 @@ export default function Navbar() {
 
           {/* Middle Section - Navigation & Search */}
           <div className="flex-1 max-w-2xl mx-2 md:mx-6">
-            <div className="flex items-center gap-4 h-full">
+            <div className="flex items-center gap-2 h-full">
               {/* Navigation Links - Hidden on mobile */}
               <div className="hidden lg:flex items-center gap-1">
                 {loggedInNavLinks.map((link) => (
@@ -693,7 +693,7 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Icons - Premium, Notifications, Account (Visible on mobile) */}
-            <div className="flex md:hidden items-center gap-0"> {/* Reduced gap from gap-0.5 to gap-0 */}
+            <div className="flex md:hidden items-center gap-2"> {/* Consistent gap-2 spacing */}
               {/* Premium Icon */}
               <button className="p-2.5 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target group">
                 <Crown size={22} className="text-amber-400 group-hover:scale-110 transition-transform" />

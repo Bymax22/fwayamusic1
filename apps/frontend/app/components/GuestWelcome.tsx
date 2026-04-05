@@ -256,7 +256,7 @@ const HeroBanner = ({
 
   return (
     <section 
-      className="relative h-[300px] md:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden mb-8 -mt-4
+      className="relative h-[350px] md:h-[450px] lg:h-[550px] rounded-2xl overflow-hidden mb-8 -mt-4
         mx-0 w-full
         sm:mx-2
         sm:w-auto
