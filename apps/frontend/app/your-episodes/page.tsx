@@ -62,7 +62,7 @@ export default function YourEpisodesPage() {
   if (loading) return <div className="p-4 text-center">Loading episodes...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#240e47] to-[#1a0a33] p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#1a0a33] to-[#240e47] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <History className="w-8 h-8 text-cyan-500" />

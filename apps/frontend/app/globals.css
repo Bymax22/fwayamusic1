@@ -1,5 +1,5 @@
 /* Custom Fonts - MUST come first before any other rules */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Ubuntu:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100..900&display=swap');
 
 /* Tailwind directives */
 @tailwind base;
@@ -103,7 +103,7 @@
   body {
     background-color: rgb(var(--background));
     color: rgb(var(--foreground));
-    font-family: 'Inter', 'Ubuntu', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: var(--text-base);
     line-height: 1.5;
     min-height: 100vh;

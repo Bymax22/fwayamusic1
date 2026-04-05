@@ -332,7 +332,7 @@ export default function Navbar() {
             </div>
 
             {/* Right Section - Guest Features */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1"> {/* Reduced gap from gap-4 to gap-1 */}
               {/* Navigation Icons */}
               <Link href="/" className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target">
                 <Home size={20} />

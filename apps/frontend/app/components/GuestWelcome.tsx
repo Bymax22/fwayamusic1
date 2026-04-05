@@ -304,7 +304,7 @@ const HeroBanner = ({
           </div>
 
           {/* Content */}
-          <div className="relative z-10 h-full flex flex-col justify-end p-6 md:p-8 lg:p-12">
+          <div className="relative z-10 h-full flex flex-col justify-end p-4 md:p-6 lg:p-8">
             {/* Badge */}
             <div className="flex items-center gap-2 mb-4">
               <div className={`flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r ${getBadgeColor(currentBanner.type)} text-white text-xs font-bold`}>
@@ -1673,7 +1673,7 @@ const GuestWelcome = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#240e47] to-[#1a0a33]">
+    <div className="min-h-screen bg-gradient-to-b from-[#1a0a33] to-[#240e47]">
       {/* Welcome Notification */}
       <WelcomeNotification />
 
