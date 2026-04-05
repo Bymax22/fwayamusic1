@@ -1,3 +1,19 @@
 {
-  "version": 2
+  "version": 2,
+  "env": {
+    "DATABASE_URL": "postgresql://postgres.hgnrwnxmjcsodwwoyfte:9tlxiuCMy7dJgwZJ@db.hgnrwnxmjcsodwwoyfte.supabase.co:5432/postgres?pgbouncer=true&connection_limit=1",
+    "CLOUDINARY_CLOUD_NAME": "dayn5vifn",
+    "CLOUDINARY_API_KEY": "964776455271163",
+    "CLOUDINARY_API_SECRET": "FB9q8oeNmE-0qAV376geWx3fxgQ",
+    "FIREBASE_API_KEY": "AIzaSyA7O2nG1_5zT5YmvTIn31M4jQ6mMpPYRZg",
+    "FIREBASE_AUTH_DOMAIN": "fwaya-music.firebaseapp.com",
+    "FIREBASE_PROJECT_ID": "fwaya-music",
+    "FIREBASE_MESSAGING_SENDER_ID": "66706587105",
+    "FIREBASE_APP_ID": "1:66706587105:web:5f4a13981680c9e7f826a0",
+    "FIREBASE_MEASUREMENT_ID": "G-3R3LWCK3XE",
+    "FIREBASE_PRIVATE_KEY": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCp+RPWsqlhLUR9\nmYpo+3FhTsM/fJQU0zb/r32J/vHV7ZkhoSBaKZNbheLbQUwcqc4p14TvJ5nQu+/u\nv/hYykFoa15khb9e3J+Rnof0N91Zs3K1A+PNaj8O2M6UhQ5C726agggBhZg5Aa7b\nYtt++NdupmsrqtxKgO1CDFsLeApjXeYwUoJZzQiI8/1q6ZwhBXzz8Xvc9t4NzDFp\n6+qxsEu4mDhPbjw+BJuklbiXhxqgnAq7iuZEzXPrr7GXE15BXxm7r8AKUwdZYUxG\nbtpAXgczeFTR6q1RHcBKG//8mykJKmu/AmlgJmMR+ovrZ+SSXHKncOgJNnCHi4i3\nkMbE8193AgMBAAECggEAPc6Dx0NqUhra1+04JlqgbOjuGKzdUAFJ84nF1aMuH0Np\nto/XqtGJcvNpfZ7t5VJd1Fs5TJmS1hMw+Rk3XloVlLnONjFoWD9TiukhuM2DoPWe\n1XHXqT9kNKrj25/SgsZ76pU0AhGpO7l/8uistiwYcnTzbYqQ1kqxe53wkWgSJvVK\nBsuNGgXKJ3CHtAM+zrPwlewq4c7ZFKtmY1PMALnWtQYEOFLXjbEwufEo1VYkL73C\nilat2ffkouCdTyMhyz09dpjWGTN5EO4C+bg4KYYcL+EgSeqcIg8HiuFrmI1OylhQ\n7Bbay5c5eCWhoUMU8VUH31kLQPkualwZy/ZfFaH6SQKBgQDukSq1T9YrhyjLqwws\nGyfuv8cADtNNiHWzYpVz5aAajkJCFpUnwodOq8m1G0gK42irVwxYw8dlQhlKJ0DV\nIRK2pGNmOgh6oE/gYWgX3Y5fv3tlxNDiq+pY24GMjh+VxNflXcUgKl4Em85kvawa\nEpaiG/9EQec6DnpeFAC1mLVAAwKBgQC2ZLuKgXEDIQZnh8eqNC2i5RruTAqtAP+I\nXZ41WW8KwJopgJAem0zZLdf7o1v+4rlhQrqZqEdf8PTsc2UVPrAh844sGA3wT4Cl\n+y+J1Jn9F0SNDHJRhMHcsjHAUIjAnSj+Bfmh1FFHcpVdma+mZodQTIbvb7vCeL0+\n9nLY9VEKfQKBgQCEhWU5BJlO4qy5vlFrqsYa7LMpiBK+rf/b3vZwQ+0U81NBDPRb\n+sZY4DqS/Q2e5sY874TvRgncaMRNmdJ80ftoM5b3sWMGY0kbtmAxaaRt8ZslZBg4\n4hCyvXSQVF6dPpRDWDxpar+BRd93vJj+frboZC7/hrBgYqx82BWwypxcawKBgQCl\nZbeDpFn9QmdyXvi66dIwk53WVnKf6/XNjUe4jT9a+slRtVn7x0zq7N2dPchg3OzK\nvB5G1QjUgcc43HPfzhce0qQsbCvHrfC1k5DKZla14fGyDoVkUwURwy3GfcFlGZ9g\nq75x9/000z2LwaA9P2CZeqwqWKJleePzQr1m7R7uaQKBgFbOHWRDRHZjVjRzkVMI\nWRTSTSWyZxC5swAZvQKtT3ymfFV/KmHtFmzFujJGMM8zlu9uVN/6DyWGV0/XMKe7\nHOGVythHg8Js7IVrdDwyLcnIwK+FsU3vQ2WGNUiubO07y0sJam1xq+DvmwWzNG3x\nqcpgHBafuohV0loCPRLXcDnA\n-----END PRIVATE KEY-----\n",
+    "FIREBASE_CLIENT_EMAIL": "firebase-adminsdk-fbsvc@fwaya-music.iam.gserviceaccount.com",
+    "JWT_SECRET": "rd'h*}V{J4!8Fm/AfeW$Yq^:~GUMc5a+;Rb2H#6=",
+    "NODE_ENV": "production"
+  }
 }
