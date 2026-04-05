@@ -26,17 +26,24 @@ async function initializeApp() {
 
     // CORS must be enabled BEFORE global prefix
     app.enableCors({
-      origin: (origin: any, callback: any) => {
-        // Allow all origins
-        callback(null, true);
-      },
-      credentials: true,
+      origin: '*',
+      credentials: false,
       methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
       optionsSuccessStatus: 200,
     });
 
-    app.setGlobalPrefix('api');
+    app.setGlobalPrefix('/api');
+    app.use((req: any, res: any, next: any) => {
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,Origin,X-Requested-With');
+      res.header('Access-Control-Allow-Credentials', 'false');
+      if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+      }
+      next();
+    });
     await app.init();
     logger.log('NestJS application initialized successfully');
 
