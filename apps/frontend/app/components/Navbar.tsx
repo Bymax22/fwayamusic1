@@ -253,13 +253,12 @@ export default function Navbar() {
                   <span className="text-lg font-bold text-white">
                     Fwaya<span className="text-[#ce7f16]"></span>
                   </span>
-                  <span className="text-xs text-gray-400">Discover</span>
                 </div>
               </Link>
             </div>
 
             {/* Middle Section - Search (desktop + mobile) */}
-            <div className="flex-1 mx-6">
+            <div className="flex-1 mx-2 md:mx-6">
               <div className="flex items-center w-full justify-center h-full">
                 <form
                         onSubmit={(e) => {
@@ -515,7 +514,7 @@ export default function Navbar() {
           </div>
 
           {/* Middle Section - Navigation & Search */}
-          <div className="flex-1 max-w-2xl mx-6">
+          <div className="flex-1 max-w-2xl mx-2 md:mx-6">
             <div className="flex items-center gap-4 h-full">
               {/* Navigation Links - Hidden on mobile */}
               <div className="hidden lg:flex items-center gap-1">
@@ -694,7 +693,7 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Icons - Premium, Notifications, Account (Visible on mobile) */}
-            <div className="flex md:hidden items-center gap-0.5"> {/* Reduced gap from gap-2 to gap-0.5 */}
+            <div className="flex md:hidden items-center gap-0"> {/* Reduced gap from gap-0.5 to gap-0 */}
               {/* Premium Icon */}
               <button className="p-2.5 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target group">
                 <Crown size={22} className="text-amber-400 group-hover:scale-110 transition-transform" />

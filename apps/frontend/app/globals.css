@@ -624,6 +624,7 @@ html, body, #__next, #root {
 
   .main-content {
     margin-left: 0;
+    margin-top: 0; /* Remove top margin on mobile to eliminate space between navbar and content */
     width: 100%;
     padding: var(--gap-sm);
   }
