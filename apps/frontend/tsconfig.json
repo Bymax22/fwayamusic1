@@ -19,8 +19,7 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",  // Root folder, usually the project folder
-    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
     "paths": {
   "@/*": ["app/*"]
     }
