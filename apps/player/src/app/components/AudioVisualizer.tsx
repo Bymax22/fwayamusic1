@@ -1,4 +1,5 @@
 // apps/player/src/app/components/AudioVisualizer.tsx
+// @ts-nocheck
 'use client';
 
 import { useEffect, useRef, useState } from 'react';

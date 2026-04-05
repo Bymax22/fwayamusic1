@@ -187,7 +187,7 @@ const SidebarWithAuth = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
   return (
     <aside
       id="sidebar"
-      className={`sidebar fixed top-16 left-0 h-[calc(100vh-4rem)] z-40 transition-all duration-300 ease-in-out ${sidebarExpanded ? "w-56" : "w-14"}`}
+      className={`sidebar fixed top-0 left-0 h-screen z-40 transition-all duration-300 ease-in-out ${sidebarExpanded ? "w-56" : "w-14"}`}
       style={{ display: sidebarExpanded ? undefined : "none" }}
     >
       <div className="flex items-center gap-2 p-3 border-b border-white/10">

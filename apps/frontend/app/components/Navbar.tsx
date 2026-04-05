@@ -232,7 +232,7 @@ export default function Navbar() {
     return (
       <>
         {/* Guest User Navbar - Bigger Logo with More Features */}
-        <nav className={`fixed top-0 left-0 w-full h-16 transition-all duration-300 z-50 
+        <nav className={`relative w-full h-16 transition-all duration-300 z-50 
           ${isScrolled ? "bg-[#0a3747] bg-opacity-95 backdrop-blur-lg" : "bg-[#0a3747] bg-opacity-90 backdrop-blur-md"}
           border-b border-[#0a3747]/30 shadow-lg`}
         >
@@ -478,7 +478,7 @@ export default function Navbar() {
   return (
     <>
       {/* Logged-in User Navbar - More Features */}
-      <nav className={`fixed top-0 left-0 w-full h-16 transition-all duration-300 z-50 
+      <nav className={`relative w-full h-16 transition-all duration-300 z-50 
         ${isScrolled ? "bg-[#0a3747] bg-opacity-95 backdrop-blur-lg" : "bg-[#0a3747] bg-opacity-90 backdrop-blur-md"}
         border-b border-[#0a3747]/30 shadow-lg`}
       >

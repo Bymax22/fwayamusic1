@@ -1,0 +1,28 @@
+{
+  "name": "fwaya-hooks",
+  "version": "1.0.0",
+  "description": "Shared React hooks for Fwaya Music",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zustand": "^4.4.1",
+    "axios": "^1.6.8",
+    "@fwaya-music/types": "file:../types"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "react": "^18.3.1",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  }
+}

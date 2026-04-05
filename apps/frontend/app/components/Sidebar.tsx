@@ -88,7 +88,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
 
   return (
     <div
-      className={`hidden md:block fixed top-0 left-0 h-screen bg-[#0f2d3d] border-r border-[#1e293b] shadow-lg z-30 overflow-y-auto pt-16 transition-all duration-300
+      className={`hidden md:block fixed top-0 left-0 h-screen bg-[#0f2d3d] border-r border-[#1e293b] shadow-lg z-30 overflow-y-auto transition-all duration-300
         ${sidebarExpanded ? "w-56" : "w-16"} lg:w-56`}
     >
       <div className="flex flex-col h-[calc(100vh-4rem)] p-2 space-y-2">

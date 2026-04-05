@@ -295,7 +295,7 @@ const HeroBanner = ({
               fill
               className="object-cover"
               priority
-              onError={(e) => {
+              onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                 (e.target as HTMLImageElement).src = "/default-banner.jpg";
               }}
             />
@@ -553,7 +553,7 @@ const MediaCard = ({
           alt={getTitle()}
           fill
           className="object-cover"
-          onError={(e) => {
+          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
             (e.target as HTMLImageElement).src = type === 'artist' ? "/default-artist.png" : "/default-cover.png";
           }}
         />
@@ -690,7 +690,7 @@ const PremiumMediaCard = ({
           alt={item.title}
           fill
           className="object-cover"
-          onError={(e) => {
+          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
             (e.target as HTMLImageElement).src = "/default-cover.png";
           }}
         />
@@ -795,7 +795,7 @@ const BeatCard = ({
             alt={beat.title}
             fill
             className="object-cover"
-            onError={(e) => {
+            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
@@ -898,7 +898,7 @@ const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: N
           alt={item.title}
           fill
           className="object-cover"
-          onError={(e) => {
+          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
             (e.target as HTMLImageElement).src = "/default-news.png";
           }}
         />
@@ -967,7 +967,7 @@ const WelcomeNotification = () => {
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -50 }}
-      className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] text-white p-3 rounded-lg shadow-lg max-w-xs mx-3 mobile-text-sm"
+      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] text-white p-3 rounded-lg shadow-lg max-w-xs mx-3 mobile-text-sm"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
@@ -1047,7 +1047,7 @@ const TopChartsSection = ({
                     alt={song.title} 
                     fill 
                     className="rounded"
-                    onError={(e) => {
+                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                       (e.target as HTMLImageElement).src = "/default-cover.png";
                     }}
                   />
@@ -1283,7 +1283,7 @@ const FeaturedPlaylistsCarousel = ({
                     alt={playlist.name}
                     fill
                     className="object-cover"
-                    onError={(e) => {
+                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                       (e.target as HTMLImageElement).src = "/default-playlist.png";
                     }}
                   />

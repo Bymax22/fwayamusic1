@@ -135,15 +135,16 @@ module.exports = {
           },
         },
         '.glass-morphism': {
-          'background-color': 'rgba(var(--background), 0.2)',
-          'backdrop-filter': 'blur(12px)',
-          'border': '1px solid rgba(var(--border), 0.2)',
+          'background-color': 'rgba(var(--primary-dark-darker), 0.3)',
+          'backdrop-filter': 'blur(16px)',
+          'border': '1px solid rgba(var(--primary-accent), 0.15)',
+          'box-shadow': '0 8px 32px rgba(var(--primary-dark), 0.2)',
         },
         '.text-gradient': {
           'background-clip': 'text',
           '-webkit-background-clip': 'text',
           'color': 'transparent',
-          'background-image': 'linear-gradient(90deg, var(--primary-accent), var(--primary-light))',
+          'background-image': 'linear-gradient(135deg, rgb(var(--primary-accent)), rgb(var(--primary-dark)))',
         },
       });
     },

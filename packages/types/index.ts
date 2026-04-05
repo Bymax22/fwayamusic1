@@ -50,3 +50,10 @@ export interface SharedMediaWithRelations extends Media {
 	lastPlayedAt?: Date | null;
 	cloudinaryPublicId?: string | null;
 }
+
+export interface Track extends Media {
+	artist?: User;
+	duration?: number;
+	liked?: boolean;
+	played?: boolean;
+}

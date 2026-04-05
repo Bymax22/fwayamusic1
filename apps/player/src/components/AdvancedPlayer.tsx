@@ -152,15 +152,15 @@ export function AdvancedPlayer({ metadata, encryptedData }: AdvancedPlayerProps)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black flex flex-col">
       {/* Header */}
-      <div className="p-6 text-white">
-        <h1 className="text-2xl font-bold">{metadata.mediaInfo.title}</h1>
-        <p className="text-gray-300">{metadata.mediaInfo.artist}</p>
+      <div className="p-6 sm:p-8 text-white border-b border-white/10 backdrop-blur-sm">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-1">{metadata.mediaInfo.title}</h1>
+        <p className="text-gray-300 text-lg">{metadata.mediaInfo.artist}</p>
       </div>
 
       {/* Visualizer */}
-      <div className="flex-1 flex items-center justify-center px-6">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8">
         <AudioVisualizer
           audioElement={audioRef.current}
           audioContext={audioContextRef.current}
@@ -169,44 +169,58 @@ export function AdvancedPlayer({ metadata, encryptedData }: AdvancedPlayerProps)
       </div>
 
       {/* Controls */}
-      <div className="p-6 bg-black/20 backdrop-blur-sm">
+      <div className="p-6 sm:p-8 bg-gradient-to-t from-black/80 to-black/40 backdrop-blur-md border-t border-white/10">
         {/* Progress Bar */}
-        <div className="mb-4">
+        <div className="mb-6">
           <input
             type="range"
             min="0"
-            max={duration}
+            max={duration || 0}
             value={currentTime}
             onChange={handleSeek}
-            className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+            className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500 hover:h-2 transition-all"
+            style={{
+              background: `linear-gradient(to right, rgb(236, 72, 153) 0%, rgb(236, 72, 153) ${duration ? (currentTime / duration) * 100 : 0}%, rgb(55, 65, 81) ${duration ? (currentTime / duration) * 100 : 0}%, rgb(55, 65, 81) 100%)`
+            }}
           />
-          <div className="flex justify-between text-sm text-gray-300 mt-1">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
+          <div className="flex justify-between text-sm text-gray-300 mt-2">
+            <span className="font-medium">{formatTime(currentTime)}</span>
+            <span className="font-medium">{formatTime(duration)}</span>
           </div>
         </div>
 
         {/* Main Controls */}
-        <div className="flex items-center justify-center space-x-6 mb-4">
-          <button className="text-white hover:text-blue-400 transition-colors">
+        <div className="flex items-center justify-center space-x-4 sm:space-x-8 mb-8">
+          <button 
+            className="text-gray-400 hover:text-white hover:scale-110 transition-all"
+            title="Previous track"
+          >
             <SkipBack size={24} />
           </button>
 
           <button
             onClick={togglePlay}
-            className="bg-white text-black rounded-full p-4 hover:scale-105 transition-transform"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white flex items-center justify-center shadow-lg hover:shadow-pink-500/50 transition-all transform hover:scale-105 active:scale-95"
+            title={isPlaying ? 'Pause' : 'Play'}
           >
-            {isPlaying ? <Pause size={32} /> : <Play size={32} />}
+            {isPlaying ? <Pause size={32} /> : <Play size={32} className="ml-1" />}
           </button>
 
-          <button className="text-white hover:text-blue-400 transition-colors">
+          <button 
+            className="text-gray-400 hover:text-white hover:scale-110 transition-all"
+            title="Next track"
+          >
             <SkipForward size={24} />
           </button>
         </div>
 
         {/* Volume Control */}
-        <div className="flex items-center justify-center space-x-2">
-          <button onClick={toggleMute} className="text-white hover:text-blue-400">
+        <div className="flex items-center justify-center space-x-4 bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10">
+          <button 
+            onClick={toggleMute} 
+            className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
+            title={isMuted ? 'Unmute' : 'Mute'}
+          >
             {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
           </button>
           <input
@@ -216,8 +230,14 @@ export function AdvancedPlayer({ metadata, encryptedData }: AdvancedPlayerProps)
             step="0.1"
             value={isMuted ? 0 : volume}
             onChange={handleVolumeChange}
-            className="w-24 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+            className="flex-1 h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-pink-500 hover:h-2 transition-all"
+            style={{
+              background: `linear-gradient(to right, rgb(236, 72, 153) 0%, rgb(236, 72, 153) ${(isMuted ? 0 : volume) * 100}%, rgb(55, 65, 81) ${(isMuted ? 0 : volume) * 100}%, rgb(55, 65, 81) 100%)`
+            }}
           />
+          <span className="text-sm text-gray-400 w-8 text-right flex-shrink-0">
+            {Math.round((isMuted ? 0 : volume) * 100)}%
+          </span>
         </div>
       </div>
 
@@ -229,6 +249,37 @@ export function AdvancedPlayer({ metadata, encryptedData }: AdvancedPlayerProps)
         onEnded={() => setIsPlaying(false)}
         preload="auto"
       />
+
+      <style>{`
+        input[type="range"]::-webkit-slider-thumb {
+          appearance: none;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: white;
+          cursor: pointer;
+          box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: white;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </div>
   )
 }

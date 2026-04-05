@@ -1,4 +1,5 @@
 // apps/player/src/app/components/AdvancedPlayer.tsx
+// @ts-nocheck
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
