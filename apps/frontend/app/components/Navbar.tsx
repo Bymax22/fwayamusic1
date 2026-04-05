@@ -1,7 +1,7 @@
 "use client";
 import { 
   Music, User, Bell, LogOut, Settings, Share2, Crown, TrendingUp, 
-  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play, Coins, Search
+  Heart, Plus, Radio, Mic2, Gift, Compass, DollarSign, X, Play, Coins, Search, Home, Menu, LogIn
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -334,6 +334,20 @@ export default function Navbar() {
 
             {/* Right Section - Guest Features */}
             <div className="flex items-center gap-4">
+              {/* Navigation Icons */}
+              <Link href="/" className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target">
+                <Home size={20} />
+              </Link>
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('mobileMenu:open'))}
+                className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target md:hidden"
+              >
+                <Menu size={20} />
+              </button>
+              <Link href="/auth/user/signin" className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target">
+                <LogIn size={20} />
+              </Link>
+              
               <AnimatePresence mode="wait">
                 {(forcedNowPlaying || (currentTrack && isPlaying)) ? (
                   // Audio Wave + Now Playing text (forced or normal)
@@ -384,7 +398,7 @@ export default function Navbar() {
                     className="flex items-center gap-3"
                   >
                     {/* Now Playing Icon */}
-                    <Music 
+                    <Play 
                       size={22} 
                       className="text-[#ce7f16] hover:scale-110 transition-transform cursor-pointer"
                       onClick={() => router.push('/browse')}
@@ -609,6 +623,17 @@ export default function Navbar() {
 
           {/* Right Section - User Actions */}
           <div className="flex items-center gap-2"> {/* Reduced gap from gap-3 to gap-2 */}
+            {/* Navigation Icons */}
+            <Link href="/dashboard" className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target">
+              <Home size={20} />
+            </Link>
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('mobileMenu:open'))}
+              className="p-2 rounded-full hover:bg-[#240e47]/50 text-white transition-colors touch-target md:hidden"
+            >
+              <Menu size={20} />
+            </button>
+            
             {/* Now Playing Section - Shows when song is playing or player minimized */}
             {currentTrack && (isPlaying || forcedNowPlaying) && (
               <button

@@ -42,7 +42,6 @@
   /* Mobile-first layout */
   --navbar-height: 3rem;
   --player-height: 4.5rem;
-  --bottom-nav-height: 4.5rem;
   --sidebar-width: 14rem;
   --sidebar-collapsed: 4rem;
   
@@ -67,7 +66,6 @@
   :root {
     --navbar-height: 3.5rem;
     --player-height: 5rem;
-    --bottom-nav-height: 4rem;
     --gap-md: 1rem;
     --gap-lg: 1.5rem;
     --gap-xl: 2rem;
@@ -244,64 +242,7 @@
     }
   }
 
-/* Update bottom nav styles */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: var(--bottom-nav-height); /* Now uses the increased height */
-  background: rgba(var(--primary-dark-darker), 0.98);
-  backdrop-filter: blur(24px);
-  border-top: 1px solid rgba(var(--primary-accent), 0.15);
-  z-index: 45;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 0 var(--gap-sm);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-  .bottom-nav--hidden {
-    transform: translateY(100%);
-  }
-
-.bottom-nav__item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  padding: var(--gap-xs) 0;
-  color: rgb(var(--muted));
-  font-size: var(--text-xs);
-  transition: all 0.2s ease;
-  min-height: 44px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-    
-    &:hover {
-      color: rgb(var(--foreground));
-    }
-  }
-
-  .bottom-nav__item--active {
-    color: rgb(var(--primary-accent));
-  }
-
-  .bottom-nav__icon {
-    width: 20px;
-    height: 20px;
-    margin-bottom: 2px;
-    transition: transform 0.2s ease;
-  }
-
-  .bottom-nav__item:hover .bottom-nav__icon {
-    transform: scale(1.1);
-  }
-
-  /* Mobile Cards */
+/* Mobile Cards */
   .mobile-card {
     background: rgba(var(--primary-dark-darker), 0.8);
     border-radius: var(--radius-md);
@@ -770,10 +711,7 @@ html, body, #__next, #root {
   .navbar {
     border-bottom-width: 2px;
   }
-  
-  .bottom-nav {
-    border-top-width: 2px;
-  }
+}
 }
 
 /* Dark mode support (if needed in future) */
@@ -797,10 +735,6 @@ html, body, #__next, #root {
   .navbar {
     backdrop-filter: blur(12px) brightness(0.9);
   }
-  
-  .bottom-nav {
-    backdrop-filter: blur(20px) brightness(0.9);
-  }
 }
 
 /* Edge specific fixes */
@@ -808,15 +742,7 @@ html, body, #__next, #root {
   .navbar {
     background-color: rgb(var(--primary-dark));
   }
-  
-  .bottom-nav {
-    background-color: rgb(var(--primary-dark));
-  }
 }
-
-/* Adjust main content padding to account for taller bottom nav */
-.main-content {
-  padding-bottom: var(--bottom-nav-height);
 }
 
 /* Add to your existing animations in globals.css */

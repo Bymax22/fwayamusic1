@@ -4,7 +4,6 @@ import { PaymentProvider } from '../context/PaymentContext';
 import "../globals.css";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
-import BottomNav from "../components/BottomNav";
 import MobileMenu from "../components/MobileMenu";
 import { useState, useEffect } from "react";
 import { ThemeProvider } from "../context/ThemeContext";
@@ -254,6 +253,15 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
     return () => window.removeEventListener("player:openBottomHeader", handler);
   }, []);
 
+  // Listen for mobile menu open events
+  useEffect(() => {
+    const handler = () => {
+      setIsMobileMenuOpen(true);
+    };
+    window.addEventListener("mobileMenu:open", handler);
+    return () => window.removeEventListener("mobileMenu:open", handler);
+  }, []);
+
   // Fetch nonce for CSP
   useEffect(() => {
     const fetchNonce = async () => {
@@ -314,12 +322,6 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
                     {children}
                   </main>
                 </div>
-
-                {/* Bottom Navigation - Auto-hides when player opens */}
-                <BottomNav 
-                  isVisible={bottomHeaderOpenOverride || !currentTrack}
-                  onMenuOpen={handleMobileMenuOpen}
-                />
 
                 {/* Mobile Menu - Beautiful glassmorphic popup */}
                 <MobileMenu 
