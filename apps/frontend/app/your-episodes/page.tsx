@@ -62,10 +62,10 @@ export default function YourEpisodesPage() {
   if (loading) return <div className="p-4 text-center">Loading episodes...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a0a33] to-[#240e47] p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#2E055E] to-[#5B0EA6] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
-          <History className="w-8 h-8 text-cyan-500" />
+          <History className="w-8 h-8 text-primary" />
           <h1 className="text-4xl font-bold text-white">Your Episodes</h1>
         </div>
 
@@ -77,7 +77,7 @@ export default function YourEpisodesPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="group bg-[#0f2935]/50 backdrop-blur-lg rounded-lg overflow-hidden border border-cyan-500/20 hover:border-cyan-500/50 transition-all p-4 flex items-center gap-4"
+                className="group bg-[#2E055E]/50 backdrop-blur-lg rounded-lg overflow-hidden border border-primary/20 hover:border-primary/50 transition-all p-4 flex items-center gap-4"
               >
                 <div className="relative flex-shrink-0">
                   <Image
@@ -94,7 +94,7 @@ export default function YourEpisodesPage() {
                     onClick={() => playTrack(episode)}
                     className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded"
                   >
-                    <Play className="w-6 h-6 text-cyan-500 fill-cyan-500" />
+                    <Play className="w-6 h-6 text-primary fill-primary" />
                   </button>
                 </div>
 
@@ -110,10 +110,10 @@ export default function YourEpisodesPage() {
                 </div>
 
                 <div className="flex gap-2 flex-shrink-0">
-                  <button className="p-2 bg-cyan-500/20 text-cyan-400 rounded hover:bg-cyan-500/30 transition-colors">
+                  <button className="p-2 bg-primary/20 text-primary rounded hover:bg-primary/30 transition-colors">
                     <Heart className="w-4 h-4" />
                   </button>
-                  <button className="p-2 bg-[#240e47] text-gray-300 rounded hover:bg-[#ce7f16]/50 transition-colors">
+                  <button className="p-2 bg-primary text-gray-300 rounded hover:bg-primary-light transition-colors">
                     <Download className="w-4 h-4" />
                   </button>
                 </div>

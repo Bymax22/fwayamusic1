@@ -268,7 +268,7 @@ export default function LibraryPage() {
     <ThemeProvider>
       <AuthProvider>
         <PaymentProvider>
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#2E055E]/95 to-[#5B0EA6]/95 min-h-screen pb-32">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -277,7 +277,7 @@ export default function LibraryPage() {
         </div>
         <button 
           onClick={handleCreatePlaylist}
-          className="flex items-center gap-2 px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-[#5B0EA6] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors"
         >
           <Plus className="w-5 h-5" />
           New Playlist
@@ -285,7 +285,7 @@ export default function LibraryPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-4 border-b border-[#0a3747] pb-2 mb-6 overflow-x-auto">
+      <div className="flex gap-4 border-b border-[#2E055E] pb-2 mb-6 overflow-x-auto">
         {[
           { id: 'playlists', label: 'Playlists', icon: <ListMusic className="w-4 h-4" /> },
           { id: 'liked', label: 'Liked Songs', icon: <Heart className="w-4 h-4" /> },
@@ -297,7 +297,7 @@ export default function LibraryPage() {
             onClick={() => setActiveTab(tab.id as 'playlists' | 'liked' | 'recent' | 'downloaded')}
             className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${
               activeTab === tab.id 
-                ? 'text-[#e51f48] border-b-2 border-[#e51f48]' 
+                ? 'text-[#5B0EA6] border-b-2 border-[#5B0EA6]' 
                 : 'text-gray-400 hover:text-gray-300'
             }`}
           >
@@ -319,7 +319,7 @@ export default function LibraryPage() {
   ? (getContent() as Playlist[]).map((playlist) => (
       <div 
         key={playlist.id} 
-        className="bg-[#0a3747]/70 rounded-xl overflow-hidden hover:bg-[#0a3747] transition-colors group"
+        className="bg-[#2E055E]/70 rounded-xl overflow-hidden hover:bg-[#2E055E] transition-colors group"
       >
         <div className="relative">
           <Image 
@@ -332,7 +332,7 @@ export default function LibraryPage() {
           />
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all">
             <button className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
-              <div className="w-12 h-12 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 rounded-full bg-[#5B0EA6] flex items-center justify-center shadow-lg">
                 <Play className="w-5 h-5 text-white" />
               </div>
             </button>
@@ -351,7 +351,7 @@ export default function LibraryPage() {
 : (getContent() as MediaFile[]).map((file: MediaFile) => (
   <div 
     key={file.id} 
-    className="bg-[#0a3747]/70 rounded-xl overflow-hidden hover:bg-[#0a3747] transition-colors group"
+    className="bg-[#2E055E]/70 rounded-xl overflow-hidden hover:bg-[#2E055E] transition-colors group"
   >
         <div className="relative">
           <Image 
@@ -367,7 +367,7 @@ export default function LibraryPage() {
               onClick={() => handlePlay(file)}
               className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
             >
-              <div className="w-12 h-12 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 rounded-full bg-[#5B0EA6] flex items-center justify-center shadow-lg">
                 <Play className="w-5 h-5 text-white" />
               </div>
             </button>
@@ -383,7 +383,7 @@ export default function LibraryPage() {
 
         {getContent().length === 0 && (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-[#0a3747] rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#2E055E] rounded-full flex items-center justify-center mx-auto mb-4">
               {getIcon()}
             </div>
             <h3 className="text-xl font-medium text-gray-400 mb-2">No {getTitle().toLowerCase()} yet</h3>

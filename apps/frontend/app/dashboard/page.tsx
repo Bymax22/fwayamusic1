@@ -216,28 +216,28 @@ const UserDashboard: React.FC = () => {
       value: Math.floor(libraryStats.totalMinutes).toString(),
       icon: <FaHeadphones />,
       change: '+12%',
-      color: 'from-[#e51f48] to-[#ff4d6d]'
+      color: 'from-[#5B0EA6] to-[#9B5DE5]'
     },
     {
       label: 'Tracks',
       value: libraryStats.totalSongs.toString(),
       icon: <FaMusic />,
       change: '+5',
-      color: 'from-[#e51f48] to-[#ff4d6d]'
+      color: 'from-[#5B0EA6] to-[#9B5DE5]'
     },
     {
       label: 'Playlists',
       value: libraryStats.totalPlaylists.toString(),
       icon: <FaList />,
       change: '+2',
-      color: 'from-[#e51f48] to-[#ff4d6d]'
+      color: 'from-[#5B0EA6] to-[#9B5DE5]'
     },
     {
       label: 'Artists',
       value: libraryStats.totalArtists.toString(),
       icon: <FaUsers />,
       change: '+3',
-      color: 'from-[#e51f48] to-[#ff4d6d]'
+      color: 'from-[#5B0EA6] to-[#9B5DE5]'
     }
   ];
 
@@ -382,9 +382,9 @@ const UserDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#2E055E] to-[#5B0EA6] text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-3 border-[#e51f48] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <div className="w-12 h-12 border-3 border-[#5B0EA6] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
           <p className="text-gray-400 mobile-text-sm">Loading dashboard...</p>
         </div>
       </div>
@@ -393,9 +393,9 @@ const UserDashboard: React.FC = () => {
 
   return (
     <RoleGuard allowedRoles={['USER']} customLoadingComponent={<DashboardLoading/>}>
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] text-white pb-20">
+      <div className="min-h-screen bg-gradient-to-b from-[#2E055E] to-[#5B0EA6] text-white pb-20">
         {/* Mobile-Optimized Header */}
-        <header className="bg-[#0a3747]/80 backdrop-blur-lg border-b border-[#0a3747] sticky top-0 z-40">
+        <header className="bg-[#2E055E]/80 backdrop-blur-lg border-b border-[#2E055E] sticky top-0 z-40">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -405,10 +405,10 @@ const UserDashboard: React.FC = () => {
                     alt={user.displayName || user.username}
                     width={50}
                     height={50}
-                    className="rounded-full border-2 border-[#e51f48]"
+                    className="rounded-full border-2 border-[#5B0EA6]"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center border-2 border-[#e51f48]">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B0EA6] to-[#9B5DE5] flex items-center justify-center border-2 border-[#5B0EA6]">
                     <FaUser className="text-white text-lg" />
                   </div>
                 )}
@@ -435,7 +435,7 @@ const UserDashboard: React.FC = () => {
               </div>
               
               <div className="flex items-center gap-2">
-                <div className="bg-[#0a1f29] rounded-full p-2 border border-[#0a3747]">
+                <div className="bg-[#2E055E] rounded-full p-2 border border-[#5B0EA6]">
                   {user.walletBalance && user.walletBalance > 0 ? (
                     <div className="flex items-center gap-1 text-sm mobile-text-sm">
                       <FaDollarSign className="text-green-400" />
@@ -444,7 +444,7 @@ const UserDashboard: React.FC = () => {
                   ) : (
                     <button
                       onClick={() => router.push('/reseller-dashboard')}
-                      className="px-2 py-1 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-full text-xs font-semibold transition-colors mobile-text-xs"
+                      className="px-2 py-1 bg-[#5B0EA6] hover:bg-[#9B5DE5] text-white rounded-full text-xs font-semibold transition-colors mobile-text-xs"
                     >
                       Reseller
                     </button>
@@ -454,7 +454,7 @@ const UserDashboard: React.FC = () => {
             </div>
 
             {/* Mobile-Optimized Navigation Tabs */}
-            <nav className="flex space-x-1 bg-[#0a1f29] rounded-lg p-1 border border-[#0a3747] overflow-x-auto">
+            <nav className="flex space-x-1 bg-[#2E055E] rounded-lg p-1 border border-[#5B0EA6] overflow-x-auto">
               {[
                 { id: 'overview', label: 'Overview', icon: <FaChartLine className="w-3 h-3" /> },
                 { id: 'library', label: 'Library', icon: <FaMusic className="w-3 h-3" /> },

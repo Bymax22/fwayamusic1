@@ -359,7 +359,7 @@ async getHomepageSections() {
       },
       orderBy: { createdAt: "desc" },
       take: 8 - featuredSongs.length,
-      where: { id: { notIn: featuredSongs.map(m => m.id) }, accessType: 'FREE' }
+      where: { id: { notIn: featuredSongs.map((m: any) => m.id) }, accessType: 'FREE' }
     });
     featuredSongs = featuredSongs.concat(latest);
   }
@@ -394,7 +394,7 @@ async getHomepageSections() {
       },
       orderBy: { playCount: "desc" },
       take: 8 - trendingSongs.length,
-      where: { id: { notIn: trendingSongs.map(m => m.id) }, accessType: 'FREE' }
+      where: { id: { notIn: trendingSongs.map((m: any) => m.id) }, accessType: 'FREE' }
     });
     trendingSongs = trendingSongs.concat(mostPlayed);
   }
@@ -451,7 +451,7 @@ async getHomepageSections() {
       },
       orderBy: { createdAt: "desc" },
       take: 8 - topCharts.length,
-      where: { id: { notIn: topCharts.map(m => m.id) }, accessType: 'FREE' }
+      where: { id: { notIn: topCharts.map((m: any) => m.id) }, accessType: 'FREE' }
     });
     topCharts = topCharts.concat(latest);
   }

@@ -46,7 +46,7 @@ export default function PremiumPage() {
   if (loading) return <div className="p-4 text-center">Loading premium tracks...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#050d12] p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#2E055E] to-[#5B0EA6] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Crown className="w-8 h-8 text-yellow-500" />
@@ -90,14 +90,14 @@ export default function PremiumPage() {
                 
                 <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
                   <span>{(track.views || 0).toLocaleString()} plays</span>
-                  <span className="px-2 py-1 bg-[#0a3747] rounded text-yellow-500 font-semibold">{track.genre || 'Unknown'}</span>
+                  <span className="px-2 py-1 bg-[#2E055E] rounded text-yellow-500 font-semibold">{track.genre || 'Unknown'}</span>
                 </div>
 
                 <div className="flex gap-2">
                   <button className="flex-1 p-2 bg-yellow-500/20 text-yellow-500 rounded hover:bg-yellow-500/30 transition-colors text-xs font-semibold">
                     <Heart className="w-4 h-4 inline mr-1" /> Like
                   </button>
-                  <button className="flex-1 p-2 bg-[#0a3747] text-gray-300 rounded hover:bg-[#0f4a5f] transition-colors text-xs font-semibold">
+                  <button className="flex-1 p-2 bg-[#2E055E] text-gray-300 rounded hover:bg-[#5B0EA6] transition-colors text-xs font-semibold">
                     <Download className="w-4 h-4 inline mr-1" /> Get
                   </button>
                 </div>

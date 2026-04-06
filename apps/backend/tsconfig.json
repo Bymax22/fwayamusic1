@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "module": "commonjs",
     "declaration": true,
     "esModuleInterop": true,
@@ -13,8 +14,7 @@
     "rootDir": "../..",
     "baseUrl": "./",
     "paths": {
-  "@app/*": ["src/*"],
-  "@prisma/client": ["./node_modules/@prisma/client"]
+  "@app/*": ["src/*"]
     },
     
     "forceConsistentCasingInFileNames": true,

@@ -9,16 +9,16 @@
 /* 🌈 Root Theme Variables - Mobile First */
 :root {
   /* Core brand colors */
-  --primary-dark: 36, 14, 71;    /* RGB values - Dark Purple */
-  --primary-accent: 206, 127, 22; /* RGB values - Orange/Gold */
-  --primary-light: 206, 127, 22;
+  --primary-dark: 155, 93, 229;    /* RGB values - Vibrant Purple (Secondary) */
+  --primary-accent: 91, 14, 166; /* RGB values - Deep Purple (Primary) */
+  --primary-light: 255, 122, 0;   /* RGB values - Accent Orange */
 
   /* Darker background variants for layering */
   --primary-dark-darker: 16, 8, 43;  /* Even deeper purple for backgrounds */
   --primary-accent-darker: 165, 102, 18; /* Darker gold for backgrounds */
 
   /* Backgrounds - using darker variants for depth */
-  --dark-bg: 16, 8, 43;  /* Deeper purple background */
+  --dark-bg: 46, 5, 94;  /* Ultra Deep Purple (Background) */
   --light-bg: 248, 250, 252;
   
   /* Semantic variables */

@@ -121,12 +121,12 @@ export default function LikedSongsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
+      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#2E055E]/95 to-[#5B0EA6]/95 min-h-screen">
         <div className="animate-pulse">
-          <div className="h-48 bg-[#0a3747] rounded-xl mb-8"></div>
+          <div className="h-48 bg-[#2E055E] rounded-xl mb-8"></div>
           <div className="space-y-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-16 bg-[#0a3747] rounded-lg"></div>
+              <div key={i} className="h-16 bg-[#2E055E] rounded-lg"></div>
             ))}
           </div>
         </div>
@@ -136,9 +136,9 @@ export default function LikedSongsPage() {
 
   return (
     <Protected>
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#2E055E]/95 to-[#5B0EA6]/95 min-h-screen pb-32">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] rounded-xl p-8 mb-8">
+      <div className="bg-gradient-to-br from-[#5B0EA6] to-[#9B5DE5] rounded-xl p-8 mb-8">
         <div className="flex items-end gap-6">
           <div className="w-48 h-48 bg-white/20 rounded-xl flex items-center justify-center shadow-2xl">
             <Heart className="w-16 h-16 text-white" fill="currentColor" />
@@ -161,25 +161,25 @@ export default function LikedSongsPage() {
       <div className="flex items-center gap-4 mb-8">
         <button 
           onClick={handlePlayAll}
-          className="w-14 h-14 rounded-full bg-[#e51f48] hover:bg-[#ff4d6d] flex items-center justify-center shadow-lg transition-colors"
+          className="w-14 h-14 rounded-full bg-[#5B0EA6] hover:bg-[#9B5DE5] flex items-center justify-center shadow-lg transition-colors"
         >
           <Play className="w-6 h-6 text-white" fill="currentColor" />
         </button>
         
-        <button className="w-10 h-10 rounded-full bg-[#0a3747] hover:bg-[#0a3747]/80 flex items-center justify-center transition-colors">
+        <button className="w-10 h-10 rounded-full bg-[#2E055E] hover:bg-[#2E055E]/80 flex items-center justify-center transition-colors">
           <Shuffle className="w-5 h-5 text-gray-400" />
         </button>
 
-        <button className="w-10 h-10 rounded-full bg-[#0a3747] hover:bg-[#0a3747]/80 flex items-center justify-center transition-colors">
+        <button className="w-10 h-10 rounded-full bg-[#2E055E] hover:bg-[#2E055E]/80 flex items-center justify-center transition-colors">
           <Share2 className="w-5 h-5 text-gray-400" />
         </button>
       </div>
 
       {/* Songs List */}
       {likedSongs.length > 0 ? (
-        <div className="bg-[#0a3747]/70 rounded-xl overflow-hidden">
+        <div className="bg-[#2E055E]/70 rounded-xl overflow-hidden">
           {/* Table Header */}
-          <div className="grid grid-cols-12 gap-4 items-center p-4 border-b border-[#0a3747] text-gray-400 text-sm font-medium">
+          <div className="grid grid-cols-12 gap-4 items-center p-4 border-b border-[#2E055E] text-gray-400 text-sm font-medium">
             <div className="col-span-1">#</div>
             <div className="col-span-5">TITLE</div>
             <div className="col-span-3">ARTIST</div>
@@ -190,25 +190,25 @@ export default function LikedSongsPage() {
           </div>
 
           {/* Songs */}
-          <div className="divide-y divide-[#0a3747]">
+          <div className="divide-y divide-[#2E055E]">
             {likedSongs.map((song, index) => (
               <div 
                 key={song.id} 
                 className={`grid grid-cols-12 gap-4 items-center p-4 transition-colors ${
                   currentTrack?.id === song.id 
-                    ? 'bg-[#0a3747]' 
-                    : 'hover:bg-[#0a3747]/50'
+                    ? 'bg-[#2E055E]' 
+                    : 'hover:bg-[#2E055E]/50'
                 }`}
               >
                 <div className="col-span-1 text-gray-400">
                   {currentTrack?.id === song.id && isPlaying ? (
                     <Pause 
-                      className="w-5 h-5 text-[#e51f48] cursor-pointer" 
+                      className="w-5 h-5 text-[#5B0EA6] cursor-pointer" 
                       onClick={() => handlePlay(song)}
                     />
                   ) : (
                     <span 
-                      className="cursor-pointer hover:text-[#e51f48] transition-colors"
+                      className="cursor-pointer hover:text-[#5B0EA6] transition-colors"
                       onClick={() => handlePlay(song)}
                     >
                       {index + 1}
@@ -227,7 +227,7 @@ export default function LikedSongsPage() {
                   />
                   <div>
                     <p className={`font-medium ${
-                      currentTrack?.id === song.id ? 'text-[#e51f48]' : 'text-white'
+                      currentTrack?.id === song.id ? 'text-[#5B0EA6]' : 'text-white'
                     }`}>
                       {song.title}
                     </p>
@@ -240,7 +240,7 @@ export default function LikedSongsPage() {
                 </div>
                 
                 <div className="col-span-2">
-                  <span className="px-3 py-1 bg-[#0a3747] text-gray-300 rounded-full text-xs">
+                  <span className="px-3 py-1 bg-[#2E055E] text-gray-300 rounded-full text-xs">
                     {song.genre}
                   </span>
                 </div>
@@ -248,7 +248,7 @@ export default function LikedSongsPage() {
                 <div className="col-span-1 flex justify-end gap-3">
                   <button 
                     onClick={() => handleUnlike(song.id)}
-                    className="text-[#e51f48] hover:text-[#ff4d6d] transition-colors"
+                    className="text-[#5B0EA6] hover:text-[#9B5DE5] transition-colors"
                     aria-label="Unlike"
                   >
                     <Heart className="w-5 h-5" fill="currentColor" />

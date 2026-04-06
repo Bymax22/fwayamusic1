@@ -364,7 +364,7 @@ const HeroBanner = ({
                     e.stopPropagation();
                     onPlayTrack(currentBanner.featuredTrack!);
                   }}
-                  className="bg-[#ce7f16] hover:bg-[#240e47] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all transform hover:scale-105"
+                  className="bg-[#FF7A00] hover:bg-[#5B0EA6] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all transform hover:scale-105"
                 >
                   <FaPlay className="w-4 h-4" />
                   Play Now
@@ -375,7 +375,7 @@ const HeroBanner = ({
                     e.stopPropagation();
                     onBannerClick(currentBanner);
                   }}
-                  className="bg-[#ce7f16] hover:bg-[#240e47] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all transform hover:scale-105"
+                  className="bg-[#FF7A00] hover:bg-[#5B0EA6] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all transform hover:scale-105"
                 >
                   {currentBanner.ctaText || 'Explore More'}
                   <FaArrowRight className="w-4 h-4" />
@@ -571,14 +571,14 @@ const MediaCard = ({
                   e.stopPropagation();
                   onPlay(item as MediaItem);
                 }}
-                className="p-2 rounded-full touch-target text-[#ce7f16] hover:text-white transition-colors"
+                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
               >
                           {isCurrentTrack && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
               </button>
               {(item as MediaItem).accessType === 'FREE' && (
                 <button 
                   onClick={handleDownload}
-                  className="p-2 rounded-full touch-target text-[#ce7f16] hover:text-white transition-colors"
+                  className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
                 >
                   <FaDownload size={10} />
                 </button>
@@ -603,14 +603,14 @@ const MediaCard = ({
               <div className="flex items-center gap-2">
                 <button 
                   onClick={handleLike}
-                  className="text-[#ce7f16] hover:scale-110 transition-transform touch-target"
+                  className="text-[#FF7A00] hover:scale-110 transition-transform touch-target"
                 >
                   {isLiked ? <FaHeart size={12} /> : <FaRegHeart size={12} />}
                 </button>
                 {(item as MediaItem).accessType === 'FREE' && (
                   <button 
                     onClick={handleDownload}
-                    className="text-gray-400 hover:text-[#ce7f16] transition-colors touch-target"
+                    className="text-gray-400 hover:text-[#FF7A00] transition-colors touch-target"
                   >
                     <FaDownload size={10} />
                   </button>
@@ -637,8 +637,8 @@ const MediaCard = ({
                   className={`
                     rounded-full transition-colors text-xs px-1 py-0.5 touch-target mobile-text-xs
                     ${isFollowing 
-                      ? 'bg-[#ce7f16] text-white' 
-                      : 'bg-[#0b2936] text-[#ce7f16] hover:bg-[#ce7f16] hover:text-white'
+                      ? 'bg-[#FF7A00] text-white' 
+                      : 'bg-[#0b2936] text-[#FF7A00] hover:bg-[#FF7A00] hover:text-white'
                     }
                   `}
                 >
@@ -715,7 +715,7 @@ const PremiumMediaCard = ({
                   e.stopPropagation();
                   onPlay(item);
                 }}
-                className="p-2 rounded-full touch-target text-[#ce7f16] hover:text-white transition-colors"
+                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
               >
                 {isCurrent && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
               </button>
@@ -724,7 +724,7 @@ const PremiumMediaCard = ({
                   e.stopPropagation();
                   onPurchase(item);
                 }}
-                className="p-2 rounded-full touch-target text-[#ce7f16] hover:text-white transition-colors"
+                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
               >
                 <FaShoppingCart size={12} />
               </button>
@@ -831,7 +831,7 @@ const BeatCard = ({
                   e.stopPropagation();
                   onPlay(beat);
                 }}
-                className="p-2 rounded-full touch-target text-[#ce7f16] hover:text-white transition-colors"
+                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
               >
                 {isCurrent && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
               </button>
@@ -840,7 +840,7 @@ const BeatCard = ({
                   e.stopPropagation();
                   onPurchase(beat);
                 }}
-                className="p-2 rounded-full touch-target text-[#ce7f16] hover:text-white transition-colors"
+                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
               >
                 <FaShoppingCart size={12} />
               </button>
@@ -858,7 +858,7 @@ const BeatCard = ({
             {beat.bpm} BPM
           </span>
           
-          <span className="text-xs font-bold text-[#ce7f16] mobile-text-xs">
+          <span className="text-xs font-bold text-[#FF7A00] mobile-text-xs">
             ZMW{beat.price.toFixed(2)}
           </span>
         </div>
@@ -903,7 +903,7 @@ const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: N
           }}
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
-          <span className="text-xs text-[#ce7f16] font-medium mobile-text-xs">{item.category}</span>
+          <span className="text-xs text-[#FF7A00] font-medium mobile-text-xs">{item.category}</span>
           <h3 className="text-white font-bold line-clamp-1 mobile-text-sm">{item.title}</h3>
         </div>
       </div>
@@ -918,7 +918,7 @@ const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: N
                 key={index}
                 className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs transition-colors touch-target mobile-text-xs ${
                   reaction.userReacted 
-                    ? 'bg-[#ce7f16]/20 text-[#ce7f16]' 
+                    ? 'bg-[#FF7A00]/20 text-[#FF7A00]' 
                     : 'bg-gray-600/50 text-gray-400 hover:bg-gray-500/50'
                 }`}
               >
@@ -942,7 +942,7 @@ const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: N
         <div className="flex justify-between items-center pt-2 border-t border-gray-600/50">
           <span className="text-xs text-gray-400 mobile-text-xs">{item.date}</span>
           <button 
-            className="text-xs text-[#ce7f16] hover:underline flex items-center gap-1 mobile-text-xs"
+            className="text-xs text-[#FF7A00] hover:underline flex items-center gap-1 mobile-text-xs"
             onClick={(e) => {
               e.stopPropagation();
               onNewsClick(item);
@@ -967,7 +967,7 @@ const WelcomeNotification = () => {
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -50 }}
-      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-[#ce7f16] to-[#240e47] text-white p-3 rounded-lg shadow-lg max-w-xs mx-3 mobile-text-sm"
+      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-[#FF7A00] to-[#240e47] text-white p-3 rounded-lg shadow-lg max-w-xs mx-3 mobile-text-sm"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
@@ -978,7 +978,7 @@ const WelcomeNotification = () => {
           <div className="flex flex-col gap-1">
             <button 
               onClick={() => window.location.href = '/auth?tab=reseller'}
-              className="bg-white text-[#ce7f16] px-3 py-1.5 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors whitespace-nowrap touch-target mobile-text-xs"
+              className="bg-white text-[#FF7A00] px-3 py-1.5 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors whitespace-nowrap touch-target mobile-text-xs"
             >
               Become Reseller
             </button>
@@ -1014,7 +1014,7 @@ const TopChartsSection = ({
   isPlaying: boolean;
 }) => {
   return (
-    <section className="mb-4 bg-gradient-to-br from-[#ce7f16] to-[#240e47] p-4 rounded-xl">
+    <section className="mb-4 bg-gradient-to-br from-[#FF7A00] to-[#240e47] p-4 rounded-xl">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-lg font-bold text-white mobile-text-lg">Top Charts</h2>
@@ -1053,7 +1053,7 @@ const TopChartsSection = ({
                   />
                 </div>
                 <div className="ml-2 flex-1 min-w-0">
-                  <h3 className="font-medium truncate text-white group-hover:text-[#ce7f16] transition-colors mobile-text-sm">
+                  <h3 className="font-medium truncate text-white group-hover:text-[#FF7A00] transition-colors mobile-text-sm">
                     {song.title}
                   </h3>
                   <p className="text-xs text-gray-400 truncate mobile-text-xs">
@@ -1154,7 +1154,7 @@ const HorizontalScrollSection = ({
         </div>
         <button 
           onClick={onSeeAll}
-          className="text-xs text-[#ce7f16] hover:underline flex items-center gap-1 mobile-text-xs"
+          className="text-xs text-[#FF7A00] hover:underline flex items-center gap-1 mobile-text-xs"
         >
           See all <FaArrowRight size={10} />
         </button>
@@ -1259,7 +1259,7 @@ const FeaturedPlaylistsCarousel = ({
           <h2 className="text-lg font-bold text-white mobile-text-lg">Featured Playlists</h2>
           <p className="text-gray-400 mt-0.5 text-xs mobile-text-xs">Curated collections for every mood</p>
         </div>
-        <button className="text-xs text-[#ce7f16] hover:underline flex items-center gap-1 mobile-text-xs">
+        <button className="text-xs text-[#FF7A00] hover:underline flex items-center gap-1 mobile-text-xs">
           View All <FaArrowRight size={10} />
         </button>
       </div>
@@ -1272,7 +1272,7 @@ const FeaturedPlaylistsCarousel = ({
           {playlists.map((playlist) => (
             <motion.div
               key={playlist.id}
-              className="bg-gradient-to-br from-[#240e47] to-[#ce7f16] rounded-xl overflow-hidden cursor-pointer group min-w-[280px] max-w-[280px] mobile-card"
+              className="bg-gradient-to-br from-[#240e47] to-[#FF7A00] rounded-xl overflow-hidden cursor-pointer group min-w-[280px] max-w-[280px] mobile-card"
               whileHover={{ scale: 1.02 }}
               onClick={() => onPlaylistClick(playlist)}
             >
@@ -1290,7 +1290,7 @@ const FeaturedPlaylistsCarousel = ({
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                     <motion.button
                       whileHover={{ scale: 1.1 }}
-                      className="bg-[#ce7f16] p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all touch-target"
+                      className="bg-[#FF7A00] p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all touch-target"
                     >
                       <FaPlay size={10} />
                     </motion.button>
@@ -1620,7 +1620,7 @@ const GuestWelcome = () => {
                 repeatType: "reverse",
               },
             }}
-            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#ce7f16]"
+            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#FF7A00]"
             style={{
               background: `conic-gradient(
                 from 0deg at 50% 50%,
@@ -1644,7 +1644,7 @@ const GuestWelcome = () => {
               repeat: Infinity,
               ease: "easeOut"
             }}
-            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#ce7f16] to-[#240e47] flex items-center justify-center"
+            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#FF7A00] to-[#240e47] flex items-center justify-center"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
               <path 
@@ -1663,7 +1663,7 @@ const GuestWelcome = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#ce7f16]"
+            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#FF7A00]"
           >
             Loading your experience
           </motion.span>
@@ -1789,7 +1789,7 @@ const GuestWelcome = () => {
               <h2 className="text-lg font-bold text-white mobile-text-lg">Latest News</h2>
               <p className="text-gray-400 mt-0.5 text-xs mobile-text-xs">Stay updated with Fwaya Music</p>
             </div>
-            <button className="text-xs text-[#ce7f16] hover:underline flex items-center gap-1 mobile-text-xs">
+            <button className="text-xs text-[#FF7A00] hover:underline flex items-center gap-1 mobile-text-xs">
               View All <FaArrowRight size={10} />
             </button>
           </div>
