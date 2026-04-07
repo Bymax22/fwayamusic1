@@ -20,7 +20,13 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   async onModuleInit() {
     this.logger.log('PrismaService: onModuleInit called');
-    await this.connectWithRetry();
+    try {
+      await this.connectWithRetry();
+    } catch (error) {
+      this.logger.error('Failed to connect to database during startup, but continuing...');
+      this.logger.error(error);
+      // Don't throw - allow the app to start even if DB is unavailable
+    }
   }
 
   private async connectWithRetry(attempt: number = 1): Promise<void> {

@@ -11,10 +11,21 @@ export class AppController {
   }
 
   @Get('health')
-  health(): { status: string; timestamp: string } {
-    return {
+  async health(): Promise<{ status: string; timestamp: string; database?: string }> {
+    const response = {
       status: 'ok',
       timestamp: new Date().toISOString()
     };
+
+    try {
+      // Try a simple database query to check connection
+      await this.appService.checkDatabaseConnection();
+      response.database = 'connected';
+    } catch (error) {
+      response.database = 'disconnected';
+      response.status = 'degraded';
+    }
+
+    return response;
   }
 }
