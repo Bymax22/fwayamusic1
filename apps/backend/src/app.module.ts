@@ -1,6 +1,7 @@
 import { Module, Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
+import { AppController } from './app.controller';
 import { PrismaModule } from './db/prisma.module';
 import { MediaModule } from './media/media.module';
 import { AuthModule } from './auth/auth.module';
@@ -33,6 +34,7 @@ const logger = new Logger('AppModule');
     ArtistsModule,
     UserModule,
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: 'FIREBASE_ADMIN',
