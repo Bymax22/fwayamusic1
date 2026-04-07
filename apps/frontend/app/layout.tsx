@@ -16,17 +16,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <PaymentProvider>
-          <GlobalPlayerProvider>
-            <LayoutClient>
-              {children}
-            </LayoutClient>
-          </GlobalPlayerProvider>
-        </PaymentProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <html lang="en">
+      <body>
+        <ThemeProvider>
+          <AuthProvider>
+            <PaymentProvider>
+              <GlobalPlayerProvider>
+                <LayoutClient>{children}</LayoutClient>
+              </GlobalPlayerProvider>
+            </PaymentProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }
 
