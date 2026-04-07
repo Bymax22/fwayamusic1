@@ -1,7 +1,7 @@
 {
   "version": 2,
   "env": {
-    "DATABASE_URL": "postgresql://postgres.hgnrwnxmjcsodwwoyfte:9tlxiuCMy7dJgwZJ@db.hgnrwnxmjcsodwwoyfte.supabase.co:5432/postgres?pgbouncer=true&connection_limit=1",
+    "DATABASE_URL": "postgresql://postgres.hgnrwnxmjcsodwwoyfte:9tlxiuCMy7dJgwZJ@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require",
     "CLOUDINARY_CLOUD_NAME": "dayn5vifn",
     "CLOUDINARY_API_KEY": "964776455271163",
     "CLOUDINARY_API_SECRET": "FB9q8oeNmE-0qAV376geWx3fxgQ",
