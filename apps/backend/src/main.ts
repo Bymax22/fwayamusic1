@@ -93,7 +93,11 @@ export default async (req: any, res: any) => {
   } catch (error) {
     logger.error('Error handling request:', error instanceof Error ? error.message : error);
     setCorsHeaders();
-    res.status(500).json({ error: 'Internal Server Error', details: error instanceof Error ? error.message : error });
+
+    // Use raw Node response methods for Vercel when Express response helpers may not exist.
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ error: 'Internal Server Error', details: error instanceof Error ? error.message : error }));
   }
 };
 
