@@ -12,9 +12,9 @@ export class AppController {
 
   @Get('health')
   async health(): Promise<{ status: string; timestamp: string; database?: string }> {
-    const response = {
+    const response: { status: string; timestamp: string; database?: string } = {
       status: 'ok',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     try {
