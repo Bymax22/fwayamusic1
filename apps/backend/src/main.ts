@@ -72,16 +72,27 @@ if (!process.env.VERCEL) {
 
 // Export for Vercel serverless
 export default async (req: any, res: any) => {
+  const setCorsHeaders = () => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,Origin,X-Requested-With');
+    res.setHeader('Access-Control-Allow-Credentials', 'false');
+  };
+
   try {
     if (!app) {
       logger.log('Initializing app on first request');
       await initializeApp();
     }
+    // Ensure CORS headers are present even for serverless errors
+    setCorsHeaders();
+
     // Get the HTTP adapter and use it to handle the request
     const httpAdapter = app.getHttpAdapter();
     return httpAdapter.getInstance()(req, res);
   } catch (error) {
     logger.error('Error handling request:', error instanceof Error ? error.message : error);
+    setCorsHeaders();
     res.status(500).json({ error: 'Internal Server Error', details: error instanceof Error ? error.message : error });
   }
 };
