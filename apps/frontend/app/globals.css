@@ -18,7 +18,7 @@
   --primary-accent-darker: 165, 102, 18; /* Darker gold for accents */
 
   /* Backgrounds - using darker variants for depth */
-  --dark-bg: 10, 4, 30;  /* Rich deep purple (Page background) */
+  --dark-bg: 18, 8, 55;  /* Rich deep purple (Page background) */
   --light-bg: 248, 250, 252;
   
   /* Semantic variables */
