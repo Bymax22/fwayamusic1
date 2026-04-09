@@ -115,6 +115,16 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-image: none;
+  }
+
+  main {
+    background: transparent;
+  }
+
+  .main-content > * {
+    background-color: transparent !important;
+    background-image: none !important;
   }
 
   /* Enhanced focus states for accessibility */

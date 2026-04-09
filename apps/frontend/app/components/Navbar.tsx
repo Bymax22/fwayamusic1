@@ -91,13 +91,13 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-gradient-to-br from-[#240e47] to-[#240e47] rounded-2xl p-6 max-w-md w-full border border-[#ce7f16]/30 shadow-2xl"
+        className="bg-[#240e47] rounded-2xl p-6 max-w-md w-full border border-[#ce7f16]/30 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#ce7f16] to-[#ce7f16] rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-[#ce7f16] rounded-lg flex items-center justify-center">
               <Gift size={24} className="text-white" />
             </div>
             <div>
@@ -119,7 +119,7 @@ const InvitePopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
             <button
               key={platform.name}
               onClick={() => handleShare(platform)}
-              className={`bg-gradient-to-br ${platform.color} text-white p-3 rounded-xl transition-all hover:scale-105 touch-target flex flex-col items-center gap-2`}
+              className="bg-[#1f2d4d] text-white p-3 rounded-xl transition-all hover:bg-[#253a5d] hover:scale-105 touch-target flex flex-col items-center gap-2"
             >
               <span className="text-xl">{platform.icon}</span>
               <span className="text-xs font-medium">{platform.name}</span>
@@ -187,7 +187,12 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setShowInvitePopup(true);
+    }, 30000);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   // Listen for player minimize events to show running title/artist in header
   useEffect(() => {

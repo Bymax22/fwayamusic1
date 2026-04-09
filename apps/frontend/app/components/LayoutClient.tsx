@@ -293,7 +293,6 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
     <ThemeProvider>
       <AuthProvider>
         <div className="bg-background text-foreground antialiased">
-          <HolographicPreloader />
           <PaymentProvider>
             <AuthWrapper>
               <div className="flex flex-col h-screen">
