@@ -14,15 +14,16 @@
   --primary-light: 255, 122, 0;   /* RGB values - Accent Orange */
 
   /* Darker background variants for layering */
-  --primary-dark-darker: 16, 8, 43;  /* Even deeper purple for backgrounds */
-  --primary-accent-darker: 165, 102, 18; /* Darker gold for backgrounds */
+  --primary-dark-darker: 28, 10, 72;  /* Deep purple for navbar and cards */
+  --primary-accent-darker: 165, 102, 18; /* Darker gold for accents */
 
   /* Backgrounds - using darker variants for depth */
-  --dark-bg: 46, 5, 94;  /* Ultra Deep Purple (Background) */
+  --dark-bg: 10, 4, 30;  /* Rich deep purple (Page background) */
   --light-bg: 248, 250, 252;
   
   /* Semantic variables */
   --background: var(--dark-bg);
+  --navbar-bg: rgba(var(--primary-dark-darker), 0.95);
   --foreground: 255, 255, 255;
   --card: 15, 45, 61;
   --card-foreground: 255, 255, 255;
@@ -172,7 +173,7 @@
 @layer components {
   /* Compact Navbar */
   .navbar {
-    background-color: rgba(var(--primary-dark-darker), 0.95);
+    background-color: var(--navbar-bg);
     position: fixed;
     top: 0;
     left: 0;
