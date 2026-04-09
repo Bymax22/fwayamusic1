@@ -242,7 +242,7 @@ export default function SearchPage() {
               transition={{ delay: 0.5 }}
               className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#e51f48]"
             >
-              Loading your experience
+              Loading...
             </motion.span>
           </div>
         </div>

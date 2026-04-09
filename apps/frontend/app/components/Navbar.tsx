@@ -187,13 +187,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setShowInvitePopup(true);
-    }, 30000);
-    return () => window.clearTimeout(timer);
-  }, []);
-
   // Listen for player minimize events to show running title/artist in header
   useEffect(() => {
     const handler = (evt: Event) => {

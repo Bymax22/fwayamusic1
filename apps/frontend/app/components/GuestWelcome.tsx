@@ -958,7 +958,12 @@ const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: N
 
 // Enhanced Welcome Notification Component for mobile
 const WelcomeNotification = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsVisible(true), 30000);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   if (!isVisible) return null;
 
@@ -967,7 +972,7 @@ const WelcomeNotification = () => {
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -50 }}
-      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-[#FF7A00] to-[#240e47] text-white p-3 rounded-lg shadow-lg max-w-xs mx-3 mobile-text-sm"
+      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-[rgb(var(--background))] text-white p-3 rounded-lg shadow-lg max-w-xs mx-3 mobile-text-sm border border-[#4e2e9e]/40"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
@@ -1600,80 +1605,11 @@ const GuestWelcome = () => {
   };
 
   if (loading) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-        <div className="relative w-32 h-32">
-          <motion.div
-            animate={{
-              rotate: 360,
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              rotate: {
-                duration: 8,
-                repeat: Infinity,
-                ease: "linear",
-              },
-              scale: {
-                duration: 3,
-                repeat: Infinity,
-                repeatType: "reverse",
-              },
-            }}
-            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#FF7A00]"
-            style={{
-              background: `conic-gradient(
-                from 0deg at 50% 50%,
-                rgba(206, 127, 22, 0) 0deg,
-                rgba(206, 127, 22, 0.3) 120deg,
-                rgba(206, 127, 22, 0) 240deg
-              )`,
-            }}
-          />
-          <motion.div
-            animate={{
-              scale: [1, 1.1, 1],
-              boxShadow: [
-                '0 0 0 0 rgba(229, 31, 72, 0.4)',
-                '0 0 0 15px rgba(229, 31, 72, 0)',
-                '0 0 0 30px rgba(229, 31, 72, 0)'
-              ]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeOut"
-            }}
-            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#FF7A00] to-[#240e47] flex items-center justify-center"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-              <path 
-                d="M12 3V18M9 5V16M15 7V18M18 9V16" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round"
-              />
-              <path
-                d="M6 18C6 15.7909 7.79086 14 10 14C12.2091 14 14 15.7909 14 18C14 20.2091 12.2091 22 10 22C7.79086 22 6 20.2091 6 18Z"
-                fill="currentColor"
-              />
-            </svg>
-          </motion.div>
-          <motion.span 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#FF7A00]"
-          >
-            Loading your experience
-          </motion.span>
-        </div>
-      </div>
-    );
+    return <div className="min-h-screen bg-[rgb(var(--background))]" />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#090512] to-[#1a0a33]">
+    <div className="min-h-screen bg-[rgb(var(--background))]">
       {/* Welcome Notification */}
       <WelcomeNotification />
 
