@@ -44,7 +44,7 @@ export default function GuestWelcome() {
         const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
         // Fetch homepage sections (featured songs, trending, beats, top charts)
-        const homepageResponse = await fetch(`${API_BASE}/v1/media/homepage-sections`);
+        const homepageResponse = await fetch(`${API_BASE}/api/v1/media/homepage-sections`);
         if (!homepageResponse.ok) throw new Error('Failed to fetch homepage data');
         const homepageData = await homepageResponse.json();
 
@@ -69,13 +69,13 @@ export default function GuestWelcome() {
         }
 
         // Fetch featured artists
-        const artistsResponse = await fetch(`${API_BASE}/v1/artists`);
+        const artistsResponse = await fetch(`${API_BASE}/api/v1/artists`);
         if (!artistsResponse.ok) throw new Error('Failed to fetch artists');
         const artistsData = await artistsResponse.json();
         setFeaturedArtists(Array.isArray(artistsData) ? artistsData : artistsData.artists || []);
 
         // Fetch playlists
-        const playlistsResponse = await fetch(`${API_BASE}/v1/playlist`);
+        const playlistsResponse = await fetch(`${API_BASE}/api/v1/playlist`);
         if (!playlistsResponse.ok) throw new Error('Failed to fetch playlists');
         const playlistsData = await playlistsResponse.json();
         setPlaylists(Array.isArray(playlistsData) ? playlistsData : playlistsData.playlists || []);
