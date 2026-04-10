@@ -1,1752 +1,856 @@
 "use client";
-/* eslint-disable */
-import React from 'react';
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from 'next/navigation';
+
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { FaUserFriends } from "react-icons/fa";
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import Waveform from '@/components/Waveform';
-import { 
-  FaPlay, 
+import {
+  FaPlay,
   FaPause,
-  FaHeart,
-  FaRegHeart,
   FaSearch,
+  FaHome,
+  FaMusic,
+  FaUser,
+  FaCompass,
   FaChevronLeft,
   FaChevronRight,
-  FaHeadphones,
-  FaCrown,
-  FaArrowRight,
-  FaTimes,
-  FaShoppingCart,
-  FaDownload,
-  FaComment,
-  FaEye,
-  FaMusic,
-  FaStar,
-  FaFire
+  FaList,
+  FaMicrophone,
+  FaBookOpen,
+  FaHeadphones
 } from "react-icons/fa";
-import { IoMdMusicalNote } from "react-icons/io";
+import { FaRegHeart } from "react-icons/fa";
 
-// Track interface for player
-interface Track {
-  id: string | number;
-  title: string;
-  artist: string;
-  imageUrl?: string;
-  audioUrl?: string;
-  url?: string;
-  coverArt?: string;
-  duration?: number;
-  isDRMProtected?: boolean;
-}
+export default function GuestWelcome() {
+  const [activeTab, setActiveTab] = useState("for-you");
+  const [heroImageIndex, setHeroImageIndex] = useState(0);
+  const [isSliding, setIsSliding] = useState(false);
 
-// Types
-interface MediaItem {
-  id: number;
-  title: string;
-  artist: string;
-  url: string;
-  duration: number;
-  format: string;
-  createdAt: string;
-  coverArt: string;
-  views: number;
-  likes: number;
-  genre?: string;
-  interactions?: { liked: boolean; saved: boolean }[];
-  accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
-  price?: number;
-  currency?: string;
-  isExplicit: boolean;
-  downloadCount: number;
-  shareCount: number;
-  tags: string[];
-  thumbnailUrl?: string;
-  artCoverUrl?: string; 
-  user?: {
-    id: number;
-    username?: string;
-    displayName?: string;
-    avatarUrl?: string;
-    isVerified?: boolean;
-  };
-  isDRMProtected?: boolean;
-  artistCommissionRate?: number;
-  allowReselling?: boolean;
-  type?: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM';
-  imageUrl?: string;
-  audioUrl?: string;
-  plays?: number;
-  isFeatured?: boolean;
-  isTrending?: boolean;
-  liked?: boolean;
-}
+  // Data state
+  const [quickPicks, setQuickPicks] = useState([]);
+  const [featuredAlbums, setFeaturedAlbums] = useState([]);
+  const [featuredArtists, setFeaturedArtists] = useState([]);
+  const [trendingNow, setTrendingNow] = useState([]);
+  const [topCharts, setTopCharts] = useState([]);
+  const [playlists, setPlaylists] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-interface Playlist {
-  id: number;
-  name: string;
-  description?: string;
-  coverUrl?: string;
-  isPublic: boolean;
-  type: 'SYSTEM' | 'USER' | 'SMART' | 'RADIO';
-  mediaCount: number;
-  title?: string;
-  imageUrl?: string;
-  artist?: string;
-  plays?: number;
-}
+  const quickRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
 
-interface Artist {
-  id: string;
-  name: string;
-  imageUrl: string;
-  followers: number;
-  isVerified?: boolean;
-  isFollowing?: boolean;
-  mediaCount?: number; 
-  avatarUrl?: string;
-}
-
-interface NewsItem {
-  id: string;
-  title: string;
-  excerpt: string;
-  imageUrl: string;
-  date: string;
-  category: string;
-  content?: string;
-  comments?: Comment[];
-  reactions?: Reaction[];
-  views?: number;
-}
-
-interface Comment {
-  id: string;
-  user: string;
-  avatar: string;
-  text: string;
-  timestamp: string;
-  likes: number;
-}
-
-interface Reaction {
-  emoji: string;
-  count: number;
-  userReacted: boolean;
-}
-
-interface BeatItem {
-  id: string;
-  title: string;
-  producer: string;
-  imageUrl: string;
-  price: number;
-  isPremium: boolean;
-  bpm: number;
-  genre: string;
-  audioUrl: string;
-}
-
-// Banner Types
-interface BannerItem {
-  id: number;
-  type: 'PROMO' | 'TRENDING' | 'NEW_RELEASE' | 'EVENT' | 'ADVERTISEMENT';
-  title: string;
-  subtitle?: string;
-  description?: string;
-  imageUrl: string;
-  backgroundColor?: string;
-  textColor?: string;
-  ctaText?: string;
-  ctaLink?: string;
-  badge?: string;
-  featuredTrack?: MediaItem;
-  startDate?: string;
-  endDate?: string;
-  isActive?: boolean;
-}
-
-// Enhanced Hero Banner Component
-const HeroBanner = ({ 
-  banners, 
-  onBannerClick,
-  onPlayTrack 
-}: { 
-  banners: BannerItem[];
-  onBannerClick: (banner: BannerItem) => void;
-  onPlayTrack: (track: MediaItem) => void;
-}) => {
-  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const autoPlayRef = useRef<number | null>(null);
-
-  const nextBanner = useCallback(() => {
-    setDirection(1);
-    setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
-  }, [banners.length]);
-
-  const prevBanner = useCallback(() => {
-    setDirection(-1);
-    setCurrentBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
-  }, [banners.length]);
-
-  const goToBanner = (index: number) => {
-    setDirection(index > currentBannerIndex ? 1 : -1);
-    setCurrentBannerIndex(index);
-  };
-
-  // Auto-play banners
+  // Fetch homepage data from backend
   useEffect(() => {
-    if (isAutoPlaying && banners.length > 1) {
-      autoPlayRef.current = window.setInterval(nextBanner, 5000);
-    }
-    return () => {
-      if (autoPlayRef.current !== null) {
-        window.clearInterval(autoPlayRef.current);
-        autoPlayRef.current = null;
+    const fetchHomepageData = async () => {
+      try {
+        setIsLoading(true);
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+        // Fetch homepage sections (featured songs, trending, beats, top charts)
+        const homepageResponse = await fetch(`${API_BASE}/v1/media/homepage-sections`);
+        if (!homepageResponse.ok) throw new Error('Failed to fetch homepage data');
+        const homepageData = await homepageResponse.json();
+
+        // Set quick picks from featured songs
+        if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {
+          setQuickPicks(homepageData.featuredSongs);
+        }
+
+        // Set trending songs
+        if (homepageData.trendingSongs && Array.isArray(homepageData.trendingSongs)) {
+          setTrendingNow(homepageData.trendingSongs);
+        }
+
+        // Set top charts
+        if (homepageData.topCharts && Array.isArray(homepageData.topCharts)) {
+          setTopCharts(homepageData.topCharts);
+        }
+
+        // Set featured albums from beats
+        if (homepageData.beats && Array.isArray(homepageData.beats)) {
+          setFeaturedAlbums(homepageData.beats);
+        }
+
+        // Fetch featured artists
+        const artistsResponse = await fetch(`${API_BASE}/v1/artists`);
+        if (!artistsResponse.ok) throw new Error('Failed to fetch artists');
+        const artistsData = await artistsResponse.json();
+        setFeaturedArtists(Array.isArray(artistsData) ? artistsData : artistsData.artists || []);
+
+        // Fetch playlists
+        const playlistsResponse = await fetch(`${API_BASE}/v1/playlist`);
+        if (!playlistsResponse.ok) throw new Error('Failed to fetch playlists');
+        const playlistsData = await playlistsResponse.json();
+        setPlaylists(Array.isArray(playlistsData) ? playlistsData : playlistsData.playlists || []);
+
+      } catch (error) {
+        console.error('Error fetching homepage data:', error);
+        setIsLoading(false);
+      } finally {
+        setIsLoading(false);
       }
     };
-  }, [isAutoPlaying, nextBanner, banners.length]);
 
-  const handleBannerInteraction = () => {
-    setIsAutoPlaying(false);
-    if (autoPlayRef.current !== null) {
-      window.clearInterval(autoPlayRef.current);
-      autoPlayRef.current = null;
+    fetchHomepageData();
+  }, []);
+
+  const heroImages = [
+    "/breadcumb3.jpg",
+    "/featured5.jpg",
+    "/featured6.jpg",
+  ];
+
+  const heroContent = [
+    {
+      title: "Lost in the Echo (Killsonik Remix)",
+      subtitle: "Linkin Park — Recharged",
+      primaryButton: "Play",
+      secondaryButton: "Save"
+    },
+    {
+      title: "Electric Dreams",
+      subtitle: "The Midnight — Infinite",
+      primaryButton: "Listen Now",
+      secondaryButton: "Add to Playlist"
+    },
+    {
+      title: "Midnight Skies",
+      subtitle: "Owl City — Ocean Eyes",
+      primaryButton: "Stream",
+      secondaryButton: "Download"
     }
-    // Resume auto-play after 10 seconds of inactivity
-    setTimeout(() => setIsAutoPlaying(true), 10000);
+  ];
+
+  // Auto-rotate hero images with sliding animation
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setIsSliding(true);
+      // Wait for slide animation to complete before changing image
+      setTimeout(() => {
+        setHeroImageIndex((prev) => (prev + 1) % heroImages.length);
+        setIsSliding(false);
+      }, 1200); // Slightly slower slide duration
+    }, 4000); // Total cycle time
+    return () => clearInterval(interval);
+  }, []);
+
+  const scroll = (ref: any, dir: "left" | "right") => {
+    if (!ref.current) return;
+    ref.current.scrollBy({
+      left: dir === "left" ? -400 : 400,
+      behavior: "smooth",
+    });
   };
 
-  if (!banners.length) return null;
-
-  const currentBanner = banners[currentBannerIndex];
-
-  const getBadgeIcon = (type: string) => {
-    switch (type) {
-      case 'TRENDING':
-        return <FaFire className="w-3 h-3" />;
-      case 'NEW_RELEASE':
-        return <FaMusic className="w-3 h-3" />;
-      case 'PROMO':
-        return <FaStar className="w-3 h-3" />;
-      default:
-        return <FaStar className="w-3 h-3" />;
-    }
-  };
-
-  const getBadgeColor = (type: string) => {
-    switch (type) {
-      case 'TRENDING':
-        return 'from-orange-500 to-red-500';
-      case 'NEW_RELEASE':
-        return 'from-blue-500 to-purple-500';
-      case 'PROMO':
-        return 'from-green-500 to-emerald-500';
-      case 'EVENT':
-        return 'from-purple-500 to-pink-500';
-      default:
-        return 'from-gray-500 to-gray-700';
-    }
-  };
 
   return (
-    <section 
-      className="relative h-[350px] md:h-[450px] lg:h-[550px] rounded-2xl overflow-hidden mb-8 -mt-4
-        mx-0 w-full
-        sm:mx-2
-        sm:w-auto
-        "
-      onMouseEnter={() => setIsAutoPlaying(false)}
-      onMouseLeave={() => setIsAutoPlaying(true)}
-      onClick={handleBannerInteraction}
-    >
-      <AnimatePresence mode="wait" custom={direction}>
-        <motion.div
-          key={currentBannerIndex}
-          custom={direction}
-          initial={{ 
-            opacity: 0,
-            x: direction > 0 ? 300 : -300 
-          }}
-          animate={{ 
-            opacity: 1,
-            x: 0 
-          }}
-          exit={{ 
-            opacity: 0,
-            x: direction > 0 ? -300 : 300 
-          }}
-          transition={{ 
-            duration: 0.5,
-            ease: "easeInOut"
-          }}
-          className="relative w-full h-full"
-        >
-          {/* Background Image with Overlay */}
+    <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black">
+      {/* ================= MOBILE ================= */}
+          <div className="lg:hidden pb-24 px-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-white text-lg font-semibold">Discover</div>
+              <div className="flex items-center gap-2">
+                <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
+                  Get App
+                </button>
+                <button className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400">
+                  Premium
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="flex items-center gap-3 bg-white/5 rounded-full px-4 py-3 text-white/80">
+                <FaSearch className="text-white/60" />
+                <input
+                  type="search"
+                  placeholder="Search music, artists, playlists"
+                  className="bg-transparent outline-none text-sm text-white placeholder:text-white/40 w-full"
+                />
+              </div>
+            </div>
+
+        {/* HERO SECTION - Minimal modern mobile hero */}
+        <div className="relative h-[150px] rounded-3xl overflow-hidden mb-3 pt-5">
           <div className="absolute inset-0">
             <Image
-              src={currentBanner.imageUrl}
-              alt={currentBanner.title}
+              src={heroImages[heroImageIndex]}
+              alt="Hero banner"
               fill
-              className="object-cover"
-              priority
-              onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                (e.target as HTMLImageElement).src = "/default-banner.jpg";
-              }}
+              className="object-cover object-center"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
           </div>
 
-          {/* Content */}
-          <div className="relative z-10 h-full flex flex-col justify-center p-4 md:p-6 lg:p-8">
-            {/* Badge */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className={`flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r ${getBadgeColor(currentBanner.type)} text-white text-xs font-bold`}>
-                {getBadgeIcon(currentBanner.type)}
-                <span>{currentBanner.badge || currentBanner.type}</span>
-              </div>
-              {currentBanner.featuredTrack && (
-                <div className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs text-white">
-                  <FaHeadphones className="w-3 h-3" />
-                  <span>{currentBanner.featuredTrack.plays?.toLocaleString() || '0'} plays</span>
+          <div className="absolute inset-0 bg-black/35"></div>
+          <div className="absolute top-0 left-0 right-0 h-2/3 bg-gradient-to-b from-purple-600/70 to-transparent"></div>
+
+          <div className="relative z-10 flex flex-col justify-between h-full pb-5">
+            <div className="space-y-3">
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 mt-2 overflow-x-auto pb-2 scrollbar-hide">
+          {[
+            { name: "For You", key: "for-you" },
+            { name: "New Releases", key: "new-releases" },
+            { name: "Playlists", key: "playlists" },
+            { name: "Podcasts", key: "podcasts" }
+          ].map((tab, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
+                activeTab === tab.key ? "bg-purple-600 text-white" : "bg-white/5 text-gray-300 hover:bg-white/10"
+              }`}
+            >
+              {tab.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Quick Picks (mobile) */}
+        <div className="mt-3">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-semibold">Quick Picks for You</h3>
+            <span className="text-xs text-gray-400">See All {'>'}</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {quickPicks.slice(0, 3).map((item: any, i: number) => (
+              <div key={i} className="flex-1 min-w-0 cursor-pointer">
+                <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
+                  <div 
+                    className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
+                    style={{
+                      backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
+                      <div className="flex items-center gap-1">
+                        <FaHeadphones className="text-[9px]" />
+                        <span>{item.playCount?.toLocaleString() || '0'}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <FaRegHeart className="text-[9px]" />
+                        <span>{item.likeCount?.toLocaleString() || '0'}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
+                <div className="px-1">
+                  <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
+                  <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Trending Now (mobile) */}
+        <div className="mt-3">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-semibold">Trending Now</h3>
+            <span className="text-xs text-gray-400">See All {'>'}</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {trendingNow.slice(0, 3).map((item: any, i: number) => (
+              <div key={i} className="flex-1 min-w-0 cursor-pointer">
+                <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
+                  <div 
+                    className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
+                    style={{
+                      backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
+                      <div className="flex items-center gap-1">
+                        <FaHeadphones className="text-[9px]" />
+                        <span>{item.playCount?.toLocaleString() || '0'}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <FaRegHeart className="text-[9px]" />
+                        <span>{item.likeCount?.toLocaleString() || '0'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="px-1">
+                  <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
+                  <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Featured Albums (mobile) */}
+        <div className="mt-3">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-semibold">Featured Albums</h3>
+            <span className="text-xs text-gray-400">See All {'>'}</span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {featuredAlbums.slice(0, 4).map((item: any, i: number) => (
+              <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-[#0a0a0d]">
+                <div className="relative">
+                  <div 
+                    className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
+                    style={{
+                      backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/90 to-transparent" />
+                  <div className="absolute bottom-3 left-3 text-[9px] text-white/90">
+                    {item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks
+                  </div>
+                </div>
+                <div className="p-3 bg-black/20">
+                  <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
+                  <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Featured Artists (mobile) */}
+        <div className="mt-3">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-semibold">Featured Artists</h3>
+            <span className="text-xs text-gray-400">See All {'>'}</span>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+            {featuredArtists.slice(0, 4).map((artist: any, i: number) => (
+              <div key={i} className="flex-shrink-0 text-center cursor-pointer">
+                <div 
+                  className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
+                  style={{
+                    backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
+                >
+                  {!artist.avatarUrl && (
+                    <span className="text-white font-bold text-lg">
+                      {artist.username?.substring(0, 2).toUpperCase() || 'A'}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs font-semibold truncate text-white mb-1">{artist.displayName || artist.username || 'Unknown'}</p>
+                <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Suggested Playlists (mobile) */}
+        <div className="mt-3 mb-4">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-semibold">Suggested Playlists</h3>
+            <span className="text-xs text-gray-400">See All {'>'}</span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {playlists.slice(0, 6).map((item: any, i: number) => (
+              <div key={i} className="min-w-[120px] bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
+                <div 
+                  className="w-full aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-2"
+                  style={{
+                    backgroundImage: item.coverUrl ? `url(${item.coverUrl})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
+                />
+                <p className="text-xs font-semibold truncate">{item.name || item.title}</p>
+                <p className="text-xs text-gray-400">{item.mediasCount || 0} tracks</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Top Charts (mobile styled) */}
+        <div className="mt-3">
+          <h3 className="font-semibold mb-3">Top Charts</h3>
+          <div className="space-y-3">
+            {topCharts.slice(0, 4).map((track: any, i: number) => (
+              <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
+                  <div 
+                    className="w-10 h-10 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0"
+                    style={{
+                      backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{track.title}</p>
+                    <p className="text-xs text-gray-400">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
+                  </div>
+                  <button className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors">
+                    <FaPlay className="text-white text-xs ml-0.5" />
+                  </button>
+                </div>
+                <div className="flex items-center justify-end">
+                  <span className="text-xs text-gray-400">
+                    {track.duration ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` : '0:00'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ================= DESKTOP ================= */}
+      <div className="hidden lg:flex h-full gap-3 items-stretch">
+
+        {/* SIDEBAR */}
+        <div className="w-60 h-full min-h-0 overflow-y-auto scrollbar-modern bg-[#080812]/60 backdrop-blur p-6 flex flex-col rounded-2xl">
+         
+
+          {[
+            { name: "Home", icon: FaHome },
+            { name: "Browse", icon: FaCompass },
+            { name: "Search", icon: FaSearch },
+            { name: "Library", icon: FaBookOpen },
+            { name: "Playlists", icon: FaList },
+            { name: "Albums", icon: FaMusic },
+            { name: "Artists", icon: FaUser },
+            { name: "Podcasts", icon: FaMicrophone }
+          ].map((item, i) => (
+            <div
+              key={i}
+              className={`px-4 py-3 rounded-lg mb-2 text-sm font-medium flex items-center gap-3 ${
+                i === 0
+                  ? "bg-purple-600 text-white"
+                  : "text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
+              }`}
+            >
+              <item.icon className="text-base" />
+              {item.name}
+            </div>
+          ))}
+        </div>
+
+        {/* MAIN */}
+        <div className="flex-1 h-full min-h-0 px-4 py-6 overflow-y-auto scrollbar-modern rounded-2xl bg-[#080812]/60">
+
+
+          {/* ===== HERO ===== */}
+          <div className="relative rounded-3xl mb-10 overflow-hidden h-80">
+            <div className="absolute inset-0">
+              <Image
+                src={heroImages[heroImageIndex]}
+                alt="Hero banner"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="absolute inset-0 bg-black/35" />
+
+            {/* Purple overlay on the left side */}
+            <div className="absolute left-0 top-0 bottom-0 w-1/2 bg-gradient-to-r from-purple-600/80 to-transparent" />
+
+            <div className="relative p-8 flex justify-between items-center h-full">
+              <div className="max-w-xl z-10">
+                <h2 className="text-4xl font-bold mb-2 text-white">
+                  {heroContent[heroImageIndex].title}
+                </h2>
+                <p className="text-lg text-white/90 mb-6">
+                  {heroContent[heroImageIndex].subtitle}
+                </p>
+
+                <div className="flex gap-4">
+                  <button className="bg-white text-black px-6 py-3 rounded-full flex items-center gap-2 text-sm font-medium hover:bg-gray-100 transition-colors">
+                    <FaPlay /> {heroContent[heroImageIndex].primaryButton}
+                  </button>
+                  <button className="bg-white/20 px-6 py-3 rounded-full text-sm text-white border border-white/30 hover:bg-white/30 transition-colors">
+                    {heroContent[heroImageIndex].secondaryButton}
+                  </button>
+                </div>
+              </div>
+
+              <div className={`relative w-48 h-48 rounded-3xl overflow-hidden border border-white/20 shadow-2xl transition-all duration-1000 ease-out ${isSliding ? 'translate-x-12 opacity-50 scale-95' : 'translate-x-0 opacity-100 scale-100'}`}>
+                <Image
+                  src={heroImages[heroImageIndex]}
+                  alt="Hero overlay"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ===== QUICK PICKS ===== */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">
+                Quick Picks for You
+              </h3>
+
+              <div className="flex gap-1">
+                <button
+                  onClick={() => scroll(quickRef, "left")}
+                  className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center"
+                >
+                  <FaChevronLeft className="text-sm" />
+                </button>
+                <button
+                  onClick={() => scroll(quickRef, "right")}
+                  className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center"
+                >
+                  <FaChevronRight className="text-sm" />
+                </button>
+              </div>
             </div>
 
-            {/* Title & Description */}
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-3 max-w-2xl leading-tight"
-            >
-              {currentBanner.title}
-            </motion.h1>
-
-            {currentBanner.subtitle && (
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-lg md:text-xl text-gray-200 mb-4 max-w-xl"
-              >
-                {currentBanner.subtitle}
-              </motion.p>
-            )}
-
-            {currentBanner.description && (
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-sm md:text-base text-gray-300 mb-6 max-w-lg line-clamp-2"
-              >
-                {currentBanner.description}
-              </motion.p>
-            )}
-
-            {/* CTA Buttons */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-wrap gap-3"
-            >
-              {currentBanner.featuredTrack ? (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onPlayTrack(currentBanner.featuredTrack!);
-                  }}
-                  className="bg-[#FF7A00] hover:bg-[#5B0EA6] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all transform hover:scale-105"
+            {/* GRID LAYOUT - ALL 6 CARDS VISIBLE */}
+            <div className="grid grid-cols-6 gap-3">
+              {quickPicks.slice(0, 6).map((item: any, i: number) => (
+                <div
+                  key={i}
+                  className="rounded-lg overflow-hidden relative shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
-                  <FaPlay className="w-4 h-4" />
-                  Play Now
-                </button>
-              ) : (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onBannerClick(currentBanner);
-                  }}
-                  className="bg-[#FF7A00] hover:bg-[#5B0EA6] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all transform hover:scale-105"
-                >
-                  {currentBanner.ctaText || 'Explore More'}
-                  <FaArrowRight className="w-4 h-4" />
-                </button>
-              )}
-              
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onBannerClick(currentBanner);
-                }}
-                className="border border-white/30 hover:border-white text-white hover:bg-white/10 px-6 py-3 rounded-full font-bold transition-all backdrop-blur-sm"
-              >
-                Learn More
-              </button>
-            </motion.div>
-          </div>
+                  {/* IMAGE */}
+                  <div
+                    className="aspect-[4/5] bg-gradient-to-br from-purple-500 to-pink-500 group-hover:scale-105 transition-transform"
+                    style={{
+                      backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
 
-          {/* Navigation Arrows */}
-          {banners.length > 1 && (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  prevBanner();
-                  handleBannerInteraction();
-                }}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all z-20 backdrop-blur-sm"
-              >
-                <FaChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  nextBanner();
-                  handleBannerInteraction();
-                }}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all z-20 backdrop-blur-sm"
-              >
-                <FaChevronRight className="w-5 h-5" />
-              </button>
-            </>
-          )}
-
-          {/* Dots Indicator */}
-          {banners.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
-              {banners.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goToBanner(index);
-                    handleBannerInteraction();
-                  }}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === currentBannerIndex 
-                      ? 'bg-white w-6' 
-                      : 'bg-white/50 hover:bg-white/70'
-                  }`}
-                />
+                  {/* OVERLAY */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 backdrop-blur-sm">
+                    <p className="text-xs font-medium truncate text-white">
+                      {item.title}
+                    </p>
+                    <p className="text-xs text-gray-200 truncate">
+                      {item.user?.displayName || item.user?.username || 'Unknown Artist'}
+                    </p>
+                  </div>
+                </div>
               ))}
             </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
-    </section>
-  );
-};
+          </div>
 
-// Enhanced Media Card Component - Mobile Optimized
-const MediaCard = ({ 
-  item, 
-  onPlay,
-  onLike,
-  onDownload,
-  onShare,
-  type = 'media',
-  currentTrack,
-  isPlaying
-}: { 
-  item: MediaItem | Artist;
-  onPlay: (item: MediaItem) => void;
-  onLike?: (id: string) => void;
-  onDownload?: (item: MediaItem) => void;
-  onShare?: (item: MediaItem | Artist) => void;
-  type?: 'media' | 'artist';
-  currentTrack?: Track | null;
-  isPlaying?: boolean;
-}) => {
-  const router = useRouter();
-  const [isHovered, setIsHovered] = useState(false);
-  const [isLiked, setIsLiked] = useState((item as MediaItem).liked || false);
-  const [isFollowing, setIsFollowing] = useState((item as Artist).isFollowing || false);
-  
-  const isCurrentTrack = String(currentTrack?.id) === String((item as any).id);
-  
-  const handleLike = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsLiked(!isLiked);
-    onLike?.(item.id.toString());
-  };
+          {/* ===== FEATURED ALBUMS ===== */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">
+                Featured Albums
+              </h3>
 
-  const handleFollow = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsFollowing(!isFollowing);
-  };
-
-  const handleDownload = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (type === 'media' && (item as MediaItem).accessType === 'FREE') {
-      onDownload?.(item as MediaItem);
-    }
-  };
-
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onShare?.(item);
-  };
-
-  const getImageUrl = () => {
-    if (type === 'artist') {
-      return (
-        (item as Artist).imageUrl ||
-        (item as Artist).avatarUrl ||
-        "/default-artist.png"
-      );
-    }
-    return (
-      (item as MediaItem).imageUrl ||
-      (item as MediaItem).coverArt ||
-      (item as MediaItem).artCoverUrl ||
-      (item as MediaItem).thumbnailUrl ||
-      "/default-cover.png"
-    );
-  };
-
-  const getTitle = () => {
-    if (type === 'artist') {
-      return (item as Artist).name;
-    }
-    return (item as MediaItem).title;
-  };
-
-  const getSubtitle = () => {
-    if (type === 'artist') {
-      return ''; // Remove followers from subtitle for artists
-    }
-    const media = item as MediaItem;
-    return (
-      media.artist ||
-      media.user?.displayName ||
-      media.user?.username ||
-      "Unknown Artist"
-    );
-  };
-
-  return (
-    <motion.div
-      className="relative bg-[#240e47] bg-opacity-50 rounded-lg p-2 cursor-pointer flex-shrink-0 w-[140px] mobile-card"
-      whileHover={{ y: -3 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      onClick={() => {
-        if (type === 'media') {
-          onPlay(item as MediaItem);
-        } else if (type === 'artist') {
-          router.push(`/artists/${item.id}`);
-        }
-      }}
-    >
-      <div className="relative aspect-square overflow-hidden rounded-lg">
-        <Image
-          src={getImageUrl()}
-          alt={getTitle()}
-          fill
-          className="object-cover"
-          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-            (e.target as HTMLImageElement).src = type === 'artist' ? "/default-artist.png" : "/default-cover.png";
-          }}
-        />
-        
-        <AnimatePresence>
-          {(isHovered || isCurrentTrack) && type === 'media' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-2"
-            >
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPlay(item as MediaItem);
-                }}
-                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
-              >
-                          {isCurrentTrack && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
-              </button>
-              {(item as MediaItem).accessType === 'FREE' && (
-                <button 
-                  onClick={handleDownload}
-                  className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
+              <div className="flex gap-1">
+                <button
+                  onClick={() => scroll(quickRef, "left")}
+                  className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center"
                 >
-                  <FaDownload size={10} />
+                  <FaChevronLeft className="text-sm" />
                 </button>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      <div className="mt-2">
-        <h3 className="font-bold text-white truncate mobile-text-sm">{getTitle()}</h3>
-        <p className="text-xs text-gray-300 truncate mobile-text-xs">{getSubtitle()}</p>
-        
-        <div className="flex justify-between items-center mt-1">
-          {type === 'media' && (
-            <>
-              <span className="text-xs text-gray-400 flex items-center gap-1">
-                <FaHeadphones size={8} />
-                {Number((item as MediaItem).plays ?? (item as MediaItem).views ?? 0).toLocaleString()}
-              </span>
-              
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={handleLike}
-                  className="text-[#FF7A00] hover:scale-110 transition-transform touch-target"
+                <button
+                  onClick={() => scroll(quickRef, "right")}
+                  className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center"
                 >
-                  {isLiked ? <FaHeart size={12} /> : <FaRegHeart size={12} />}
+                  <FaChevronRight className="text-sm" />
                 </button>
-                {(item as MediaItem).accessType === 'FREE' && (
-                  <button 
-                    onClick={handleDownload}
-                    className="text-gray-400 hover:text-[#FF7A00] transition-colors touch-target"
+              </div>
+            </div>
+
+            {/* GRID LAYOUT - ALL 5 ALBUMS FIT EXACTLY */}
+            <div className="grid grid-cols-5 gap-3">
+              {featuredAlbums.slice(0, 5).map((album: any, i: number) => (
+                <div
+                  key={i}
+                  className="rounded-xl overflow-hidden relative shadow-lg hover:shadow-xl transition-all cursor-pointer group"
+                >
+                  {/* ALBUM COVER */}
+                  <div
+                    className="aspect-[4/5] bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg group-hover:scale-105 transition-transform"
+                    style={{
+                      backgroundImage: album.artCoverUrl ? `url(${album.artCoverUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+
+                  {/* OVERLAY */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 backdrop-blur-sm rounded-b-xl">
+                    <p className="text-xs font-semibold truncate text-white mb-0.5">
+                      {album.title}
+                    </p>
+                    <p className="text-xs text-gray-200 truncate">
+                      {album.user?.displayName || album.user?.username || 'Unknown Artist'}
+                    </p>
+                    <p className="text-xs text-gray-300">
+                      {album.createdAt ? new Date(album.createdAt).getFullYear() : new Date().getFullYear()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ===== FEATURED ARTISTS ===== */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">
+                Featured Artists
+              </h3>
+            </div>
+
+            {/* GRID LAYOUT - 6 ARTISTS */}
+            <div className="grid grid-cols-6 gap-3">
+              {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
+                <div
+                  key={i}
+                  className="text-center cursor-pointer hover:bg-white/5 rounded-xl p-3 transition-colors"
+                >
+                  {/* ARTIST IMAGE */}
+                  <div
+                    className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mx-auto mb-2"
+                    style={{
+                      backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  ></div>
+
+                  {/* ARTIST INFO */}
+                  <p className="text-sm font-semibold truncate mb-1">
+                    {artist.displayName || artist.username || artist.artistName || 'Unknown Artist'}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {artist.followers ? `${artist.followers.length} followers` : '0 followers'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ===== TRENDING NOW ===== */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">
+                Trending Now
+              </h3>
+            </div>
+
+            {/* GRID LAYOUT - 6 ITEMS LIKE QUICK PICKS */}
+            <div className="grid grid-cols-6 gap-3">
+              {trendingNow.slice(0, 6).map((track: any, i: number) => (
+                <div
+                  key={i}
+                  className="rounded-lg overflow-hidden relative shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                >
+                  {/* IMAGE */}
+                  <div
+                    className="aspect-[4/5] bg-gradient-to-br from-purple-500 to-pink-500 group-hover:scale-105 transition-transform"
+                    style={{
+                      backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+
+                  {/* OVERLAY */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 backdrop-blur-sm">
+                    <p className="text-xs font-medium truncate text-white">
+                      {track.title}
+                    </p>
+                    <p className="text-xs text-gray-200 truncate">
+                      {track.user?.displayName || track.user?.username || 'Unknown Artist'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ===== SUGGESTED PLAYLISTS ===== */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">
+                Suggested Playlists
+              </h3>
+              <div className="flex gap-1">
+                <button className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center">
+                  <FaChevronLeft className="text-sm" />
+                </button>
+                <button className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center">
+                  <FaChevronRight className="text-sm" />
+                </button>
+              </div>
+            </div>
+
+            {/* GRID LAYOUT - 5 PLAYLISTS */}
+            <div className="grid grid-cols-5 gap-3">
+              {playlists.slice(0, 5).map((playlist: any, i: number) => (
+                <div
+                  key={i}
+                  className="rounded-xl overflow-hidden relative shadow-lg hover:shadow-xl transition-all cursor-pointer group"
+                >
+                  {/* PLAYLIST COVER */}
+                  <div
+                    className="aspect-[4/5] bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg group-hover:scale-105 transition-transform"
+                    style={{
+                      backgroundImage: playlist.coverUrl ? `url(${playlist.coverUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+
+                  {/* OVERLAY */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 backdrop-blur-sm rounded-b-xl">
+                    <p className="text-xs font-semibold truncate text-white mb-0.5">
+                      {playlist.name || playlist.title}
+                    </p>
+                    <p className="text-xs text-gray-300">
+                      {playlist.mediasCount || 0} tracks
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ===== TOP CHARTS + GENRES ===== */}
+          <div className="flex gap-8">
+
+            {/* TOP CHARTS */}
+            <div className="flex-1 relative">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-lg">
+                  Top Charts
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {topCharts.slice(0, 5).map((track: any, index: number) => (
+                  <div
+                    key={track.id || index}
+                    className="flex gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer"
                   >
-                    <FaDownload size={10} />
+                    <div className="flex flex-col items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-purple-400">{index + 1}</span>
+                    </div>
+                    <div
+                      className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0"
+                      style={{
+                        backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{track.title}</p>
+                      <p className="text-xs text-gray-400 truncate">
+                        {track.user?.displayName || track.user?.username || 'Unknown Artist'}
+                      </p>
+                    </div>
+                    <div className="text-xs text-gray-500 flex-shrink-0">
+                      {track.duration ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` : '0:00'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* SEPARATOR - positioned to the right of top charts */}
+              <div className="absolute right-0 top-0 bottom-0 w-px bg-white/10"></div>
+            </div>
+
+            {/* GENRES */}
+            <div className="w-48">
+              <h3 className="mb-4 font-semibold text-lg">
+                Genres
+              </h3>
+
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { label: "Pop", color: "bg-purple-600" },
+                  { label: "Electronic", color: "bg-white/10" },
+                  { label: "Hip-Hop", color: "bg-white/10" },
+                  { label: "Rock", color: "bg-white/10" },
+                  { label: "Chill", color: "bg-white/10" },
+                  { label: "Zed", color: "bg-white/10" }
+                ].map((g, i) => (
+                  <button
+                    key={i}
+                    className={`px-4 py-2 rounded-full text-sm font-medium ${g.color} hover:opacity-90 transition-opacity`}
+                  >
+                    {g.label}
                   </button>
-                )}
-              </div>
-            </>
-          )}
-          
-          {type === 'artist' && (
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
-                  <FaUserFriends size={8} />
-                  {Number((item as Artist).followers ?? 0).toLocaleString()}
-                </span>
-                <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
-                  <FaMusic size={8} />
-                  {Number((item as Artist).mediaCount ?? 0).toLocaleString()}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <button 
-                  onClick={handleFollow}
-                  className={`
-                    rounded-full transition-colors text-xs px-1 py-0.5 touch-target mobile-text-xs
-                    ${isFollowing 
-                      ? 'bg-[#FF7A00] text-white' 
-                      : 'bg-[#0b2936] text-[#FF7A00] hover:bg-[#FF7A00] hover:text-white'
-                    }
-                  `}
-                >
-                  {isFollowing ? 'Following' : 'Follow'}
-                </button>
+                ))}
               </div>
             </div>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// Premium Media Card with Buy Button - Mobile Optimized
-const PremiumMediaCard = ({ 
-  item, 
-  onPlay,
-  onPurchase,
-  currentTrack,
-  isPlaying
-}: { 
-  item: MediaItem;
-  onPlay: (item: MediaItem) => void;
-  onPurchase: (item: MediaItem) => void;
-  currentTrack?: Track | null;
-  isPlaying?: boolean;
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const isCurrent = String(currentTrack?.id) === String((item as any).id);
-
-  return (
-    <motion.div
-      className="relative bg-gradient-to-br from-amber-900/30 to-amber-800/20 rounded-lg p-2 cursor-pointer border border-amber-500/30 w-[140px] mobile-card"
-      whileHover={{ y: -3 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      onClick={() => onPlay(item)}
-    >
-      <div className="relative aspect-square overflow-hidden rounded-lg">
-        <Image
-          src={
-            item.imageUrl ||
-            item.coverArt ||
-            item.artCoverUrl ||
-            item.thumbnailUrl ||
-            "/default-cover.png"
-          }
-          alt={item.title}
-          fill
-          className="object-cover"
-          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-            (e.target as HTMLImageElement).src = "/default-cover.png";
-          }}
-        />
-        
-        <div className="absolute top-1 left-1">
-          <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded-full text-xs backdrop-blur-sm mobile-text-xs">
-            <FaCrown className="w-2 h-2" />
-            Premium
           </div>
         </div>
-        
-        <AnimatePresence>
-          {(isHovered || isCurrent) && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-2"
-            >
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPlay(item);
-                }}
-                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
-              >
-                {isCurrent && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
-              </button>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPurchase(item);
-                }}
-                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
-              >
-                <FaShoppingCart size={12} />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
 
-      <div className="mt-2">
-        <h3 className="font-bold text-white truncate mobile-text-sm">{item.title}</h3>
-        <p className="text-xs text-gray-400 truncate mobile-text-xs">
-          {item.artist ||
-           item.user?.displayName ||
-           item.user?.username ||
-           "Unknown Artist"}
-        </p>
-        
-        <div className="flex justify-between items-center mt-1">
-          <span className="text-xs text-gray-400 flex items-center gap-1 mobile-text-xs">
-            <FaHeadphones size={8} />
-            {Number(item.plays ?? item.views ?? 0).toLocaleString()}
-          </span>
-          <span className="text-xs font-bold text-amber-400 mobile-text-xs">
-            ZMW{item.price?.toFixed(2)}
-          </span>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+        {/* RIGHT PANEL */}
+        <div className="w-64 h-full min-h-0 overflow-y-auto scrollbar-modern bg-[#080812]/60 backdrop-blur p-6 rounded-2xl">
+          <h3 className="mb-6 font-semibold text-lg">Now Playing</h3>
 
-// Beat Card Component - Mobile Optimized
-const BeatCard = ({
-  beat,
-  onPlay,
-  onPurchase,
-  onShare,
-  currentTrack,
-  isPlaying
-}: {
-  beat: BeatItem;
-  onPlay: (beat: BeatItem) => void;
-  onPurchase: (beat: BeatItem) => void;
-  onShare?: (beat: BeatItem) => void;
-  currentTrack?: Track | null;
-  isPlaying?: boolean;
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const isCurrent = String(currentTrack?.id) === String(beat.id);
+          {/* Current Track */}
+          <div className="mb-6">
+            <div className="w-full aspect-square rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mb-4" />
+            <h4 className="font-semibold text-base mb-1">Lost in the Echo</h4>
+            <p className="text-sm text-gray-400 mb-4">Linkin Park — Recharged</p>
 
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onShare?.(beat);
-  };
-
-  return (
-    <motion.div
-      className="relative bg-[#240e47] bg-opacity-50 rounded-lg p-2 cursor-pointer flex-shrink-0 w-[140px] mobile-card"
-      whileHover={{ y: -3 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      onClick={() => onPlay(beat)}
-    >
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-pink-600">
-        {beat.imageUrl && beat.imageUrl !== "/default-cover.png" ? (
-          <Image
-            src={beat.imageUrl}
-            alt={beat.title}
-            fill
-            className="object-cover"
-            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <FaMusic className="w-8 h-8 text-white/70" />
-          </div>
-        )}
-        
-        <div className="absolute top-1 left-1">
-          {beat.isPremium ? (
-            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded-full text-xs backdrop-blur-sm mobile-text-xs">
-              <FaCrown className="w-2 h-2" />
-              Premium
+            {/* Progress Bar */}
+            <div className="w-full bg-white/20 rounded-full h-1 mb-2">
+              <div className="bg-purple-500 h-1 rounded-full w-1/3"></div>
             </div>
-          ) : (
-            <div className="px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded-full text-xs backdrop-blur-sm mobile-text-xs">
-              Free
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>1:45</span>
+              <span>3:45</span>
             </div>
-          )}
-        </div>
-        
-        <AnimatePresence>
-          {(isHovered || isCurrent) && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center gap-2"
-            >
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPlay(beat);
-                }}
-                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
-              >
-                {isCurrent && isPlaying ? <Waveform playing={true} className="w-5 h-5" /> : <FaPlay size={12} />}
-              </button>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPurchase(beat);
-                }}
-                className="p-2 rounded-full touch-target text-[#FF7A00] hover:text-white transition-colors"
-              >
-                <FaShoppingCart size={12} />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      <div className="mt-2">
-        <h3 className="font-bold text-white truncate mobile-text-sm">{beat.title}</h3>
-        <p className="text-xs text-gray-300 truncate mobile-text-xs">{beat.producer}</p>
-        
-        <div className="flex justify-between items-center mt-1">
-          <span className="text-xs text-gray-400 mobile-text-xs">
-            {beat.bpm} BPM
-          </span>
-          
-          <span className="text-xs font-bold text-[#FF7A00] mobile-text-xs">
-            ZMW{beat.price.toFixed(2)}
-          </span>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// Enhanced News Card Component with Interactions - Mobile Optimized
-const NewsCard = ({ item, onNewsClick }: { item: NewsItem; onNewsClick: (item: NewsItem) => void }) => {
-  const reactions: Reaction[] = item.reactions || [
-    { emoji: '👍', count: 15, userReacted: false },
-    { emoji: '❤️', count: 8, userReacted: false },
-    { emoji: '🔥', count: 12, userReacted: false },
-  ];
-
-  const comments: Comment[] = item.comments || [
-    {
-      id: '1',
-      user: 'MusicLover',
-      avatar: '/default-avatar.png',
-      text: 'Great news! Looking forward to this.',
-      timestamp: '2 hours ago',
-      likes: 3
-    }
-  ];
-
-  return (
-    <motion.div
-      className="bg-[#240e47]/70 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer mobile-card"
-      whileHover={{ y: -3 }}
-      onClick={() => onNewsClick(item)}
-    >
-      <div className="relative h-32">
-        <Image
-          src={item.imageUrl}
-          alt={item.title}
-          fill
-          className="object-cover"
-          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-            (e.target as HTMLImageElement).src = "/default-news.png";
-          }}
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
-          <span className="text-xs text-[#FF7A00] font-medium mobile-text-xs">{item.category}</span>
-          <h3 className="text-white font-bold line-clamp-1 mobile-text-sm">{item.title}</h3>
-        </div>
-      </div>
-      <div className="p-3">
-        <p className="text-sm text-gray-300 line-clamp-2 mb-2 mobile-text-xs">{item.excerpt}</p>
-        
-        {/* Reactions */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1">
-            {reactions.slice(0, 2).map((reaction, index) => (
-              <button
-                key={index}
-                className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs transition-colors touch-target mobile-text-xs ${
-                  reaction.userReacted 
-                    ? 'bg-[#FF7A00]/20 text-[#FF7A00]' 
-                    : 'bg-gray-600/50 text-gray-400 hover:bg-gray-500/50'
-                }`}
-              >
-                <span>{reaction.emoji}</span>
-                <span>{reaction.count}</span>
-              </button>
-            ))}
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400 mobile-text-xs">
-            <button className="flex items-center gap-1 hover:text-white transition-colors">
-              <FaComment size={8} />
-              <span>{comments.length}</span>
+
+          {/* Control Buttons */}
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+              <FaChevronLeft className="text-sm" />
             </button>
-            <div className="flex items-center gap-1">
-              <FaEye size={8} />
-              <span>{item.views || 0}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-between items-center pt-2 border-t border-gray-600/50">
-          <span className="text-xs text-gray-400 mobile-text-xs">{item.date}</span>
-          <button 
-            className="text-xs text-[#FF7A00] hover:underline flex items-center gap-1 mobile-text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              onNewsClick(item);
-            }}
-          >
-            Read More <FaArrowRight size={8} />
-          </button>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// Enhanced Welcome Notification Component for mobile
-const WelcomeNotification = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setIsVisible(true), 30000);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  if (!isVisible) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-[rgb(var(--background))] text-white p-3 rounded-lg shadow-lg max-w-xs mx-3 mobile-text-sm border border-[#4e2e9e]/40"
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold mobile-text-sm mb-1">Welcome to Fwaya Music!</h3>
-          <p className="opacity-90 mb-2 leading-tight mobile-text-xs">
-            Start earning as a reseller! Share music and earn commissions.
-          </p>
-          <div className="flex flex-col gap-1">
-            <button 
-              onClick={() => window.location.href = '/auth?tab=reseller'}
-              className="bg-white text-[#FF7A00] px-3 py-1.5 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors whitespace-nowrap touch-target mobile-text-xs"
-            >
-              Become Reseller
+            <button className="w-12 h-12 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center">
+              <FaPause className="text-lg" />
             </button>
-            <button 
-              onClick={() => window.location.href = '/auth'}
-              className="border border-white text-white px-3 py-1.5 rounded-full text-xs font-bold hover:bg-white/10 transition-colors whitespace-nowrap touch-target mobile-text-xs"
-            >
-              Create Account
+            <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+              <FaChevronRight className="text-sm" />
             </button>
           </div>
-        </div>
-        <button 
-          onClick={() => setIsVisible(false)}
-          className="text-white hover:text-gray-200 transition-colors flex-shrink-0 mt-1 touch-target"
-        >
-          <FaTimes size={12} />
-        </button>
-      </div>
-    </motion.div>
-  );
-};
 
-// Enhanced Top Charts Section with proper play functionality - Mobile Optimized
-const TopChartsSection = ({ 
-  songs, 
-  onPlay,
-  currentTrack,
-  isPlaying 
-}: { 
-  songs: MediaItem[];
-  onPlay: (item: MediaItem) => void;
-  currentTrack: Track | null;
-  isPlaying: boolean;
-}) => {
-  return (
-    <section className="mb-4 bg-gradient-to-br from-[#FF7A00] to-[#240e47] p-4 rounded-xl">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h2 className="text-lg font-bold text-white mobile-text-lg">Top Charts</h2>
-          <p className="text-gray-400 text-xs mobile-text-xs">Most played tracks this week</p>
-        </div>
-        <button className="text-xs text-white hover:underline mobile-text-xs">See all</button>
-      </div>
-      <div className="space-y-1">
-        {songs.slice(0, 3).map((song, index) => {
-          const isCurrent = String(currentTrack?.id) === String(song.id);
-          return (
-            <div 
-              key={song.id} 
-              className="flex items-center gap-2 p-2 hover:bg-[#240e47] rounded-lg cursor-pointer transition-colors group touch-target"
-              onClick={() => onPlay(song)}
-            >
-              <div className="flex items-center w-full">
-                <span className="text-gray-400 w-4 text-right mr-2 font-bold mobile-text-sm">
-                  {index + 1}
-                </span>
-                <div className="relative h-8 w-8 flex-shrink-0">
-                  <Image 
-                    src={
-                      song.imageUrl ||
-                      song.coverArt ||
-                      song.artCoverUrl ||
-                      song.thumbnailUrl ||
-                      "/default-cover.png"
-                    }
-                    alt={song.title} 
-                    fill 
-                    className="rounded"
-                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                      (e.target as HTMLImageElement).src = "/default-cover.png";
-                    }}
-                  />
-                </div>
-                <div className="ml-2 flex-1 min-w-0">
-                  <h3 className="font-medium truncate text-white group-hover:text-[#FF7A00] transition-colors mobile-text-sm">
-                    {song.title}
-                  </h3>
-                  <p className="text-xs text-gray-400 truncate mobile-text-xs">
-                    {song.user?.displayName || song.user?.username || song.artist || "Unknown Artist"}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2 ml-auto">
-                <button 
-                  className={`p-1.5 rounded-full transition-all touch-target ${
-                    isCurrent 
-                      ? 'text-white opacity-100' 
-                      : 'text-gray-400 opacity-0 group-hover:opacity-100 hover:text-white'
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onPlay(song);
-                  }}
-                >
-                  {isCurrent && isPlaying ? <Waveform playing={true} className="w-4 h-4" /> : <FaPlay size={10} />}
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-};
-
-// Horizontal Scroll Section Component - Mobile Optimized
-const HorizontalScrollSection = ({ 
-  title, 
-  subtitle,
-  items, 
-  type = 'media',
-  onPlay,
-  onLike,
-  onPurchase,
-  onDownload,
-  onShare,
-  onSeeAll,
-  currentTrack,
-  isPlaying
-}: {
-  title: string;
-  subtitle?: string;
-  items: (MediaItem | Artist | BeatItem | Playlist)[];
-  type?: 'media' | 'artist' | 'beat' | 'premium' | 'playlist';
-  onPlay: (item: MediaItem | BeatItem) => void;
-  onLike?: (id: string) => void;
-  onPurchase?: (item: MediaItem | BeatItem) => void;
-  onDownload?: (item: MediaItem) => void;
-  onShare?: (item: MediaItem | Artist | BeatItem) => void;
-  onSeeAll?: () => void;
-  currentTrack?: Track | null;
-  isPlaying?: boolean;
-}) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(true);
-
-  const checkScroll = useCallback(() => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
-    }
-  }, []);
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -200 : 200;
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
-
-  useEffect(() => {
-    const currentRef = scrollRef.current;
-    if (currentRef) {
-      currentRef.addEventListener('scroll', checkScroll);
-      checkScroll();
-      return () => {
-        if (currentRef) {
-          currentRef.removeEventListener('scroll', checkScroll);
-        }
-      };
-    }
-  }, [checkScroll]);
-
-  return (
-    <section className="mb-4 relative">
-      <div className="flex justify-between items-center mb-4 px-1">
-        <div>
-          <h2 className="text-lg font-bold text-white mobile-text-lg">{title}</h2>
-          {subtitle && <p className="text-gray-400 mt-0.5 text-xs mobile-text-xs">{subtitle}</p>}
-        </div>
-        <button 
-          onClick={onSeeAll}
-          className="text-xs text-[#FF7A00] hover:underline flex items-center gap-1 mobile-text-xs"
-        >
-          See all <FaArrowRight size={10} />
-        </button>
-      </div>
-      
-      <div className="relative">
-        {showLeftArrow && (
-          <button 
-            onClick={() => scroll('left')}
-            className="absolute left-1 top-1/2 transform -translate-y-1/2 z-10 bg-[#240e47] bg-opacity-80 p-1.5 rounded-full hover:bg-opacity-100 transition-all touch-target"
-          >
-            <FaChevronLeft className="w-3 h-3" />
-          </button>
-        )}
-        
-        <div 
-          ref={scrollRef}
-          className="flex overflow-x-auto scrollbar-hide gap-2 pb-3 px-1 horizontal-scroll"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {items.map((item: MediaItem | Artist | BeatItem | Playlist) => (
-            <div key={item.id} className="flex-shrink-0">
-              {type === 'beat' ? (
-                <BeatCard 
-                  beat={item as BeatItem} 
-                  onPlay={onPlay}
-                  onPurchase={onPurchase as (beat: BeatItem) => void}
-                  onShare={onShare as (beat: BeatItem) => void}
-                  currentTrack={currentTrack}
-                  isPlaying={isPlaying}
-                />
-              ) : type === 'premium' ? (
-                <PremiumMediaCard 
-                  item={item as MediaItem}
-                  onPlay={onPlay}
-                  onPurchase={onPurchase as (item: MediaItem) => void}
-                  currentTrack={currentTrack}
-                  isPlaying={isPlaying}
-                />
-              ) : type === 'artist' ? (
-                <MediaCard 
-                  item={item as Artist}
-                  onPlay={onPlay as (item: MediaItem) => void}
-                  onLike={onLike}
-                  onShare={onShare}
-                  type="artist"
-                  currentTrack={currentTrack}
-                  isPlaying={isPlaying}
-                />
-              ) : (
-                <MediaCard 
-                  item={item as MediaItem}
-                  onPlay={onPlay as (item: MediaItem) => void}
-                  onLike={onLike}
-                  onDownload={onDownload}
-                  onShare={onShare}
-                  currentTrack={currentTrack}
-                  isPlaying={isPlaying}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        
-        {showRightArrow && (
-          <button 
-            onClick={() => scroll('right')}
-            className="absolute right-1 top-1/2 transform -translate-y-1/2 z-10 bg-[#240e47] bg-opacity-80 p-1.5 rounded-full hover:bg-opacity-100 transition-all touch-target"
-          >
-            <FaChevronRight className="w-3 h-3" />
-          </button>
-        )}
-      </div>
-    </section>
-  );
-};
-
-// Featured Playlists Carousel Component - Mobile Optimized
-const FeaturedPlaylistsCarousel = ({ 
-  playlists, 
-  onPlaylistClick 
-}: { 
-  playlists: Playlist[]; 
-  onPlaylistClick: (playlist: Playlist) => void;
-}) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll horizontally every 5s
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollBy({ left: 280, behavior: 'smooth' });
-      }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [playlists.length]);
-
-  return (
-    <section className="mb-4">
-      <div className="flex justify-between items-center mb-4 px-1">
-        <div>
-          <h2 className="text-lg font-bold text-white mobile-text-lg">Featured Playlists</h2>
-          <p className="text-gray-400 mt-0.5 text-xs mobile-text-xs">Curated collections for every mood</p>
-        </div>
-        <button className="text-xs text-[#FF7A00] hover:underline flex items-center gap-1 mobile-text-xs">
-          View All <FaArrowRight size={10} />
-        </button>
-      </div>
-      <div className="relative">
-        <div
-          ref={scrollRef}
-          className="flex overflow-x-auto scrollbar-hide gap-3 px-1 pb-3 horizontal-scroll"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {playlists.map((playlist) => (
-            <motion.div
-              key={playlist.id}
-              className="bg-gradient-to-br from-[#240e47] to-[#FF7A00] rounded-xl overflow-hidden cursor-pointer group min-w-[280px] max-w-[280px] mobile-card"
-              whileHover={{ scale: 1.02 }}
-              onClick={() => onPlaylistClick(playlist)}
-            >
-              <div className="flex h-20">
-                <div className="relative w-20 flex-shrink-0">
-                  <Image
-                    src={playlist.coverUrl || playlist.imageUrl || "/default-playlist.png"}
-                    alt={playlist.name}
-                    fill
-                    className="object-cover"
-                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                      (e.target as HTMLImageElement).src = "/default-playlist.png";
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      className="bg-[#FF7A00] p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all touch-target"
-                    >
-                      <FaPlay size={10} />
-                    </motion.button>
+          {/* Up Next */}
+          <div>
+            <h4 className="font-semibold mb-4">Up Next</h4>
+            <div className="space-y-3">
+              {[
+                { title: "Midnight Skies", artist: "Owl City" },
+                { title: "Electric Dreams", artist: "The Midnight" },
+                { title: "The Rock Revival", artist: "Various Artists" }
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+                  <div className="w-8 h-8 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.title}</p>
+                    <p className="text-xs text-gray-400 truncate">{item.artist}</p>
                   </div>
+                  <span className="text-xs text-gray-400">3:45</span>
                 </div>
-                <div className="p-2 flex-1">
-                  <h3 className="font-bold text-white mobile-text-sm mb-1">{playlist.name}</h3>
-                  <p className="text-gray-300 text-xs line-clamp-2 mb-1 mobile-text-xs">
-                    {playlist.description || `${playlist.mediaCount} tracks`}
-                  </p>
-                  <div className="flex items-center justify-between text-xs text-gray-400 mobile-text-xs">
-                    <span>{playlist.mediaCount} songs</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-    </section>
-  );
-};
-
-// Main Component - Mobile Optimized
-const GuestWelcome = () => {
-  const { currentTrack, isPlaying, playTrack } = useAudioPlayer();
-  const [featuredAlbums, setFeaturedAlbums] = useState<MediaItem[]>([]);
-  const [trendingSongs, setTrendingSongs] = useState<MediaItem[]>([]);
-  const [favoriteArtists, setFavoriteArtists] = useState<Artist[]>([]);
-  const [premiumContent, setPremiumContent] = useState<MediaItem[]>([]);
-  const [freeContent, setFreeContent] = useState<MediaItem[]>([]);
-  const [beatsForProducers, setBeatsForProducers] = useState<BeatItem[]>([]);
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
-  const [featuredPlaylists, setFeaturedPlaylists] = useState<Playlist[]>([]);
-  const [banners, setBanners] = useState<BannerItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Sample banner data - you can replace this with API calls
-  const sampleBanners: BannerItem[] = [
-    {
-      id: 1,
-      type: 'TRENDING',
-      title: 'Summer Hits 2024',
-      subtitle: 'The hottest tracks for your summer playlist',
-      description: 'Curated collection of trending summer songs from top Zambian artists',
-      imageUrl: '/banners/summer-hits.jpg',
-      badge: 'Trending Now',
-      ctaText: 'Play Now',
-      featuredTrack: trendingSongs[0]
-    },
-    {
-      id: 2,
-      type: 'NEW_RELEASE',
-      title: 'New Album: "African Dreams"',
-      subtitle: 'Fresh from the studio',
-      description: 'Experience the latest album featuring collaborations with top artists',
-      imageUrl: '/banners/new-release.jpg',
-      badge: 'Just Released',
-      ctaText: 'Listen Now'
-    },
-    {
-      id: 3,
-      type: 'PROMO',
-      title: '50% Off All Beats',
-      subtitle: 'Limited Time Offer',
-      description: 'Get premium beats at half price for your next production',
-      imageUrl: '/banners/promo-beats.jpg',
-      badge: 'Special Offer',
-      ctaText: 'Shop Now'
-    },
-    {
-      id: 4,
-      type: 'EVENT',
-      title: 'Live Concert: Lusaka Nights',
-      subtitle: 'This Saturday at 8 PM',
-      description: 'Join us for an unforgettable night with top Zambian artists',
-      imageUrl: '/banners/live-concert.jpg',
-      badge: 'Upcoming Event',
-      ctaText: 'Get Tickets'
-    }
-  ];
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      try {
-        // Set sample banners
-        setBanners(sampleBanners);
-
-        // Fetch homepage media sections
-        const homepageSectionsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/homepage-sections`);
-        const homepageSections = await homepageSectionsRes.json();
-
-        // Fetch other data
-        const [
-          artistsRes,
-          newsRes,
-          playlistsRes
-        ] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/artists`),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/news`),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=SYSTEM`)
-        ]);
-
-        const [artistsData, newsData, playlistsData] = await Promise.all([
-          artistsRes.json(),
-          newsRes.json(),
-          playlistsRes.json()
-        ]);
-
-        const featuredSongs = (homepageSections.featuredSongs || []).map((item: any) => ({
-          ...item,
-          artist: item.user?.displayName || item.user?.username || "Unknown Artist"
-        }));
-        const trendingSongs = (homepageSections.trendingSongs || []).map((item: any) => ({
-          ...item,
-          artist: item.user?.displayName || item.user?.username || "Unknown Artist"
-        }));
-        const topCharts = (homepageSections.topCharts || []).map((item: any) => ({
-          ...item,
-          artist: item.user?.displayName || item.user?.username || "Unknown Artist"
-        }));
-        const beats = (homepageSections.beats || []).map((item: any) => ({
-          ...item,
-          imageUrl: item.coverImage || item.cover || item.imageUrl || "/default-cover.png",
-          artist: item.user?.displayName || item.user?.username || "Unknown Artist"
-        }));
-
-        setFeaturedAlbums(featuredSongs);
-        setTrendingSongs(trendingSongs);
-        setFeaturedPlaylists(playlistsData || []);
-        setFavoriteArtists(artistsData || []);
-        setNewsItems(newsData || []);
-        setBeatsForProducers(beats);
-
-        // Filter premium content
-        const allContent = [
-          ...featuredSongs,
-          ...trendingSongs,
-          ...topCharts
-        ] as MediaItem[];
-
-        setPremiumContent(allContent.filter(item => item.accessType === 'PREMIUM'));
-        setFreeContent((featuredSongs as MediaItem[]).filter(item => item.accessType === 'FREE'));
-
-      } catch (err) {
-        console.error("Failed to fetch data:", err);
-        
-        // Fallback to sample banners if API fails
-        setBanners(sampleBanners);
-      }
-      setLoading(false);
-    }
-    fetchData();
-  }, []);
-
-  const handlePlay = async (item: MediaItem | BeatItem) => {
-    try {
-      // Check if this is a downloaded track that needs DRM decryption
-      const db = await (window as any).indexedDB.open('fwaya-music-db', 1);
-      const transaction = db.result.transaction(['downloads'], 'readonly');
-      const store = transaction.objectStore('downloads');
-      const request = store.get(item.id.toString());
-
-      request.onsuccess = async () => {
-        if (request.result) {
-          // Track is downloaded, decrypt it
-          try {
-            const deviceKey = localStorage.getItem('deviceKey');
-            if (!deviceKey) {
-              console.error('No device key found for DRM decryption');
-              // Fallback to streaming
-              playTrack({
-                id: item.id.toString(),
-                title: item.title,
-                artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-                imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
-                audioUrl: item.audioUrl || (item as MediaItem).url
-              });
-              return;
-            }
-
-            const key = await crypto.subtle.importKey(
-              'jwk',
-              JSON.parse(deviceKey),
-              { name: 'AES-GCM', length: 256 },
-              false,
-              ['decrypt']
-            );
-
-            const encryptedData = request.result.encryptedData;
-            const iv = new Uint8Array(encryptedData.slice(0, 12));
-            const encrypted = new Uint8Array(encryptedData.slice(12));
-
-            const decrypted = await crypto.subtle.decrypt(
-              { name: 'AES-GCM', iv: iv },
-              key,
-              encrypted
-            );
-
-            const blob = new Blob([decrypted], { type: 'audio/mpeg' });
-            const url = URL.createObjectURL(blob);
-
-            playTrack({
-              id: item.id.toString(),
-              title: item.title,
-              artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-              imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
-              audioUrl: url
-            });
-          } catch (error) {
-            console.error('DRM decryption failed:', error);
-            // Fallback to streaming
-            playTrack({
-              id: item.id.toString(),
-              title: item.title,
-              artist: 'artist' in item ? item.artist : 'producer' in item ? (item as BeatItem).producer : "Unknown Artist",
-              imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
-              audioUrl: item.audioUrl || (item as MediaItem).url
-            });
-          }
-        } else {
-          // Track not downloaded, use streaming URL
-          playTrack({
-            id: item.id.toString(),
-            title: item.title,
-            artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-            imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
-            audioUrl: item.audioUrl || (item as MediaItem).url
-          });
-        }
-      };
-
-      request.onerror = () => {
-        console.error('Failed to check download status');
-        // Fallback to streaming
-        playTrack({
-          id: item.id.toString(),
-          title: item.title,
-          artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-          imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
-          audioUrl: item.audioUrl || (item as MediaItem).url
-        });
-      };
-    } catch (error) {
-      console.error('Error in handlePlay:', error);
-      // Fallback to streaming
-      playTrack({
-        id: item.id.toString(),
-        title: item.title,
-        artist: (item as MediaItem).user?.displayName || (item as MediaItem).user?.username || "Unknown Artist",
-        imageUrl: (item as any).coverArt || (item as any).artCoverUrl || (item as any).imageUrl || "/default-cover.png",
-        audioUrl: item.audioUrl || (item as MediaItem).url
-      });
-    }
-  };
-
-  const handleBannerClick = (banner: BannerItem) => {
-    console.log('Banner clicked:', banner);
-    // Handle banner click - navigate to specific page or show modal
-    if (banner.featuredTrack) {
-      handlePlay(banner.featuredTrack);
-    } else if (banner.ctaLink) {
-      window.location.href = banner.ctaLink;
-    }
-  };
-
-  const handlePlayTrackFromBanner = (track: MediaItem) => {
-    handlePlay(track);
-  };
-
-  const handleLike = (id: string) => {
-    console.log('Liked item:', id);
-    // Implement like functionality
-  };
-
-  const handlePurchase = (item: MediaItem | BeatItem) => {
-    console.log('Purchase item:', item);
-    // Implement purchase functionality
-  };
-
-  const handleDownload = (item: MediaItem) => {
-    console.log('Download item:', item);
-    // Implement download functionality
-  };
-
-  const handleShare = (item: MediaItem | Artist | BeatItem) => {
-    console.log('Share item:', item);
-    // Implement share functionality
-  };
-
-  const handleFollowArtist = (artistId: string) => {
-    console.log('Follow artist:', artistId);
-    // Implement follow functionality
-  };
-
-  const handleNewsClick = (newsItem: NewsItem) => {
-    console.log('News item clicked:', newsItem);
-    // Navigate to news detail page or open modal
-    window.location.href = `/news/${newsItem.id}`;
-  };
-
-  const handlePlaylistClick = (playlist: Playlist & { entries?: { media: MediaItem }[] }) => {
-    const mediaItems = playlist.entries?.map(entry => entry.media) || [];
-    console.log(mediaItems);
-    window.location.href = `/playlist/${playlist.id}`;
-  };
-
-  if (loading) {
-    return <div className="min-h-screen bg-[rgb(var(--background))]" />;
-  }
-
-  return (
-    <div className="min-h-screen bg-[rgb(var(--background))]">
-      {/* Welcome Notification */}
-      <WelcomeNotification />
-
-      {/* Main Content */}
-      <main className="pt-4 md:pt-6 pb-24 px-2 max-w-7xl mx-auto">
-        {/* Hero Banner Section */}
-        <HeroBanner 
-          banners={banners}
-          onBannerClick={handleBannerClick}
-          onPlayTrack={handlePlayTrackFromBanner}
-        />
-
-        {/* Featured Playlists Carousel */}
-        {featuredPlaylists.length > 0 && (
-          <FeaturedPlaylistsCarousel 
-            playlists={featuredPlaylists} 
-            onPlaylistClick={handlePlaylistClick}
-          />
-        )}
-
-        {/* Featured Media */}
-        <HorizontalScrollSection
-          title="Featured Songs"
-          subtitle="Handpicked content just for you"
-          items={featuredAlbums.slice(0, 6)}
-          onPlay={handlePlay}
-          onLike={handleLike}
-          onDownload={handleDownload}
-          onShare={handleShare}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-
-        {/* Trending Now */}
-        <HorizontalScrollSection
-          title="Trending Now"
-          subtitle="The hottest tracks everyone's listening to"
-          items={trendingSongs.slice(0, 6)}
-          onPlay={handlePlay}
-          onLike={handleLike}
-          onDownload={handleDownload}
-          onShare={handleShare}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-
-        {/* Premium Content */}
-        {premiumContent.length > 0 && (
-          <HorizontalScrollSection
-            title="Premium Exclusives"
-            subtitle="Unlock premium content for the best experience"
-            items={premiumContent.slice(0, 6)}
-            type="premium"
-            onPlay={handlePlay}
-            onPurchase={handlePurchase}
-            onShare={handleShare}
-            currentTrack={currentTrack}
-            isPlaying={isPlaying}
-          />
-        )}
-
-        {/* Favorite Artists */}
-        <HorizontalScrollSection
-          title="Favourite Artists"
-          subtitle="Follow your favorite artists"
-          items={favoriteArtists.slice(0, 6)}
-          type="artist"
-          onPlay={handlePlay}
-          onLike={handleFollowArtist}
-          onShare={handleShare}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-
-        {/* Free Content */}
-        <HorizontalScrollSection
-          title="Free Favourite Mix"
-          subtitle="Enjoy these tracks without any cost"
-          items={freeContent.slice(0, 6)}
-          onPlay={handlePlay}
-          onLike={handleLike}
-          onDownload={handleDownload}
-          onShare={handleShare}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-
-        {/* Beats Marketplace */}
-        <HorizontalScrollSection
-          title="Beats & Instruments"
-          subtitle="Premium and free beats from beatmakers & producers"
-          items={beatsForProducers.slice(0, 6)}
-          type="beat"
-          onPlay={handlePlay}
-          onPurchase={handlePurchase}
-          onShare={handleShare}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-
-        {/* Top Charts Section */}
-        <TopChartsSection 
-          songs={trendingSongs}
-          onPlay={handlePlay}
-          currentTrack={currentTrack}
-          isPlaying={isPlaying}
-        />
-
-        {/* Latest News */}
-        <section className="mb-4">
-          <div className="flex justify-between items-center mb-4 px-1">
-            <div>
-              <h2 className="text-lg font-bold text-white mobile-text-lg">Latest News</h2>
-              <p className="text-gray-400 mt-0.5 text-xs mobile-text-xs">Stay updated with Fwaya Music</p>
-            </div>
-            <button className="text-xs text-[#FF7A00] hover:underline flex items-center gap-1 mobile-text-xs">
-              View All <FaArrowRight size={10} />
-            </button>
-          </div>
-          <div
-            className="flex overflow-x-auto scrollbar-hide gap-3 px-1 pb-3 horizontal-scroll"
-            style={{ scrollbarWidth: 'none' }}
-          >
-            {newsItems.slice(0, 4).map((newsItem) => (
-              <div key={newsItem.id} className="min-w-[280px] max-w-[280px]">
-                <NewsCard item={newsItem} onNewsClick={handleNewsClick} />
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
     </div>
   );
-};
-
-export default GuestWelcome;
-
-
-
-
+}

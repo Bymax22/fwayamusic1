@@ -395,23 +395,25 @@ const UserDashboard: React.FC = () => {
     <RoleGuard allowedRoles={['USER']} customLoadingComponent={<DashboardLoading/>}>
       <div className="min-h-screen bg-gradient-to-b from-[#2E055E] to-[#5B0EA6] text-white pb-20">
         {/* Mobile-Optimized Header */}
-        <header className="bg-[#2E055E]/80 backdrop-blur-lg border-b border-[#2E055E] sticky top-0 z-40">
+        <header className="bg-[#2E055E]/80 backdrop-blur-lg border-b border-[#2E055E] sticky top-[64px] z-40">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                {user.avatarUrl ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt={user.displayName || user.username}
-                    width={50}
-                    height={50}
-                    className="rounded-full border-2 border-[#5B0EA6]"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B0EA6] to-[#9B5DE5] flex items-center justify-center border-2 border-[#5B0EA6]">
-                    <FaUser className="text-white text-lg" />
-                  </div>
-                )}
+                <div className="lg:hidden">
+                  {user.avatarUrl ? (
+                    <Image
+                      src={user.avatarUrl}
+                      alt={user.displayName || user.username}
+                      width={50}
+                      height={50}
+                      className="rounded-full border-2 border-[#5B0EA6]"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B0EA6] to-[#9B5DE5] flex items-center justify-center border-2 border-[#5B0EA6]">
+                      <FaUser className="text-white text-lg" />
+                    </div>
+                  )}
+                </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-lg font-bold truncate mobile-text-lg">

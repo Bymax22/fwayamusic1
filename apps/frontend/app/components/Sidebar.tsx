@@ -27,7 +27,7 @@ import { MdExplore, MdLibraryMusic, MdEqualizer } from "react-icons/md";
 const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
   const [currentSong] = useState({
     title: "CEO Wandi",
-    artist: "Fwaya Music",
+    artist: "Artist Name",
     cover: "/covers/wt3.jpg",
     progress: 35,
     volume: 70
@@ -50,7 +50,6 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
   // Main navigation items
   const mainMenuItems = [
     { title: "Home", icon: <Icon><HiHome size={18} /></Icon>, href: "/" },
-    { title: "Search", icon: <Icon><HiSearch size={18} /></Icon>, href: "/search" },
     { title: "Explore", icon: <Icon><MdExplore size={18} /></Icon>, href: "/explore" },
     { title: "Library", icon: <Icon><MdLibraryMusic size={18} /></Icon>, href: "/library" },
   ];
@@ -82,7 +81,6 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
     { title: "Mood", icon: <Icon><FaPalette size={16} /></Icon>, href: "/mood" },
     { title: "VIP", icon: <Icon><FaStar size={16} /></Icon>, href: "/vip" },
     { title: "Connect Device", icon: <Icon><HiOutlineDeviceMobile size={18} /></Icon>, href: "/connect-device" },
-    { title: "Settings", icon: <Icon><HiCog size={18} /></Icon>, href: "/settings" },
     { title: "Profile", icon: <Icon><HiUser size={18} /></Icon>, href: "/profile" },
   ];
 

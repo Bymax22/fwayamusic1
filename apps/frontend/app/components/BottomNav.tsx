@@ -1,113 +1,57 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { 
-  Home, 
-  Search, 
-  User,
-  Menu,
-  Compass,
-  LogIn
-} from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import type { LucideIcon } from "lucide-react";
 
-interface BottomNavProps {
-  isVisible: boolean;
-  onMenuOpen: () => void;
-}
+import { useState } from "react";
+import Image from "next/image";
+import { Compass, Search, Library, MoreHorizontal } from "lucide-react";
 
-interface NavItem {
-  name: string;
-  href?: string;
-  icon: LucideIcon;
-  active: boolean;
-  action?: () => void;
-  center?: boolean;
-}
+export default function BottomNav() {
+  const [activeTab, setActiveTab] = useState("home");
 
-export default function BottomNav({ isVisible, onMenuOpen }: BottomNavProps) {
-  const pathname = usePathname();
-  const { user } = useAuth();
-
-  // Determine profile item based on auth state
-  const profileItem: NavItem = user 
-    ? { name: "Profile", href: "/profile", icon: User, active: pathname.startsWith("/profile") }
-    : { name: "Login", href: "/auth/user/signin", icon: LogIn, active: pathname.startsWith("/auth") };
-
-  // Simplified nav items: Home, Search, Browse, Menu (center), Profile/Login
-  const navItems: NavItem[] = [
-    { name: "Home", href: "/dashboard", icon: Home, active: pathname === "/dashboard" },
-    { name: "Search", href: "/search", icon: Search, active: pathname.startsWith("/search") },
-    { name: "Browse", href: "/browse", icon: Compass, active: pathname.startsWith("/browse") },
-    { name: "Menu", href: "#", icon: Menu, active: false, action: onMenuOpen, center: true },
-    profileItem,
+  const navItems = [
+    { id: "home", label: "Fwaya", icon: null, image: "/fwaya lp-01.png", inactiveImage: "/fwaya white icon-01.png" },
+    { id: "browse", label: "Browse", icon: Compass },
+    { id: "search", label: "Search", icon: Search },
+    { id: "library", label: "Library", icon: Library },
+    { id: "more", label: "More", icon: MoreHorizontal },
   ];
 
   return (
-    <nav className={`bottom-nav flex justify-between items-center px-4 ${!isVisible ? 'bottom-nav--hidden' : ''}`}>
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        
-        if (item.center && item.action) {
-          // Centered, larger Menu button with transparent background and animation
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+      <div className="glass-pill mx-4 mb-3 px-2 py-2 flex items-center justify-around">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
           return (
-            <div key={item.name} className="flex-1 flex justify-center -mt-8">
-              <button
-                onClick={item.action}
-                className="relative flex flex-col items-center touch-target group"
-                aria-label={item.name}
-              >
-                {/* Transparent background circle with border and pulse animation */}
-                <div className="relative w-18 h-18 rounded-full bg-transparent border-2 border-[#e51f48] border-opacity-60 flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:border-opacity-100 group-hover:bg-[#e51f48] group-hover:bg-opacity-20">
-                  <Icon size={30} className="text-[#e51f48] group-hover:text-white transition-colors duration-300" strokeWidth={2.5} />
-                  
-                  {/* Pulsing animation ring */}
-                  <div className="absolute inset-0 rounded-full border-2 border-[#e51f48] border-opacity-30 animate-ping-slow"></div>
-                </div>
-                
-                <span className="mobile-text-xs font-bold text-white mt-1 transition-colors duration-300 group-hover:text-[#e51f48]">
-                  {item.name}
-                </span>
-                
-                {/* Subtle glow effect that pulses */}
-                <div className="absolute inset-0 rounded-full bg-[#e51f48] opacity-10 blur-md -z-10 group-hover:opacity-20 transition-opacity duration-300 animate-pulse-slow"></div>
-              </button>
-            </div>
-          );
-        }
-
-        // Normal link (Home, Search, Browse, Profile/Login)
-        if (!item.href) return null;
-        return (
-          <Link key={item.name} href={item.href} passHref className="flex-1">
             <button
-              className={`bottom-nav__item touch-target flex flex-col items-center w-full ${
-                item.active ? 'bottom-nav__item--active' : ''
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${
+                isActive ? "text-white" : "text-gray-400"
               }`}
-              aria-label={item.name}
-              aria-current={item.active ? "page" : undefined}
             >
-              <Icon 
-                size={24} 
-                className={`bottom-nav__icon mb-1 ${
-                  item.active ? 'text-[#e51f48]' : 'text-gray-300'
-                }`} 
-                strokeWidth={item.active ? 2.5 : 2} 
-              />
-              <span className={`mobile-text-xs font-medium ${
-                item.active ? 'text-[#e51f48]' : 'text-white'
-              }`}>
-                {item.name}
-              </span>
+              {item.image ? (
+                <Image
+                  src={isActive ? item.image : (item.inactiveImage || item.image)}
+                  alt={item.label}
+                  width={22}
+                  height={22}
+                  className="opacity-100"
+                />
+              ) : Icon ? (
+                <Icon
+                  size={22}
+                  className={isActive ? "text-purple-400" : "text-current"}
+                  fill={isActive ? "rgba(155, 93, 229, 0.2)" : "none"}
+                />
+              ) : null}
+              <span className="text-[10px] font-medium">{item.label}</span>
+              {isActive && (
+                <div className="absolute -bottom-2 w-6 h-0.5 bg-purple-500 rounded-full" />
+              )}
             </button>
-          </Link>
-        );
-      })}
-    </nav>
+          );
+        })}
+      </div>
+    </div>
   );
 }
-
-
-
-

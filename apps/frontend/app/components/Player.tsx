@@ -270,25 +270,44 @@ export default function Player({
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Waveform component
-  const Waveform = () => (
-    <div className="flex items-center justify-center gap-0.5 h-6">
-      {[0, 1, 2, 3].map((i) => (
-        <motion.div
-          key={i}
-          className="w-1 bg-gradient-to-t from-[#e51f48] to-[#ff4d6d] rounded-full"
-          animate={{
-            height: isPlaying ? [8, 20, 12, 16, 10] : 8,
-          }}
-          transition={{
-            duration: 0.6,
-            delay: i * 0.1,
-            repeat: isPlaying ? Infinity : 0,
-          }}
-        />
-      ))}
-    </div>
-  );
+  // Advanced Waveform component
+  const AudioWaveform = ({ isPlaying = false, progress = 0, className = "" }) => {
+    const bars = Array.from({ length: 25 }, (_, i) => {
+      const baseHeight = Math.random() * 16 + 4; // Random height between 4-20
+      const isActive = i < progress * 25; // Show progress
+      return { height: baseHeight, isActive, delay: i * 0.05 };
+    });
+
+    return (
+      <div className={`flex items-end gap-0.5 ${className}`}>
+        {bars.map((bar, i) => (
+          <motion.div
+            key={i}
+            className={`w-0.5 rounded-sm transition-all duration-200 ${
+              bar.isActive
+                ? "bg-gradient-to-t from-purple-500 to-pink-500"
+                : isPlaying
+                  ? "bg-white/40"
+                  : "bg-white/20"
+            }`}
+            style={{
+              height: isPlaying && i % 4 === 0 ? `${bar.height * 1.3}px` : `${bar.height}px`,
+            }}
+            animate={isPlaying && i % 5 === 0 ? {
+              height: [bar.height, bar.height * 1.5, bar.height * 0.8, bar.height],
+              scaleY: [1, 1.2, 0.9, 1]
+            } : {}}
+            transition={{
+              duration: 0.6,
+              delay: bar.delay,
+              repeat: isPlaying ? Infinity : 0,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
 
   const notifyMinimized = (minimized: boolean) => {
     if (typeof window !== "undefined") {
@@ -311,7 +330,7 @@ export default function Player({
             setIsMinimized(false);
             notifyMinimized(false);
           }}
-          className="fixed bottom-20 right-4 z-40 rounded-full shadow-2xl overflow-hidden focus:outline-none active:scale-95 transition-transform"
+          className="fixed bottom-20 md:bottom-4 right-4 z-40 rounded-full shadow-2xl overflow-hidden focus:outline-none active:scale-95 transition-transform"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
@@ -333,7 +352,7 @@ export default function Player({
             
             {/* Waveform */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <Waveform />
+              <AudioWaveform isPlaying={isPlaying} progress={currentTime / duration} className="scale-75" />
             </div>
           </div>
         </motion.button>
@@ -344,23 +363,22 @@ export default function Player({
         <motion.div
           className={`fixed left-0 right-0 z-50 ${
             isExpanded ? "h-[60vh]" : "h-32 sm:h-28"
-          } bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg ${
+          } bg-gradient-to-br from-[#0a1f29]/95 to-[#0a3747]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg bottom-0 md:bottom-0 ${
             className || ""
           }`}
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
           transition={{ type: "spring", damping: 25, stiffness: 120 }}
-          style={{ bottom: 0 }}
         >
         {/* Compact Player Header - Minimal height */}
         <div className="flex items-center justify-between py-1 px-3 sm:py-0.5 sm:px-2 border-b border-white/10">
           <div className="flex items-center gap-3 sm:gap-2 min-w-0 flex-1">
             <div className="relative flex-shrink-0">
-              <MusicalNoteIcon className="w-4 h-4 text-[#e51f48]" />
+              <MusicalNoteIcon className="w-4 h-4 text-purple-400" />
               {isPlaying && (
                 <motion.div
-                  className="absolute -top-0.5 -right-0.5 w-0.5 h-0.5 bg-[#e51f48] rounded-full"
+                  className="absolute -top-0.5 -right-0.5 w-0.5 h-0.5 bg-purple-400 rounded-full"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 />
@@ -449,7 +467,7 @@ export default function Player({
                 />
                 {isLoading ? (
                   <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#e51f48]"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-400"></div>
                   </div>
                 ) : isPlaying ? (
                   <motion.div
@@ -469,16 +487,21 @@ export default function Player({
             {/* Compact Progress Bar */}
             <div className={`relative ${isExpanded ? "my-3" : "my-1 sm:my-0.5 w-full"}`} onClick={handleSeek}>
               <div className="h-1 bg-white/10 rounded-full w-full cursor-pointer">
-                <div 
-                  ref={progressBarRef} 
-                  className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full transition-all duration-100" 
-                  style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }} 
+                <div
+                  ref={progressBarRef}
+                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-100"
+                  style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                 />
               </div>
               <div className="flex justify-between text-xs text-gray-400 mt-1 sm:mt-0.5">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
+              {isPlaying && (
+                <div className="mt-2 flex justify-center">
+                  <AudioWaveform isPlaying={isPlaying} progress={currentTime / duration} className="h-4" />
+                </div>
+              )}
             </div>
 
             {/* Compact Main Controls */}
@@ -507,7 +530,7 @@ export default function Player({
               <button 
                 onClick={onPlayPause} 
                 disabled={isLoading} 
-                className="p-3 sm:p-2.5 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] rounded-full hover:shadow-lg hover:shadow-[#e51f48]/30 transition-all shadow-md disabled:opacity-50 active:scale-95" 
+                className="p-3 sm:p-2.5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full hover:shadow-lg hover:shadow-purple-500/30 transition-all shadow-md disabled:opacity-50 active:scale-95" 
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? <PauseIcon className="w-5 h-5 sm:w-4 sm:h-4 text-white" /> : <PlayIcon className="w-5 h-5 sm:w-4 sm:h-4 text-white" />}
@@ -574,7 +597,7 @@ export default function Player({
                 />
                 {isLoading ? (
                   <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#e51f48]"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-400"></div>
                   </div>
                 ) : isPlaying ? (
                   <motion.div
@@ -592,7 +615,7 @@ export default function Player({
                   <h3 className="text-lg font-bold text-white truncate">
                       {track.title || "Unknown Title"}
                     </h3>
-                  {isLiked && <HeartIcon className="flex-shrink-0 w-4 h-4 text-[#e51f48]" />}
+                  {isLiked && <HeartIcon className="flex-shrink-0 w-4 h-4 text-purple-400" />}
                 </div>
                 <p className="text-sm text-gray-300 truncate">
                   {track.artist || "Unknown Artist"}
@@ -604,9 +627,9 @@ export default function Player({
                 <div className="flex items-center mt-4 space-x-4">
                   <button 
                     onClick={() => setIsLiked(!isLiked)} 
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm hover:bg-white/10 hover:text-[#e51f48] transition-colors active:bg-white/20"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm hover:bg-white/10 hover:text-purple-400 transition-colors active:bg-white/20"
                   >
-                    {isLiked ? <HeartIcon className="w-4 h-4 text-[#e51f48]" /> : <HeartOutline className="w-4 h-4 text-gray-400" />}
+                    {isLiked ? <HeartIcon className="w-4 h-4 text-purple-400" /> : <HeartOutline className="w-4 h-4 text-gray-400" />}
                     <span>Like</span>
                   </button>
 
