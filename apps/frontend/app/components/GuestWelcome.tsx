@@ -18,6 +18,7 @@ import {
   FaHeadphones
 } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 export default function GuestWelcome() {
   const [activeTab, setActiveTab] = useState("for-you");
@@ -35,6 +36,9 @@ export default function GuestWelcome() {
 
   const quickRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<HTMLDivElement>(null);
+
+  // Audio player hook
+  const { playTrack } = useAudioPlayer();
 
   // Fetch homepage data from backend
   useEffect(() => {
@@ -215,7 +219,18 @@ export default function GuestWelcome() {
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {quickPicks.slice(0, 3).map((item: any, i: number) => (
-              <div key={i} className="w-32 flex-shrink-0 cursor-pointer">
+              <div 
+                key={i} 
+                className="w-32 flex-shrink-0 cursor-pointer"
+                onClick={() => playTrack({
+                  id: item.id,
+                  title: item.title,
+                  artist: item.user?.displayName || item.user?.username || 'Unknown',
+                  imageUrl: item.artCoverUrl,
+                  audioUrl: item.audioUrl,
+                  duration: item.duration
+                })}
+              >
                 <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
                   <div 
                     className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
@@ -256,7 +271,18 @@ export default function GuestWelcome() {
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {trendingNow.slice(0, 3).map((item: any, i: number) => (
-              <div key={i} className="w-32 flex-shrink-0 cursor-pointer">
+              <div 
+                key={i} 
+                className="w-32 flex-shrink-0 cursor-pointer"
+                onClick={() => playTrack({
+                  id: item.id,
+                  title: item.title,
+                  artist: item.user?.displayName || item.user?.username || 'Unknown',
+                  imageUrl: item.artCoverUrl,
+                  audioUrl: item.audioUrl,
+                  duration: item.duration
+                })}
+              >
                 <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
                   <div 
                     className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
@@ -395,7 +421,17 @@ export default function GuestWelcome() {
                     <p className="text-sm font-medium">{track.title}</p>
                     <p className="text-xs text-gray-400">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
                   </div>
-                  <button className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors">
+                  <button 
+                    onClick={() => playTrack({
+                      id: track.id,
+                      title: track.title,
+                      artist: track.user?.displayName || track.user?.username || 'Unknown',
+                      imageUrl: track.artCoverUrl,
+                      audioUrl: track.audioUrl,
+                      duration: track.duration
+                    })}
+                    className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors"
+                  >
                     <FaPlay className="text-white text-xs ml-0.5" />
                   </button>
                 </div>
