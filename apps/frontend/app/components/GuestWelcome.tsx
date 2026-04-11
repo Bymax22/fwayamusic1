@@ -215,7 +215,7 @@ export default function GuestWelcome() {
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {quickPicks.slice(0, 3).map((item: any, i: number) => (
-              <div key={i} className="flex-1 min-w-0 cursor-pointer">
+              <div key={i} className="w-32 flex-shrink-0 cursor-pointer">
                 <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
                   <div 
                     className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
@@ -256,7 +256,7 @@ export default function GuestWelcome() {
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {trendingNow.slice(0, 3).map((item: any, i: number) => (
-              <div key={i} className="flex-1 min-w-0 cursor-pointer">
+              <div key={i} className="w-32 flex-shrink-0 cursor-pointer">
                 <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
                   <div 
                     className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
@@ -344,7 +344,7 @@ export default function GuestWelcome() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs font-semibold truncate text-white mb-1">{artist.displayName || artist.username || 'Unknown'}</p>
+                <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
                 <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
               </div>
             ))}
