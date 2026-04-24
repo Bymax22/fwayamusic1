@@ -67,8 +67,10 @@ export default function Player({
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
+      console.log('Created new audio element');
     }
     const audio = audioRef.current;
+    console.log('Audio element:', audio);
 
     const updateDuration = () => setDuration(audio.duration || 0);
     const updateTime = () => setCurrentTime(audio.currentTime);
@@ -77,6 +79,10 @@ export default function Player({
     };
     const handleLoadStart = () => setIsLoading(true);
     const handleCanPlay = () => setIsLoading(false);
+    const handleError = (e: Event) => {
+      console.error('Audio error:', e);
+      setIsLoading(false);
+    };
 
     audio.addEventListener("loadedmetadata", updateDuration);
     audio.addEventListener("timeupdate", updateTime);
@@ -84,6 +90,7 @@ export default function Player({
     audio.addEventListener("loadstart", handleLoadStart);
     audio.addEventListener("canplay", handleCanPlay);
     audio.addEventListener("canplaythrough", handleCanPlay);
+    audio.addEventListener("error", handleError);
 
     return () => {
       audio.removeEventListener("loadedmetadata", updateDuration);
@@ -92,6 +99,7 @@ export default function Player({
       audio.removeEventListener("loadstart", handleLoadStart);
       audio.removeEventListener("canplay", handleCanPlay);
       audio.removeEventListener("canplaythrough", handleCanPlay);
+      audio.removeEventListener("error", handleError);
       audio.pause();
       if (previewTimerRef.current) {
         window.clearTimeout(previewTimerRef.current);
@@ -138,7 +146,7 @@ export default function Player({
         audio.preload = 'metadata'; // Preload metadata for better handling
         audio.crossOrigin = 'anonymous'; // Enable CORS for streaming
         audio.src = src;
-        // Don't call load() - the browser will handle it automatically
+        audio.load(); // Explicitly load the audio
         setCurrentTime(0);
         setDuration(0);
       }
@@ -151,6 +159,8 @@ export default function Player({
     }
 
     audio.volume = isMuted ? 0 : volume;
+    audio.muted = isMuted;
+    console.log('Setting audio volume to:', audio.volume, 'muted:', audio.muted);
     audio.playbackRate = playbackRate;
     audio.loop = isLooping;
 
@@ -158,10 +168,29 @@ export default function Player({
     const isPremiumTrack = track?.accessType === 'PREMIUM' || track?.accessType === 'PAY_PER_VIEW';
 
     if (isPlaying) {
-      audio.play().catch((err) => {
-        console.warn("Audio play() failed:", err);
-        setIsLoading(false);
-      });
+      console.log('Attempting to play audio:', audio.src, 'volume:', audio.volume, 'muted:', audio.muted, 'readyState:', audio.readyState);
+      
+      // Wait for audio to be ready
+      if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or better
+        audio.play().then(() => {
+          console.log('Audio started playing successfully');
+        }).catch((err) => {
+          console.error("Audio play() failed:", err);
+          setIsLoading(false);
+        });
+      } else {
+        console.log('Audio not ready yet, waiting for canplay event');
+        const playWhenReady = () => {
+          audio.removeEventListener('canplay', playWhenReady);
+          audio.play().then(() => {
+            console.log('Audio started playing successfully after canplay');
+          }).catch((err) => {
+            console.error("Audio play() failed after canplay:", err);
+            setIsLoading(false);
+          });
+        };
+        audio.addEventListener('canplay', playWhenReady);
+      }
 
       // If premium and not unlocked, ensure we only play a 30-second preview
       if (isPremiumTrack && !unlocked) {
@@ -177,6 +206,7 @@ export default function Player({
         }, 30000);
       }
     } else {
+      console.log('Pausing audio');
       audio.pause();
       if (previewTimerRef.current) {
         window.clearTimeout(previewTimerRef.current);

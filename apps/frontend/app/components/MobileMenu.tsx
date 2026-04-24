@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings } from "lucide-react";
+import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -11,9 +11,9 @@ interface MobileMenuProps {
   onClose: () => void;
 }
 
-// Custom icon wrapper with red color
+// Custom icon wrapper with purple color
 const Icon = ({ children }: { children: React.ReactNode }) => (
-  <span className="text-[#e51f48]">{children}</span>
+  <span className="text-purple-500">{children}</span>
 );
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
@@ -71,6 +71,12 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { title: "Settings", icon: <Icon><Settings size={20} /></Icon>, href: "/settings" },
   ];
 
+  // Auth items (shown when not logged in)
+  const authMenuItems = [
+    { title: "Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/login" },
+    { title: "Create Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/signup" },
+  ];
+
   const MenuSection = ({ title, items }: { title: string; items: { title: string; icon: React.ReactNode; href: string }[] }) => (
     <div className="space-y-1">
       <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-2">
@@ -120,7 +126,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center">
                   <Music className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -139,10 +145,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </div>
 
             {/* User Info */}
-            {user && (
+            {user ? (
               <div className="px-6 py-4 border-b border-white/10">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center text-white text-sm font-bold">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
                     {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -155,22 +161,37 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-purple-600/10 to-pink-500/10">
+                <p className="text-sm text-gray-300">
+                  Sign in to access your personalized experience and create playlists
+                </p>
+              </div>
             )}
 
             {/* Scrollable Content */}
             <div className="h-[calc(100%-140px)] overflow-y-auto pb-6">
               <div className="space-y-6 py-4">
                 <MenuSection title="Navigation" items={mainMenuItems} />
-                <MenuSection title="Your Library" items={musicMenuItems} />
-                <MenuSection title="Discover" items={discoverMenuItems} />
-                <MenuSection title="Account" items={settingsMenuItems} />
+                {user ? (
+                  <>
+                    <MenuSection title="Your Library" items={musicMenuItems} />
+                    <MenuSection title="Discover" items={discoverMenuItems} />
+                    <MenuSection title="Account" items={settingsMenuItems} />
+                  </>
+                ) : (
+                  <>
+                    <MenuSection title="Discover" items={discoverMenuItems} />
+                    <MenuSection title="Authentication" items={authMenuItems} />
+                  </>
+                )}
               </div>
 
               {/* Now Playing Preview */}
-              <div className="mx-4 mt-6 p-4 rounded-2xl bg-gradient-to-r from-[#e51f48]/20 to-[#ff4d6d]/20 backdrop-blur-sm border border-white/10">
+              <div className="mx-4 mt-6 p-4 rounded-2xl bg-gradient-to-r from-purple-600/20 to-pink-500/20 backdrop-blur-sm border border-white/10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center">
                       <Music className="w-6 h-6 text-white" />
                     </div>
                     <div>
@@ -178,7 +199,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       <p className="text-xs text-gray-300">Tap to open player</p>
                     </div>
                   </div>
-                  <div className="w-2 h-8 bg-gradient-to-b from-[#e51f48] to-[#ff4d6d] rounded-full animate-pulse"></div>
+                  <div className="w-2 h-8 bg-gradient-to-b from-purple-600 to-pink-500 rounded-full animate-pulse"></div>
                 </div>
               </div>
 
