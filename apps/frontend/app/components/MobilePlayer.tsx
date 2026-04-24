@@ -366,4 +366,3 @@ export default function MobilePlayer({
     </AnimatePresence>
   );
 }
-<parameter name="filePath">c:\Users\BYMAX SERVICES\Documents\fwaya-music\apps\frontend\app\components\MobilePlayer.tsx

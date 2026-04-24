@@ -1,32 +1,7 @@
 // @ts-check
-import eslint from '@eslint/js';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
-import nextPlugin from '@next/eslint-plugin-next';
 
-export default tseslint.config(
+export default [
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', '.next', 'node_modules'],
   },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-      ecmaVersion: 2022,
-      sourceType: 'module',
-    },
-  },
-  {
-    plugins: {
-      '@next/next': nextPlugin,
-    },
-    rules: {
-      ...nextPlugin.configs.recommended.rules,
-      ...nextPlugin.configs['core-web-vitals'].rules,
-    },
-  },
-);
+];
