@@ -395,22 +395,18 @@ export default function GuestWelcome() {
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
                   <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-[#0a0a0d]">
-                    <div className="relative">
-                      <div 
-                        className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
-                        style={{
-                          backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center'
-                        }}
-                      />
-                      <div className="absolute bottom-3 left-3 text-[9px] text-white/90 bg-black/70 px-2 py-1 rounded">
-                        {item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks
-                      </div>
-                    </div>
+                    <div 
+                      className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
+                      style={{
+                        backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    />
                     <div className="p-3 bg-black/20">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-xs text-gray-400">{item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks</p>
                     </div>
                   </div>
                 ))}
@@ -547,22 +543,18 @@ export default function GuestWelcome() {
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
                   <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-[#0a0a0d]">
-                    <div className="relative">
-                      <div 
-                        className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
-                        style={{
-                          backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center'
-                        }}
-                      />
-                      <div className="absolute bottom-3 left-3 text-[9px] text-white/90 bg-black/70 px-2 py-1 rounded">
-                        {item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks
-                      </div>
-                    </div>
+                    <div 
+                      className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
+                      style={{
+                        backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    />
                     <div className="p-3 bg-black/20">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-xs text-gray-400">{item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks</p>
                     </div>
                   </div>
                 ))}
