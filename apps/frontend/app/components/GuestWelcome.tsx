@@ -357,7 +357,7 @@ export default function GuestWelcome() {
                       duration: item.duration
                     })}
                   >
-                    <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
+                    <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow mb-2">
                       <div 
                         className="aspect-square bg-black"
                         style={{
@@ -366,20 +366,18 @@ export default function GuestWelcome() {
                           backgroundPosition: 'center'
                         }}
                       />
-                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 backdrop-blur-sm">
-                        <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
-                          <div className="flex items-center gap-1">
-                            <FaHeadphones className="text-[9px]" />
-                            <span>{item.playCount?.toLocaleString() || '0'}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <FaRegHeart className="text-[9px]" />
-                            <span>{item.likeCount?.toLocaleString() || '0'}</span>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                     <div className="px-1">
+                      <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
+                        <div className="flex items-center gap-1">
+                          <FaHeadphones className="text-[9px]" />
+                          <span>{item.playCount?.toLocaleString() || '0'}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FaRegHeart className="text-[9px]" />
+                          <span>{item.likeCount?.toLocaleString() || '0'}</span>
+                        </div>
+                      </div>
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                     </div>
@@ -511,7 +509,7 @@ export default function GuestWelcome() {
                       duration: item.duration
                     })}
                   >
-                    <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
+                    <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow mb-2">
                       <div 
                         className="aspect-square bg-black"
                         style={{
@@ -520,20 +518,18 @@ export default function GuestWelcome() {
                           backgroundPosition: 'center'
                         }}
                       />
-                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 backdrop-blur-sm">
-                        <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
-                          <div className="flex items-center gap-1">
-                            <FaHeadphones className="text-[9px]" />
-                            <span>{item.playCount?.toLocaleString() || '0'}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <FaRegHeart className="text-[9px]" />
-                            <span>{item.likeCount?.toLocaleString() || '0'}</span>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                     <div className="px-1">
+                      <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
+                        <div className="flex items-center gap-1">
+                          <FaHeadphones className="text-[9px]" />
+                          <span>{item.playCount?.toLocaleString() || '0'}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FaRegHeart className="text-[9px]" />
+                          <span>{item.likeCount?.toLocaleString() || '0'}</span>
+                        </div>
+                      </div>
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                     </div>
@@ -974,7 +970,7 @@ export default function GuestWelcome() {
               {quickPicks.slice(0, 6).map((item: any, i: number) => (
                 <div
                   key={i}
-                  className="rounded-lg overflow-hidden relative shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                  className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
                   {/* IMAGE */}
                   <div
@@ -986,12 +982,11 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  {/* OVERLAY */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 backdrop-blur-sm">
+                  <div className="p-3 bg-[#080a13]">
                     <p className="text-xs font-medium truncate text-white">
                       {item.title}
                     </p>
-                    <p className="text-xs text-gray-200 truncate">
+                    <p className="text-xs text-gray-400 truncate">
                       {item.user?.displayName || item.user?.username || 'Unknown Artist'}
                     </p>
                   </div>
