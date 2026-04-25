@@ -4,7 +4,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { Compass, Search, Library, MoreHorizontal } from "lucide-react";
 
-export default function BottomNav() {
+interface BottomNavProps {
+  onMoreClick?: () => void;
+}
+
+export default function BottomNav({ onMoreClick }: BottomNavProps) {
   const [activeTab, setActiveTab] = useState("home");
 
   const navItems = [
@@ -15,6 +19,13 @@ export default function BottomNav() {
     { id: "more", label: "More", icon: MoreHorizontal },
   ];
 
+  const handleClick = (id: string) => {
+    setActiveTab(id);
+    if (id === "more" && onMoreClick) {
+      onMoreClick();
+    }
+  };
+
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
       <div className="glass-pill mx-4 mb-3 px-2 py-2 flex items-center justify-around">
@@ -24,7 +35,7 @@ export default function BottomNav() {
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleClick(item.id)}
               className={`relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${
                 isActive ? "text-white" : "text-gray-400"
               }`}

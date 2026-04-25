@@ -70,7 +70,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
       {/* =======================
           📱 BOTTOM NAVIGATION
       ======================== */}
-      <BottomNav />
+      <BottomNav onMoreClick={() => setMobileMenuOpen(true)} />
 
       {/* =======================
           📱 MOBILE MENU

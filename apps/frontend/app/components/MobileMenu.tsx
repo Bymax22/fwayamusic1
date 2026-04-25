@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus } from "lucide-react";
+import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, PlayCircle } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -19,6 +19,7 @@ const Icon = ({ children }: { children: React.ReactNode }) => (
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const [activeMenuTab, setActiveMenuTab] = useState("menu");
 
   // Only close menu if pathname changes after menu is already open
   const prevPathnameRef = useRef(pathname);
@@ -75,6 +76,14 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const authMenuItems = [
     { title: "Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/login" },
     { title: "Create Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/signup" },
+  ];
+
+  // Menu tabs
+  const menuTabs = [
+    { id: "menu", label: "Menu", icon: Home },
+    { id: "library", label: "Library", icon: Library },
+    { id: "discover", label: "Discover", icon: Compass },
+    { id: "account", label: "Account", icon: User },
   ];
 
   const MenuSection = ({ title, items }: { title: string; items: { title: string; icon: React.ReactNode; href: string }[] }) => (
@@ -169,23 +178,57 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </div>
             )}
 
-            {/* Scrollable Content */}
-            <div className="h-[calc(100%-140px)] overflow-y-auto pb-6">
-              <div className="space-y-6 py-4">
-                <MenuSection title="Navigation" items={mainMenuItems} />
-                {user ? (
-                  <>
-                    <MenuSection title="Your Library" items={musicMenuItems} />
-                    <MenuSection title="Discover" items={discoverMenuItems} />
-                    <MenuSection title="Account" items={settingsMenuItems} />
-                  </>
-                ) : (
-                  <>
-                    <MenuSection title="Discover" items={discoverMenuItems} />
-                    <MenuSection title="Authentication" items={authMenuItems} />
-                  </>
-                )}
+            {/* Tabs */}
+            <div className="px-6 py-3 border-b border-white/10">
+              <div className="flex space-x-1 bg-white/5 rounded-xl p-1">
+                {menuTabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeMenuTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveMenuTab(tab.id)}
+                      className={`flex-1 flex items-center justify-center space-x-2 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 ${
+                        isActive ? "bg-purple-600 text-white" : "text-gray-400 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      <Icon size={16} />
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
               </div>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="h-[calc(100%-180px)] overflow-y-auto pb-6">
+              {activeMenuTab === "menu" && (
+                <div className="space-y-6 py-4">
+                  <MenuSection title="Navigation" items={mainMenuItems} />
+                </div>
+              )}
+
+              {activeMenuTab === "library" && user && (
+                <div className="space-y-6 py-4">
+                  <MenuSection title="Your Library" items={musicMenuItems} />
+                </div>
+              )}
+
+              {activeMenuTab === "discover" && (
+                <div className="space-y-6 py-4">
+                  <MenuSection title="Discover" items={discoverMenuItems} />
+                </div>
+              )}
+
+              {activeMenuTab === "account" && (
+                <div className="space-y-6 py-4">
+                  {user ? (
+                    <MenuSection title="Account" items={settingsMenuItems} />
+                  ) : (
+                    <MenuSection title="Authentication" items={authMenuItems} />
+                  )}
+                </div>
+              )}
 
               {/* Now Playing Preview */}
               <div className="mx-4 mt-6 p-4 rounded-2xl bg-gradient-to-r from-purple-600/20 to-pink-500/20 backdrop-blur-sm border border-white/10">
