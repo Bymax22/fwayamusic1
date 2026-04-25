@@ -241,21 +241,20 @@ export default function GuestWelcome() {
         {/* Tabs */}
         <div className="flex gap-2 mt-2 overflow-x-auto pb-2 scrollbar-hide">
           {[
-            { name: "For You", key: "for-you", href: "/" },
-            { name: "New Releases", key: "new-releases", href: "/new-releases" },
-            { name: "Playlists", key: "playlists", href: "/playlist" },
-            { name: "Podcasts", key: "podcasts", href: "/podcasts" }
+            { name: "For You", key: "for-you" },
+            { name: "New Releases", key: "new-releases" },
+            { name: "Playlists", key: "playlists" },
+            { name: "Podcasts", key: "podcasts" }
           ].map((tab, i) => (
-            <Link
+            <button
               key={i}
-              href={tab.href}
               className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
                 activeTab === tab.key ? "bg-purple-600 text-white" : "bg-white/5 text-gray-300 hover:bg-white/10"
               }`}
               onClick={() => setActiveTab(tab.key)}
             >
               {tab.name}
-            </Link>
+            </button>
           ))}
           
           {/* More Button */}
@@ -269,236 +268,287 @@ export default function GuestWelcome() {
           </button>
         </div>
 
-        {/* Quick Picks (mobile) */}
-        <div className="mt-3">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-semibold">Quick Picks for You</h3>
-            <span className="text-xs text-gray-400">See All {'>'}</span>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {quickPicks.slice(0, 6).map((item: any, i: number) => (
-              <div 
-                key={i} 
-                className="w-32 flex-shrink-0 cursor-pointer"
-                onClick={() => playTrack({
-                  id: item.id,
-                  title: item.title,
-                  artist: item.user?.displayName || item.user?.username || 'Unknown',
-                  imageUrl: item.artCoverUrl,
-                  audioUrl: item.audioUrl,
-                  duration: item.duration
-                })}
-              >
-                <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
+        {/* Tab Content */}
+        {activeTab === 'for-you' && (
+          <>
+            {/* Quick Picks (mobile) */}
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Quick Picks for You</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {quickPicks.slice(0, 6).map((item: any, i: number) => (
                   <div 
-                    className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
-                    style={{
-                      backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 backdrop-blur-sm">
-                    <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
-                      <div className="flex items-center gap-1">
-                        <FaHeadphones className="text-[9px]" />
-                        <span>{item.playCount?.toLocaleString() || '0'}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <FaRegHeart className="text-[9px]" />
-                        <span>{item.likeCount?.toLocaleString() || '0'}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="px-1">
-                  <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
-                  <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Trending Now (mobile) */}
-        <div className="mt-3">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-semibold">Trending Now</h3>
-            <span className="text-xs text-gray-400">See All {'>'}</span>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {trendingNow.slice(0, 6).map((item: any, i: number) => (
-              <div 
-                key={i} 
-                className="w-32 flex-shrink-0 cursor-pointer"
-                onClick={() => playTrack({
-                  id: item.id,
-                  title: item.title,
-                  artist: item.user?.displayName || item.user?.username || 'Unknown',
-                  imageUrl: item.artCoverUrl,
-                  audioUrl: item.audioUrl,
-                  duration: item.duration
-                })}
-              >
-                <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
-                  <div 
-                    className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
-                    style={{
-                      backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 backdrop-blur-sm">
-                    <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
-                      <div className="flex items-center gap-1">
-                        <FaHeadphones className="text-[9px]" />
-                        <span>{item.playCount?.toLocaleString() || '0'}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <FaRegHeart className="text-[9px]" />
-                        <span>{item.likeCount?.toLocaleString() || '0'}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="px-1">
-                  <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
-                  <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Featured Albums (mobile) */}
-        <div className="mt-3">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-semibold">Featured Albums</h3>
-            <span className="text-xs text-gray-400">See All {'>'}</span>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
-              <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-[#0a0a0d]">
-                <div className="relative">
-                  <div 
-                    className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
-                    style={{
-                      backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  />
-                  <div className="absolute bottom-3 left-3 text-[9px] text-white/90 bg-black/70 px-2 py-1 rounded">
-                    {item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks
-                  </div>
-                </div>
-                <div className="p-3 bg-black/20">
-                  <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
-                  <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Featured Artists (mobile) */}
-        <div className="mt-3">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-semibold">Featured Artists</h3>
-            <span className="text-xs text-gray-400">See All {'>'}</span>
-          </div>
-          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-            {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-              <div key={i} className="flex-shrink-0 text-center cursor-pointer">
-                <div 
-                  className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
-                  style={{
-                    backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                >
-                  {!artist.avatarUrl && (
-                    <span className="text-white font-bold text-lg">
-                      {artist.username?.substring(0, 2).toUpperCase() || 'A'}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
-                <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Suggested Playlists (mobile) */}
-        <div className="mt-3 mb-4">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-semibold">Suggested Playlists</h3>
-            <span className="text-xs text-gray-400">See All {'>'}</span>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {playlists.slice(0, 6).map((item: any, i: number) => (
-              <div key={i} className="min-w-[120px] bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
-                <div 
-                  className="w-full aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-2"
-                  style={{
-                    backgroundImage: item.coverUrl ? `url(${item.coverUrl})` : undefined,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                />
-                <p className="text-xs font-semibold truncate">{item.name || item.title}</p>
-                <p className="text-xs text-gray-400">{item.mediasCount || 0} tracks</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Top Charts (mobile styled) */}
-        <div className="mt-3">
-          <h3 className="font-semibold mb-3">Top Charts</h3>
-          <div className="space-y-3">
-            {topCharts.slice(0, 6).map((track: any, i: number) => (
-              <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
-                  <div 
-                    className="w-10 h-10 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0"
-                    style={{
-                      backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{track.title}</p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-gray-400">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
-                      <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
-                        {track.duration ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` : '0:00'}
-                      </span>
-                    </div>
-                  </div>
-                  <button 
+                    key={i} 
+                    className="w-32 flex-shrink-0 cursor-pointer"
                     onClick={() => playTrack({
-                      id: track.id,
-                      title: track.title,
-                      artist: track.user?.displayName || track.user?.username || 'Unknown',
-                      imageUrl: track.artCoverUrl,
-                      audioUrl: track.audioUrl,
-                      duration: track.duration
+                      id: item.id,
+                      title: item.title,
+                      artist: item.user?.displayName || item.user?.username || 'Unknown',
+                      imageUrl: item.artCoverUrl,
+                      audioUrl: item.audioUrl,
+                      duration: item.duration
                     })}
-                    className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
                   >
-                    <FaPlay className="text-white text-xs ml-0.5" />
-                  </button>
-                </div>
+                    <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
+                      <div className="aspect-square relative">
+                        {item.artCoverUrl ? (
+                          <Image
+                            src={item.artCoverUrl}
+                            alt={item.title}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500" />
+                        )}
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 backdrop-blur-sm">
+                        <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
+                          <div className="flex items-center gap-1">
+                            <FaHeadphones className="text-[9px]" />
+                            <span>{item.playCount?.toLocaleString() || '0'}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <FaRegHeart className="text-[9px]" />
+                            <span>{item.likeCount?.toLocaleString() || '0'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-1">
+                      <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
+                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+
+            {/* Featured Artists (mobile) */}
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Featured Artists</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
+                  <div key={i} className="flex-shrink-0 text-center cursor-pointer">
+                    <div 
+                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
+                      style={{
+                        backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    >
+                      {!artist.avatarUrl && (
+                        <span className="text-white font-bold text-lg">
+                          {artist.username?.substring(0, 2).toUpperCase() || 'A'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
+                    <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === 'new-releases' && (
+          <>
+            {/* Trending Now (mobile) */}
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Trending Now</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {trendingNow.slice(0, 6).map((item: any, i: number) => (
+                  <div 
+                    key={i} 
+                    className="w-32 flex-shrink-0 cursor-pointer"
+                    onClick={() => playTrack({
+                      id: item.id,
+                      title: item.title,
+                      artist: item.user?.displayName || item.user?.username || 'Unknown',
+                      imageUrl: item.artCoverUrl,
+                      audioUrl: item.audioUrl,
+                      duration: item.duration
+                    })}
+                  >
+                    <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
+                      <div 
+                        className="aspect-square bg-black"
+                        style={{
+                          backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 backdrop-blur-sm">
+                        <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
+                          <div className="flex items-center gap-1">
+                            <FaHeadphones className="text-[9px]" />
+                            <span>{item.playCount?.toLocaleString() || '0'}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <FaRegHeart className="text-[9px]" />
+                            <span>{item.likeCount?.toLocaleString() || '0'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-1">
+                      <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
+                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Featured Albums (mobile) */}
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Featured Albums</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
+                  <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-[#0a0a0d]">
+                    <div className="relative">
+                      <div 
+                        className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
+                        style={{
+                          backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                      <div className="absolute bottom-3 left-3 text-[9px] text-white/90 bg-black/70 px-2 py-1 rounded">
+                        {item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks
+                      </div>
+                    </div>
+                    <div className="p-3 bg-black/20">
+                      <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
+                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Top Charts (mobile styled) */}
+            <div className="mt-3">
+              <h3 className="font-semibold mb-3">Top Charts</h3>
+              <div className="space-y-3">
+                {topCharts.slice(0, 6).map((track: any, i: number) => (
+                  <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
+                      <div 
+                        className="w-10 h-10 rounded-md bg-black flex-shrink-0"
+                        style={{
+                          backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{track.title}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-gray-400">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
+                          <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
+                            {track.duration ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` : '0:00'}
+                          </span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => playTrack({
+                          id: track.id,
+                          title: track.title,
+                          artist: track.user?.displayName || track.user?.username || 'Unknown',
+                          imageUrl: track.artCoverUrl,
+                          audioUrl: track.audioUrl,
+                          duration: track.duration
+                        })}
+                        className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
+                      >
+                        <FaPlay className="text-white text-xs ml-0.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === 'playlists' && (
+          <>
+            {/* Suggested Playlists (mobile) */}
+            <div className="mt-3 mb-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Suggested Playlists</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {playlists.slice(0, 6).map((item: any, i: number) => (
+                  <div key={i} className="min-w-[120px] bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
+                    <div 
+                      className="w-full aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-2"
+                      style={{
+                        backgroundImage: item.coverUrl ? `url(${item.coverUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    />
+                    <p className="text-xs font-semibold truncate">{item.name || item.title}</p>
+                    <p className="text-xs text-gray-400">{item.mediasCount || 0} tracks</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === 'podcasts' && (
+          <>
+            {/* Featured Artists (as Podcasts placeholder) */}
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Featured Podcasts</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
+                  <div key={i} className="flex-shrink-0 text-center cursor-pointer">
+                    <div 
+                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
+                      style={{
+                        backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    >
+                      {!artist.avatarUrl && (
+                        <span className="text-white font-bold text-lg">
+                          {artist.username?.substring(0, 2).toUpperCase() || 'A'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
+                    <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* ================= DESKTOP ================= */}
@@ -667,7 +717,7 @@ export default function GuestWelcome() {
                 >
                   {/* ALBUM COVER */}
                   <div
-                    className="aspect-[4/5] bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg group-hover:scale-105 transition-transform"
+                    className="aspect-[4/5] bg-black rounded-lg group-hover:scale-105 transition-transform"
                     style={{
                       backgroundImage: album.artCoverUrl ? `url(${album.artCoverUrl})` : undefined,
                       backgroundSize: 'cover',
