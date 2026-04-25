@@ -1023,7 +1023,7 @@ export default function GuestWelcome() {
               {featuredAlbums.slice(0, 5).map((album: any, i: number) => (
                 <div
                   key={i}
-                  className="rounded-xl overflow-hidden relative shadow-lg hover:shadow-xl transition-all cursor-pointer group"
+                  className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all cursor-pointer group"
                 >
                   {/* ALBUM COVER */}
                   <div
@@ -1035,15 +1035,14 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  {/* OVERLAY */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 backdrop-blur-sm rounded-b-xl">
+                  <div className="p-3 bg-[#080a13]">
                     <p className="text-xs font-semibold truncate text-white mb-0.5">
                       {album.title}
                     </p>
-                    <p className="text-xs text-gray-200 truncate">
+                    <p className="text-xs text-gray-400 truncate">
                       {album.user?.displayName || album.user?.username || 'Unknown Artist'}
                     </p>
-                    <p className="text-xs text-gray-300">
+                    <p className="text-xs text-gray-400">
                       {album.createdAt ? new Date(album.createdAt).getFullYear() : new Date().getFullYear()}
                     </p>
                   </div>
@@ -1102,7 +1101,7 @@ export default function GuestWelcome() {
               {trendingNow.slice(0, 6).map((track: any, i: number) => (
                 <div
                   key={i}
-                  className="rounded-lg overflow-hidden relative shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                  className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
                   {/* IMAGE */}
                   <div
@@ -1114,12 +1113,11 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  {/* OVERLAY */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 backdrop-blur-sm">
+                  <div className="p-3 bg-[#080a13]">
                     <p className="text-xs font-medium truncate text-white">
                       {track.title}
                     </p>
-                    <p className="text-xs text-gray-200 truncate">
+                    <p className="text-xs text-gray-400 truncate">
                       {track.user?.displayName || track.user?.username || 'Unknown Artist'}
                     </p>
                   </div>
@@ -1149,7 +1147,7 @@ export default function GuestWelcome() {
               {playlists.slice(0, 5).map((playlist: any, i: number) => (
                 <div
                   key={i}
-                  className="rounded-xl overflow-hidden relative shadow-lg hover:shadow-xl transition-all cursor-pointer group"
+                  className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all cursor-pointer group"
                 >
                   {/* PLAYLIST COVER */}
                   <div
@@ -1161,12 +1159,11 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  {/* OVERLAY */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/70 backdrop-blur-sm rounded-b-xl">
+                  <div className="p-3 bg-[#080a13]">
                     <p className="text-xs font-semibold truncate text-white mb-0.5">
                       {playlist.name || playlist.title}
                     </p>
-                    <p className="text-xs text-gray-300">
+                    <p className="text-xs text-gray-400">
                       {playlist.mediasCount || 0} tracks
                     </p>
                   </div>
