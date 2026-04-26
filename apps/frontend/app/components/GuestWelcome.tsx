@@ -22,7 +22,7 @@ import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import MobileMenu from "./MobileMenu";
 
 export default function GuestWelcome() {
-  const [activeTab, setActiveTab] = useState("for-you");
+  const [activeTab, setActiveTab] = useState<string>("for-you");
   const [heroImageIndex, setHeroImageIndex] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -358,14 +358,18 @@ export default function GuestWelcome() {
                     })}
                   >
                     <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow mb-2">
-                      <div 
-                        className="aspect-square bg-black"
-                        style={{
-                          backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center'
-                        }}
-                      />
+                      <div className="aspect-square relative overflow-hidden bg-black/10">
+                        {item.artCoverUrl ? (
+                          <Image
+                            src={item.artCoverUrl}
+                            alt={item.title}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500" />
+                        )}
+                      </div>
                     </div>
                     <div className="px-1">
                       <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
@@ -421,14 +425,16 @@ export default function GuestWelcome() {
                   <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
-                      <div 
-                        className="w-10 h-10 rounded-md bg-black flex-shrink-0"
-                        style={{
-                          backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center'
-                        }}
-                      />
+                      <div className="w-10 h-10 rounded-md overflow-hidden bg-black flex-shrink-0 relative">
+                        {track.artCoverUrl ? (
+                          <Image
+                            src={track.artCoverUrl}
+                            alt={track.title || 'Track art'}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : null}
+                      </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium">{track.title}</p>
                         <div className="flex items-center justify-between">
