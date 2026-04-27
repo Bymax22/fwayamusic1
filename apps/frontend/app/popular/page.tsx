@@ -21,7 +21,7 @@ interface PopularItem {
 export default function PopularPage() {
   const [popularItems, setPopularItems] = useState<PopularItem[]>([]);
   const [category, setCategory] = useState<'tracks' | 'artists' | 'playlists'>('tracks');
-  const { currentTrack, isPlaying, setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
 
   useEffect(() => {
     const fetchPopular = async () => {
@@ -99,7 +99,7 @@ export default function PopularPage() {
     if (currentTrack?.id === track.id) {
       togglePlay();
     } else {
-      setCurrentTrack({
+      playTrack({
         id: track.id,
         title: track.title,
         artist: track.artist,

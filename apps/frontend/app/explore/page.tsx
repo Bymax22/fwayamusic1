@@ -30,7 +30,7 @@ export default function ExplorePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [trendingTracks, setTrendingTracks] = useState<MediaFile[]>([]);
   const [newReleases, setNewReleases] = useState<MediaFile[]>([]);
-  const { currentTrack, isPlaying, setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,7 +88,7 @@ export default function ExplorePage() {
     if (currentTrack?.id === file.id) {
       togglePlay();
     } else {
-      setCurrentTrack({
+      playTrack({
         id: file.id,
         title: file.title,
         artist: file.artist,

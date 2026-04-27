@@ -37,7 +37,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'songs' | 'artists'>('all');
   
-  const { currentTrack, isPlaying, togglePlay, setCurrentTrack } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,7 +103,7 @@ export default function SearchPage() {
     if (currentTrack?.id === file.id) {
       togglePlay();
     } else {
-      setCurrentTrack({
+      playTrack({
         id: file.id,
         title: file.title,
         artist: file.artist,

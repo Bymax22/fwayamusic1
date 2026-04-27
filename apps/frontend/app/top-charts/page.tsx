@@ -22,7 +22,7 @@ interface ChartItem {
 export default function TopChartsPage() {
   const [charts, setCharts] = useState<ChartItem[]>([]);
   const [timeRange, setTimeRange] = useState<'day' | 'week' | 'month'>('week');
-  const { currentTrack, isPlaying, setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
 
   useEffect(() => {
     const fetchCharts = async () => {
@@ -105,7 +105,7 @@ export default function TopChartsPage() {
     if (currentTrack?.id === track.id) {
       togglePlay();
     } else {
-      setCurrentTrack({
+      playTrack({
         id: track.id,
         title: track.title,
         artist: track.artist,

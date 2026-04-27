@@ -20,7 +20,7 @@ interface NewRelease {
 export default function NewReleasesPage() {
   const [newReleases, setNewReleases] = useState<NewRelease[]>([]);
   const [filter, setFilter] = useState<'all' | 'this-week' | 'this-month'>('all');
-  const { currentTrack, isPlaying, setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
 
   useEffect(() => {
     const fetchNewReleases = async () => {
@@ -93,7 +93,7 @@ export default function NewReleasesPage() {
     if (currentTrack?.id === track.id) {
       togglePlay();
     } else {
-      setCurrentTrack({
+      playTrack({
         id: track.id,
         title: track.title,
         artist: track.artist,

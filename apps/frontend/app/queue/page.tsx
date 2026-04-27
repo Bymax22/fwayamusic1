@@ -20,7 +20,7 @@ interface QueueItem {
 export default function QueuePage() {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [upNext, setUpNext] = useState<QueueItem[]>([]);
-  const { currentTrack,  setCurrentTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack, playTrack, togglePlay } = useAudioPlayer();
 
   useEffect(() => {
     // Mock queue data
@@ -78,7 +78,7 @@ export default function QueuePage() {
     if (currentTrack?.id === track.id) {
       togglePlay();
     } else {
-      setCurrentTrack({
+      playTrack({
         id: track.id,
         title: track.title,
         artist: track.artist,
