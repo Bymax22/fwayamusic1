@@ -45,87 +45,81 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(new Audio());
 
-  // Initialize audio element
   useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      const audio = audioRef.current;
+    const audio = audioRef.current;
+    console.log('GlobalPlayer: Created new audio element');
 
-      console.log('GlobalPlayer: Created new audio element');
+    const updateDuration = () => {
+      const duration = audio.duration || 0;
+      console.log('GlobalPlayer: Duration loaded:', duration);
+      setDuration(duration);
+    };
 
-      // Set up permanent event listeners
-      const updateDuration = () => {
-        const duration = audio.duration || 0;
-        console.log('GlobalPlayer: Duration loaded:', duration);
-        setDuration(duration);
-      };
+    const updateTime = () => {
+      setCurrentTime(audio.currentTime);
+    };
 
-      const updateTime = () => {
-        setCurrentTime(audio.currentTime);
-      };
+    const handleEnded = () => {
+      console.log('GlobalPlayer: Track ended');
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
 
-      const handleEnded = () => {
-        console.log('GlobalPlayer: Track ended');
-        setIsPlaying(false);
-        setCurrentTime(0);
-      };
+    const handleLoadStart = () => {
+      console.log('GlobalPlayer: Load started');
+      setIsLoading(true);
+    };
 
-      const handleLoadStart = () => {
-        console.log('GlobalPlayer: Load started');
-        setIsLoading(true);
-      };
+    const handleCanPlay = () => {
+      console.log('GlobalPlayer: Can play now');
+      setIsLoading(false);
+    };
 
-      const handleCanPlay = () => {
-        console.log('GlobalPlayer: Can play now');
-        setIsLoading(false);
-      };
+    const handleError = (e: Event) => {
+      console.error('GlobalPlayer: Audio error:', e);
+      setIsLoading(false);
+      setIsPlaying(false);
+    };
 
-      const handleError = (e: Event) => {
-        console.error('GlobalPlayer: Audio error:', e);
-        setIsLoading(false);
-        setIsPlaying(false);
-      };
+    const handlePlaying = () => {
+      console.log('GlobalPlayer: Audio started playing');
+      setIsPlaying(true);
+      setIsLoading(false);
+    };
 
-      const handlePlaying = () => {
-        console.log('GlobalPlayer: Audio started playing');
-        setIsPlaying(true);
-        setIsLoading(false);
-      };
+    const handlePause = () => {
+      console.log('GlobalPlayer: Audio paused');
+      setIsPlaying(false);
+    };
 
-      const handlePause = () => {
-        console.log('GlobalPlayer: Audio paused');
-        setIsPlaying(false);
-      };
+    audio.addEventListener('loadedmetadata', updateDuration);
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('playing', handlePlaying);
+    audio.addEventListener('pause', handlePause);
 
-      audio.addEventListener("loadedmetadata", updateDuration);
-      audio.addEventListener("timeupdate", updateTime);
-      audio.addEventListener("ended", handleEnded);
-      audio.addEventListener("loadstart", handleLoadStart);
-      audio.addEventListener("canplay", handleCanPlay);
-      audio.addEventListener("error", handleError);
-      audio.addEventListener("playing", handlePlaying);
-      audio.addEventListener("pause", handlePause);
+    audio.volume = volume;
+    audio.muted = isMuted;
+    audio.preload = 'metadata';
+    audio.crossOrigin = 'anonymous';
 
-      // Set initial volume
-      audio.volume = volume;
-      audio.muted = isMuted;
-
-      // Cleanup function
-      return () => {
-        console.log('GlobalPlayer: Cleaning up audio element');
-        audio.removeEventListener("loadedmetadata", updateDuration);
-        audio.removeEventListener("timeupdate", updateTime);
-        audio.removeEventListener("ended", handleEnded);
-        audio.removeEventListener("loadstart", handleLoadStart);
-        audio.removeEventListener("canplay", handleCanPlay);
-        audio.removeEventListener("error", handleError);
-        audio.removeEventListener("playing", handlePlaying);
-        audio.removeEventListener("pause", handlePause);
-        audio.pause();
-      };
-    }
+    return () => {
+      console.log('GlobalPlayer: Cleaning up audio element');
+      audio.removeEventListener('loadedmetadata', updateDuration);
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('error', handleError);
+      audio.removeEventListener('playing', handlePlaying);
+      audio.removeEventListener('pause', handlePause);
+      audio.pause();
+    };
   }, []);
 
   const togglePlay = () => {
@@ -141,6 +135,19 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    const normalizedUrl = audioUrl.trim();
+    if (!audio.src || audio.src !== normalizedUrl) {
+      console.log('GlobalPlayer: Loading current track source before toggling playback');
+      audio.src = normalizedUrl;
+      audio.preload = 'metadata';
+      audio.crossOrigin = 'anonymous';
+      audio.muted = isMuted;
+      audio.volume = isMuted ? 0 : volume;
+      audio.load();
+      setCurrentTime(0);
+      setDuration(0);
+    }
+
     if (isPlaying) {
       console.log('GlobalPlayer: Pausing playback');
       audio.pause();
@@ -154,7 +161,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
         setIsPlaying(true);
         setIsLoading(false);
       }).catch((err) => {
-        console.error("GlobalPlayer: Play failed:", err);
+        console.error('GlobalPlayer: Play failed:', err);
         setIsPlaying(false);
         setIsLoading(false);
       });
@@ -196,73 +203,27 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     const src = newTrack.audioUrl.trim();
     console.log('GlobalPlayer: Setting audio source to:', src);
 
-    // Stop any current playback
     audio.pause();
     audio.currentTime = 0;
-
-    // Clear any existing event listeners to avoid duplicates
-    const audioElement = audio as any;
-    if (audioElement.canplayHandler) {
-      audio.removeEventListener('canplay', audioElement.canplayHandler);
-    }
-    if (audioElement.errorHandler) {
-      audio.removeEventListener('error', audioElement.errorHandler);
-    }
-    if (audioElement.loadstartHandler) {
-      audio.removeEventListener('loadstart', audioElement.loadstartHandler);
-    }
-
-    // Set up event handlers
-    const handleCanPlay = () => {
-      console.log('GlobalPlayer: Audio can play, starting playback');
-      const audioElement = audio as any;
-      audio.removeEventListener('canplay', audioElement.canplayHandler);
-      audio.removeEventListener('error', audioElement.errorHandler);
-      audio.removeEventListener('loadstart', audioElement.loadstartHandler);
-
-      audio.play().then(() => {
-        console.log('GlobalPlayer: Audio started playing successfully');
-        setIsPlaying(true);
-        setIsLoading(false);
-      }).catch((err) => {
-        console.error("GlobalPlayer: Auto-play failed:", err);
-        setIsPlaying(false);
-        setIsLoading(false);
-      });
-    };
-
-    const handleError = (e: Event) => {
-      console.error('GlobalPlayer: Audio load error:', e);
-      const audioElement = audio as any;
-      audio.removeEventListener('canplay', audioElement.canplayHandler);
-      audio.removeEventListener('error', audioElement.errorHandler);
-      audio.removeEventListener('loadstart', audioElement.loadstartHandler);
-      setIsPlaying(false);
-      setIsLoading(false);
-    };
-
-    const handleLoadStart = () => {
-      console.log('GlobalPlayer: Audio load started');
-      setIsLoading(true);
-    };
-
-    // Store handlers on audio element to allow removal
-    audioElement.canplayHandler = handleCanPlay;
-    audioElement.errorHandler = handleError;
-    audioElement.loadstartHandler = handleLoadStart;
-
-    audio.addEventListener('canplay', handleCanPlay);
-    audio.addEventListener('error', handleError);
-    audio.addEventListener('loadstart', handleLoadStart);
-
-    // Set audio properties
-    audio.preload = 'metadata';
-    audio.crossOrigin = 'anonymous';
     audio.src = src;
+    audio.crossOrigin = 'anonymous';
+    audio.preload = 'metadata';
+    audio.muted = isMuted;
+    audio.volume = isMuted ? 0 : volume;
     audio.load();
 
     setCurrentTime(0);
     setDuration(0);
+
+    audio.play().then(() => {
+      console.log('GlobalPlayer: Audio started playing successfully');
+      setIsPlaying(true);
+      setIsLoading(false);
+    }).catch((err) => {
+      console.error('GlobalPlayer: Play failed:', err);
+      setIsPlaying(false);
+      setIsLoading(false);
+    });
   };
 
   const seekTo = (time: number) => {
