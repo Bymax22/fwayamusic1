@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlayIcon,
@@ -32,170 +32,67 @@ type TrackType = {
 interface MobilePlayerProps {
   track: TrackType;
   isPlaying: boolean;
+  currentTime: number;
+  duration: number;
+  volume: number;
+  isMuted: boolean;
+  isLoading: boolean;
   onPlayPause: () => void;
   onClose: () => void;
   onNext?: () => void;
   onPrevious?: () => void;
   onRepeat?: () => void;
+  onSeek?: (time: number) => void;
+  onVolumeChange?: (volume: number) => void;
+  onToggleMute?: () => void;
   className?: string;
 }
 
 export default function MobilePlayer({
   track,
   isPlaying,
+  currentTime,
+  duration,
+  volume,
+  isMuted,
+  isLoading,
   onPlayPause,
   onClose,
   onNext,
   onPrevious,
   onRepeat,
+  onSeek,
+  onVolumeChange,
+  onToggleMute,
   className,
 }: MobilePlayerProps) {
-  const [volume, setVolume] = useState(0.7);
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffled, setIsShuffled] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-    }
-    const audio = audioRef.current;
-
-    const updateDuration = () => {
-      console.log('MobilePlayer: Duration loaded:', audio.duration);
-      setDuration(audio.duration || 0);
-    };
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const handleEnded = () => {
-      console.log('MobilePlayer: Track ended');
-      if (onPlayPause) onPlayPause();
-    };
-    const handleLoadStart = () => {
-      console.log('MobilePlayer: Load started');
-      setIsLoading(true);
-    };
-    const handleCanPlay = () => {
-      console.log('MobilePlayer: Can play now');
-      setIsLoading(false);
-    };
-    const handleError = (e: Event) => {
-      console.error('MobilePlayer: Audio error:', e);
-      setIsLoading(false);
-    };
-
-    audio.addEventListener("loadedmetadata", updateDuration);
-    audio.addEventListener("timeupdate", updateTime);
-    audio.addEventListener("ended", handleEnded);
-    audio.addEventListener("loadstart", handleLoadStart);
-    audio.addEventListener("canplay", handleCanPlay);
-    audio.addEventListener("error", handleError);
-
-    return () => {
-      audio.removeEventListener("loadedmetadata", updateDuration);
-      audio.removeEventListener("timeupdate", updateTime);
-      audio.removeEventListener("ended", handleEnded);
-      audio.removeEventListener("loadstart", handleLoadStart);
-      audio.removeEventListener("canplay", handleCanPlay);
-      audio.removeEventListener("error", handleError);
-      audio.pause();
-    };
-  }, [onPlayPause]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    console.log('MobilePlayer: Setting up audio for track:', track);
-
-    if (track?.audioUrl && typeof track.audioUrl === "string") {
-      const src = track.audioUrl.trim();
-      console.log('MobilePlayer: Audio URL:', src);
-      
-      if (src && audio.src !== src) {
-        audio.preload = 'metadata';
-        audio.crossOrigin = 'anonymous';
-        audio.src = src;
-        audio.load();
-        setCurrentTime(0);
-        setDuration(0);
-        console.log('MobilePlayer: Audio source set and loaded');
-      }
-    } else {
-      console.log('MobilePlayer: No valid audio URL provided');
-      audio.pause();
-      audio.src = "";
-      setIsLoading(false);
-      setCurrentTime(0);
-      setDuration(0);
-    }
-
-    audio.volume = isMuted ? 0 : volume;
-    audio.muted = isMuted;
-
-    if (isPlaying) {
-      console.log('MobilePlayer: Attempting to play');
-      if (audio.readyState >= 2) {
-        audio.play().catch((err) => {
-          console.error("MobilePlayer: Audio play() failed:", err);
-          setIsLoading(false);
-        });
-      } else {
-        const playWhenReady = () => {
-          console.log('MobilePlayer: Audio can play, starting playback');
-          audio.removeEventListener('canplay', playWhenReady);
-          audio.play().catch((err) => {
-            console.error("MobilePlayer: Audio play() failed after canplay:", err);
-            setIsLoading(false);
-          });
-        };
-        audio.addEventListener('canplay', playWhenReady);
-      }
-    } else {
-      console.log('MobilePlayer: Pausing audio');
-      audio.pause();
-    }
-  }, [track, track?.audioUrl, isPlaying, volume, isMuted, onPlayPause]);
-
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const audio = audioRef.current;
-    if (!audio || !progressBarRef.current) return;
+    if (!progressBarRef.current || !onSeek) return;
 
     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     const newTime = percent * duration;
 
-    audio.currentTime = newTime;
-    setCurrentTime(newTime);
+    onSeek(newTime);
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    const audio = audioRef.current;
-    if (audio && !isMuted) {
-      audio.volume = newVolume;
-    }
-    if (newVolume === 0) {
-      setIsMuted(true);
-    } else if (isMuted) {
-      setIsMuted(false);
+    if (onVolumeChange) {
+      onVolumeChange(newVolume);
     }
   };
 
   const toggleMute = () => {
-    const audio = audioRef.current;
-    setIsMuted((m) => {
-      const next = !m;
-      if (audio) audio.volume = next ? 0 : volume;
-      return next;
-    });
+    if (onToggleMute) {
+      onToggleMute();
+    }
   };
 
   const formatTime = (seconds: number) => {
