@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileMoneyPaymentPreviewModal } from "./modal/MobileMoneyPaymentPreviewModal";
 import {
@@ -36,228 +36,75 @@ type TrackType = {
 interface PlayerProps {
   track: TrackType;
   isPlaying: boolean;
+  currentTime: number;
+  duration: number;
+  volume: number;
+  isMuted: boolean;
+  isLoading: boolean;
   onPlayPause: () => void;
   onClose: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  onSeek?: (time: number) => void;
+  onVolumeChange?: (volume: number) => void;
+  onToggleMute?: () => void;
   className?: string;
 }
 
 export default function Player({
   track,
   isPlaying,
+  currentTime,
+  duration,
+  volume,
+  isMuted,
+  isLoading,
   onPlayPause,
   onClose,
+  onNext,
+  onPrevious,
+  onSeek,
+  onVolumeChange,
+  onToggleMute,
   className,
 }: PlayerProps) {
-  const [volume, setVolume] = useState(0.7);
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const previewTimerRef = useRef<number | null>(null);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      console.log('Created new audio element');
-    }
-    const audio = audioRef.current;
-    console.log('Audio element:', audio);
 
-    const updateDuration = () => setDuration(audio.duration || 0);
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const handleEnded = () => {
-      if (onPlayPause) onPlayPause();
-    };
-    const handleLoadStart = () => setIsLoading(true);
-    const handleCanPlay = () => setIsLoading(false);
-    const handleError = (e: Event) => {
-      console.error('Audio error:', e);
-      setIsLoading(false);
-    };
-
-    audio.addEventListener("loadedmetadata", updateDuration);
-    audio.addEventListener("timeupdate", updateTime);
-    audio.addEventListener("ended", handleEnded);
-    audio.addEventListener("loadstart", handleLoadStart);
-    audio.addEventListener("canplay", handleCanPlay);
-    audio.addEventListener("canplaythrough", handleCanPlay);
-    audio.addEventListener("error", handleError);
-
-    return () => {
-      audio.removeEventListener("loadedmetadata", updateDuration);
-      audio.removeEventListener("timeupdate", updateTime);
-      audio.removeEventListener("ended", handleEnded);
-      audio.removeEventListener("loadstart", handleLoadStart);
-      audio.removeEventListener("canplay", handleCanPlay);
-      audio.removeEventListener("canplaythrough", handleCanPlay);
-      audio.removeEventListener("error", handleError);
-      audio.pause();
-      if (previewTimerRef.current) {
-        window.clearTimeout(previewTimerRef.current);
-        previewTimerRef.current = null;
-      }
-    };
-  }, [onPlayPause]);
-
-  // Reset unlocked when the track changes
-  useEffect(() => {
-    setUnlocked(false);
-  }, [track?.id]);
-
-  // Audio playback logic (keep your existing useEffect)
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (track?.audioUrl && typeof track.audioUrl === "string") {
-      const src = track.audioUrl.trim();
-      if (src && audio.src !== src) {
-        // Your existing audio loading logic
-        const ext = src.split(".").pop()?.split("?")[0].toLowerCase() || "";
-        const mimeMap: Record<string, string> = {
-          mp3: "audio/mpeg",
-          m4a: "audio/mp4",
-          aac: "audio/aac",
-          ogg: "audio/ogg",
-          oga: "audio/ogg",
-          wav: "audio/wav",
-          webm: "audio/webm",
-          opus: "audio/ogg; codecs=opus",
-          flac: "audio/flac",
-        };
-        const guessedMime = mimeMap[ext] || "";
-
-        if (guessedMime) {
-          const canPlay = audio.canPlayType(guessedMime);
-          if (!canPlay) {
-            console.warn(`Audio may not be supported: ${guessedMime}`);
-          }
-        }
-
-        audio.preload = 'metadata'; // Preload metadata for better handling
-        audio.crossOrigin = 'anonymous'; // Enable CORS for streaming
-        audio.src = src;
-        audio.load(); // Explicitly load the audio
-        setCurrentTime(0);
-        setDuration(0);
-      }
-    } else {
-      audio.pause();
-      audio.src = "";
-      setIsLoading(false);
-      setCurrentTime(0);
-      setDuration(0);
-    }
-
-    audio.volume = isMuted ? 0 : volume;
-    audio.muted = isMuted;
-    console.log('Setting audio volume to:', audio.volume, 'muted:', audio.muted);
-    audio.playbackRate = playbackRate;
-    audio.loop = isLooping;
-
-    // Handle preview behavior for premium/pay-per-view tracks: play only first 30s
-    const isPremiumTrack = track?.accessType === 'PREMIUM' || track?.accessType === 'PAY_PER_VIEW';
-
-    if (isPlaying) {
-      console.log('Attempting to play audio:', audio.src, 'volume:', audio.volume, 'muted:', audio.muted, 'readyState:', audio.readyState);
-      
-      // Wait for audio to be ready
-      if (audio.readyState >= 2) { // HAVE_CURRENT_DATA or better
-        audio.play().then(() => {
-          console.log('Audio started playing successfully');
-        }).catch((err) => {
-          console.error("Audio play() failed:", err);
-          setIsLoading(false);
-        });
-      } else {
-        console.log('Audio not ready yet, waiting for canplay event');
-        const playWhenReady = () => {
-          audio.removeEventListener('canplay', playWhenReady);
-          audio.play().then(() => {
-            console.log('Audio started playing successfully after canplay');
-          }).catch((err) => {
-            console.error("Audio play() failed after canplay:", err);
-            setIsLoading(false);
-          });
-        };
-        audio.addEventListener('canplay', playWhenReady);
-      }
-
-      // If premium and not unlocked, ensure we only play a 30-second preview
-      if (isPremiumTrack && !unlocked) {
-        if (previewTimerRef.current) {
-          window.clearTimeout(previewTimerRef.current);
-        }
-        previewTimerRef.current = window.setTimeout(() => {
-          // Pause playback and notify parent
-          audio.pause();
-          if (onPlayPause) onPlayPause();
-          // Show purchase modal
-          setShowPurchaseModal(true);
-        }, 30000);
-      }
-    } else {
-      console.log('Pausing audio');
-      audio.pause();
-      if (previewTimerRef.current) {
-        window.clearTimeout(previewTimerRef.current);
-        previewTimerRef.current = null;
-      }
-    }
-  }, [track, track?.audioUrl, isPlaying, volume, isMuted, playbackRate, isLooping, onPlayPause, unlocked]);
-
-  // Rest of your existing functions (handleSeek, handleVolumeChange, etc.)
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const audio = audioRef.current;
-    if (!audio || !progressBarRef.current) return;
+    if (!progressBarRef.current || !onSeek) return;
 
     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     const newTime = percent * duration;
 
-    audio.currentTime = newTime;
-    setCurrentTime(newTime);
+    onSeek(newTime);
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    const audio = audioRef.current;
-    if (audio && !isMuted) {
-      audio.volume = newVolume;
-    }
-    if (newVolume === 0) {
-      setIsMuted(true);
-    } else if (isMuted) {
-      setIsMuted(false);
+    if (onVolumeChange) {
+      onVolumeChange(newVolume);
     }
   };
 
   const toggleMute = () => {
-    const audio = audioRef.current;
-    setIsMuted((m) => {
-      const next = !m;
-      if (audio) audio.volume = next ? 0 : volume;
-      return next;
-    });
+    if (onToggleMute) {
+      onToggleMute();
+    }
   };
 
   const toggleLoop = () => {
-    const audio = audioRef.current;
-    setIsLooping((l) => {
-      const next = !l;
-      if (audio) audio.loop = next;
-      return next;
-    });
+    setIsLooping((l) => !l);
+    // Note: Loop functionality should be handled by the global audio player
   };
 
   const changePlaybackRate = () => {
@@ -267,7 +114,7 @@ export default function Player({
     const newRate = rates[nextIndex];
 
     setPlaybackRate(newRate);
-    if (audioRef.current) audioRef.current.playbackRate = newRate;
+    // Note: Playback rate should be handled by the global audio player
   };
 
   const handleClosePurchaseModal = () => {
@@ -284,10 +131,7 @@ export default function Player({
       window.clearTimeout(previewTimerRef.current);
       previewTimerRef.current = null;
     }
-    const audio = audioRef.current;
-    if (audio) {
-      audio.play().catch(() => {});
-    }
+    // Resume playback through the global audio player
     if (!isPlaying && onPlayPause) {
       onPlayPause();
     }
@@ -549,7 +393,7 @@ export default function Player({
                 </button>
 
                 <button 
-                  onClick={() => { if (audioRef.current) audioRef.current.currentTime = Math.max(0, currentTime - 10); }} 
+                  onClick={() => { if (onSeek) onSeek(Math.max(0, currentTime - 10)); }} 
                   className="p-2 sm:p-1.5 text-gray-400 hover:text-white rounded-full hover:bg-white/10 transition-colors active:bg-white/20" 
                   aria-label="Rewind 10 seconds"
                 >
@@ -568,7 +412,7 @@ export default function Player({
 
               <div className="flex items-center gap-1 sm:gap-1.5">
                 <button 
-                  onClick={() => { if (audioRef.current) audioRef.current.currentTime = Math.min(duration, currentTime + 10); }} 
+                  onClick={() => { if (onSeek) onSeek(Math.min(duration, currentTime + 10)); }} 
                   className="p-2 sm:p-1.5 text-gray-400 hover:text-white rounded-full hover:bg-white/10 transition-colors active:bg-white/20" 
                   aria-label="Forward 10 seconds"
                 >

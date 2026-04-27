@@ -112,8 +112,18 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
             <Player
               track={currentTrack}
               isPlaying={isPlaying}
+              currentTime={currentTime}
+              duration={duration}
+              volume={volume}
+              isMuted={isMuted}
+              isLoading={isLoading}
               onPlayPause={togglePlay}
               onClose={() => setCurrentTrack(null)}
+              onNext={() => console.log('Next track')}
+              onPrevious={() => console.log('Previous track')}
+              onSeek={seekTo}
+              onVolumeChange={setVolume}
+              onToggleMute={toggleMute}
             />
           </div>
         </div>
