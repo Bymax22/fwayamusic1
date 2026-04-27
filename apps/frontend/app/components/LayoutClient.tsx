@@ -93,6 +93,9 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
               isPlaying={isPlaying}
               onPlayPause={togglePlay}
               onClose={() => setCurrentTrack(null)}
+              onNext={() => console.log('Next track')}
+              onPrevious={() => console.log('Previous track')}
+              onRepeat={() => console.log('Toggle repeat')}
             />
           </div>
           

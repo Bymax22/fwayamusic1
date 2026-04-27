@@ -12,6 +12,7 @@ import {
   HeartIcon,
   QueueListIcon,
   XMarkIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/solid";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 
@@ -33,6 +34,9 @@ interface MobilePlayerProps {
   isPlaying: boolean;
   onPlayPause: () => void;
   onClose: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  onRepeat?: () => void;
   className?: string;
 }
 
@@ -41,12 +45,17 @@ export default function MobilePlayer({
   isPlaying,
   onPlayPause,
   onClose,
+  onNext,
+  onPrevious,
+  onRepeat,
   className,
 }: MobilePlayerProps) {
   const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isRepeat, setIsRepeat] = useState(false);
+  const [isShuffled, setIsShuffled] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -198,55 +207,83 @@ export default function MobilePlayer({
 
   // Modern Waveform Component - Advanced Version
   const ModernWaveform = ({ isPlaying = false, progress = 0, className = "" }) => {
-    const bars = Array.from({ length: 50 }, (_, i) => {
-      const baseHeight = Math.sin(i * 0.3) * 8 + Math.random() * 6 + 4; // Sine wave with randomness
-      const isActive = i < progress * 50;
-      const isNearActive = i < (progress * 50) + 3; // Glow effect near active bars
+    const bars = Array.from({ length: 40 }, (_, i) => {
+      const baseHeight = Math.sin(i * 0.4) * 6 + Math.random() * 4 + 2; // Sine wave with randomness
+      const isActive = i < progress * 40;
+      const isNearActive = i < (progress * 40) + 2; // Glow effect near active bars
       return { 
         height: baseHeight, 
         isActive, 
         isNearActive,
-        delay: i * 0.01,
-        frequency: Math.sin(i * 0.2) * 0.5 + 0.5 // For color variation
+        delay: i * 0.008,
+        frequency: Math.sin(i * 0.3) * 0.5 + 0.5 // For color variation
       };
     });
 
     return (
-      <div className={`flex items-end gap-0.5 justify-center ${className}`}>
-        {bars.map((bar, i) => (
-          <motion.div
-            key={i}
-            className={`w-0.5 rounded-full transition-all duration-300 ${
-              bar.isActive
-                ? "bg-gradient-to-t from-purple-400 via-purple-300 to-white shadow-lg"
-                : bar.isNearActive && isPlaying
-                  ? "bg-gradient-to-t from-purple-500/60 to-purple-300/40"
-                  : isPlaying
-                    ? "bg-purple-400/40"
-                    : "bg-white/30"
-            }`}
-            style={{
-              height: isPlaying && bar.isActive ? `${bar.height * 1.8}px` : `${bar.height}px`,
-              boxShadow: bar.isActive ? `0 0 8px rgba(147, 51, 234, ${bar.frequency * 0.6})` : 'none',
-            }}
-            animate={isPlaying ? {
-              height: [
-                bar.height, 
-                bar.height * (bar.isActive ? 2.2 : 1.4), 
-                bar.height * (bar.isActive ? 1.6 : 0.8), 
-                bar.height
-              ],
-              scaleY: bar.isActive ? [1, 1.3, 0.9, 1] : [1, 1.1, 0.95, 1],
-            } : {}}
-            transition={{
-              duration: bar.isActive ? 0.6 : 0.8,
-              delay: bar.delay,
-              repeat: isPlaying ? Infinity : 0,
-              ease: "easeInOut",
-              repeatType: "reverse"
-            }}
-          />
-        ))}
+      <div className={`absolute inset-0 flex items-center justify-center pointer-events-none ${className}`}>
+        <div className="flex items-end gap-0.5 justify-center opacity-30">
+          {bars.map((bar, i) => (
+            <motion.div
+              key={i}
+              className={`w-0.5 rounded-full transition-all duration-300 ${
+                bar.isActive
+                  ? "bg-gradient-to-t from-purple-400 via-purple-300 to-purple-200"
+                  : bar.isNearActive && isPlaying
+                    ? "bg-gradient-to-t from-purple-500/50 to-purple-300/30"
+                    : isPlaying
+                      ? "bg-purple-400/20"
+                      : "bg-purple-300/10"
+              }`}
+              style={{
+                height: isPlaying && bar.isActive ? `${bar.height * 1.6}px` : `${bar.height}px`,
+                boxShadow: bar.isActive ? `0 0 6px rgba(147, 51, 234, ${bar.frequency * 0.4})` : 'none',
+              }}
+              animate={isPlaying ? {
+                height: [
+                  bar.height, 
+                  bar.height * (bar.isActive ? 1.8 : 1.2), 
+                  bar.height * (bar.isActive ? 1.3 : 0.7), 
+                  bar.height
+                ],
+                scaleY: bar.isActive ? [1, 1.2, 0.8, 1] : [1, 1.05, 0.95, 1],
+              } : {}}
+              transition={{
+                duration: bar.isActive ? 0.5 : 0.7,
+                delay: bar.delay,
+                repeat: isPlaying ? Infinity : 0,
+                ease: "easeInOut",
+                repeatType: "reverse"
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Scrolling Title Component
+  const ScrollingTitle = ({ title, isPlaying }: { title: string; isPlaying: boolean }) => {
+    const shouldScroll = title.length > 20 && isPlaying;
+
+    return (
+      <div className="overflow-hidden relative">
+        <motion.div
+          className="whitespace-nowrap"
+          animate={shouldScroll ? {
+            x: [0, -100, 0],
+          } : {}}
+          transition={{
+            duration: 8,
+            repeat: shouldScroll ? Infinity : 0,
+            ease: "linear",
+            repeatType: "loop"
+          }}
+        >
+          <span className="text-white font-semibold text-sm">
+            {title}
+          </span>
+        </motion.div>
       </div>
     );
   };
@@ -254,46 +291,51 @@ export default function MobilePlayer({
   return (
     <AnimatePresence>
       <motion.div
-        className={`fixed left-0 right-0 bottom-16 z-40 bg-gradient-to-r from-purple-600/95 via-purple-700/95 to-purple-800/95 backdrop-blur-xl border-t border-white/20 shadow-2xl ${className || ""}`}
+        className={`fixed left-0 right-0 bottom-16 z-40 bg-black/90 backdrop-blur-2xl border-t border-white/10 shadow-2xl ${className || ""}`}
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
       >
-        <div className="p-3">
+        <div className="p-2 relative">
+          {/* Waveform Background */}
+          <ModernWaveform
+            isPlaying={isPlaying}
+            progress={duration > 0 ? currentTime / duration : 0}
+            className="h-full"
+          />
+
           {/* Compact Track Info and Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 relative z-10">
             {/* Track Image */}
             <div className="relative">
               <Image
                 src={track.imageUrl || "/default-cover.jpg"}
                 alt={track.title || "Track cover"}
-                width={48}
-                height={48}
-                className="rounded-lg object-cover shadow-lg"
+                width={40}
+                height={40}
+                className="rounded-md object-cover shadow-lg"
               />
               {isLoading && (
-                <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                <div className="absolute inset-0 bg-black/40 rounded-md flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-2 w-2 border-b-2 border-white"></div>
                 </div>
               )}
             </div>
 
-            {/* Track Info */}
-            <div className="flex-1 min-w-0">
-              <h3 className="text-white font-semibold text-sm truncate">
-                {track.title || "Unknown Title"}
-              </h3>
+            {/* Track Info with Scrolling Title */}
+            <div className="flex-1 min-w-0 relative z-10">
+              <ScrollingTitle title={track.title || "Unknown Title"} isPlaying={isPlaying} />
               <p className="text-white/70 text-xs truncate">
                 {track.artist || "Unknown Artist"}
               </p>
             </div>
 
             {/* Controls */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 relative z-10">
               <button
                 onClick={() => setIsLiked(!isLiked)}
-                className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                className="p-1 rounded-full hover:bg-white/10 transition-colors"
                 aria-label="Like track"
               >
                 {isLiked ? (
@@ -304,21 +346,50 @@ export default function MobilePlayer({
               </button>
 
               <button
+                onClick={onPrevious}
+                disabled={!onPrevious}
+                className="p-1.5 rounded-full hover:bg-white/10 transition-colors disabled:opacity-30"
+                aria-label="Previous track"
+              >
+                <BackwardIcon className="w-4 h-4 text-white" />
+              </button>
+
+              <button
                 onClick={onPlayPause}
                 disabled={isLoading}
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 active:scale-95"
+                className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 active:scale-95"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? (
-                  <PauseIcon className="w-5 h-5 text-purple-600 ml-0.5" />
+                  <PauseIcon className="w-4 h-4 text-black ml-0.5" />
                 ) : (
-                  <PlayIcon className="w-5 h-5 text-purple-600 ml-0.5" />
+                  <PlayIcon className="w-4 h-4 text-black ml-0.5" />
                 )}
               </button>
 
               <button
+                onClick={onNext}
+                disabled={!onNext}
+                className="p-1.5 rounded-full hover:bg-white/10 transition-colors disabled:opacity-30"
+                aria-label="Next track"
+              >
+                <ForwardIcon className="w-4 h-4 text-white" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsRepeat(!isRepeat);
+                  if (onRepeat) onRepeat();
+                }}
+                className={`p-1 rounded-full hover:bg-white/10 transition-colors ${isRepeat ? 'text-purple-400' : 'text-white/70'}`}
+                aria-label="Repeat"
+              >
+                <ArrowPathIcon className="w-4 h-4" />
+              </button>
+
+              <button
                 onClick={onClose}
-                className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                className="p-1 rounded-full hover:bg-white/10 transition-colors"
                 aria-label="Close player"
               >
                 <XMarkIcon className="w-4 h-4 text-white" />
@@ -326,32 +397,22 @@ export default function MobilePlayer({
             </div>
           </div>
 
-          {/* Compact Progress and Waveform */}
-          <div className="mt-3">
-            {/* Progress Bar */}
-            <div className="mb-2">
-              <div
-                className="h-1 bg-white/20 rounded-full cursor-pointer relative overflow-hidden"
-                onClick={handleSeek}
-              >
-                <motion.div
-                  className="h-full bg-gradient-to-r from-purple-400 to-purple-500 rounded-full"
-                  style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                  transition={{ duration: 0.1 }}
-                />
-              </div>
-              <div className="flex justify-between text-xs text-white/60 mt-1">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
-              </div>
+          {/* Compact Progress Bar */}
+          <div className="mt-2 relative z-10">
+            <div
+              className="h-0.5 bg-white/20 rounded-full cursor-pointer relative overflow-hidden"
+              onClick={handleSeek}
+            >
+              <motion.div
+                className="h-full bg-gradient-to-r from-purple-400 to-purple-500 rounded-full"
+                style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                transition={{ duration: 0.1 }}
+              />
             </div>
-
-            {/* Advanced Waveform */}
-            <ModernWaveform
-              isPlaying={isPlaying}
-              progress={duration > 0 ? currentTime / duration : 0}
-              className="h-6"
-            />
+            <div className="flex justify-between text-xs text-white/60 mt-0.5">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
           </div>
         </div>
       </motion.div>
