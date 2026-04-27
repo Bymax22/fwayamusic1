@@ -310,7 +310,7 @@ export default function GuestWelcome() {
                       title: item.title,
                       artist: item.user?.displayName || item.user?.username || 'Unknown',
                       imageUrl: item.artCoverUrl,
-                      audioUrl: item.audioUrl,
+                      audioUrl: item.url,
                       duration: item.duration
                     })}
                   >
@@ -383,7 +383,7 @@ export default function GuestWelcome() {
                       title: item.title,
                       artist: item.user?.displayName || item.user?.username || 'Unknown',
                       imageUrl: item.artCoverUrl,
-                      audioUrl: item.audioUrl,
+                      audioUrl: item.url,
                       duration: item.duration
                     })}
                   >
@@ -480,7 +480,7 @@ export default function GuestWelcome() {
                           title: track.title,
                           artist: track.user?.displayName || track.user?.username || 'Unknown',
                           imageUrl: track.artCoverUrl,
-                          audioUrl: track.audioUrl,
+                          audioUrl: track.url,
                           duration: track.duration
                         })}
                         className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
@@ -537,7 +537,7 @@ export default function GuestWelcome() {
                       title: item.title,
                       artist: item.user?.displayName || item.user?.username || 'Unknown',
                       imageUrl: item.artCoverUrl,
-                      audioUrl: item.audioUrl,
+                      audioUrl: item.url,
                       duration: item.duration
                     })}
                   >
@@ -628,7 +628,7 @@ export default function GuestWelcome() {
                           title: track.title,
                           artist: track.user?.displayName || track.user?.username || 'Unknown',
                           imageUrl: track.artCoverUrl,
-                          audioUrl: track.audioUrl,
+                          audioUrl: track.url,
                           duration: track.duration
                         })}
                         className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
@@ -688,7 +688,7 @@ export default function GuestWelcome() {
                       title: item.title,
                       artist: item.user?.displayName || item.user?.username || 'Unknown',
                       imageUrl: item.artCoverUrl,
-                      audioUrl: item.audioUrl,
+                      audioUrl: item.url,
                       duration: item.duration
                     })}
                   >
@@ -809,7 +809,7 @@ export default function GuestWelcome() {
                           title: track.title,
                           artist: track.user?.displayName || track.user?.username || 'Unknown',
                           imageUrl: track.artCoverUrl,
-                          audioUrl: track.audioUrl,
+                          audioUrl: track.url,
                           duration: track.duration
                         })}
                         className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
