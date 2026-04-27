@@ -201,16 +201,24 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     audio.currentTime = 0;
 
     // Clear any existing event listeners to avoid duplicates
-    audio.removeEventListener('canplay', audio.canplayHandler);
-    audio.removeEventListener('error', audio.errorHandler);
-    audio.removeEventListener('loadstart', audio.loadstartHandler);
+    const audioElement = audio as any;
+    if (audioElement.canplayHandler) {
+      audio.removeEventListener('canplay', audioElement.canplayHandler);
+    }
+    if (audioElement.errorHandler) {
+      audio.removeEventListener('error', audioElement.errorHandler);
+    }
+    if (audioElement.loadstartHandler) {
+      audio.removeEventListener('loadstart', audioElement.loadstartHandler);
+    }
 
     // Set up event handlers
     const handleCanPlay = () => {
       console.log('GlobalPlayer: Audio can play, starting playback');
-      audio.removeEventListener('canplay', handleCanPlay);
-      audio.removeEventListener('error', audio.errorHandler);
-      audio.removeEventListener('loadstart', audio.loadstartHandler);
+      const audioElement = audio as any;
+      audio.removeEventListener('canplay', audioElement.canplayHandler);
+      audio.removeEventListener('error', audioElement.errorHandler);
+      audio.removeEventListener('loadstart', audioElement.loadstartHandler);
 
       audio.play().then(() => {
         console.log('GlobalPlayer: Audio started playing successfully');
@@ -225,9 +233,10 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
     const handleError = (e: Event) => {
       console.error('GlobalPlayer: Audio load error:', e);
-      audio.removeEventListener('canplay', handleCanPlay);
-      audio.removeEventListener('error', handleError);
-      audio.removeEventListener('loadstart', audio.loadstartHandler);
+      const audioElement = audio as any;
+      audio.removeEventListener('canplay', audioElement.canplayHandler);
+      audio.removeEventListener('error', audioElement.errorHandler);
+      audio.removeEventListener('loadstart', audioElement.loadstartHandler);
       setIsPlaying(false);
       setIsLoading(false);
     };
@@ -238,9 +247,9 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     };
 
     // Store handlers on audio element to allow removal
-    audio.canplayHandler = handleCanPlay;
-    audio.errorHandler = handleError;
-    audio.loadstartHandler = handleLoadStart;
+    audioElement.canplayHandler = handleCanPlay;
+    audioElement.errorHandler = handleError;
+    audioElement.loadstartHandler = handleLoadStart;
 
     audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('error', handleError);
