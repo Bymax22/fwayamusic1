@@ -5,6 +5,7 @@ import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import MobileMenu from "../components/MobileMenu";
 import Player from "../components/Player";
+import MobilePlayer from "../components/MobilePlayer";
 import NowPlayingPanel from "../components/NowPlayingPanel";
 import BottomNav from "../components/BottomNav";
 import Navbar from "../components/Navbar";
@@ -85,7 +86,18 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
       ======================== */}
       {currentTrack && (
         <div className="fixed bottom-0 left-0 right-0 z-30">
-          <div className="bg-black/80 backdrop-blur-xl border-t border-white/10">
+          {/* Mobile Player - shows on small screens */}
+          <div className="lg:hidden">
+            <MobilePlayer
+              track={currentTrack}
+              isPlaying={isPlaying}
+              onPlayPause={togglePlay}
+              onClose={() => setCurrentTrack(null)}
+            />
+          </div>
+          
+          {/* Desktop Player - shows on large screens */}
+          <div className="hidden lg:block bg-black/80 backdrop-blur-xl border-t border-white/10">
             <Player
               track={currentTrack}
               isPlaying={isPlaying}
