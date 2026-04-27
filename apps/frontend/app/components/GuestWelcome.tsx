@@ -192,7 +192,7 @@ export default function GuestWelcome() {
                     </span>
                   ))
                 ) : (
-                  'Discover'
+                  'Fwaya'
                 )}
               </div>
               <div className="flex items-center gap-2">

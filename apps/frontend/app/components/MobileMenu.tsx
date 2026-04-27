@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, PlayCircle, Shuffle, SkipBack, SkipForward, Play, Pause, Volume2, Bell, Moon, Sun, ChevronRight } from "lucide-react";
+import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, PlayCircle, Shuffle, SkipBack, SkipForward, Play, Pause, Volume2, Bell, Moon, Sun, ChevronRight, Crown, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -36,9 +37,9 @@ const FloatingParticle = ({ delay }: { delay: number }) => (
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
   const [activeMenuTab, setActiveMenuTab] = useState("menu");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isShuffled, setIsShuffled] = useState(false);
   const [volume, setVolume] = useState(70);
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -51,6 +52,18 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     }
     prevPathnameRef.current = pathname;
   }, [pathname, isOpen, onClose]);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -111,7 +124,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   // Quick actions
   const quickActions = [
     { icon: Shuffle, label: "Shuffle", action: () => setIsShuffled(!isShuffled) },
-    { icon: isPlaying ? Pause : Play, label: isPlaying ? "Pause" : "Play", action: () => setIsPlaying(!isPlaying) },
+    { icon: isPlaying ? Pause : Play, label: isPlaying ? "Pause" : "Play", action: () => togglePlay },
     { icon: SkipBack, label: "Previous", action: () => {} },
     { icon: SkipForward, label: "Next", action: () => {} },
   ];
@@ -130,7 +143,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         >
           <Link
             href={item.href}
-            className="flex items-center px-4 py-3 rounded-xl text-white hover:bg-gradient-to-r hover:from-purple-600/20 hover:to-pink-500/20 transition-all duration-300 group mx-2 border border-transparent hover:border-purple-500/30"
+            className="flex items-center px-4 py-3 rounded-xl text-white hover:bg-gradient-to-r hover:from-purple-600/20 hover:to-purple-700/20 transition-all duration-300 group mx-2 border border-transparent hover:border-purple-500/30"
             onClick={onClose}
           >
             <span className="flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
@@ -182,12 +195,12 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             {/* Enhanced Header with search */}
             <div className="relative p-6 border-b border-purple-500/20">
               {/* Background gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-500/10 rounded-t-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-purple-700/10 rounded-t-3xl" />
               
               <div className="relative flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <motion.div 
-                    className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30"
+                    className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/30"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -254,14 +267,14 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             {/* Enhanced User Info */}
             {user ? (
               <motion.div 
-                className="px-6 py-4 border-b border-purple-500/20 bg-gradient-to-r from-purple-600/5 to-pink-500/5"
+                className="px-6 py-4 border-b border-purple-500/20 bg-gradient-to-r from-purple-600/5 to-purple-700/5"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 <div className="flex items-center space-x-3">
                   <motion.div 
-                    className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-purple-500/30"
+                    className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-purple-500/30"
                     whileHover={{ scale: 1.05 }}
                   >
                     {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
@@ -285,21 +298,55 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </motion.div>
             ) : (
               <motion.div 
-                className="px-6 py-4 border-b border-purple-500/20 bg-gradient-to-r from-purple-600/10 to-pink-500/10"
+                className="px-6 py-4 border-b border-purple-500/20 bg-gradient-to-r from-purple-600/10 to-purple-700/10"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-300">
-                    Sign in for personalized experience
-                  </p>
+                <div className="space-y-3">
+                  {/* Guest Plan Info */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center">
+                        <User className="w-4 h-4 text-gray-300" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-white">Guest Plan</p>
+                        <p className="text-xs text-gray-400">Limited access</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-400">Free</p>
+                    </div>
+                  </div>
+
+                  {/* Premium Plan CTA */}
+                  <div className="bg-gradient-to-r from-purple-600/20 to-purple-700/20 rounded-xl p-3 border border-purple-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Crown className="w-4 h-4 text-purple-400" />
+                        <div>
+                          <p className="text-sm font-medium text-white">Premium Plan</p>
+                          <p className="text-xs text-purple-300">Unlimited access</p>
+                        </div>
+                      </div>
+                      <motion.button
+                        className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white text-xs font-medium shadow-lg shadow-purple-500/30"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Upgrade
+                      </motion.button>
+                    </div>
+                  </div>
+
+                  {/* Sign In Button */}
                   <motion.button
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-medium shadow-lg shadow-purple-500/30"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="w-full py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors border border-purple-500/20"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    Sign In
+                    Sign In to Account
                   </motion.button>
                 </div>
               </motion.div>
@@ -317,7 +364,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       onClick={() => setActiveMenuTab(tab.id)}
                       className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-300 ${
                         isActive 
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30" 
+                          ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/30" 
                           : "text-gray-400 hover:text-white hover:bg-white/10"
                       }`}
                       whileHover={{ scale: 1.02 }}
@@ -392,7 +439,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
               {/* Enhanced Now Playing with Controls */}
               <motion.div 
-                className="mx-4 mt-6 p-5 rounded-2xl bg-gradient-to-r from-purple-600/20 via-pink-500/20 to-purple-600/20 backdrop-blur-sm border border-purple-500/30 shadow-xl"
+                className="mx-4 mt-6 p-5 rounded-2xl bg-gradient-to-r from-purple-600/20 via-purple-700/20 to-purple-600/20 backdrop-blur-sm border border-purple-500/30 shadow-xl"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -400,7 +447,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <motion.div 
-                      className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/40"
+                      className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/40"
                       whileHover={{ scale: 1.05 }}
                       animate={{ rotate: isPlaying ? 360 : 0 }}
                       transition={{ duration: 2, repeat: isPlaying ? Infinity : 0, ease: "linear" }}
@@ -408,40 +455,58 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       <Music className="w-7 h-7 text-white" />
                     </motion.div>
                     <div>
-                      <p className="text-sm font-semibold text-white">Now Playing</p>
-                      <p className="text-xs text-purple-300">Lost in the Echo</p>
-                      <p className="text-xs text-gray-400">Linkin Park</p>
+                      <p className="text-sm font-semibold text-white">
+                        {currentTrack ? currentTrack.title : "No track playing"}
+                      </p>
+                      <p className="text-xs text-purple-300">
+                        {currentTrack ? currentTrack.artist : "Select a song"}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {currentTrack ? (currentTrack.accessType === 'PREMIUM' ? 'Premium' : 'Free') : ""}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-1">
-                    {quickActions.map((action, index) => (
-                      <motion.button
-                        key={index}
-                        onClick={action.action}
-                        className={`p-2 rounded-full transition-all duration-200 ${
-                          action.label === 'Shuffle' && isShuffled ? 'bg-purple-600 text-white' : 'bg-white/10 hover:bg-white/20 text-white'
-                        }`}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <action.icon className="w-4 h-4" />
-                      </motion.button>
-                    ))}
+                    <motion.button
+                      onClick={() => setIsShuffled(!isShuffled)}
+                      className={`p-2 rounded-full transition-all duration-200 ${
+                        isShuffled ? 'bg-purple-600 text-white' : 'bg-white/10 hover:bg-white/20 text-white'
+                      }`}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <Shuffle className="w-4 h-4" />
+                    </motion.button>
+                    <motion.button
+                      onClick={togglePlay}
+                      className="p-2 rounded-full bg-purple-600 hover:bg-purple-700 text-white transition-all duration-200"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    </motion.button>
+                    <motion.button
+                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <SkipForward className="w-4 h-4" />
+                    </motion.button>
                   </div>
                 </div>
 
                 {/* Progress Bar */}
                 <div className="w-full bg-white/20 rounded-full h-1 mb-3">
                   <motion.div 
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 h-1 rounded-full"
-                    initial={{ width: "30%" }}
-                    animate={{ width: isPlaying ? "70%" : "30%" }}
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 h-1 rounded-full"
+                    initial={{ width: "0%" }}
+                    animate={{ width: isPlaying ? "60%" : "30%" }}
                     transition={{ duration: 0.5 }}
                   />
                 </div>
                 <div className="flex justify-between text-xs text-gray-400 mb-3">
-                  <span>1:45</span>
-                  <span>3:45</span>
+                  <span>0:00</span>
+                  <span>{currentTrack?.duration ? `${Math.floor(currentTrack.duration / 60)}:${(currentTrack.duration % 60).toString().padStart(2, '0')}` : "0:00"}</span>
                 </div>
 
                 {/* Volume Control */}
@@ -468,7 +533,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
               >
-                <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600/10 to-pink-500/10 border border-purple-500/20">
+                <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600/10 to-purple-700/10 border border-purple-500/20">
                   <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
                   <p className="text-xs text-gray-400">
                     Fwaya Music v2.0 • Premium Experience
