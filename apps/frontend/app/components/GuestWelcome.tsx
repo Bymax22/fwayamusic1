@@ -59,22 +59,42 @@ export default function GuestWelcome() {
 
         // Set quick picks from featured songs
         if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {
-          setQuickPicks(homepageData.featuredSongs);
+          const processedSongs = homepageData.featuredSongs.map((song: any) => ({
+            ...song,
+            url: song.url ? `${API_BASE}${song.url}` : song.url,
+            coverArt: song.coverArt ? `${API_BASE}${song.coverArt}` : song.coverArt
+          }));
+          setQuickPicks(processedSongs);
         }
 
         // Set trending songs
         if (homepageData.trendingSongs && Array.isArray(homepageData.trendingSongs)) {
-          setTrendingNow(homepageData.trendingSongs);
+          const processedSongs = homepageData.trendingSongs.map((song: any) => ({
+            ...song,
+            url: song.url ? `${API_BASE}${song.url}` : song.url,
+            coverArt: song.coverArt ? `${API_BASE}${song.coverArt}` : song.coverArt
+          }));
+          setTrendingNow(processedSongs);
         }
 
         // Set top charts
         if (homepageData.topCharts && Array.isArray(homepageData.topCharts)) {
-          setTopCharts(homepageData.topCharts);
+          const processedSongs = homepageData.topCharts.map((song: any) => ({
+            ...song,
+            url: song.url ? `${API_BASE}${song.url}` : song.url,
+            coverArt: song.coverArt ? `${API_BASE}${song.coverArt}` : song.coverArt
+          }));
+          setTopCharts(processedSongs);
         }
 
         // Set featured albums from beats
         if (homepageData.beats && Array.isArray(homepageData.beats)) {
-          setFeaturedAlbums(homepageData.beats);
+          const processedAlbums = homepageData.beats.map((album: any) => ({
+            ...album,
+            url: album.url ? `${API_BASE}${album.url}` : album.url,
+            coverArt: album.coverArt ? `${API_BASE}${album.coverArt}` : album.coverArt
+          }));
+          setFeaturedAlbums(processedAlbums);
         }
 
         // Fetch featured artists
