@@ -59,15 +59,25 @@ export default function MobilePlayer({
     }
     const audio = audioRef.current;
 
-    const updateDuration = () => setDuration(audio.duration || 0);
+    const updateDuration = () => {
+      console.log('MobilePlayer: Duration loaded:', audio.duration);
+      setDuration(audio.duration || 0);
+    };
     const updateTime = () => setCurrentTime(audio.currentTime);
     const handleEnded = () => {
+      console.log('MobilePlayer: Track ended');
       if (onPlayPause) onPlayPause();
     };
-    const handleLoadStart = () => setIsLoading(true);
-    const handleCanPlay = () => setIsLoading(false);
+    const handleLoadStart = () => {
+      console.log('MobilePlayer: Load started');
+      setIsLoading(true);
+    };
+    const handleCanPlay = () => {
+      console.log('MobilePlayer: Can play now');
+      setIsLoading(false);
+    };
     const handleError = (e: Event) => {
-      console.error('Audio error:', e);
+      console.error('MobilePlayer: Audio error:', e);
       setIsLoading(false);
     };
 
@@ -93,8 +103,12 @@ export default function MobilePlayer({
     const audio = audioRef.current;
     if (!audio) return;
 
+    console.log('MobilePlayer: Setting up audio for track:', track);
+
     if (track?.audioUrl && typeof track.audioUrl === "string") {
       const src = track.audioUrl.trim();
+      console.log('MobilePlayer: Audio URL:', src);
+      
       if (src && audio.src !== src) {
         audio.preload = 'metadata';
         audio.crossOrigin = 'anonymous';
@@ -102,8 +116,10 @@ export default function MobilePlayer({
         audio.load();
         setCurrentTime(0);
         setDuration(0);
+        console.log('MobilePlayer: Audio source set and loaded');
       }
     } else {
+      console.log('MobilePlayer: No valid audio URL provided');
       audio.pause();
       audio.src = "";
       setIsLoading(false);
@@ -115,22 +131,25 @@ export default function MobilePlayer({
     audio.muted = isMuted;
 
     if (isPlaying) {
+      console.log('MobilePlayer: Attempting to play');
       if (audio.readyState >= 2) {
         audio.play().catch((err) => {
-          console.error("Audio play() failed:", err);
+          console.error("MobilePlayer: Audio play() failed:", err);
           setIsLoading(false);
         });
       } else {
         const playWhenReady = () => {
+          console.log('MobilePlayer: Audio can play, starting playback');
           audio.removeEventListener('canplay', playWhenReady);
           audio.play().catch((err) => {
-            console.error("Audio play() failed after canplay:", err);
+            console.error("MobilePlayer: Audio play() failed after canplay:", err);
             setIsLoading(false);
           });
         };
         audio.addEventListener('canplay', playWhenReady);
       }
     } else {
+      console.log('MobilePlayer: Pausing audio');
       audio.pause();
     }
   }, [track, track?.audioUrl, isPlaying, volume, isMuted, onPlayPause]);
@@ -177,38 +196,54 @@ export default function MobilePlayer({
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Modern Waveform Component
+  // Modern Waveform Component - Advanced Version
   const ModernWaveform = ({ isPlaying = false, progress = 0, className = "" }) => {
-    const bars = Array.from({ length: 40 }, (_, i) => {
-      const baseHeight = Math.random() * 20 + 8; // Height between 8-28
-      const isActive = i < progress * 40;
-      return { height: baseHeight, isActive, delay: i * 0.02 };
+    const bars = Array.from({ length: 50 }, (_, i) => {
+      const baseHeight = Math.sin(i * 0.3) * 8 + Math.random() * 6 + 4; // Sine wave with randomness
+      const isActive = i < progress * 50;
+      const isNearActive = i < (progress * 50) + 3; // Glow effect near active bars
+      return { 
+        height: baseHeight, 
+        isActive, 
+        isNearActive,
+        delay: i * 0.01,
+        frequency: Math.sin(i * 0.2) * 0.5 + 0.5 // For color variation
+      };
     });
 
     return (
-      <div className={`flex items-end gap-0.5 ${className}`}>
+      <div className={`flex items-end gap-0.5 justify-center ${className}`}>
         {bars.map((bar, i) => (
           <motion.div
             key={i}
-            className={`w-0.5 rounded-full transition-all duration-200 ${
+            className={`w-0.5 rounded-full transition-all duration-300 ${
               bar.isActive
-                ? "bg-gradient-to-t from-purple-500 to-pink-500 shadow-lg shadow-purple-500/50"
-                : isPlaying
-                  ? "bg-white/60"
-                  : "bg-white/30"
+                ? "bg-gradient-to-t from-purple-400 via-purple-300 to-white shadow-lg"
+                : bar.isNearActive && isPlaying
+                  ? "bg-gradient-to-t from-purple-500/60 to-purple-300/40"
+                  : isPlaying
+                    ? "bg-purple-400/40"
+                    : "bg-white/30"
             }`}
             style={{
-              height: isPlaying && i % 6 === 0 ? `${bar.height * 1.4}px` : `${bar.height}px`,
+              height: isPlaying && bar.isActive ? `${bar.height * 1.8}px` : `${bar.height}px`,
+              boxShadow: bar.isActive ? `0 0 8px rgba(147, 51, 234, ${bar.frequency * 0.6})` : 'none',
             }}
-            animate={isPlaying && i % 8 === 0 ? {
-              height: [bar.height, bar.height * 1.6, bar.height * 0.7, bar.height],
-              scaleY: [1, 1.3, 0.8, 1]
+            animate={isPlaying ? {
+              height: [
+                bar.height, 
+                bar.height * (bar.isActive ? 2.2 : 1.4), 
+                bar.height * (bar.isActive ? 1.6 : 0.8), 
+                bar.height
+              ],
+              scaleY: bar.isActive ? [1, 1.3, 0.9, 1] : [1, 1.1, 0.95, 1],
             } : {}}
             transition={{
-              duration: 0.8,
+              duration: bar.isActive ? 0.6 : 0.8,
               delay: bar.delay,
               repeat: isPlaying ? Infinity : 0,
-              ease: "easeInOut"
+              ease: "easeInOut",
+              repeatType: "reverse"
             }}
           />
         ))}
@@ -219,147 +254,104 @@ export default function MobilePlayer({
   return (
     <AnimatePresence>
       <motion.div
-        className={`fixed left-0 right-0 bottom-16 z-40 bg-gradient-to-r from-purple-600/95 via-purple-500/95 to-pink-500/95 backdrop-blur-xl border-t border-white/20 shadow-2xl ${className || ""}`}
+        className={`fixed left-0 right-0 bottom-16 z-40 bg-gradient-to-r from-purple-600/95 via-purple-700/95 to-purple-800/95 backdrop-blur-xl border-t border-white/20 shadow-2xl ${className || ""}`}
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 120 }}
       >
-        <div className="p-4">
-          {/* Track Info */}
-          <div className="flex items-center gap-4 mb-4">
+        <div className="p-3">
+          {/* Compact Track Info and Controls */}
+          <div className="flex items-center gap-3">
+            {/* Track Image */}
             <div className="relative">
               <Image
                 src={track.imageUrl || "/default-cover.jpg"}
                 alt={track.title || "Track cover"}
-                width={60}
-                height={60}
-                className="rounded-xl object-cover shadow-lg"
+                width={48}
+                height={48}
+                className="rounded-lg object-cover shadow-lg"
               />
               {isLoading && (
-                <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
                 </div>
               )}
             </div>
+
+            {/* Track Info */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-white font-bold text-lg truncate">
+              <h3 className="text-white font-semibold text-sm truncate">
                 {track.title || "Unknown Title"}
               </h3>
-              <p className="text-white/80 text-sm truncate">
+              <p className="text-white/70 text-xs truncate">
                 {track.artist || "Unknown Artist"}
               </p>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-white/10 transition-colors"
-              aria-label="Close player"
-            >
-              <XMarkIcon className="w-5 h-5 text-white" />
-            </button>
-          </div>
 
-          {/* Modern Waveform */}
-          <div className="mb-4 flex justify-center">
-            <ModernWaveform
-              isPlaying={isPlaying}
-              progress={duration > 0 ? currentTime / duration : 0}
-              className="h-8"
-            />
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <div
-              className="h-1.5 bg-white/20 rounded-full cursor-pointer relative overflow-hidden"
-              onClick={handleSeek}
-            >
-              <motion.div
-                className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"
-                style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                transition={{ duration: 0.1 }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-            </div>
-            <div className="flex justify-between text-xs text-white/70 mt-2">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
-
-          {/* Controls */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            {/* Controls */}
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsLiked(!isLiked)}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
                 aria-label="Like track"
               >
                 {isLiked ? (
-                  <HeartIcon className="w-6 h-6 text-pink-400" />
+                  <HeartIcon className="w-4 h-4 text-pink-400" />
                 ) : (
-                  <HeartOutline className="w-6 h-6 text-white/70" />
+                  <HeartOutline className="w-4 h-4 text-white/70" />
                 )}
               </button>
 
               <button
-                onClick={() => { if (audioRef.current) audioRef.current.currentTime = Math.max(0, currentTime - 10); }}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                aria-label="Rewind 10 seconds"
+                onClick={onPlayPause}
+                disabled={isLoading}
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 active:scale-95"
+                aria-label={isPlaying ? "Pause" : "Play"}
               >
-                <BackwardIcon className="w-6 h-6 text-white" />
+                {isPlaying ? (
+                  <PauseIcon className="w-5 h-5 text-purple-600 ml-0.5" />
+                ) : (
+                  <PlayIcon className="w-5 h-5 text-purple-600 ml-0.5" />
+                )}
+              </button>
+
+              <button
+                onClick={onClose}
+                className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                aria-label="Close player"
+              >
+                <XMarkIcon className="w-4 h-4 text-white" />
               </button>
             </div>
+          </div>
 
-            <button
-              onClick={onPlayPause}
-              disabled={isLoading}
-              className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 active:scale-95"
-              aria-label={isPlaying ? "Pause" : "Play"}
-            >
-              {isPlaying ? (
-                <PauseIcon className="w-7 h-7 text-purple-600 ml-0.5" />
-              ) : (
-                <PlayIcon className="w-7 h-7 text-purple-600 ml-0.5" />
-              )}
-            </button>
-
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => { if (audioRef.current) audioRef.current.currentTime = Math.min(duration, currentTime + 10); }}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                aria-label="Forward 10 seconds"
+          {/* Compact Progress and Waveform */}
+          <div className="mt-3">
+            {/* Progress Bar */}
+            <div className="mb-2">
+              <div
+                className="h-1 bg-white/20 rounded-full cursor-pointer relative overflow-hidden"
+                onClick={handleSeek}
               >
-                <ForwardIcon className="w-6 h-6 text-white" />
-              </button>
-
-              <div className="relative group">
-                <button
-                  onClick={toggleMute}
-                  className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                  aria-label={isMuted ? "Unmute" : "Mute"}
-                >
-                  {isMuted || volume === 0 ? (
-                    <SpeakerXMarkIcon className="w-6 h-6 text-white/70" />
-                  ) : (
-                    <SpeakerWaveIcon className="w-6 h-6 text-white" />
-                  )}
-                </button>
-
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black/80 p-3 rounded-lg shadow-lg z-10">
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    className="w-24 h-1.5 bg-gray-600 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
-                    aria-label="Volume control"
-                  />
-                </div>
+                <motion.div
+                  className="h-full bg-gradient-to-r from-purple-400 to-purple-500 rounded-full"
+                  style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                  transition={{ duration: 0.1 }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-white/60 mt-1">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
               </div>
             </div>
+
+            {/* Advanced Waveform */}
+            <ModernWaveform
+              isPlaying={isPlaying}
+              progress={duration > 0 ? currentTime / duration : 0}
+              className="h-6"
+            />
           </div>
         </div>
       </motion.div>
