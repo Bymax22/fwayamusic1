@@ -205,51 +205,74 @@ export default function MobilePlayer({
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Modern Waveform Component - Advanced Version
-  const ModernWaveform = ({ isPlaying = false, progress = 0, className = "" }) => {
-    const bars = Array.from({ length: 40 }, (_, i) => {
-      const baseHeight = Math.sin(i * 0.4) * 6 + Math.random() * 4 + 2; // Sine wave with randomness
-      const isActive = i < progress * 40;
-      const isNearActive = i < (progress * 40) + 2; // Glow effect near active bars
-      return { 
-        height: baseHeight, 
-        isActive, 
+  // Spectrum Visualizer Component - Music Visualizer Style
+  const SpectrumVisualizer = ({ isPlaying = false, progress = 0, className = "" }) => {
+    // Create frequency bars with different heights for spectrum effect
+    const bars = Array.from({ length: 60 }, (_, i) => {
+      // Create frequency-like distribution (more bars in middle frequencies)
+      const frequency = i / 60;
+      const baseHeight = Math.sin(frequency * Math.PI * 2) * 12 + Math.random() * 8 + 4;
+      const isActive = i < progress * 60;
+      const isNearActive = i < (progress * 60) + 3;
+
+      // Create spectrum-like height variations
+      const spectrumHeight = Math.abs(Math.sin(frequency * Math.PI * 4)) * 20 + Math.random() * 6 + 2;
+
+      return {
+        height: isPlaying ? spectrumHeight : baseHeight,
+        isActive,
         isNearActive,
-        delay: i * 0.008,
-        frequency: Math.sin(i * 0.3) * 0.5 + 0.5 // For color variation
+        delay: i * 0.005,
+        frequency: frequency,
+        // Create different colors for different frequency ranges
+        colorIndex: Math.floor(frequency * 3) // 0, 1, 2 for different color bands
       };
     });
 
+    const getBarColor = (bar: any) => {
+      if (bar.isActive) {
+        // Active bars: purple to pink gradient based on frequency
+        const colors = [
+          "from-purple-500 to-purple-300", // Low frequencies
+          "from-purple-400 to-pink-400",   // Mid frequencies
+          "from-pink-400 to-pink-300"      // High frequencies
+        ];
+        return colors[bar.colorIndex] || colors[0];
+      } else if (bar.isNearActive && isPlaying) {
+        return "from-purple-600/70 to-pink-500/70";
+      } else if (isPlaying) {
+        return "from-purple-500/40 to-pink-400/40";
+      }
+      return "from-purple-400/20 to-pink-300/20";
+    };
+
     return (
       <div className={`absolute inset-0 flex items-center justify-center pointer-events-none ${className}`}>
-        <div className="flex items-end gap-0.5 justify-center opacity-30">
+        <div className="flex items-end gap-0.5 justify-center opacity-80">
           {bars.map((bar, i) => (
             <motion.div
               key={i}
-              className={`w-0.5 rounded-full transition-all duration-300 ${
-                bar.isActive
-                  ? "bg-gradient-to-t from-purple-400 via-purple-300 to-purple-200"
-                  : bar.isNearActive && isPlaying
-                    ? "bg-gradient-to-t from-purple-500/50 to-purple-300/30"
-                    : isPlaying
-                      ? "bg-purple-400/20"
-                      : "bg-purple-300/10"
-              }`}
+              className={`rounded-t-sm transition-all duration-200 bg-gradient-to-t ${getBarColor(bar)}`}
               style={{
-                height: isPlaying && bar.isActive ? `${bar.height * 1.6}px` : `${bar.height}px`,
-                boxShadow: bar.isActive ? `0 0 6px rgba(147, 51, 234, ${bar.frequency * 0.4})` : 'none',
+                width: '2px',
+                minHeight: '2px',
+                boxShadow: bar.isActive ? `0 0 8px rgba(147, 51, 234, 0.8), 0 0 16px rgba(236, 72, 153, 0.6)` : 'none',
               }}
               animate={isPlaying ? {
                 height: [
-                  bar.height, 
-                  bar.height * (bar.isActive ? 1.8 : 1.2), 
-                  bar.height * (bar.isActive ? 1.3 : 0.7), 
+                  bar.height * 0.3,
+                  bar.height * (bar.isActive ? 1.8 : 1.4),
+                  bar.height * (bar.isActive ? 1.2 : 0.8),
+                  bar.height * (bar.isActive ? 1.6 : 1.1),
                   bar.height
                 ],
-                scaleY: bar.isActive ? [1, 1.2, 0.8, 1] : [1, 1.05, 0.95, 1],
-              } : {}}
+                scaleY: bar.isActive ? [0.8, 1.3, 0.9, 1.1, 1] : [0.9, 1.1, 0.95, 1.05, 1],
+              } : {
+                height: bar.height * 0.5,
+                scaleY: 1
+              }}
               transition={{
-                duration: bar.isActive ? 0.5 : 0.7,
+                duration: bar.isActive ? 0.4 : 0.6,
                 delay: bar.delay,
                 repeat: isPlaying ? Infinity : 0,
                 ease: "easeInOut",
@@ -258,6 +281,26 @@ export default function MobilePlayer({
             />
           ))}
         </div>
+
+        {/* Progress indicator line */}
+        {isPlaying && (
+          <motion.div
+            className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500"
+            style={{ width: `${progress * 100}%` }}
+            animate={{
+              boxShadow: [
+                "0 0 4px rgba(147, 51, 234, 0.6)",
+                "0 0 8px rgba(236, 72, 153, 0.8)",
+                "0 0 4px rgba(147, 51, 234, 0.6)"
+              ]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        )}
       </div>
     );
   };
@@ -299,7 +342,7 @@ export default function MobilePlayer({
       >
         <div className="p-2 relative">
           {/* Waveform Background */}
-          <ModernWaveform
+          <SpectrumVisualizer
             isPlaying={isPlaying}
             progress={duration > 0 ? currentTime / duration : 0}
             className="h-full"
