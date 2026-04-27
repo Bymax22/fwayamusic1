@@ -45,9 +45,14 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement>(new Audio());
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+
     const audio = audioRef.current;
     console.log('GlobalPlayer: Created new audio element');
 
@@ -124,11 +129,16 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const togglePlay = () => {
     const audio = audioRef.current;
-    if (!audio) {
-      console.error('GlobalPlayer: No audio element available');
+    if (typeof window === 'undefined') {
+      console.error('GlobalPlayer: togglePlay called on server side');
       return;
     }
 
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+
+    const audio = audioRef.current;
     const audioUrl = currentTrack?.audioUrl || currentTrack?.url;
     if (!audioUrl) {
       console.error('GlobalPlayer: No audio URL available in current track');
@@ -169,11 +179,16 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const playTrack = (track: Track | Record<string, unknown>) => {
-    const audio = audioRef.current;
-    if (!audio) {
-      console.error('GlobalPlayer: No audio element available');
+    if (typeof window === 'undefined') {
+      console.error('GlobalPlayer: playTrack called on server side');
       return;
     }
+
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+
+    const audio = audioRef.current;
 
     // Accept incoming partial/extended objects; coerce to Partial<Track> for safe merging
     const incoming = track as Partial<Track> & Record<string, unknown>;
@@ -227,6 +242,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const seekTo = (time: number) => {
+    if (typeof window === 'undefined') return;
     const audio = audioRef.current;
     if (audio) {
       audio.currentTime = time;
@@ -235,6 +251,11 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const setVolume = (newVolume: number) => {
+    if (typeof window === 'undefined') {
+      setVolumeState(newVolume);
+      return;
+    }
+
     setVolumeState(newVolume);
     const audio = audioRef.current;
     if (audio) {
@@ -244,6 +265,11 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const toggleMute = () => {
+    if (typeof window === 'undefined') {
+      setIsMuted((prev) => !prev);
+      return;
+    }
+
     const audio = audioRef.current;
     setIsMuted((prev) => {
       const next = !prev;
@@ -257,6 +283,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   // Update audio volume when volume or mute state changes
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const audio = audioRef.current;
     if (audio) {
       audio.volume = isMuted ? 0 : volume;
