@@ -101,13 +101,23 @@ export default function GuestWelcome() {
         const artistsResponse = await fetch(`${API_BASE}/api/v1/artists`);
         if (!artistsResponse.ok) throw new Error('Failed to fetch artists');
         const artistsData = await artistsResponse.json();
-        setFeaturedArtists(Array.isArray(artistsData) ? artistsData : artistsData.artists || []);
+        const artistsArray = Array.isArray(artistsData) ? artistsData : artistsData.artists || [];
+        const processedArtists = artistsArray.map((artist: any) => ({
+          ...artist,
+          avatar: artist.avatar ? `${API_BASE}${artist.avatar}` : artist.avatar
+        }));
+        setFeaturedArtists(processedArtists);
 
         // Fetch playlists
         const playlistsResponse = await fetch(`${API_BASE}/api/v1/playlist`);
         if (!playlistsResponse.ok) throw new Error('Failed to fetch playlists');
         const playlistsData = await playlistsResponse.json();
-        setPlaylists(Array.isArray(playlistsData) ? playlistsData : playlistsData.playlists || []);
+        const playlistsArray = Array.isArray(playlistsData) ? playlistsData : playlistsData.playlists || [];
+        const processedPlaylists = playlistsArray.map((playlist: any) => ({
+          ...playlist,
+          coverArt: playlist.coverArt ? `${API_BASE}${playlist.coverArt}` : playlist.coverArt
+        }));
+        setPlaylists(processedPlaylists);
 
       } catch (error) {
         console.error('Error fetching homepage data:', error);
