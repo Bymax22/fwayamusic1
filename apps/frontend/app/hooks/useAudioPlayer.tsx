@@ -128,7 +128,6 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const togglePlay = () => {
-    const audio = audioRef.current;
     if (typeof window === 'undefined') {
       console.error('GlobalPlayer: togglePlay called on server side');
       return;
