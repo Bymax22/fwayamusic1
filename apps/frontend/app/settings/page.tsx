@@ -1,6 +1,7 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Protected from '@/components/Protected';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { 
   Settings, 
  
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 
 export default function SettingsPage() {
+  const { audioQuality, setAudioQuality } = useAudioPlayer();
   const [activeSection, setActiveSection] = useState<'general' | 'audio' | 'privacy' | 'account'>('general');
   const [settings, setSettings] = useState({
     // General
@@ -19,7 +21,7 @@ export default function SettingsPage() {
     language: 'en',
     autoPlay: true,
     // Audio
-    audioQuality: 'high',
+    audioQuality: audioQuality,
     crossfade: false,
     crossfadeDuration: 5,
     volumeNormalization: true,
@@ -33,7 +35,14 @@ export default function SettingsPage() {
     twoFactorAuth: false
   });
 
+  useEffect(() => {
+    setSettings(prev => ({ ...prev, audioQuality }));
+  }, [audioQuality]);
+
   const handleSettingChange = (key: string, value: string | boolean | number) => {
+    if (key === 'audioQuality' && typeof value === 'string') {
+      setAudioQuality(value as 'low' | 'normal' | 'high');
+    }
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 

@@ -17,6 +17,8 @@ interface Track {
   currency?: string;
 }
 
+type AudioQuality = 'low' | 'normal' | 'high';
+
 // Create a context for global player state
 interface GlobalPlayerContextType {
   currentTrack: Track | null;
@@ -26,6 +28,8 @@ interface GlobalPlayerContextType {
   volume: number;
   isMuted: boolean;
   isLoading: boolean;
+  audioQuality: AudioQuality;
+  setAudioQuality: (quality: AudioQuality) => void;
   setCurrentTrack: (track: Track | null) => void;
   togglePlay: () => void;
   playTrack: (track: Track | Record<string, unknown>) => void;
@@ -44,6 +48,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [volume, setVolumeState] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [audioQuality, setAudioQuality] = useState<AudioQuality>('high');
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -110,7 +115,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
     audio.volume = volume;
     audio.muted = isMuted;
-    audio.preload = 'metadata';
+    audio.preload = 'auto';
     audio.crossOrigin = 'anonymous';
 
     return () => {
@@ -126,6 +131,44 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       audio.pause();
     };
   }, []);
+
+  const applyAudioQualityToUrl = (rawUrl: string) => {
+    if (!rawUrl) return rawUrl;
+    const trimmed = rawUrl.trim();
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) return trimmed;
+
+    try {
+      const url = new URL(trimmed);
+      if (url.searchParams.has('quality')) return url.href;
+
+      if (url.pathname.includes('/api/v1/media/') && url.pathname.includes('/stream')) {
+        url.searchParams.set('quality', audioQuality);
+        return url.href;
+      }
+
+      if (url.hostname.includes('cloudinary.com') && url.pathname.includes('/upload/')) {
+        const segments = url.pathname.split('/');
+        const uploadIndex = segments.findIndex((segment) => segment === 'upload');
+        const hasQualityTransform = segments.some((segment) => segment.startsWith('q_'));
+
+        if (uploadIndex >= 0 && !hasQualityTransform) {
+          const qualityTransform = audioQuality === 'high'
+            ? 'q_auto:best'
+            : audioQuality === 'normal'
+              ? 'q_auto:good'
+              : 'q_auto:low';
+
+          segments.splice(uploadIndex + 1, 0, qualityTransform);
+          url.pathname = segments.join('/');
+          return url.href;
+        }
+      }
+
+      return url.href;
+    } catch (_error) {
+      return trimmed;
+    }
+  };
 
   const togglePlay = () => {
     if (typeof window === 'undefined') {
@@ -144,11 +187,11 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const normalizedUrl = audioUrl.trim();
+    const normalizedUrl = applyAudioQualityToUrl(audioUrl);
     if (!audio.src || audio.src !== normalizedUrl) {
       console.log('GlobalPlayer: Loading current track source before toggling playback');
       audio.src = normalizedUrl;
-      audio.preload = 'metadata';
+      audio.preload = 'auto';
       audio.crossOrigin = 'anonymous';
       audio.muted = isMuted;
       audio.volume = isMuted ? 0 : volume;
@@ -214,14 +257,14 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     setCurrentTrack(newTrack);
     setIsLoading(true);
 
-    const src = newTrack.audioUrl.trim();
+    const src = applyAudioQualityToUrl(newTrack.audioUrl.trim());
     console.log('GlobalPlayer: Setting audio source to:', src);
 
     audio.pause();
     audio.currentTime = 0;
     audio.src = src;
     audio.crossOrigin = 'anonymous';
-    audio.preload = 'metadata';
+    audio.preload = 'auto';
     audio.muted = isMuted;
     audio.volume = isMuted ? 0 : volume;
     audio.load();
@@ -280,6 +323,19 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const storedAudioQuality = localStorage.getItem('fwaya-audio-quality') as AudioQuality | null;
+    if (storedAudioQuality === 'low' || storedAudioQuality === 'normal' || storedAudioQuality === 'high') {
+      setAudioQuality(storedAudioQuality);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('fwaya-audio-quality', audioQuality);
+  }, [audioQuality]);
+
   // Update audio volume when volume or mute state changes
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -303,7 +359,9 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       playTrack,
       seekTo,
       setVolume,
-      toggleMute
+      toggleMute,
+      audioQuality,
+      setAudioQuality
     }}>
       {children}
     </GlobalPlayerContext.Provider>
