@@ -336,7 +336,7 @@ export default function LibraryPage() {
             <div className="space-y-3">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Library</p>
               <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">Organize your tracks, playlists, and downloads.</h1>
-              <p className="max-w-2xl text-gray-400">A polished library view with soft purple light, real backend playlists, and no sharp borders in the library experience.</p>
+              <p className="max-w-2xl text-gray-400">We are glad to have you on board.</p>
             </div>
             <button
               onClick={handleCreatePlaylist}

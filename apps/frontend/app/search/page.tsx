@@ -136,7 +136,7 @@ export default function SearchPage() {
                 <div className="space-y-3">
                   <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Search</p>
                   <h1 className="text-4xl font-semibold tracking-tight">Find the track, artist, or mood you want.</h1>
-                  <p className="max-w-2xl text-gray-400">Search music with a clean dark UI that matches the same high-contrast guest welcome experience.</p>
+                  <p className="max-w-2xl text-gray-400">Your favouritn tracks, artists and news awaits you.</p>
                 </div>
                 <div className="relative mt-4">
                   <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40 w-5 h-5" />
