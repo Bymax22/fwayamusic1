@@ -486,7 +486,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-[#080a13]">
                   <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
                   <p className="text-xs text-gray-400">
-                    Fwaya Music v2.0 • Premium Experience
+                    Fwaya Music v1.5.3 • Developed by BymaxZM
                   </p>
                 </div>
               </motion.div>

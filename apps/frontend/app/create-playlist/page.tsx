@@ -1,9 +1,11 @@
 "use client";
 import { useState } from 'react';
-import { Save, Upload, X,  Image as ImageIcon } from 'lucide-react';
-import Image from "next/image";
+import { Save, Upload, X, Image as ImageIcon } from 'lucide-react';
+import Image from 'next/image';
+import { useAuth } from '@/context/AuthContext';
 
 export default function CreatePlaylistPage() {
+  const { getToken } = useAuth();
   const [playlistData, setPlaylistData] = useState({
     name: '',
     description: '',
@@ -41,21 +43,44 @@ export default function CreatePlaylistPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Here you would typically send the data to your backend
-    console.log('Creating playlist:', playlistData);
-    
-    // Mock success
-    alert('Playlist created successfully!');
-    
-    // Reset form
-    setPlaylistData({
-      name: '',
-      description: '',
-      isPublic: true,
-      coverImage: null,
-      coverPreview: ''
-    });
+
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to create a playlist.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/playlists', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: playlistData.name,
+          description: playlistData.description,
+          isPublic: playlistData.isPublic,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Failed to create playlist' }));
+        throw new Error(error.message || 'Failed to create playlist');
+      }
+
+      alert('Playlist created successfully!');
+      setPlaylistData({
+        name: '',
+        description: '',
+        isPublic: true,
+        coverImage: null,
+        coverPreview: ''
+      });
+    } catch (err) {
+      console.error('Create playlist error:', err);
+      alert('Unable to create playlist. Please try again.');
+    }
   };
 
   return (

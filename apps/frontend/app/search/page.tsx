@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Pause, Play, Heart, Search, Disc } from 'lucide-react';
+import { Pause, Play, Search, Disc } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
-import Image from "next/image";
+import Image from 'next/image';
 
 interface MediaFile {
   id: number;
@@ -12,8 +11,8 @@ interface MediaFile {
   artist: string;
   url: string;
   duration: number;
-  format: string;
-  createdAt: string;
+  format?: string;
+  createdAt?: string;
   coverArt: string;
   views: number;
   likes: number;
@@ -25,7 +24,23 @@ interface Artist {
   name: string;
   avatar: string;
   followers: number;
-  tracks: number;
+  tracks?: number;
+}
+
+function normalizeMedia(item: any): MediaFile {
+  return {
+    id: item.id,
+    title: item.title || 'Untitled',
+    artist: item.artist || 'Unknown Artist',
+    url: item.url,
+    duration: item.duration || 0,
+    format: item.format || 'mp3',
+    createdAt: item.createdAt || '',
+    coverArt: item.coverArt || '/default-cover.jpg',
+    views: item.views || 0,
+    likes: item.likes || 0,
+    genre: item.genre || 'Other',
+  };
 }
 
 export default function SearchPage() {
@@ -34,47 +49,34 @@ export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<MediaFile[]>([]);
   const [artistResults, setArtistResults] = useState<Artist[]>([]);
-  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'songs' | 'artists'>('all');
-  
+
   const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
-        const response = await fetch(`/api/media`, {
-          credentials: 'include',
-        });
-        const { data } = await response.json();
-        const formattedData = (data as MediaFile[]).map((item) => ({
-          id: item.id,
-          title: item.title || 'Untitled',
-          artist: item.artist || 'Unknown Artist',
-          url: item.url,
-          duration: item.duration || 0,
-          format: item.format || 'mp3',
-          createdAt: item.createdAt,
-          coverArt: item.coverArt || '/default-cover.jpg',
-          views: item.views || 0,
-          likes: item.likes || 0,
-          genre: item.genre || 'Other'
-        }));
-        setMediaFiles(formattedData);
-        // Mock artists data
-        const mockArtists: Artist[] = [
-          { id: 1, name: 'Fwaya Music', avatar: '/artists/fwaya.jpg', followers: 15000, tracks: 45 },
-          { id: 2, name: 'The Weeknd', avatar: '/artists/weeknd.jpg', followers: 35000000, tracks: 89 },
-          { id: 3, name: 'Drake', avatar: '/artists/drake.jpg', followers: 42000000, tracks: 156 },
-          { id: 4, name: 'Beyoncé', avatar: '/artists/beyonce.jpg', followers: 28000000, tracks: 112 },
-        ];
-        setArtists(mockArtists);
+        const [mediaResponse, artistsResponse] = await Promise.all([
+          fetch('/api/media', { credentials: 'include' }),
+          fetch('/api/artists'),
+        ]);
+
+        const mediaJson = await mediaResponse.json();
+        const mediaArray = Array.isArray(mediaJson)
+          ? mediaJson
+          : Array.isArray(mediaJson.data)
+          ? mediaJson.data
+          : [];
+
+        setMediaFiles(mediaArray.map(normalizeMedia));
+
+        const artistsJson = await artistsResponse.json();
+        setArtists(Array.isArray(artistsJson.artists) ? artistsJson.artists : []);
       } catch (err) {
         console.error('Fetch error:', err);
-      } finally {
-        setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
@@ -84,19 +86,18 @@ export default function SearchPage() {
       setArtistResults([]);
       return;
     }
+
     const query = searchQuery.toLowerCase();
-    // Search songs
-    const songResults = mediaFiles.filter(file => 
-      file.title.toLowerCase().includes(query) ||
-      file.artist.toLowerCase().includes(query) ||
-      file.genre?.toLowerCase().includes(query)
+    const songResults = mediaFiles.filter(
+      (file) =>
+        file.title.toLowerCase().includes(query) ||
+        file.artist.toLowerCase().includes(query) ||
+        file.genre?.toLowerCase().includes(query)
     );
+    const matchingArtists = artists.filter((artist) => artist.name.toLowerCase().includes(query));
+
     setSearchResults(songResults);
-    // Search artists
-    const artistResults = artists.filter(artist =>
-      artist.name.toLowerCase().includes(query)
-    );
-    setArtistResults(artistResults);
+    setArtistResults(matchingArtists);
   }, [searchQuery, mediaFiles, artists]);
 
   const handlePlay = (file: MediaFile) => {
@@ -109,20 +110,19 @@ export default function SearchPage() {
         artist: file.artist,
         url: file.url,
         coverArt: file.coverArt,
-        duration: file.duration
+        duration: file.duration,
       });
     }
   };
 
   const getFilteredResults = () => {
-    switch (activeTab) {
-      case 'songs':
-        return searchResults;
-      case 'artists':
-        return [];
-      default:
-        return searchResults;
+    if (activeTab === 'songs') {
+      return searchResults;
     }
+    if (activeTab === 'artists') {
+      return artistResults;
+    }
+    return searchResults;
   };
 
   return (
@@ -131,7 +131,7 @@ export default function SearchPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(114,65,255,0.2),_transparent_25%),radial-gradient(circle_at_bottom_right,_rgba(109,52,255,0.14),_transparent_30%)] pointer-events-none" />
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
           <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr] items-end mb-10">
-            <div className="rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
+            <div className="rounded-[2rem] bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
                   <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Search</p>
@@ -145,7 +145,7 @@ export default function SearchPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search for songs, artists, playlists..."
-                    className="w-full rounded-full border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white placeholder:text-white/40 outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
+                    className="w-full rounded-full bg-[#15121f]/95 py-4 pl-12 pr-4 text-white placeholder:text-white/40 outline-none transition focus:ring-2 focus:ring-purple-400/20"
                   />
                 </div>
                 <div className="flex flex-wrap gap-3">
@@ -156,7 +156,7 @@ export default function SearchPage() {
                         key={tab}
                         onClick={() => setActiveTab(tabKey)}
                         className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                          activeTab === tabKey ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                          activeTab === tabKey ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'bg-[#15121f] text-gray-300 hover:bg-[#1f173d]'
                         }`}
                       >
                         {tab}
@@ -168,14 +168,14 @@ export default function SearchPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
+              <div className="rounded-[2rem] bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
                 <h2 className="text-lg font-semibold text-white">Popular Genres</h2>
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   {['Hip Hop', 'Pop', 'R&B', 'Rock', 'Electronic', 'Jazz', 'Classical', 'Reggae'].map((genre) => (
                     <button
                       key={genre}
                       onClick={() => setSearchQuery(genre)}
-                      className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-left text-white transition hover:border-purple-400/40 hover:bg-purple-700/10"
+                      className="flex items-center gap-3 rounded-3xl bg-[#15121f] px-4 py-3 text-left text-white transition hover:bg-purple-700/20"
                     >
                       <Disc className="w-5 h-5 text-purple-300" />
                       <span className="font-medium text-sm">{genre}</span>
@@ -183,14 +183,14 @@ export default function SearchPage() {
                   ))}
                 </div>
               </div>
-              <div className="rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
+              <div className="rounded-[2rem] bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
                 <h2 className="text-lg font-semibold text-white">Popular Artists</h2>
                 <div className="mt-4 space-y-3">
                   {artists.slice(0, 4).map((artist) => (
                     <button
                       key={artist.id}
                       onClick={() => setSearchQuery(artist.name)}
-                      className="flex w-full items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-left transition hover:border-purple-400/40 hover:bg-purple-700/10"
+                      className="flex w-full items-center gap-3 rounded-3xl bg-[#15121f] px-4 py-3 text-left transition hover:bg-purple-700/20"
                     >
                       <Image
                         src={artist.avatar}
@@ -222,10 +222,10 @@ export default function SearchPage() {
                     <span className="text-sm text-gray-400">{searchResults.length} results</span>
                   </div>
                   <div className="grid gap-4 xl:grid-cols-2">
-                    {searchResults.map((file, index) => (
+                    {searchResults.map((file) => (
                       <div
                         key={file.id}
-                        className={`group rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-5 transition hover:border-purple-400/40 hover:bg-purple-700/5 ${
+                        className={`group rounded-[2rem] bg-[#09080f]/95 p-5 transition hover:bg-[#12101d]/95 ${
                           currentTrack?.id === file.id ? 'ring-1 ring-purple-400/30' : ''
                         }`}
                       >
@@ -260,7 +260,7 @@ export default function SearchPage() {
                             </div>
                             <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-gray-400">
                               <span>{formatDuration(file.duration)}</span>
-                              <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-white/80">
+                              <span className="inline-flex items-center gap-2 rounded-full bg-[#15121f] px-3 py-1 text-xs text-white/80">
                                 <Disc className="w-4 h-4 text-purple-300" />
                                 {file.genre || 'Genre'}
                               </span>
@@ -281,7 +281,7 @@ export default function SearchPage() {
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {artistResults.map((artist) => (
-                      <div key={artist.id} className="rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-5 text-center transition hover:border-purple-400/40 hover:bg-purple-700/5">
+                      <div key={artist.id} className="rounded-[2rem] bg-[#09080f]/95 p-5 text-center transition hover:bg-[#12101d]/95">
                         <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-[#121016]">
                           <Image
                             src={artist.avatar}
@@ -302,7 +302,7 @@ export default function SearchPage() {
               )}
 
               {searchQuery.trim() && getFilteredResults().length === 0 && artistResults.length === 0 && (
-                <div className="rounded-[2rem] border border-white/10 bg-[#09080f]/90 p-12 text-center text-gray-400">
+                <div className="rounded-[2rem] bg-[#09080f]/90 p-12 text-center text-gray-400">
                   <Search className="mx-auto mb-4 h-16 w-16 text-gray-400" />
                   <h3 className="text-2xl font-semibold text-white mb-2">No results found</h3>
                   <p className="text-sm text-gray-400">Try different keywords or refine your search.</p>
