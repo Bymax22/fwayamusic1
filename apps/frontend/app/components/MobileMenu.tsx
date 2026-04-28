@@ -17,22 +17,7 @@ const Icon = ({ children }: { children: React.ReactNode }) => (
   <span className="text-purple-400">{children}</span>
 );
 
-// Floating particle component for visual effect
-const FloatingParticle = ({ delay }: { delay: number }) => (
-  <motion.div
-    className="absolute w-1 h-1 bg-purple-400/30 rounded-full"
-    animate={{
-      y: [-20, -60],
-      opacity: [0, 1, 0],
-    }}
-    transition={{
-      duration: 3,
-      repeat: Infinity,
-      delay,
-      ease: "easeOut",
-    }}
-  />
-);
+// Removed floating particle component - using clean design instead
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
@@ -152,23 +137,16 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Enhanced Backdrop with particles */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#02030a]/90 backdrop-blur-xl z-50"
+            className="fixed inset-0 bg-black/60 z-50"
             onClick={onClose}
-          >
-            {/* Floating particles */}
-            <div className="absolute inset-0 overflow-hidden">
-              {[...Array(20)].map((_, i) => (
-                <FloatingParticle key={i} delay={i * 0.2} />
-              ))}
-            </div>
-          </motion.div>
+          />
           
-          {/* Menu Panel with enhanced design */}
+          {/* Menu Panel */}
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
@@ -178,17 +156,14 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               damping: 30, 
               stiffness: 300 
             }}
-            className="fixed bottom-0 left-0 right-0 h-[90vh] bg-[#04050b] backdrop-blur-3xl border-t border-white/10 rounded-t-[32px] z-50 overflow-hidden shadow-[0_-20px_80px_rgba(129,64,255,0.15)]"
+            className="fixed bottom-0 left-0 right-0 h-[90vh] bg-[#0a0a0d] rounded-t-[32px] z-50 overflow-hidden"
           >
-            {/* Enhanced Header with search */}
-            <div className="relative p-6 border-b border-white/10 bg-[#090b14]">
-              {/* Background sheen overlay */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(168,85,247,0.16),_transparent_45%)] rounded-t-[32px]" />
-              
-              <div className="relative flex items-center justify-between mb-4">
+            {/* Header with search */}
+            <div className="p-6 bg-[#0a0a0d]">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <motion.div 
-                    className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-violet-700 flex items-center justify-center shadow-xl shadow-purple-500/30 ring-1 ring-white/10"
+                    className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -205,7 +180,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <div className="flex items-center space-x-2">
                   <motion.button
                     onClick={() => setIsDarkMode(!isDarkMode)}
-                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200"
+                    className="p-2 rounded-full hover:bg-purple-600/20 transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
@@ -214,7 +189,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   
                   <motion.button
                     onClick={onClose}
-                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200"
+                    className="p-2 rounded-full hover:bg-purple-600/20 transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     aria-label="Close menu"
@@ -231,14 +206,14 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <div className="flex items-center bg-white/5 rounded-2xl px-4 py-3 border border-purple-500/20 focus-within:border-purple-400/50 transition-colors">
+                <div className="flex items-center bg-[#080a13] rounded-2xl px-4 py-3 focus-within:bg-[#0a0d18] transition-colors">
                   <Search className="w-5 h-5 text-purple-400 mr-3" />
                   <input
                     type="text"
                     placeholder="Search songs, artists, playlists..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-transparent outline-none text-white placeholder:text-gray-400 flex-1 text-sm"
+                    className="bg-transparent outline-none text-white placeholder:text-gray-500 flex-1 text-sm"
                   />
                   {searchQuery && (
                     <button 
@@ -252,17 +227,17 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </motion.div>
             </div>
 
-            {/* Enhanced User Info */}
+            {/* User Info */}
             {user ? (
               <motion.div 
-                className="px-6 py-4 border-b border-white/10 bg-[#080a12]"
+                className="px-6 py-4 bg-[#0a0a0d]"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <div className="flex items-center space-x-3 bg-[#07090f] rounded-3xl p-3 border border-white/10 shadow-sm shadow-purple-500/10">
+                <div className="flex items-center space-x-3 bg-[#080a13] rounded-3xl p-3">
                   <motion.div 
-                    className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-violet-700 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-purple-500/30 ring-1 ring-white/10"
+                    className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white text-sm font-bold"
                     whileHover={{ scale: 1.05 }}
                   >
                     {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
@@ -276,7 +251,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     </p>
                   </div>
                   <motion.button
-                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    className="p-2 rounded-full hover:bg-purple-600/20 transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
@@ -286,7 +261,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </motion.div>
             ) : (
               <motion.div 
-                className="px-6 py-4 border-b border-white/10 bg-[#080a12]"
+                className="px-6 py-4 bg-[#0a0a0d]"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -295,7 +270,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   {/* Guest Plan Info */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-[#080a13] flex items-center justify-center">
                         <User className="w-4 h-4 text-gray-300" />
                       </div>
                       <div>
@@ -309,7 +284,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   </div>
 
                   {/* Premium Plan CTA */}
-                  <div className="bg-[#090b14] rounded-3xl p-3 border border-white/10 shadow-sm shadow-purple-500/10">
+                  <div className="bg-[#080a13] rounded-3xl p-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Crown className="w-4 h-4 text-purple-400" />
@@ -319,7 +294,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         </div>
                       </div>
                       <motion.button
-                        className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white text-xs font-medium shadow-lg shadow-purple-500/30"
+                        className="px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-medium hover:bg-purple-700 transition-colors"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -330,7 +305,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
                   {/* Sign In Button */}
                   <motion.button
-                    className="w-full py-2 rounded-xl bg-purple-600/10 hover:bg-purple-600/20 text-white text-sm font-medium transition-colors border border-white/10"
+                    className="w-full py-2 rounded-xl bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -340,9 +315,9 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </motion.div>
             )}
 
-            {/* Enhanced Tabs */}
-            <div className="px-6 py-4 border-b border-white/10">
-              <div className="flex space-x-2 bg-white/5 rounded-2xl p-1 backdrop-blur-sm">
+            {/* Tabs */}
+            <div className="px-6 py-4">
+              <div className="flex space-x-2 bg-[#080a13] rounded-2xl p-1">
                 {menuTabs.map((tab, index) => {
                   const Icon = tab.icon;
                   const isActive = activeMenuTab === tab.id;
@@ -350,10 +325,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <motion.button
                       key={tab.id}
                       onClick={() => setActiveMenuTab(tab.id)}
-                      className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-300 ${
+                      className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-sm font-medium transition-colors ${
                         isActive 
-                          ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/30" 
-                          : "text-gray-400 hover:text-white hover:bg-white/10"
+                          ? "bg-purple-600 text-white" 
+                          : "text-gray-400 hover:text-white hover:bg-[#0a0d18]"
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -427,7 +402,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
               {/* Enhanced Now Playing with Controls */}
               <motion.div 
-                className="mx-4 mt-6 p-5 rounded-2xl bg-gradient-to-r from-purple-600/20 via-purple-700/20 to-purple-600/20 backdrop-blur-sm border border-purple-500/30 shadow-xl"
+                className="mx-4 mt-6 p-5 rounded-2xl bg-[#080a13]"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -435,7 +410,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <motion.div 
-                      className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/40"
+                      className="w-14 h-14 rounded-xl bg-purple-600 flex items-center justify-center"
                       whileHover={{ scale: 1.05 }}
                       animate={{ rotate: isPlaying ? 360 : 0 }}
                       transition={{ duration: 2, repeat: isPlaying ? Infinity : 0, ease: "linear" }}
@@ -486,7 +461,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 {/* Progress Bar */}
                 <div className="w-full bg-white/20 rounded-full h-1 mb-3">
                   <motion.div 
-                    className="bg-gradient-to-r from-purple-500 to-purple-600 h-1 rounded-full"
+                    className="bg-purple-600 h-1 rounded-full"
                     initial={{ width: "0%" }}
                     animate={{ width: isPlaying ? "60%" : "30%" }}
                     transition={{ duration: 0.5 }}
@@ -521,7 +496,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
               >
-                <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600/10 to-purple-700/10 border border-purple-500/20">
+                <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-[#080a13]">
                   <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
                   <p className="text-xs text-gray-400">
                     Fwaya Music v2.0 • Premium Experience
