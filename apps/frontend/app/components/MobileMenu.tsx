@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, PlayCircle, Shuffle, SkipBack, SkipForward, Play, Pause, Volume2, Bell, Moon, Sun, ChevronRight, Crown, Zap } from "lucide-react";
 import Link from "next/link";
@@ -104,8 +104,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { icon: SkipForward, label: "Next", action: () => {} },
   ];
 
-  const MenuSection = ({ title, items }: { title: string; items: { title: string; icon: React.ReactNode; href: string; description: string }[] }) => (
-    <div className="space-y-2">
+  const MenuSection = ({ title, items }: { title: string; items: { title: string; icon: ReactNode; href: string; description: string }[] }) => (
+    <div className="space-y-3">
       <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wider px-4 py-2 border-l-2 border-purple-500 bg-white/5 rounded-r-2xl">
         {title}
       </h3>
@@ -114,19 +114,19 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           key={item.title}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.1 }}
+          transition={{ delay: index * 0.05 }}
         >
           <Link
             href={item.href}
-            className={`flex items-center px-4 py-3 rounded-3xl text-white transition-all duration-300 group mx-2 border border-white/10 hover:border-purple-500/30 shadow-sm shadow-purple-500/10 ${isDarkMode ? 'bg-[#090b14]/90 hover:bg-[#121827]' : 'bg-[#12131f]/90 hover:bg-[#1c1d29]'}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-3xl text-white transition-all duration-300 group mx-2 border border-white/10 hover:border-purple-500/30 shadow-sm shadow-purple-500/10 ${isDarkMode ? 'bg-[#090b14]/90 hover:bg-[#121827]' : 'bg-[#12131f]/90 hover:bg-[#1c1d29]'}`}
             onClick={onClose}
           >
             <span className="flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
               {item.icon}
             </span>
-            <div className="ml-3 flex-1">
-              <span className="text-sm font-semibold block">{item.title}</span>
-              <span className="text-xs text-gray-400">{item.description}</span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold truncate">{item.title}</p>
+              <p className="text-xs text-gray-400 truncate">{item.description}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-purple-300 group-hover:text-white transition-colors" />
           </Link>
@@ -134,6 +134,23 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       ))}
     </div>
   );
+
+  const getActiveItems = () => {
+    if (activeMenuTab === "menu") return mainMenuItems;
+    if (activeMenuTab === "library") return musicMenuItems;
+    if (activeMenuTab === "discover") return discoverMenuItems;
+    return user ? settingsMenuItems : authMenuItems;
+  };
+
+  const filterItems = <T extends { title: string; description: string }>(items: T[]) => {
+    if (!searchQuery.trim()) return items;
+    const query = searchQuery.toLowerCase();
+    return items.filter(item => item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query));
+  };
+
+  const activeItems = filterItems(getActiveItems());
+
+  const currentSectionLabel = activeMenuTab === "menu" ? "Navigation" : activeMenuTab === "library" ? "Your Library" : activeMenuTab === "discover" ? "Discover" : "Account";
 
   return (
     <AnimatePresence>
@@ -158,45 +175,41 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               damping: 30, 
               stiffness: 300 
             }}
-            className={`fixed bottom-0 left-0 right-0 h-[90vh] rounded-t-[32px] z-50 overflow-hidden backdrop-blur-xl ${isDarkMode ? 'bg-[#0a0a0d]/90' : 'bg-[#12131f]/80'}`}
+            className={`fixed bottom-0 left-0 right-0 h-[90vh] rounded-t-[32px] z-50 overflow-hidden border-t border-white/10 shadow-[0_-30px_120px_-50px_rgba(94,43,255,0.35)] backdrop-blur-2xl ${isDarkMode ? 'bg-[#020206]/95' : 'bg-[#12131f]/95'}`}
           >
             {/* Header with search */}
-            <div className={`p-6 ${isDarkMode ? 'bg-[#0a0a0d]/20' : 'bg-[#12131f]/20'} backdrop-blur-xl`}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
+            <div className={`p-6 ${isDarkMode ? 'bg-[#0a0a0d]/20' : 'bg-[#12131f]/20'} border-b border-white/10 backdrop-blur-2xl`}>
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex items-center gap-3">
                   <motion.div 
-                    className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center"
+                    className="w-12 h-12 rounded-3xl bg-gradient-to-br from-purple-500 to-violet-700 flex items-center justify-center shadow-lg shadow-purple-500/20"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <Music className="w-6 h-6 text-white" />
                   </motion.div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">
-                      Fwaya
-                    </h2>
-                    <p className="text-sm text-purple-300">Main Menu</p>
+                    <h2 className="text-xl font-bold text-white">Fwaya Menu</h2>
+                    <p className="text-sm text-purple-300">Quick access to your music world</p>
                   </div>
                 </div>
-                
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   <motion.button
                     onClick={() => setIsDarkMode(!isDarkMode)}
-                    className="p-2 rounded-full hover:bg-purple-600/20 transition-colors"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    {isDarkMode ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-purple-400" />}
+                    {isDarkMode ? <Sun className="w-5 h-5 text-yellow-300" /> : <Moon className="w-5 h-5 text-purple-300" />}
                   </motion.button>
-                  
                   <motion.button
                     onClick={onClose}
-                    className="p-2 rounded-full hover:bg-purple-600/20 transition-colors"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     aria-label="Close menu"
                   >
-                    <X className="w-6 h-6 text-white" />
+                    <X className="w-6 h-6" />
                   </motion.button>
                 </div>
               </div>
@@ -208,14 +221,14 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <div className="flex items-center bg-[#080a13] rounded-2xl px-4 py-3 focus-within:bg-[#0a0d18] transition-colors">
-                  <Search className="w-5 h-5 text-purple-400 mr-3" />
+                <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-[#080a13] px-4 py-3 shadow-inner shadow-white/5 transition-all duration-300 focus-within:border-purple-500/50">
+                  <Search className="w-5 h-5 text-purple-300" />
                   <input
                     type="text"
-                    placeholder="Search songs, artists, playlists..."
+                    placeholder="Search menu items"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-transparent outline-none text-white placeholder:text-gray-500 flex-1 text-sm"
+                    className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-gray-500"
                   />
                   {searchQuery && (
                     <button 
@@ -311,13 +324,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       href="/auth/login?role=artist"
                       className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-[#080a13] text-white text-sm font-medium hover:bg-[#0a0d18] transition-colors"
                     >
-                      Login as Artist
+                      Login
                     </Link>
                     <Link
                       href="/auth/signup?role=artist"
                       className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
                     >
-                      Create Artist Account
+                      Create Account
                     </Link>
                   </div>
                 </div>
@@ -356,62 +369,27 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             {/* Scrollable Content */}
             <div className="h-[calc(100%-280px)] overflow-y-auto pb-6">
               <AnimatePresence mode="wait">
-                {activeMenuTab === "menu" && (
-                  <motion.div 
-                    key="menu"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="space-y-6 py-4"
-                  >
-                    <MenuSection title="Navigation" items={mainMenuItems} />
-                  </motion.div>
-                )}
-
-                {activeMenuTab === "library" && user && (
-                  <motion.div 
-                    key="library"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="space-y-6 py-4"
-                  >
-                    <MenuSection title="Your Library" items={musicMenuItems} />
-                  </motion.div>
-                )}
-
-                {activeMenuTab === "discover" && (
-                  <motion.div 
-                    key="discover"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="space-y-6 py-4"
-                  >
-                    <MenuSection title="Discover" items={discoverMenuItems} />
-                  </motion.div>
-                )}
-
-                {activeMenuTab === "account" && (
-                  <motion.div 
-                    key="account"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="space-y-6 py-4"
-                  >
-                    {user ? (
-                      <MenuSection title="Account" items={settingsMenuItems} />
-                    ) : (
-                      <MenuSection title="Authentication" items={authMenuItems} />
-                    )}
-                  </motion.div>
-                )}
+                <motion.div
+                  key={activeMenuTab}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="space-y-6 py-4"
+                >
+                  {activeItems.length > 0 ? (
+                    <MenuSection title={currentSectionLabel} items={activeItems} />
+                  ) : (
+                    <div className="mx-4 rounded-3xl border border-white/10 bg-[#080a13]/90 p-6 text-center text-gray-400 shadow-[0_25px_80px_-40px_rgba(94,43,255,0.28)]">
+                      <p className="text-sm font-semibold text-white mb-2">No menu items found.</p>
+                      <p className="text-sm text-gray-400">Try a different search or switch to another section.</p>
+                    </div>
+                  )}
+                </motion.div>
               </AnimatePresence>
 
               {/* Enhanced Now Playing with Controls */}
               <motion.div 
-                className="mx-4 mt-6 p-5 rounded-2xl bg-[#080a13]"
+                className="mx-4 mt-6 rounded-3xl border border-white/10 bg-[#080a13]/95 p-5 shadow-[0_25px_80px_-40px_rgba(94,43,255,0.28)]"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
