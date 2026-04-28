@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Pause, Heart, Search, Disc } from 'lucide-react';
+import { Pause, Play, Heart, Search, Disc } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from "next/image";
@@ -126,258 +126,83 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a0a0d] via-[#0f0f15] to-[#1a0f2e] min-h-screen pb-32">
-      {/* Search Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-6">Search</h1>
-        {/* Search Input */}
-        <div className="relative mb-6">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
-          <input
-            type="text"
-            placeholder="Search for songs, artists, or genres..."
-            className="w-full pl-12 pr-4 py-4 bg-[#1a1525]/70 border border-purple-900/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400 text-lg"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        {/* Search Tabs */}
-        <div className="flex gap-4 border-b border-purple-900/40 pb-2">
-          <button
-            onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'all' 
-                ? 'text-purple-300 border-b-2 border-purple-300' 
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setActiveTab('songs')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'songs' 
-                ? 'text-purple-300 border-b-2 border-purple-300' 
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            Songs
-          </button>
-          <button
-            onClick={() => setActiveTab('artists')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'artists' 
-                ? 'text-purple-300 border-b-2 border-purple-300' 
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            Artists
-          </button>
-        </div>
-      </div>
-
-      {/* Loading Spinner */}
-      {loading ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-          <div className="relative w-32 h-32">
-            <motion.div
-              animate={{
-                rotate: 360,
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                rotate: {
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "linear",
-                },
-                scale: {
-                  duration: 3,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                },
-              }}
-              className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#b574ff]"
-              style={{
-                background: `conic-gradient(
-                  from 0deg at 50% 50%,
-                  rgba(181, 116, 255, 0) 0deg,
-                  rgba(181, 116, 255, 0.3) 120deg,
-                  rgba(181, 116, 255, 0) 240deg
-                )`,
-              }}
-            />
-            <motion.div
-              animate={{
-                scale: [1, 1.1, 1],
-                boxShadow: [
-                  '0 0 0 0 rgba(181, 116, 255, 0.4)',
-                  '0 0 0 15px rgba(181, 116, 255, 0)',
-                  '0 0 0 30px rgba(181, 116, 255, 0)'
-                ]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeOut"
-              }}
-              className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#8d5bff] to-[#b574ff] flex items-center justify-center"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-                <path 
-                  d="M12 3V18M9 5V16M15 7V18M18 9V16" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M6 18C6 15.7909 7.79086 14 10 14C12.2091 14 14 15.7909 14 18C14 20.2091 12.2091 22 10 22C7.79086 22 6 20.2091 6 18Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </motion.div>
-            <motion.span 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#e51f48]"
-            >
-              Loading...
-            </motion.span>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* Search Results */}
-          {searchQuery.trim() ? (
-            <div>
-              {/* Songs Results */}
-              {(activeTab === 'all' || activeTab === 'songs') && searchResults.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-xl font-bold text-white mb-4">Songs</h2>
-                  <div className="bg-[#120b1f]/70 rounded-xl overflow-hidden">
-                    {searchResults.map((file, index) => (
-                      <div 
-                        key={file.id} 
-                        className={`flex items-center gap-4 p-4 transition-colors ${
-                          currentTrack?.id === file.id 
-                            ? 'bg-[#230c3f]' 
-                            : 'hover:bg-[#230c3f]/60'
+    <div className="min-h-screen bg-[#020206] text-white">
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(114,65,255,0.2),_transparent_25%),radial-gradient(circle_at_bottom_right,_rgba(109,52,255,0.14),_transparent_30%)] pointer-events-none" />
+        <div className="relative p-6 max-w-7xl mx-auto pb-32">
+          <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr] items-end mb-10">
+            <div className="rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
+              <div className="flex flex-col gap-4">
+                <div className="space-y-3">
+                  <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Search</p>
+                  <h1 className="text-4xl font-semibold tracking-tight">Find the track, artist, or mood you want.</h1>
+                  <p className="max-w-2xl text-gray-400">Search music with a clean dark UI that matches the same high-contrast guest welcome experience.</p>
+                </div>
+                <div className="relative mt-4">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40 w-5 h-5" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search for songs, artists, playlists..."
+                    className="w-full rounded-full border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white placeholder:text-white/40 outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {['All', 'Songs', 'Artists'].map((tab) => {
+                    const tabKey = tab.toLowerCase() as 'all' | 'songs' | 'artists';
+                    return (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveTab(tabKey)}
+                        className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                          activeTab === tabKey ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'bg-white/5 text-gray-300 hover:bg-white/10'
                         }`}
                       >
-                        <div className="text-gray-400 w-8 text-center">
-                          {currentTrack?.id === file.id && isPlaying ? (
-                            <Pause 
-                              className="w-5 h-5 text-[#e51f48] cursor-pointer" 
-                              onClick={() => handlePlay(file)}
-                            />
-                          ) : (
-                            <span 
-                              className="cursor-pointer hover:text-[#e51f48] transition-colors"
-                              onClick={() => handlePlay(file)}
-                            >
-                              {index + 1}
-                            </span>
-                          )}
-                        </div>
-                        <Image 
-                          src={file.coverArt} 
-                          alt={file.title} 
-                          className="w-12 h-12 rounded-lg object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/default-cover.jpg';
-                          }}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className={`font-medium truncate ${
-                            currentTrack?.id === file.id ? 'text-[#e51f48]' : 'text-white'
-                          }`}>
-                            {file.title}
-                          </p>
-                          <p className="text-sm text-gray-400 truncate">{file.artist}</p>
-                        </div>
-                        <div className="text-gray-400 text-sm">
-                          {formatDuration(file.duration)}
-                        </div>
-                        <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
-                          <Heart className="w-5 h-5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                        {tab}
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
-
-              {/* Artists Results */}
-              {(activeTab === 'all' || activeTab === 'artists') && artistResults.length > 0 && (
-                <div>
-                  <h2 className="text-xl font-bold text-white mb-4">Artists</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {artistResults.map(artist => (
-                      <div key={artist.id} className="bg-[#120b1f]/70 rounded-xl p-4 text-center hover:bg-[#230c3f] transition-colors">
-                        <Image
-                          src={artist.avatar}
-                          alt={artist.name}
-                          className="w-24 h-24 rounded-full mx-auto mb-3 object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/default-avatar.jpg';
-                          }}
-                        />
-                        <h3 className="font-medium text-white mb-1">{artist.name}</h3>
-                        <p className="text-sm text-gray-400">{artist.followers.toLocaleString()} followers</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* No Results */}
-              {getFilteredResults().length === 0 && artistResults.length === 0 && (
-                <div className="text-center py-12">
-                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-medium text-gray-400 mb-2">No results found</h3>
-                  <p className="text-gray-500">Try different keywords or check the spelling</p>
-                </div>
-              )}
+              </div>
             </div>
-          ) : (
-            /* Recent Searches / Popular Searches */
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Popular Genres */}
-              <div>
-                <h2 className="text-xl font-bold text-white mb-4">Browse Genres</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {['Hip Hop', 'Pop', 'R&B', 'Rock', 'Electronic', 'Jazz', 'Classical', 'Reggae'].map(genre => (
+
+            <div className="space-y-4">
+              <div className="rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
+                <h2 className="text-lg font-semibold text-white">Popular Genres</h2>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  {['Hip Hop', 'Pop', 'R&B', 'Rock', 'Electronic', 'Jazz', 'Classical', 'Reggae'].map((genre) => (
                     <button
                       key={genre}
                       onClick={() => setSearchQuery(genre)}
-                      className="p-4 bg-[#120b1f]/70 rounded-xl text-white hover:bg-[#230c3f] transition-colors text-left"
+                      className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-left text-white transition hover:border-purple-400/40 hover:bg-purple-700/10"
                     >
-                      <Disc className="w-6 h-6 mb-2 text-[#e51f48]" />
-                      <div className="font-medium">{genre}</div>
+                      <Disc className="w-5 h-5 text-purple-300" />
+                      <span className="font-medium text-sm">{genre}</span>
                     </button>
                   ))}
                 </div>
               </div>
-              {/* Popular Artists */}
-              <div>
-                <h2 className="text-xl font-bold text-white mb-4">Popular Artists</h2>
-                <div className="space-y-3">
-                  {artists.slice(0, 4).map(artist => (
+              <div className="rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
+                <h2 className="text-lg font-semibold text-white">Popular Artists</h2>
+                <div className="mt-4 space-y-3">
+                  {artists.slice(0, 4).map((artist) => (
                     <button
                       key={artist.id}
                       onClick={() => setSearchQuery(artist.name)}
-                      className="w-full flex items-center gap-3 p-3 bg-[#120b1f]/70 rounded-xl hover:bg-[#230c3f] transition-colors"
+                      className="flex w-full items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-left transition hover:border-purple-400/40 hover:bg-purple-700/10"
                     >
                       <Image
                         src={artist.avatar}
                         alt={artist.name}
-                        className="w-12 h-12 rounded-full object-cover"
+                        width={48}
+                        height={48}
+                        className="h-12 w-12 rounded-full object-cover"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = '/default-avatar.jpg';
                         }}
                       />
-                      <div className="text-left">
+                      <div>
                         <div className="font-medium text-white">{artist.name}</div>
                         <div className="text-sm text-gray-400">{artist.followers.toLocaleString()} followers</div>
                       </div>
@@ -386,9 +211,107 @@ export default function SearchPage() {
                 </div>
               </div>
             </div>
-          )}
-        </>
-      )}
+          </div>
+
+          {searchQuery.trim() ? (
+            <div className="space-y-8">
+              {(activeTab === 'all' || activeTab === 'songs') && searchResults.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold">Songs</h2>
+                    <span className="text-sm text-gray-400">{searchResults.length} results</span>
+                  </div>
+                  <div className="grid gap-4 xl:grid-cols-2">
+                    {searchResults.map((file, index) => (
+                      <div
+                        key={file.id}
+                        className={`group rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-5 transition hover:border-purple-400/40 hover:bg-purple-700/5 ${
+                          currentTrack?.id === file.id ? 'ring-1 ring-purple-400/30' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="relative h-20 w-20 overflow-hidden rounded-3xl bg-[#121016]">
+                            <Image
+                              src={file.coverArt}
+                              alt={file.title}
+                              fill
+                              className="object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/default-cover.jpg';
+                              }}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-3">
+                              <div>
+                                <h3 className="truncate text-lg font-semibold text-white">{file.title}</h3>
+                                <p className="text-sm text-gray-400 truncate">{file.artist}</p>
+                              </div>
+                              <button
+                                onClick={() => handlePlay(file)}
+                                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500"
+                              >
+                                {currentTrack?.id === file.id && isPlaying ? (
+                                  <Pause className="w-5 h-5" />
+                                ) : (
+                                  <Play className="w-5 h-5" />
+                                )}
+                              </button>
+                            </div>
+                            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-gray-400">
+                              <span>{formatDuration(file.duration)}</span>
+                              <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-white/80">
+                                <Disc className="w-4 h-4 text-purple-300" />
+                                {file.genre || 'Genre'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(activeTab === 'all' || activeTab === 'artists') && artistResults.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold">Artists</h2>
+                    <span className="text-sm text-gray-400">{artistResults.length} results</span>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {artistResults.map((artist) => (
+                      <div key={artist.id} className="rounded-[2rem] border border-white/10 bg-[#09080f]/95 p-5 text-center transition hover:border-purple-400/40 hover:bg-purple-700/5">
+                        <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-[#121016]">
+                          <Image
+                            src={artist.avatar}
+                            alt={artist.name}
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/default-avatar.jpg';
+                            }}
+                          />
+                        </div>
+                        <h3 className="text-lg font-semibold text-white">{artist.name}</h3>
+                        <p className="mt-2 text-sm text-gray-400">{artist.followers.toLocaleString()} followers</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {searchQuery.trim() && getFilteredResults().length === 0 && artistResults.length === 0 && (
+                <div className="rounded-[2rem] border border-white/10 bg-[#09080f]/90 p-12 text-center text-gray-400">
+                  <Search className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+                  <h3 className="text-2xl font-semibold text-white mb-2">No results found</h3>
+                  <p className="text-sm text-gray-400">Try different keywords or refine your search.</p>
+                </div>
+              )}
+            </div>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }

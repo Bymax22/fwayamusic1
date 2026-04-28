@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { Play, Heart, Plus,  Download, ListMusic, Folder, History } from 'lucide-react';
+import { Play, Heart, Plus, Download, Disc, ListMusic, Folder, History } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from "next/image";
@@ -268,135 +268,160 @@ export default function LibraryPage() {
     <ThemeProvider>
       <AuthProvider>
         <PaymentProvider>
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a0a0d] via-[#0f0f15] to-[#1a0f2e] min-h-screen pb-32">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Your Library</h1>
-          <p className="text-gray-400">Manage your music collection</p>
-        </div>
-        <button 
-          onClick={handleCreatePlaylist}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          New Playlist
-        </button>
-      </div>
+          <div className="min-h-screen bg-[#020206] text-white">
+            <div className="relative overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(120,63,255,0.18),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(94,43,255,0.14),_transparent_30%)] pointer-events-none" />
+              <div className="relative p-6 max-w-7xl mx-auto pb-32">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
+                  <div className="space-y-3">
+                    <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Library</p>
+                    <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">Organize your tracks, playlists, and downloads.</h1>
+                    <p className="max-w-2xl text-gray-400">A polished library view with glassy cards, purple accents, and a consistent dark layout.</p>
+                  </div>
+                  <button
+                    onClick={handleCreatePlaylist}
+                    className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-500"
+                  >
+                    <Plus className="w-4 h-4" />
+                    New Playlist
+                  </button>
+                </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex gap-4 border-b border-purple-900/40 pb-2 mb-6 overflow-x-auto">
-        {[
-          { id: 'playlists', label: 'Playlists', icon: <ListMusic className="w-4 h-4" /> },
-          { id: 'liked', label: 'Liked Songs', icon: <Heart className="w-4 h-4" /> },
-          { id: 'recent', label: 'Recently Played', icon: <History className="w-4 h-4" /> },
-          { id: 'downloaded', label: 'Downloads', icon: <Download className="w-4 h-4" /> },
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as 'playlists' | 'liked' | 'recent' | 'downloaded')}
-            className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${
-              activeTab === tab.id 
-                ? 'text-purple-300 border-b-2 border-purple-300' 
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+                <div className="flex flex-wrap gap-3 mb-10">
+                  {[
+                    { id: 'playlists', label: 'Playlists', icon: <ListMusic className="w-4 h-4" /> },
+                    { id: 'liked', label: 'Liked Songs', icon: <Heart className="w-4 h-4" /> },
+                    { id: 'recent', label: 'Recently Played', icon: <History className="w-4 h-4" /> },
+                    { id: 'downloaded', label: 'Downloads', icon: <Download className="w-4 h-4" /> },
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id as 'playlists' | 'liked' | 'recent' | 'downloaded')}
+                      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
+                        activeTab === tab.id
+                          ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/15'
+                          : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                      }`}
+                    >
+                      {tab.icon}
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
 
-      {/* Content */}
-      <div>
-        <div className="flex items-center gap-2 mb-6">
-          {getIcon()}
-          <h2 className="text-2xl font-bold text-white">{getTitle()}</h2>
-          <span className="text-gray-400">({getContent().length})</span>
-        </div>
+                <div className="grid gap-6">
+                  <div className="flex items-center gap-3 text-sm text-gray-400 mb-4">
+                    <span className="inline-flex h-2 w-2 rounded-full bg-purple-400" />
+                    <span>{getTitle()}</span>
+                    <span className="text-white/70">({getContent().length})</span>
+                  </div>
 
-{activeTab === 'playlists'
-  ? (getContent() as Playlist[]).map((playlist) => (
-      <div 
-        key={playlist.id} 
-        className="bg-[#120b1f]/70 rounded-xl overflow-hidden hover:bg-[#25143f] transition-colors group"
-      >
-        <div className="relative">
-          <Image 
-            src={playlist.coverArt} 
-            alt={playlist.name} 
-            className="w-full h-48 object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/default-cover.jpg';
-            }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all">
-            <button className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
-              <div className="w-12 h-12 rounded-full bg-[#7f4dda] flex items-center justify-center shadow-lg shadow-purple-500/20">
-                <Play className="w-5 h-5 text-white" />
+                  {activeTab === 'playlists' ? (
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                      {(getContent() as Playlist[]).map((playlist) => (
+                        <div key={playlist.id} className="group overflow-hidden rounded-[32px] border border-white/10 bg-[#09080f]/80 shadow-[0_25px_80px_-40px_rgba(118,86,255,0.45)] transition hover:border-purple-500/30">
+                          <div className="relative overflow-hidden">
+                            <Image
+                              src={playlist.coverArt}
+                              alt={playlist.name}
+                              width={480}
+                              height={320}
+                              className="h-44 w-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/default-cover.jpg';
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                            <button
+                              className="absolute bottom-4 right-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/30 opacity-0 transition group-hover:opacity-100"
+                              onClick={() => playTrack({
+                                id: playlist.id,
+                                title: playlist.name,
+                                artist: playlist.description,
+                                audioUrl: playlist.coverArt,
+                                url: playlist.coverArt,
+                                coverArt: playlist.coverArt,
+                                duration: playlist.duration
+                              })}
+                            >
+                              <Play className="w-5 h-5" />
+                            </button>
+                          </div>
+                          <div className="space-y-2 p-5">
+                            <div className="text-xs uppercase tracking-[0.24em] text-purple-300">Playlist</div>
+                            <h3 className="text-lg font-semibold text-white truncate">{playlist.name}</h3>
+                            <p className="text-sm text-gray-400 line-clamp-2">{playlist.description}</p>
+                            <div className="flex items-center justify-between text-xs text-gray-500 pt-3">
+                              <span>{playlist.trackCount} tracks</span>
+                              <span>{formatDuration(playlist.duration)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      {(getContent() as MediaFile[]).map((file) => (
+                        <div key={file.id} className="grid gap-4 rounded-[32px] border border-white/10 bg-[#09080f]/80 p-5 shadow-[0_25px_80px_-40px_rgba(118,86,255,0.45)] transition hover:border-purple-500/30">
+                          <div className="relative overflow-hidden rounded-3xl bg-[#0d0c14]">
+                            <Image
+                              src={file.coverArt}
+                              alt={file.title}
+                              width={640}
+                              height={400}
+                              className="h-44 w-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/default-cover.jpg';
+                              }}
+                            />
+                            <button
+                              onClick={() => handlePlay(file)}
+                              className="absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/25 transition hover:bg-purple-500"
+                            >
+                              <Play className="w-5 h-5" />
+                            </button>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <div>
+                                <h3 className="text-lg font-semibold text-white truncate">{file.title}</h3>
+                                <p className="text-sm text-gray-400 truncate">{file.artist}</p>
+                              </div>
+                              <button className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/90 transition hover:bg-purple-600/20">
+                                <Heart className="w-4 h-4 text-purple-300" />
+                              </button>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
+                              <span>{formatDuration(file.duration)}</span>
+                              <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-white/80">
+                                <Disc className="w-4 h-4 text-purple-300" />
+                                {file.genre || 'Genre'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {getContent().length === 0 && (
+                    <div className="rounded-[32px] border border-white/10 bg-[#09080f]/80 p-10 text-center text-gray-400 shadow-[0_25px_80px_-40px_rgba(118,86,255,0.35)]">
+                      <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/30 mx-auto">
+                        {getIcon()}
+                      </div>
+                      <h3 className="text-2xl font-semibold text-white mb-2">No {getTitle().toLowerCase()} yet</h3>
+                      <p className="max-w-xl mx-auto text-sm text-gray-400">
+                        {activeTab === 'liked' && 'Like some songs to see them here.'}
+                        {activeTab === 'recent' && 'Play some music to build your history.'}
+                        {activeTab === 'downloaded' && 'Download songs for offline listening.'}
+                        {activeTab === 'playlists' && 'Create your first playlist to get started.'}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </button>
-          </div>
-        </div>
-        <div className="p-4">
-          <h3 className="font-medium text-white truncate mb-1">{playlist.name}</h3>
-          <p className="text-sm text-gray-400 truncate mb-2">{playlist.description}</p>
-          <div className="flex justify-between items-center text-xs text-gray-500">
-            <span>{playlist.trackCount} tracks</span>
-            <span>{formatDuration(playlist.duration)}</span>
-          </div>
-        </div>
-      </div>
-    ))
-: (getContent() as MediaFile[]).map((file: MediaFile) => (
-  <div 
-    key={file.id} 
-    className="bg-[#120b1f]/70 rounded-xl overflow-hidden hover:bg-[#25143f] transition-colors group"
-  >
-        <div className="relative">
-          <Image 
-            src={file.coverArt} 
-            alt={file.title} 
-            className="w-full h-48 object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/default-cover.jpg';
-            }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all">
-            <button 
-              onClick={() => handlePlay(file)}
-              className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
-            >
-              <div className="w-12 h-12 rounded-full bg-[#7f4dda] flex items-center justify-center shadow-lg shadow-purple-500/20">
-                <Play className="w-5 h-5 text-white" />
-              </div>
-            </button>
-          </div>
-        </div>
-        <div className="p-4">
-          <h3 className="font-medium text-white truncate mb-1">{file.title}</h3>
-          <p className="text-sm text-gray-400 truncate">{file.artist}</p>
-        </div>
-      </div>
-    ))
-}
-
-        {getContent().length === 0 && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-[#7f4dda] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/20">
-              {getIcon()}
             </div>
-            <h3 className="text-xl font-medium text-gray-400 mb-2">No {getTitle().toLowerCase()} yet</h3>
-            <p className="text-gray-500">
-              {activeTab === 'liked' && 'Like some songs to see them here'}
-              {activeTab === 'recent' && 'Play some music to build your history'}
-              {activeTab === 'downloaded' && 'Download songs for offline listening'}
-              {activeTab === 'playlists' && 'Create your first playlist to get started'}
-            </p>
           </div>
-        )}
-      </div>
-    </div>
         </PaymentProvider>
       </AuthProvider>
     </ThemeProvider>
