@@ -161,20 +161,42 @@ export default function Browse() {
   }, []);
 
   useEffect(() => {
+    const fetchWithFallback = async (primaryUrl: string, fallbackUrl: string, options: RequestInit = {}) => {
+      try {
+        const response = await fetch(primaryUrl, options);
+        if (response.ok) {
+          return response;
+        }
+        console.warn(`Primary fetch failed: ${primaryUrl}`, response.status, response.statusText);
+      } catch (fetchError) {
+        console.warn(`Primary fetch error: ${primaryUrl}`, fetchError);
+      }
+
+      return fetch(fallbackUrl, options);
+    };
+
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
         const [mediaResponse, userPlaylistsResponse] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`, {
-            credentials: 'include',
-            headers: { 'Accept': 'application/json' }
-          }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=USER`, {
-            credentials: 'include',
-            headers: { 'Accept': 'application/json' }
-          })
+          fetchWithFallback(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`,
+            '/api/media',
+            {
+              credentials: 'include',
+              headers: { 'Accept': 'application/json' }
+            }
+          ),
+          fetchWithFallback(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=USER`,
+            '/api/playlists?type=USER',
+            {
+              credentials: 'include',
+              headers: { 'Accept': 'application/json' }
+            }
+          )
         ]);
 
         if (!mediaResponse.ok) {
@@ -685,24 +707,26 @@ export default function Browse() {
   };
 
   const getAccessTypeBadge = (file: MediaFile) => {
+    const displayPrice = typeof file.price === 'number' ? `${file.currency ?? 'ZMW'}${file.price}` : 'ZMW1';
+
     switch (file.accessType) {
       case 'PREMIUM':
         return (
-          <div className="flex items-center gap-1 px-2 py-1 bg-[#2b5060]/20 text-[#d4af37] rounded-full text-xs">
+          <div className="flex items-center gap-1 px-2 py-1 bg-[#422d72]/20 text-[#c4b5fd] rounded-full text-xs">
             <Crown className="w-3 h-3" />
             Premium
           </div>
         );
       case 'PAY_PER_VIEW':
         return (
-          <div className="flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">
+          <div className="flex items-center gap-1 px-2 py-1 bg-[#5b21b6]/20 text-[#d8b4fe] rounded-full text-xs">
             <DollarSign className="w-3 h-3" />
-            ${file.price}
+            {displayPrice}
           </div>
         );
       default:
         return (
-          <div className="px-2 py-1 bg-[#0a3747] text-gray-300 rounded-full text-xs">
+          <div className="px-2 py-1 bg-[#0f172a] text-gray-300 rounded-full text-xs">
             Free
           </div>
         );
@@ -739,14 +763,14 @@ export default function Browse() {
     return (
       <div className="py-6 px-2 sm:px-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
         <h1 className="text-3xl font-bold text-white mb-8">Browse Music</h1>
-        <div className="bg-[#0a3747] border border-[#0a3747] p-6 rounded-xl">
-          <h3 className="text-[#e51f48] font-medium text-lg">{error.message}</h3>
+        <div className="bg-[#0a3747] border border-[#0f172a] p-6 rounded-xl">
+          <h3 className="text-[#c4b5fd] font-medium text-lg">{error.message}</h3>
           {error.details && (
-            <p className="text-[#ff4d6d] text-sm mt-2">{error.details}</p>
+            <p className="text-[#d8b4fe] text-sm mt-2">{error.details}</p>
           )}
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-lg transition-colors"
+            className="mt-4 px-4 py-2 bg-[#7c3aed] hover:bg-[#9333ea] text-white rounded-lg transition-colors"
           >
             Try again
           </button>
@@ -765,21 +789,21 @@ export default function Browse() {
               <div className="flex gap-2">
                 <button 
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-[#0a3747] text-[#e51f48]' : 'bg-[#0a3747]/50 text-gray-300'}`}
+                  className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-[#0a3747] text-[#a855f7]' : 'bg-[#0a3747]/50 text-gray-300'}`}
                   aria-label="Grid view"
                 >
                   <Grid className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-[#0a3747] text-[#e51f48]' : 'bg-[#0a3747]/50 text-gray-300'}`}
+                  className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-[#0a3747] text-[#a855f7]' : 'bg-[#0a3747]/50 text-gray-300'}`}
                   aria-label="List view"
                 > 
                   <ListMusic className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => setViewMode('compact')}
-                  className={`p-2 rounded-lg ${viewMode === 'compact' ? 'bg-[#0a3747] text-[#e51f48]' : 'bg-[#0a3747]/50 text-gray-300'}`}
+                  className={`p-2 rounded-lg ${viewMode === 'compact' ? 'bg-[#0a3747] text-[#a855f7]' : 'bg-[#0a3747]/50 text-gray-300'}`}
                   aria-label="Compact view"
                 >
                   <Eye className="w-5 h-5" />
@@ -794,7 +818,7 @@ export default function Browse() {
                 <input
                   type="text"
                   placeholder="Search songs, artists, genres, or tags..."
-                  className="w-full pl-10 pr-4 py-3 bg-[#0a3747]/70 border border-[#0a3747] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent placeholder-gray-400"
+                  className="w-full pl-10 pr-4 py-3 bg-[#0a3747]/70 border border-[#0a3747] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent placeholder-gray-400"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -803,7 +827,7 @@ export default function Browse() {
               <div className="flex flex-wrap gap-3 items-center">
                 <button 
                   onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] hover:bg-[#9333ea] text-white rounded-xl transition-colors"
                 >
                   <Filter className="w-4 h-4" />
                   Filters
@@ -816,7 +840,7 @@ export default function Browse() {
                       onClick={() => setSelectedGenre(genre ?? "Other")}
                       className={`px-4 py-2 rounded-xl whitespace-nowrap transition-colors ${
                         selectedGenre === (genre ?? "Other") 
-                          ? 'bg-[#e51f48] text-white' 
+                          ? 'bg-[#7c3aed] text-white' 
                           : 'bg-[#0a3747] text-gray-300 hover:bg-[#0a3747]/80'
                       }`}
                     >
@@ -832,12 +856,11 @@ export default function Browse() {
                       onClick={() => setSelectedType(type || "all")}
                       className={`px-4 py-2 rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
                         selectedType === type 
-                          ? 'bg-[#e51f48] text-white' 
+                          ? 'bg-[#7c3aed] text-white' 
                           : 'bg-[#0a3747] text-gray-300 hover:bg-[#0a3747]/80'
                       }`}
                     >
-                      {getTypeIcon(type || "AUDIO")}
-                      {(type || "AUDIO").charAt(0).toUpperCase() + (type || "AUDIO").slice(1).toLowerCase()}
+                      {type}
                     </button>
                   ))}
                 </div>
@@ -858,7 +881,7 @@ export default function Browse() {
                         onClick={() => setActiveFilter('popular')}
                         className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
                           activeFilter === 'popular' 
-                            ? 'bg-[#e51f48] text-white' 
+                            ? 'bg-[#7c3aed] text-white' 
                             : 'bg-[#0a3747] text-gray-300'
                         }`}
                       >
@@ -870,7 +893,7 @@ export default function Browse() {
                         onClick={() => setActiveFilter('newest')}
                         className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
                           activeFilter === 'newest' 
-                            ? 'bg-[#e51f48] text-white' 
+                            ? 'bg-[#7c3aed] text-white' 
                             : 'bg-[#0a3747] text-gray-300'
                         }`}
                       >
@@ -881,7 +904,7 @@ export default function Browse() {
                         onClick={() => setActiveFilter('trending')}
                         className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
                           activeFilter === 'trending' 
-                            ? 'bg-[#e51f48] text-white' 
+                            ? 'bg-[#7c3aed] text-white' 
                             : 'bg-[#0a3747] text-gray-300'
                         }`}
                       >
@@ -892,7 +915,7 @@ export default function Browse() {
                         onClick={() => setActiveFilter('recommended')}
                         className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
                           activeFilter === 'recommended' 
-                            ? 'bg-[#e51f48] text-white' 
+                            ? 'bg-[#7c3aed] text-white' 
                             : 'bg-[#0a3747] text-gray-300'
                         }`}
                       >
@@ -941,7 +964,7 @@ export default function Browse() {
                     <div className="col-span-1 flex justify-center items-center">
                     <button
                       onClick={() => handlePlay(file)}
-                      className="w-8 h-8 flex items-center justify-center rounded-full text-[#e51f48] hover:text-white transition-colors"
+                      className="w-8 h-8 flex items-center justify-center rounded-full text-[#a855f7] hover:text-white transition-colors"
                         aria-label={String(currentTrack?.id) === String(file.id) && isPlaying ? 'Pause' : 'Play'}
                     >
                       {String(currentTrack?.id) === String(file.id) && isPlaying ? (
@@ -967,7 +990,7 @@ export default function Browse() {
                     <div className="flex-1 min-w-0">
                       <p className={`font-medium flex items-center gap-2 ${
                         String(currentTrack?.id) === String(file.id) 
-                          ? 'text-[#e51f48]' 
+                          ? 'text-[#a855f7]' 
                           : 'text-white'
                       }`}>
                         {file.title}
@@ -1030,7 +1053,7 @@ export default function Browse() {
                     <div className="flex gap-2">
                       <button 
                         onClick={() => handleLike(file.id)}
-                        className="text-gray-400 hover:text-[#e51f48] transition-colors group"
+                        className="text-gray-400 hover:text-[#a855f7] transition-colors group"
                         aria-label="Like"
                       >
                         <Heart 
@@ -1043,7 +1066,7 @@ export default function Browse() {
                           setSelectedMedia(file);
                           setShowMediaMenu(true);
                         }}
-                        className="text-gray-400 hover:text-[#e51f48] transition-colors group"
+                        className="text-gray-400 hover:text-[#a855f7] transition-colors group"
                         aria-label="More options"
                       >
                         <MoreHorizontal className="w-4 h-4 group-hover:scale-110 transition-transform" />
@@ -1089,7 +1112,7 @@ export default function Browse() {
                           String(currentTrack?.id) === String(file.id) && isPlaying ? 'opacity-100 translate-y-0' : ''
                         }`}
                       >
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg text-[#e51f48] hover:text-white transition-colors">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg text-[#a855f7] hover:text-white transition-colors">
                           {String(currentTrack?.id) === String(file.id) && isPlaying ? (
                             <Waveform playing={true} className="w-6 h-6" />
                           ) : (
@@ -1123,7 +1146,7 @@ export default function Browse() {
                   </div>
 
                   {!file.isDRMProtected && (
-  <div className="flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">
+  <div className="flex items-center gap-1 px-2 py-1 bg-[#4c1d95]/20 text-[#d8b4fe] rounded-full text-xs">
     <Unlock className="w-3 h-3" />
     Unlocked
   </div>
@@ -1208,7 +1231,7 @@ export default function Browse() {
                   />
                   <button
                     onClick={() => handlePlay(file)}
-                    className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 transition-colors text-[#e51f48] hover:text-white"
+                    className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 transition-colors text-[#a855f7] hover:text-white"
                   >
                     {String(currentTrack?.id) === String(file.id) && isPlaying ? (
                       <Waveform playing={true} className="w-5 h-5" />
@@ -1243,7 +1266,7 @@ export default function Browse() {
 
                   {/* Line 2: Access Type | Genre | Duration | Play Count */}
                   <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
-                    <span className={file.accessType === 'FREE' ? 'text-gray-400 font-semibold' : 'text-[#d4af37] font-semibold'}>
+                    <span className={file.accessType === 'FREE' ? 'text-gray-400 font-semibold' : 'text-[#c4b5fd] font-semibold'}>
                       {file.accessType === 'FREE' ? 'FREE' : (file.accessType === 'PAY_PER_VIEW' ? 'PAY_PER_VIEW' : 'PREMIUM')}
                     </span>
                     <span>•</span>
@@ -1259,7 +1282,7 @@ export default function Browse() {
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button 
                     onClick={() => handleLike(file.id)}
-                    className="text-gray-400 hover:text-[#e51f48] transition-colors"
+                    className="text-gray-400 hover:text-[#a855f7] transition-colors"
                   >
                     <Heart 
                       className="w-3.5 h-3.5" 
@@ -1271,7 +1294,7 @@ export default function Browse() {
                       setSelectedMedia(file);
                       setShowMediaMenu(true);
                     }}
-                    className="text-gray-400 hover:text-[#e51f48] transition-colors"
+                    className="text-gray-400 hover:text-[#a855f7] transition-colors"
                   >
                     <MoreHorizontal className="w-3.5 h-3.5" />
                   </button>
@@ -1292,7 +1315,7 @@ export default function Browse() {
               <div className="flex justify-center mt-6">
                 <button
                   onClick={loadMore}
-                  className="px-6 py-3 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl"
+                  className="px-6 py-3 bg-[#7c3aed] hover:bg-[#9333ea] text-white rounded-xl"
                 >
                   Load more
                 </button>
@@ -1326,13 +1349,13 @@ export default function Browse() {
 
                     <div className="space-y-2">
                 <button
-                  onClick={() => handlePlay(selectedMedia)}
+                  onClick={() => selectedMedia && handlePlay(selectedMedia)}
                   className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
                 >
                   {currentTrack?.id === selectedMedia.id && isPlaying ? (
-                    <Pause className="w-5 h-5 text-[#e51f48]" />
+                    <Pause className="w-5 h-5 text-[#a855f7]" />
                   ) : (
-                    <Play className="w-5 h-5 text-[#e51f48]" />
+                    <Play className="w-5 h-5 text-[#a855f7]" />
                   )}
                   <span className="text-white">
                     {currentTrack?.id === selectedMedia.id && isPlaying ? 'Pause' : 'Play'}
@@ -1340,12 +1363,12 @@ export default function Browse() {
                 </button>
 
                 <button
-                  onClick={() => handleLike(selectedMedia.id)}
+                  onClick={() => selectedMedia && handleLike(selectedMedia.id)}
                   className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
                 >
                   <Heart 
-                    className="w-5 h-5 text-[#e51f48]" 
-                    fill={selectedMedia.likes > 0 ? '#e51f48' : 'none'}
+                    className="w-5 h-5 text-[#a855f7]" 
+                    fill={selectedMedia.likes > 0 ? '#a855f7' : 'none'}
                   />
                   <span className="text-white">Like</span>
                 </button>
@@ -1354,7 +1377,7 @@ export default function Browse() {
   className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
   onClick={() => alert('Bookmark feature coming soon!')}
 >
-  <Bookmark className="w-5 h-5 text-[#e51f48]" />
+  <Bookmark className="w-5 h-5 text-[#a855f7]" />
   <span className="text-white">Bookmark</span>
 </button>
 
@@ -1362,16 +1385,16 @@ export default function Browse() {
   className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
   onClick={() => alert('Save to Library feature coming soon!')}
 >
-  <BookmarkCheck className="w-5 h-5 text-[#e51f48]" />
+  <BookmarkCheck className="w-5 h-5 text-[#a855f7]" />
   <span className="text-white">Save to Library</span>
 </button>
 
                 {selectedMedia.accessType === 'FREE' && (
                   <button
-                    onClick={() => handleDownload(selectedMedia)}
+                    onClick={() => selectedMedia && handleDownload(selectedMedia)}
                     className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
                   >
-                    <Download className="w-5 h-5 text-[#e51f48]" />
+                    <Download className="w-5 h-5 text-[#a855f7]" />
                     <span className="text-white">Download</span>
                   </button>
                 )}
@@ -1381,11 +1404,11 @@ export default function Browse() {
                         <button
                           onClick={() => {
                             setShowMediaMenu(false);
-                            handlePurchase(selectedMedia);
+                            selectedMedia && handlePurchase(selectedMedia);
                           }}
                           className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
                         >
-                          <ShoppingCart className="w-5 h-5 text-[#e51f48]" />
+                          <ShoppingCart className="w-5 h-5 text-[#a855f7]" />
                           <span className="text-white">
                             Purchase ZMW{selectedMedia.price}
                           </span>
@@ -1399,15 +1422,15 @@ export default function Browse() {
                   }}
                   className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
                 >
-                  <Plus className="w-5 h-5 text-[#e51f48]" />
+                  <Plus className="w-5 h-5 text-[#a855f7]" />
                   <span className="text-white">Add to Playlist</span>
                 </button>
 
                 <button
-                  onClick={() => handleShare(selectedMedia)}
+                  onClick={() => selectedMedia && handleShare(selectedMedia)}
                   className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
                 >
-                  <Share2 className="w-5 h-5 text-[#e51f48]" />
+                  <Share2 className="w-5 h-5 text-[#a855f7]" />
                   <span className="text-white">Share</span>
                 </button>
               </div>
@@ -1425,7 +1448,9 @@ export default function Browse() {
                   setSelectedMediaForPayment(null);
                 }}
                 media={{
-                  ...selectedMediaForPayment,
+                  id: selectedMediaForPayment.id ?? 0,
+                  title: selectedMediaForPayment.title ?? 'Unknown',
+                  artist: selectedMediaForPayment.artist ?? 'Unknown',
                   price: selectedMediaForPayment.price ?? 1,
                   currency: selectedMediaForPayment.currency ?? 'ZMW',
                 }}
@@ -1449,11 +1474,11 @@ export default function Browse() {
                 {userPlaylists.map(playlist => (
                   <button
                     key={playlist.id}
-                    onClick={() => handleAddToPlaylist(playlist.id, selectedMedia.id)}
+                    onClick={() => selectedMedia && handleAddToPlaylist(playlist.id, selectedMedia.id)}
                     className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#0a1f29] rounded-lg transition-colors"
                   >
                     <div className="w-10 h-10 bg-[#0a1f29] rounded-lg flex items-center justify-center">
-                      <ListMusic className="w-5 h-5 text-[#e51f48]" />
+                      <ListMusic className="w-5 h-5 text-[#a855f7]" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-white truncate">{playlist.name}</p>
