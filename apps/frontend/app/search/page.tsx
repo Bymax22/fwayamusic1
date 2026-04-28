@@ -126,7 +126,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a0a0d] via-[#0f0f15] to-[#1a0f2e] min-h-screen pb-32">
       {/* Search Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-6">Search</h1>
@@ -136,18 +136,18 @@ export default function SearchPage() {
           <input
             type="text"
             placeholder="Search for songs, artists, or genres..."
-            className="w-full pl-12 pr-4 py-4 bg-[#0a3747]/70 border border-[#0a3747] text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent placeholder-gray-400 text-lg"
+            className="w-full pl-12 pr-4 py-4 bg-[#1a1525]/70 border border-purple-900/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400 text-lg"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         {/* Search Tabs */}
-        <div className="flex gap-4 border-b border-[#0a3747] pb-2">
+        <div className="flex gap-4 border-b border-purple-900/40 pb-2">
           <button
             onClick={() => setActiveTab('all')}
             className={`px-4 py-2 font-medium transition-colors ${
               activeTab === 'all' 
-                ? 'text-[#e51f48] border-b-2 border-[#e51f48]' 
+                ? 'text-purple-300 border-b-2 border-purple-300' 
                 : 'text-gray-400 hover:text-gray-300'
             }`}
           >
@@ -157,7 +157,7 @@ export default function SearchPage() {
             onClick={() => setActiveTab('songs')}
             className={`px-4 py-2 font-medium transition-colors ${
               activeTab === 'songs' 
-                ? 'text-[#e51f48] border-b-2 border-[#e51f48]' 
+                ? 'text-purple-300 border-b-2 border-purple-300' 
                 : 'text-gray-400 hover:text-gray-300'
             }`}
           >
@@ -167,7 +167,7 @@ export default function SearchPage() {
             onClick={() => setActiveTab('artists')}
             className={`px-4 py-2 font-medium transition-colors ${
               activeTab === 'artists' 
-                ? 'text-[#e51f48] border-b-2 border-[#e51f48]' 
+                ? 'text-purple-300 border-b-2 border-purple-300' 
                 : 'text-gray-400 hover:text-gray-300'
             }`}
           >
@@ -197,13 +197,13 @@ export default function SearchPage() {
                   repeatType: "reverse",
                 },
               }}
-              className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#e51f48]"
+              className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#b574ff]"
               style={{
                 background: `conic-gradient(
                   from 0deg at 50% 50%,
-                  rgba(229, 31, 72, 0) 0deg,
-                  rgba(229, 31, 72, 0.3) 120deg,
-                  rgba(229, 31, 72, 0) 240deg
+                  rgba(181, 116, 255, 0) 0deg,
+                  rgba(181, 116, 255, 0.3) 120deg,
+                  rgba(181, 116, 255, 0) 240deg
                 )`,
               }}
             />
@@ -211,9 +211,9 @@ export default function SearchPage() {
               animate={{
                 scale: [1, 1.1, 1],
                 boxShadow: [
-                  '0 0 0 0 rgba(229, 31, 72, 0.4)',
-                  '0 0 0 15px rgba(229, 31, 72, 0)',
-                  '0 0 0 30px rgba(229, 31, 72, 0)'
+                  '0 0 0 0 rgba(181, 116, 255, 0.4)',
+                  '0 0 0 15px rgba(181, 116, 255, 0)',
+                  '0 0 0 30px rgba(181, 116, 255, 0)'
                 ]
               }}
               transition={{
@@ -221,7 +221,7 @@ export default function SearchPage() {
                 repeat: Infinity,
                 ease: "easeOut"
               }}
-              className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center"
+              className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#8d5bff] to-[#b574ff] flex items-center justify-center"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
                 <path 
@@ -255,14 +255,14 @@ export default function SearchPage() {
               {(activeTab === 'all' || activeTab === 'songs') && searchResults.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-xl font-bold text-white mb-4">Songs</h2>
-                  <div className="bg-[#0a3747]/70 rounded-xl overflow-hidden">
+                  <div className="bg-[#120b1f]/70 rounded-xl overflow-hidden">
                     {searchResults.map((file, index) => (
                       <div 
                         key={file.id} 
                         className={`flex items-center gap-4 p-4 transition-colors ${
                           currentTrack?.id === file.id 
-                            ? 'bg-[#0a3747]' 
-                            : 'hover:bg-[#0a3747]/50'
+                            ? 'bg-[#230c3f]' 
+                            : 'hover:bg-[#230c3f]/60'
                         }`}
                       >
                         <div className="text-gray-400 w-8 text-center">
@@ -314,7 +314,7 @@ export default function SearchPage() {
                   <h2 className="text-xl font-bold text-white mb-4">Artists</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {artistResults.map(artist => (
-                      <div key={artist.id} className="bg-[#0a3747]/70 rounded-xl p-4 text-center hover:bg-[#0a3747] transition-colors">
+                      <div key={artist.id} className="bg-[#120b1f]/70 rounded-xl p-4 text-center hover:bg-[#230c3f] transition-colors">
                         <Image
                           src={artist.avatar}
                           alt={artist.name}
@@ -351,7 +351,7 @@ export default function SearchPage() {
                     <button
                       key={genre}
                       onClick={() => setSearchQuery(genre)}
-                      className="p-4 bg-[#0a3747]/70 rounded-xl text-white hover:bg-[#0a3747] transition-colors text-left"
+                      className="p-4 bg-[#120b1f]/70 rounded-xl text-white hover:bg-[#230c3f] transition-colors text-left"
                     >
                       <Disc className="w-6 h-6 mb-2 text-[#e51f48]" />
                       <div className="font-medium">{genre}</div>
@@ -367,7 +367,7 @@ export default function SearchPage() {
                     <button
                       key={artist.id}
                       onClick={() => setSearchQuery(artist.name)}
-                      className="w-full flex items-center gap-3 p-3 bg-[#0a3747]/70 rounded-xl hover:bg-[#0a3747] transition-colors"
+                      className="w-full flex items-center gap-3 p-3 bg-[#120b1f]/70 rounded-xl hover:bg-[#230c3f] transition-colors"
                     >
                       <Image
                         src={artist.avatar}
