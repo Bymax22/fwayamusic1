@@ -42,6 +42,12 @@ export default function GuestWelcome() {
   const quickRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<HTMLDivElement>(null);
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const resolveMediaUrl = (url?: string) => {
+    if (!url) return undefined;
+    return url.startsWith('http://') || url.startsWith('https://') ? url : `${API_BASE}${url}`;
+  };
+
   // Audio player hook
   const { playTrack, isPlaying } = useAudioPlayer();
 
@@ -61,8 +67,8 @@ export default function GuestWelcome() {
         if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {
           const processedSongs = homepageData.featuredSongs.map((song: any) => ({
             ...song,
-            url: song.url ? `${API_BASE}${song.url}` : song.url,
-            coverArt: song.coverArt ? `${API_BASE}${song.coverArt}` : song.coverArt
+            url: song.url ? resolveMediaUrl(song.url) : song.url,
+            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt
           }));
           setQuickPicks(processedSongs);
         }
@@ -71,8 +77,8 @@ export default function GuestWelcome() {
         if (homepageData.trendingSongs && Array.isArray(homepageData.trendingSongs)) {
           const processedSongs = homepageData.trendingSongs.map((song: any) => ({
             ...song,
-            url: song.url ? `${API_BASE}${song.url}` : song.url,
-            coverArt: song.coverArt ? `${API_BASE}${song.coverArt}` : song.coverArt
+            url: song.url ? resolveMediaUrl(song.url) : song.url,
+            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt
           }));
           setTrendingNow(processedSongs);
         }
@@ -81,8 +87,8 @@ export default function GuestWelcome() {
         if (homepageData.topCharts && Array.isArray(homepageData.topCharts)) {
           const processedSongs = homepageData.topCharts.map((song: any) => ({
             ...song,
-            url: song.url ? `${API_BASE}${song.url}` : song.url,
-            coverArt: song.coverArt ? `${API_BASE}${song.coverArt}` : song.coverArt
+            url: song.url ? resolveMediaUrl(song.url) : song.url,
+            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt
           }));
           setTopCharts(processedSongs);
         }
@@ -91,8 +97,8 @@ export default function GuestWelcome() {
         if (homepageData.beats && Array.isArray(homepageData.beats)) {
           const processedAlbums = homepageData.beats.map((album: any) => ({
             ...album,
-            url: album.url ? `${API_BASE}${album.url}` : album.url,
-            coverArt: album.coverArt ? `${API_BASE}${album.coverArt}` : album.coverArt
+            url: album.url ? resolveMediaUrl(album.url) : album.url,
+            coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt
           }));
           setFeaturedAlbums(processedAlbums);
         }
@@ -104,7 +110,7 @@ export default function GuestWelcome() {
         const artistsArray = Array.isArray(artistsData) ? artistsData : artistsData.artists || [];
         const processedArtists = artistsArray.map((artist: any) => ({
           ...artist,
-          avatar: artist.avatar ? `${API_BASE}${artist.avatar}` : artist.avatar
+          avatar: artist.avatar ? resolveMediaUrl(artist.avatar) : artist.avatar
         }));
         setFeaturedArtists(processedArtists);
 
@@ -115,7 +121,7 @@ export default function GuestWelcome() {
         const playlistsArray = Array.isArray(playlistsData) ? playlistsData : playlistsData.playlists || [];
         const processedPlaylists = playlistsArray.map((playlist: any) => ({
           ...playlist,
-          coverArt: playlist.coverArt ? `${API_BASE}${playlist.coverArt}` : playlist.coverArt
+          coverArt: playlist.coverArt ? resolveMediaUrl(playlist.coverArt) : playlist.coverArt
         }));
         setPlaylists(processedPlaylists);
 
@@ -310,7 +316,7 @@ export default function GuestWelcome() {
                       title: item.title,
                       artist: item.user?.displayName || item.user?.username || 'Unknown',
                       imageUrl: item.artCoverUrl,
-                      audioUrl: item.url,
+                      audioUrl: item.audioUrl || item.url,
                       duration: item.duration
                     })}
                   >
@@ -383,7 +389,7 @@ export default function GuestWelcome() {
                       title: item.title,
                       artist: item.user?.displayName || item.user?.username || 'Unknown',
                       imageUrl: item.artCoverUrl,
-                      audioUrl: item.url,
+                      audioUrl: item.audioUrl || item.url,
                       duration: item.duration
                     })}
                   >
@@ -480,7 +486,7 @@ export default function GuestWelcome() {
                           title: track.title,
                           artist: track.user?.displayName || track.user?.username || 'Unknown',
                           imageUrl: track.artCoverUrl,
-                          audioUrl: track.url,
+                          audioUrl: track.audioUrl || track.url,
                           duration: track.duration
                         })}
                         className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
@@ -537,7 +543,7 @@ export default function GuestWelcome() {
                       title: item.title,
                       artist: item.user?.displayName || item.user?.username || 'Unknown',
                       imageUrl: item.artCoverUrl,
-                      audioUrl: item.url,
+                      audioUrl: item.audioUrl || item.url,
                       duration: item.duration
                     })}
                   >
@@ -628,7 +634,7 @@ export default function GuestWelcome() {
                           title: track.title,
                           artist: track.user?.displayName || track.user?.username || 'Unknown',
                           imageUrl: track.artCoverUrl,
-                          audioUrl: track.url,
+                          audioUrl: track.audioUrl || track.url,
                           duration: track.duration
                         })}
                         className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
@@ -688,7 +694,7 @@ export default function GuestWelcome() {
                       title: item.title,
                       artist: item.user?.displayName || item.user?.username || 'Unknown',
                       imageUrl: item.artCoverUrl,
-                      audioUrl: item.url,
+                      audioUrl: item.audioUrl || item.url,
                       duration: item.duration
                     })}
                   >
@@ -809,7 +815,7 @@ export default function GuestWelcome() {
                           title: track.title,
                           artist: track.user?.displayName || track.user?.username || 'Unknown',
                           imageUrl: track.artCoverUrl,
-                          audioUrl: track.url,
+                          audioUrl: track.audioUrl || track.url,
                           duration: track.duration
                         })}
                         className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
