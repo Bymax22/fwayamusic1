@@ -735,7 +735,7 @@ export default function Browse() {
 
   if (loading) {
     return (
-      <div className="py-6 px-2 sm:px-6 max-w-7xl mx-auto bg-gradient-to-br from-[#090816]/95 to-[#100c26]/95 min-h-screen">
+      <div className="py-6 px-2 sm:px-6 max-w-7xl mx-auto bg-gradient-to-b from-[#020206] via-[#020206] to-[#000000] min-h-screen">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-white">Browse Music</h1>
           <div className="flex gap-2">
@@ -761,7 +761,7 @@ export default function Browse() {
 
   if (error) {
     return (
-      <div className="py-6 px-2 sm:px-6 max-w-7xl mx-auto bg-gradient-to-br from-[#090816]/95 to-[#100c26]/95 min-h-screen">
+      <div className="py-6 px-2 sm:px-6 max-w-7xl mx-auto bg-gradient-to-b from-[#020206] via-[#020206] to-[#000000] min-h-screen">
         <h1 className="text-3xl font-bold text-white mb-8">Browse Music</h1>
         <div className="bg-[#0f0f2a] border border-[#0f172a] p-6 rounded-xl">
           <h3 className="text-[#c4b5fd] font-medium text-lg">{error.message}</h3>
@@ -782,7 +782,7 @@ export default function Browse() {
 
 
   return (
-         <div className="py-6 px-2 sm:px-6 max-w-7xl mx-auto bg-gradient-to-br from-[#090816]/95 to-[#100c26]/95 min-h-screen pb-32">
+         <div className="py-6 px-2 sm:px-6 max-w-7xl mx-auto bg-gradient-to-b from-[#020206] via-[#020206] to-[#000000] min-h-screen pb-32">
 
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-3xl font-bold text-white">Browse Music</h1>
