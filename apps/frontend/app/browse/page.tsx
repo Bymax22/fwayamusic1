@@ -824,45 +824,49 @@ export default function Browse() {
                 />
               </div>
 
-              <div className="flex flex-wrap gap-3 items-center">
-                <button 
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] hover:bg-[#9333ea] text-white rounded-xl transition-colors"
-                >
-                  <Filter className="w-4 h-4" />
-                  Filters
-                </button>
+              <div className="space-y-3">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <button 
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-[#7c3aed] hover:bg-[#9333ea] text-white rounded-full transition-colors"
+                  >
+                    <Filter className="w-4 h-4" />
+                    Filters
+                  </button>
 
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {getGenres().map(genre => (
-                    <button
-                      key={genre ?? "Other"}
-                      onClick={() => setSelectedGenre(genre ?? "Other")}
-                      className={`px-4 py-2 rounded-xl whitespace-nowrap transition-colors ${
-                        selectedGenre === (genre ?? "Other") 
-                          ? 'bg-[#7c3aed] text-white' 
-                          : 'bg-[#0f0f2a] text-gray-300 hover:bg-[#0f0f2a]/80'
-                      }`}
-                    >
-                      {(genre ?? "Other").charAt(0).toUpperCase() + (genre ?? "Other").slice(1)}
-                    </button>
-                  ))}
-                </div>
+                  <div className="flex flex-wrap gap-2 items-center justify-start sm:justify-end">
+                    <div className="flex flex-wrap gap-2 items-center border border-white/10 bg-white/5 rounded-full px-2 py-1">
+                      {getGenres().map(genre => (
+                        <button
+                          key={genre ?? "Other"}
+                          onClick={() => setSelectedGenre(genre ?? "Other")}
+                          className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap transition-colors ${
+                            selectedGenre === (genre ?? "Other") 
+                              ? 'bg-[#7c3aed] text-white' 
+                              : 'bg-[#0f0f2a] text-gray-300 hover:bg-[#0f0f2a]/80'
+                          }`}
+                        >
+                          {(genre ?? "Other").charAt(0).toUpperCase() + (genre ?? "Other").slice(1)}
+                        </button>
+                      ))}
+                    </div>
 
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {getMediaTypes().map(type => (
-                    <button
-                      key={type}
-                      onClick={() => setSelectedType(type || "all")}
-                      className={`px-4 py-2 rounded-xl whitespace-nowrap transition-colors flex items-center gap-2 ${
-                        selectedType === type 
-                          ? 'bg-[#7c3aed] text-white' 
-                          : 'bg-[#0f0f2a] text-gray-300 hover:bg-[#0f0f2a]/80'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
+                    <div className="flex flex-wrap gap-2 items-center border border-white/10 bg-white/5 rounded-full px-2 py-1">
+                      {getMediaTypes().map(type => (
+                        <button
+                          key={type}
+                          onClick={() => setSelectedType(type || "all")}
+                          className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap transition-colors ${
+                            selectedType === type 
+                              ? 'bg-[#7c3aed] text-white' 
+                              : 'bg-[#0f0f2a] text-gray-300 hover:bg-[#0f0f2a]/80'
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -876,25 +880,24 @@ export default function Browse() {
                     className="mt-4 bg-[#0f0f2a] border border-[#0f0f2a] rounded-xl p-4 overflow-hidden"
                   >
                     <h3 className="font-medium mb-3 text-gray-300">Sort by</h3>
-                    <div className="flex gap-3 flex-wrap">
+                    <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setActiveFilter('popular')}
-                        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                        className={`px-3 py-1.5 rounded-full text-sm transition-colors flex items-center gap-2 ${
                           activeFilter === 'popular' 
                             ? 'bg-[#7c3aed] text-white' 
-                            : 'bg-[#0f0f2a] text-gray-300'
+                            : 'bg-[#0f0f2a] text-gray-300 hover:bg-[#0f0f2a]/80'
                         }`}
                       >
                         <TrendingUp className="w-4 h-4" />
                         Most Popular
-                        
                       </button>
                       <button
                         onClick={() => setActiveFilter('newest')}
-                        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                        className={`px-3 py-1.5 rounded-full text-sm transition-colors flex items-center gap-2 ${
                           activeFilter === 'newest' 
                             ? 'bg-[#7c3aed] text-white' 
-                            : 'bg-[#0f0f2a] text-gray-300'
+                            : 'bg-[#0f0f2a] text-gray-300 hover:bg-[#0f0f2a]/80'
                         }`}
                       >
                         <Calendar className="w-4 h-4" />
@@ -902,10 +905,10 @@ export default function Browse() {
                       </button>
                       <button
                         onClick={() => setActiveFilter('trending')}
-                        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                        className={`px-3 py-1.5 rounded-full text-sm transition-colors flex items-center gap-2 ${
                           activeFilter === 'trending' 
                             ? 'bg-[#7c3aed] text-white' 
-                            : 'bg-[#0f0f2a] text-gray-300'
+                            : 'bg-[#0f0f2a] text-gray-300 hover:bg-[#0f0f2a]/80'
                         }`}
                       >
                         <Star className="w-4 h-4" />
@@ -913,10 +916,10 @@ export default function Browse() {
                       </button>
                       <button
                         onClick={() => setActiveFilter('recommended')}
-                        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                        className={`px-3 py-1.5 rounded-full text-sm transition-colors flex items-center gap-2 ${
                           activeFilter === 'recommended' 
                             ? 'bg-[#7c3aed] text-white' 
-                            : 'bg-[#0f0f2a] text-gray-300'
+                            : 'bg-[#0f0f2a] text-gray-300 hover:bg-[#0f0f2a]/80'
                         }`}
                       >
                         <Users className="w-4 h-4" />
