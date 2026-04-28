@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Compass, Search, Library, MoreHorizontal } from "lucide-react";
 
@@ -9,20 +10,31 @@ interface BottomNavProps {
 }
 
 export default function BottomNav({ onMoreClick }: BottomNavProps) {
-  const [activeTab, setActiveTab] = useState("home");
+  const router = useRouter();
+  const pathname = usePathname();
 
   const navItems = [
-    { id: "home", label: "Fwaya", icon: null, image: "/fwaya lp-01.png", inactiveImage: "/fwaya white icon-01.png" },
-    { id: "browse", label: "Browse", icon: Compass },
-    { id: "search", label: "Search", icon: Search },
-    { id: "library", label: "Library", icon: Library },
+    { id: "home", label: "Fwaya", icon: null, image: "/fwaya lp-01.png", inactiveImage: "/fwaya white icon-01.png", href: "/" },
+    { id: "browse", label: "Browse", icon: Compass, href: "/browse" },
+    { id: "search", label: "Search", icon: Search, href: "/search" },
+    { id: "library", label: "Library", icon: Library, href: "/library" },
     { id: "more", label: "More", icon: MoreHorizontal },
   ];
 
-  const handleClick = (id: string) => {
-    setActiveTab(id);
-    if (id === "more" && onMoreClick) {
+  const activeTab = navItems.find((item) => {
+    if (!item.href || !pathname) return false;
+    if (item.href === "/") return pathname === "/";
+    return pathname.startsWith(item.href);
+  })?.id || "home";
+
+  const handleClick = (item: typeof navItems[number]) => {
+    if (item.id === "more" && onMoreClick) {
       onMoreClick();
+      return;
+    }
+
+    if (item.href) {
+      router.push(item.href);
     }
   };
 
@@ -35,7 +47,7 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
           return (
             <button
               key={item.id}
-              onClick={() => handleClick(item.id)}
+              onClick={() => handleClick(item)}
               className={`relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${
                 isActive ? "text-white" : "text-gray-400"
               }`}
