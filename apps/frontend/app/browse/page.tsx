@@ -12,10 +12,7 @@ import Waveform from '@/components/Waveform';
 import { formatDuration, formatFileSize } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
-import { AuthProvider, useAuth } from "../context/AuthContext";
-import { ThemeProvider } from "../context/ThemeContext";
-import { PaymentProvider } from "../context/PaymentContext";
-
+import { useAuth } from "../context/AuthContext";
 import { MobileMoneyPaymentModal } from '../components/modal/MobileMoneyPaymentModal';
 
 interface MediaFile {
@@ -605,51 +602,11 @@ export default function Browse() {
 
   
   const handlePurchase = async (file: MediaFile) => {
-    // Don't close the menu here - let the button click handle it
     if (file.accessType === 'PAY_PER_VIEW' || file.accessType === 'PREMIUM') {
       setSelectedMediaForPayment(file);
       setShowMobileMoneyModal(true);
-      return;
     }
-
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/transaction`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        mediaId: file.id,
-        amount: file.price,
-        currency: 'ZMW',
-        paymentMethod: 'CREDIT_CARD',
-        paymentProvider: 'STRIPE',
-        deviceInfo: {
-          deviceId: localStorage.getItem('deviceId') || 'web-browser',
-          deviceName: 'Web Browser',
-          deviceType: 'desktop',
-          os: navigator.platform,
-          fingerprint: localStorage.getItem('deviceId') || 'web-browser'
-        }
-      })
-    });
-
-    if (!response.ok) throw new Error('Purchase failed');
-
-    const transaction = await response.json();
-    console.log('Transaction:', transaction);
-    console.log('showMobileMoneyModal:', showMobileMoneyModal, 'selectedMediaForPayment:', selectedMediaForPayment);
-    alert('Purchase successful! You can now download this track.');
-    
-  } catch (err) {
-    console.error('Purchase error:', err);
-    setError({
-      message: 'Failed to purchase media',
-      details: err instanceof Error ? err.message : String(err)
-    });
-  }
-};
+  };
 
   const handleShare = async (file: MediaFile) => {
     try {
@@ -801,9 +758,6 @@ export default function Browse() {
 
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <PaymentProvider>
          <div className="py-6 px-2 sm:px-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
 
             <div className="flex justify-between items-center mb-8">
@@ -1108,8 +1062,8 @@ export default function Browse() {
         </div>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredFiles.length > 0 ? (
-            filteredFiles.map(file => (
+          {displayedFiles.length > 0 ? (
+            displayedFiles.map(file => (
               <div 
                 key={file.id} 
                 className="bg-[#0a3747]/70 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group"
@@ -1237,8 +1191,8 @@ export default function Browse() {
       ) : (
         // Compact view - Mobile optimized
         <div className="space-y-0.5">
-          {filteredFiles.length > 0 ? (
-            filteredFiles.map(file => (
+          {displayedFiles.length > 0 ? (
+            displayedFiles.map(file => (
               <div 
                 key={file.id} 
                 className={`flex items-start gap-2 px-1 py-1 rounded-xl transition-colors min-w-0 hover:bg-[#0a3747]/50`}
@@ -1523,12 +1477,7 @@ export default function Browse() {
       </AnimatePresence>
 
     </div>
-            </PaymentProvider>
-      </AuthProvider>
-    </ThemeProvider>
   );
 }
-
-
 
 

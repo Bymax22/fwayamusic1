@@ -33,6 +33,7 @@ interface GlobalPlayerContextType {
   setCurrentTrack: (track: Track | null) => void;
   togglePlay: () => void;
   playTrack: (track: Track | Record<string, unknown>) => void;
+  stopTrack: () => void;
   seekTo: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
@@ -323,6 +324,21 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const stopTrack = () => {
+    if (typeof window === 'undefined') return;
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = '';
+    }
+    setIsPlaying(false);
+    setIsLoading(false);
+    setCurrentTrack(null);
+    setCurrentTime(0);
+    setDuration(0);
+  };
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const storedAudioQuality = localStorage.getItem('fwaya-audio-quality') as AudioQuality | null;
@@ -360,6 +376,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       seekTo,
       setVolume,
       toggleMute,
+      stopTrack,
       audioQuality,
       setAudioQuality
     }}>

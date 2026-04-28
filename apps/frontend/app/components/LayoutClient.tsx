@@ -14,7 +14,7 @@ import { useAudioPlayer } from "../hooks/useAudioPlayer";
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  const { currentTrack, isPlaying, togglePlay, setCurrentTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute } = useAudioPlayer();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -97,7 +97,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
               isMuted={isMuted}
               isLoading={isLoading}
               onPlayPause={togglePlay}
-              onClose={() => setCurrentTrack(null)}
+              onClose={stopTrack}
               onNext={() => console.log('Next track')}
               onPrevious={() => console.log('Previous track')}
               onRepeat={() => console.log('Toggle repeat')}
@@ -118,7 +118,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
               isMuted={isMuted}
               isLoading={isLoading}
               onPlayPause={togglePlay}
-              onClose={() => setCurrentTrack(null)}
+              onClose={stopTrack}
               onNext={() => console.log('Next track')}
               onPrevious={() => console.log('Previous track')}
               onSeek={seekTo}
