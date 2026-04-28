@@ -84,6 +84,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const authMenuItems = [
     { title: "Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/login", description: "Sign in to your account" },
     { title: "Create Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/signup", description: "Join Fwaya Music" },
+    { title: "Artist Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/login?role=artist", description: "Sign in as an artist" },
+    { title: "Create Artist Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/signup?role=artist", description: "Sign up as an artist" },
   ];
 
   // Menu tabs with enhanced icons
@@ -116,7 +118,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         >
           <Link
             href={item.href}
-            className="flex items-center px-4 py-3 rounded-3xl text-white bg-[#090b14]/90 hover:bg-[#121827] transition-all duration-300 group mx-2 border border-white/10 hover:border-purple-500/30 shadow-sm shadow-purple-500/10"
+            className={`flex items-center px-4 py-3 rounded-3xl text-white transition-all duration-300 group mx-2 border border-white/10 hover:border-purple-500/30 shadow-sm shadow-purple-500/10 ${isDarkMode ? 'bg-[#090b14]/90 hover:bg-[#121827]' : 'bg-[#12131f]/90 hover:bg-[#1c1d29]'}`}
             onClick={onClose}
           >
             <span className="flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
@@ -156,10 +158,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               damping: 30, 
               stiffness: 300 
             }}
-            className="fixed bottom-0 left-0 right-0 h-[90vh] bg-[#0a0a0d] rounded-t-[32px] z-50 overflow-hidden"
+            className={`fixed bottom-0 left-0 right-0 h-[90vh] rounded-t-[32px] z-50 overflow-hidden backdrop-blur-xl ${isDarkMode ? 'bg-[#0a0a0d]/90' : 'bg-[#12131f]/80'}`}
           >
             {/* Header with search */}
-            <div className="p-6 bg-[#0a0a0d]">
+            <div className={`p-6 ${isDarkMode ? 'bg-[#0a0a0d]/20' : 'bg-[#12131f]/20'} backdrop-blur-xl`}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <motion.div 
@@ -173,7 +175,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <h2 className="text-xl font-bold text-white">
                       Fwaya
                     </h2>
-                    <p className="text-sm text-purple-300">Discover</p>
+                    <p className="text-sm text-purple-300">Main Menu</p>
                   </div>
                 </div>
                 
@@ -303,14 +305,21 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     </div>
                   </div>
 
-                  {/* Sign In Button */}
-                  <motion.button
-                    className="w-full py-2 rounded-xl bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Sign In to Account
-                  </motion.button>
+                  {/* Artist login/create actions */}
+                  <div className="grid gap-3">
+                    <Link
+                      href="/auth/login?role=artist"
+                      className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-[#080a13] text-white text-sm font-medium hover:bg-[#0a0d18] transition-colors"
+                    >
+                      Login as Artist
+                    </Link>
+                    <Link
+                      href="/auth/signup?role=artist"
+                      className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
+                    >
+                      Create Artist Account
+                    </Link>
+                  </div>
                 </div>
               </motion.div>
             )}
