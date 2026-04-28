@@ -121,7 +121,6 @@ export default function Browse() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'grid' | 'compact'>('compact');
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
-  const [selectedType, setSelectedType] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'popular' | 'newest' | 'trending' | 'recommended'>('popular');
   const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
@@ -307,10 +306,6 @@ export default function Browse() {
     if (selectedGenre !== 'all') {
       results = results.filter(file => file.genre === selectedGenre);
     }
-
-    if (selectedType !== 'all') {
-      results = results.filter(file => file.type === selectedType);
-    }
     
     switch (activeFilter) {
       case 'popular':
@@ -334,7 +329,7 @@ export default function Browse() {
     
     setFilteredFiles(results);
     setVisibleCount(PAGE_SIZE); // reset visible count whenever filters/search change
-  }, [searchQuery, selectedGenre, selectedType, mediaFiles, activeFilter]);
+  }, [searchQuery, selectedGenre, mediaFiles, activeFilter]);
 
   // displayed slice based on visibleCount
   const displayedFiles = filteredFiles.slice(0, visibleCount);
@@ -835,7 +830,7 @@ export default function Browse() {
                   </button>
 
                   <div className="flex flex-wrap gap-2 items-center justify-start sm:justify-end">
-                    <div className="flex flex-wrap gap-2 items-center border border-white/10 bg-white/5 rounded-full px-2 py-1">
+                    <div className="flex flex-wrap gap-2 items-center bg-[#0f0f2a]/50 rounded-full px-2 py-1">
                       {getGenres().map(genre => (
                         <button
                           key={genre ?? "Other"}
@@ -847,22 +842,6 @@ export default function Browse() {
                           }`}
                         >
                           {(genre ?? "Other").charAt(0).toUpperCase() + (genre ?? "Other").slice(1)}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 items-center border border-white/10 bg-white/5 rounded-full px-2 py-1">
-                      {getMediaTypes().map(type => (
-                        <button
-                          key={type}
-                          onClick={() => setSelectedType(type || "all")}
-                          className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap transition-colors ${
-                            selectedType === type 
-                              ? 'bg-[#7c3aed] text-white' 
-                              : 'bg-[#0f0f2a] text-gray-300 hover:bg-[#0f0f2a]/80'
-                          }`}
-                        >
-                          {type}
                         </button>
                       ))}
                     </div>
@@ -1001,7 +980,7 @@ export default function Browse() {
                           <span className="px-1.5 py-0.5 bg-gray-600 text-gray-300 rounded text-xs">E</span>
                         )}
                         {file.isDRMProtected && (
-                          <Lock className="w-3 h-3 text-blue-400" />
+                          <Lock className="w-3 h-3 text-gray-600" />
                         )}
                       </p>
                       <div className="flex items-center gap-3 text-sm text-gray-400">
@@ -1032,7 +1011,7 @@ export default function Browse() {
     <MapPin className="w-3 h-3 text-gray-400" />
   </span>
   {file.user?.isVerified && (
-    <Star className="w-3 h-3 text-blue-400 fill-current" />
+    <Star className="w-3 h-3 text-gray-600 fill-current" />
   )}
 </div>
                   </div>
@@ -1141,7 +1120,7 @@ export default function Browse() {
                   <div className="absolute top-2 left-2 flex flex-col gap-1">
                     {getAccessTypeBadge(file)}
                     {file.isDRMProtected && (
-                      <div className="flex items-center gap-1 px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">
+                      <div className="flex items-center gap-1 px-2 py-1 bg-gray-600/20 text-gray-400 rounded-full text-xs">
                         <Lock className="w-3 h-3" />
                         DRM
                       </div>
@@ -1178,7 +1157,7 @@ export default function Browse() {
                     )}
                     <p className="text-sm text-gray-400 truncate">{file.artist}</p>
                     {file.user?.isVerified && (
-                      <Star className="w-3 h-3 text-blue-400 fill-current" />
+                      <Star className="w-3 h-3 text-gray-600 fill-current" />
                     )}
                   </div>
 
@@ -1291,6 +1270,24 @@ export default function Browse() {
                       className="w-3.5 h-3.5" 
                       fill={file.likes > 0 ? 'currentColor' : 'none'} 
                     />
+                  </button>
+                  <button 
+                    onClick={() => handleDownload(file)}
+                    className={`transition-colors ${
+                      file.accessType === 'PREMIUM' || file.accessType === 'PAY_PER_VIEW'
+                        ? 'text-[#c4b5fd] hover:text-[#d8b4fe]'
+                        : 'text-gray-400 hover:text-[#a855f7]'
+                    }`}
+                    aria-label="Download"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                  <button 
+                    onClick={() => handleShare(file)}
+                    className="text-gray-400 hover:text-[#a855f7] transition-colors"
+                    aria-label="Share"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
                   </button>
                   <button 
                     onClick={() => {
