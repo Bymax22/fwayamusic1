@@ -126,12 +126,11 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020206] text-white">
+    <div className="min-h-screen bg-black text-white">
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(114,65,255,0.2),_transparent_25%),radial-gradient(circle_at_bottom_right,_rgba(109,52,255,0.14),_transparent_30%)] pointer-events-none" />
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
           <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr] items-end mb-10">
-            <div className="rounded-[2rem] bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
+            <div className="rounded-[2rem] bg-black p-6">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
                   <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Search</p>
@@ -145,7 +144,7 @@ export default function SearchPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search for songs, artists, playlists..."
-                    className="w-full rounded-full bg-[#15121f]/95 py-4 pl-12 pr-4 text-white placeholder:text-white/40 outline-none transition focus:ring-2 focus:ring-purple-400/20"
+                    className="w-full rounded-full bg-white/5 py-4 pl-12 pr-4 text-white placeholder:text-white/40 outline-none transition focus:ring-2 focus:ring-purple-400/20"
                   />
                 </div>
                 <div className="flex flex-wrap gap-3">
@@ -156,7 +155,7 @@ export default function SearchPage() {
                         key={tab}
                         onClick={() => setActiveTab(tabKey)}
                         className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                          activeTab === tabKey ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'bg-[#15121f] text-gray-300 hover:bg-[#1f173d]'
+                          activeTab === tabKey ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20' : 'bg-white/10 text-gray-300 hover:bg-white/15'
                         }`}
                       >
                         {tab}
@@ -168,14 +167,14 @@ export default function SearchPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[2rem] bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
+              <div className="rounded-[2rem] bg-black p-6">
                 <h2 className="text-lg font-semibold text-white">Popular Genres</h2>
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   {['Hip Hop', 'Pop', 'R&B', 'Rock', 'Electronic', 'Jazz', 'Classical', 'Reggae'].map((genre) => (
                     <button
                       key={genre}
                       onClick={() => setSearchQuery(genre)}
-                      className="flex items-center gap-3 rounded-3xl bg-[#15121f] px-4 py-3 text-left text-white transition hover:bg-purple-700/20"
+                      className="flex items-center gap-3 rounded-3xl bg-white/10 px-4 py-3 text-left text-white transition hover:bg-white/15"
                     >
                       <Disc className="w-5 h-5 text-purple-300" />
                       <span className="font-medium text-sm">{genre}</span>
@@ -183,14 +182,14 @@ export default function SearchPage() {
                   ))}
                 </div>
               </div>
-              <div className="rounded-[2rem] bg-[#09080f]/95 p-6 shadow-[0_35px_120px_-60px_rgba(124,71,255,0.28)]">
+              <div className="rounded-[2rem] bg-black p-6">
                 <h2 className="text-lg font-semibold text-white">Popular Artists</h2>
                 <div className="mt-4 space-y-3">
                   {artists.slice(0, 4).map((artist) => (
                     <button
                       key={artist.id}
                       onClick={() => setSearchQuery(artist.name)}
-                      className="flex w-full items-center gap-3 rounded-3xl bg-[#15121f] px-4 py-3 text-left transition hover:bg-purple-700/20"
+                      className="flex w-full items-center gap-3 rounded-3xl bg-white/10 px-4 py-3 text-left transition hover:bg-white/15"
                     >
                       <Image
                         src={artist.avatar}
@@ -225,7 +224,7 @@ export default function SearchPage() {
                     {searchResults.map((file) => (
                       <div
                         key={file.id}
-                        className={`group rounded-[2rem] bg-[#09080f]/95 p-5 transition hover:bg-[#12101d]/95 ${
+                        className={`group rounded-[2rem] bg-black p-5 transition hover:bg-white/5 ${
                           currentTrack?.id === file.id ? 'ring-1 ring-purple-400/30' : ''
                         }`}
                       >
@@ -260,7 +259,7 @@ export default function SearchPage() {
                             </div>
                             <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-gray-400">
                               <span>{formatDuration(file.duration)}</span>
-                              <span className="inline-flex items-center gap-2 rounded-full bg-[#15121f] px-3 py-1 text-xs text-white/80">
+                                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs text-white/80">
                                 <Disc className="w-4 h-4 text-purple-300" />
                                 {file.genre || 'Genre'}
                               </span>
@@ -281,7 +280,7 @@ export default function SearchPage() {
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {artistResults.map((artist) => (
-                      <div key={artist.id} className="rounded-[2rem] bg-[#09080f]/95 p-5 text-center transition hover:bg-[#12101d]/95">
+                      <div key={artist.id} className="rounded-[2rem] bg-black p-5 text-center transition hover:bg-white/5">
                         <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-[#121016]">
                           <Image
                             src={artist.avatar}

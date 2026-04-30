@@ -328,9 +328,8 @@ export default function LibraryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020206] text-white">
+    <div className="min-h-screen bg-black text-white">
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(120,63,255,0.18),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(94,43,255,0.14),_transparent_30%)] pointer-events-none" />
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
             <div className="space-y-3">
@@ -340,7 +339,7 @@ export default function LibraryPage() {
             </div>
             <button
               onClick={handleCreatePlaylist}
-              className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-500"
+              className="inline-flex items-center gap-2 rounded-full bg-purple-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
             >
               <Plus className="w-4 h-4" />
               New Playlist
@@ -359,8 +358,8 @@ export default function LibraryPage() {
                 onClick={() => setActiveTab(tab.id as 'playlists' | 'liked' | 'recent' | 'downloaded')}
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
                   activeTab === tab.id
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/15'
-                    : 'bg-[#11101d] text-gray-300 hover:bg-[#1f173d]'
+                    ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/15'
+                    : 'bg-white/10 text-gray-300 hover:bg-white/15'
                 }`}
               >
                 {tab.icon}
@@ -379,7 +378,7 @@ export default function LibraryPage() {
             {activeTab === 'playlists' ? (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {(getContent() as Playlist[]).map((playlist) => (
-                  <div key={playlist.id} className="group overflow-hidden rounded-[32px] bg-[#09080f]/85 shadow-[0_25px_80px_-40px_rgba(118,86,255,0.45)] transition hover:bg-[#12101d]/95">
+                  <div key={playlist.id} className="group overflow-hidden rounded-[32px] bg-black transition hover:bg-white/5">
                     <div className="relative overflow-hidden">
                       <Image
                         src={playlist.coverArt}
@@ -424,7 +423,7 @@ export default function LibraryPage() {
             ) : (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {(getContent() as MediaFile[]).map((file) => (
-                  <div key={file.id} className="grid gap-4 rounded-[32px] bg-[#09080f]/85 p-5 shadow-[0_25px_80px_-40px_rgba(118,86,255,0.45)] transition hover:bg-[#12101d]/95">
+                  <div key={file.id} className="grid gap-4 rounded-[32px] bg-black p-5 transition hover:bg-white/5">
                     <div className="relative overflow-hidden rounded-3xl bg-[#0d0c14]">
                       <Image
                         src={file.coverArt}
@@ -467,8 +466,8 @@ export default function LibraryPage() {
             )}
 
             {getContent().length === 0 && (
-              <div className="rounded-[32px] bg-[#09080f]/85 p-10 text-center text-gray-400 shadow-[0_25px_80px_-40px_rgba(118,86,255,0.35)]">
-                <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/30 mx-auto">
+              <div className="rounded-[32px] bg-black p-10 text-center text-gray-400">
+                <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-purple-500 text-white shadow-lg shadow-purple-500/20 mx-auto">
                   {getIcon()}
                 </div>
                 <h3 className="text-2xl font-semibold text-white mb-2">No {getTitle().toLowerCase()} yet</h3>
