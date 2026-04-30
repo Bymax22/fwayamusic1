@@ -357,7 +357,7 @@ export default function ForArtistsPage() {
       case 'dashboard':
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-gray-400 flex items-center gap-2">
                 <BarChart2 className="w-5 h-5" />
                 Total Plays
@@ -368,7 +368,7 @@ export default function ForArtistsPage() {
               </p>
             </div>
             
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-gray-400 flex items-center gap-2">
                 <Users className="w-5 h-5" />
                 Followers
@@ -379,7 +379,7 @@ export default function ForArtistsPage() {
               </p>
             </div>
             
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-gray-400 flex items-center gap-2">
                 <Download className="w-5 h-5" />
                 Downloads
@@ -390,7 +390,7 @@ export default function ForArtistsPage() {
               </p>
             </div>
             
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-gray-400 flex items-center gap-2">
                 <DollarSign className="w-5 h-5" />
                 Total Revenue
@@ -401,7 +401,7 @@ export default function ForArtistsPage() {
               </p>
             </div>
 
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-gray-400 flex items-center gap-2">
                 <Music className="w-5 h-5" />
                 Active Tracks
@@ -412,7 +412,7 @@ export default function ForArtistsPage() {
               </p>
             </div>
 
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-gray-400 flex items-center gap-2">
                 <Share2 className="w-5 h-5" />
                 Reseller Sales
@@ -425,9 +425,9 @@ export default function ForArtistsPage() {
               </p>
             </div>
             
-            <div className="md:col-span-2 lg:col-span-3 bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="md:col-span-2 lg:col-span-3 bg-black p-6 rounded-xl">
               <h3 className="text-gray-400 mb-4">Plays Over Time</h3>
-              <div className="h-64 bg-[#0a1f29] rounded-lg p-4">
+              <div className="h-64 bg-white/5 rounded-lg p-4">
                 <div className="flex items-end h-full gap-1">
                   {(analytics?.playsByDay || []).map((count, i) => (
                     <div 
@@ -458,17 +458,17 @@ export default function ForArtistsPage() {
               <h2 className="text-xl font-bold text-white">Your Content</h2>
               <button 
                 onClick={() => setShowUploadModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 text-white rounded-lg transition-colors"
               >
                 <PlusCircle className="w-5 h-5" />
                 Upload New
               </button>
             </div>
             
-            <div className="bg-[#0a3747]/70 rounded-xl overflow-hidden">
+            <div className="bg-black rounded-xl overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#0a3747] text-gray-400 text-left">
+                  <tr className="border-b border-white/10 text-gray-400 text-left">
                     <th className="p-4">Title</th>
                     <th className="p-4">Type</th>
                     <th className="p-4">Access</th>
@@ -490,7 +490,7 @@ export default function ForArtistsPage() {
                 </thead>
                 <tbody>
                   {(media || []).map(item => (
-                    <tr key={item.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
+                    <tr key={item.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           {item.artCoverUrl && (
@@ -587,12 +587,12 @@ export default function ForArtistsPage() {
       case 'analytics':
         return (
           <div className="space-y-8">
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-xl font-bold text-white mb-4">Top Tracks</h3>
-              <div className="bg-[#0a1f29] rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-gray-400 text-left border-b border-[#0a3747]">
+                    <tr className="text-gray-400 text-left border-b border-white/10">
                       <th className="p-3">Track</th>
                       <th className="p-3">Plays</th>
                       <th className="p-3">Revenue</th>
@@ -601,14 +601,14 @@ export default function ForArtistsPage() {
                   </thead>
                   <tbody>
                     {(analytics?.topTracks || []).map((track) => (
-                      <tr key={track.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
+                      <tr key={track.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
                         <td className="p-3 text-white">{track.title}</td>
                         <td className="p-3 text-gray-300">{(track.plays || 0).toLocaleString()}</td>
                         <td className="p-3 text-green-400">${(track.revenue ?? 0).toFixed(2)}</td>
                         <td className="p-3">
-                          <div className="w-32 bg-[#0a3747] rounded-full h-2 overflow-hidden">
+                          <div className="w-32 bg-white/10 rounded-full h-2 overflow-hidden">
                             <div 
-                              className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full"
+                              className="h-full bg-[#e51f48] rounded-full"
                               style={{ width: `${analytics?.topTracks && analytics.topTracks.length > 0 ? (track.plays / Math.max(...analytics.topTracks.map(t => t.plays))) * 100 : 0}%` }}
                             />
                           </div>
@@ -620,12 +620,12 @@ export default function ForArtistsPage() {
               </div>
             </div>
             
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-xl font-bold text-white mb-4">Top Countries</h3>
-              <div className="bg-[#0a1f29] rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-gray-400 text-left border-b border-[#0a3747]">
+                    <tr className="text-gray-400 text-left border-b border-white/10">
                       <th className="p-3">Country</th>
                       <th className="p-3">Plays</th>
                       <th className="p-3">% of Total</th>
@@ -633,12 +633,12 @@ export default function ForArtistsPage() {
                   </thead>
                   <tbody>
                     {(analytics?.topCountries || []).map((country, i) => (
-                      <tr key={i} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
+                      <tr key={i} className="border-b border-white/10 hover:bg-white/5 transition-colors">
                         <td className="p-3 text-white">{country.country}</td>
                         <td className="p-3 text-gray-300">{(country.plays || 0).toLocaleString()}</td>
                         <td className="p-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-32 bg-[#0a3747] rounded-full h-2 overflow-hidden">
+                            <div className="w-32 bg-white/10 rounded-full h-2 overflow-hidden">
                               <div 
                                 className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full"
                                 style={{ width: `${country.percentage}%` }}
@@ -667,10 +667,10 @@ export default function ForArtistsPage() {
               </div>
             </div>
             
-            <div className="bg-[#0a3747]/70 rounded-xl overflow-hidden">
+            <div className="bg-black rounded-xl overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#0a3747] text-gray-400 text-left">
+                  <tr className="border-b border-white/10 text-gray-400 text-left">
                     <th className="p-4">Follower</th>
                     <th className="p-4">Followed Since</th>
                     <th className="p-4">Actions</th>
@@ -678,7 +678,7 @@ export default function ForArtistsPage() {
                 </thead>
                 <tbody>
                   {(followers || []).map(follower => (
-                    <tr key={follower.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
+                    <tr key={follower.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           {follower.follower.avatarUrl && (
@@ -717,21 +717,21 @@ export default function ForArtistsPage() {
       case 'monetization':
         return (
           <div className="space-y-6">
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-xl font-bold text-white mb-4">Earnings Overview</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-[#0a1f29] p-4 rounded-lg">
+                <div className="bg-white/5 p-4 rounded-lg">
                   <h4 className="text-gray-400">Total Earnings</h4>
                   <p className="text-2xl font-bold text-white mt-2">${(stats?.totalRevenue ?? 0).toFixed(2)}</p>
                 </div>
                 
-                <div className="bg-[#0a1f29] p-4 rounded-lg">
+                <div className="bg-white/5 p-4 rounded-lg">
                   <h4 className="text-gray-400">This Month</h4>
                   <p className="text-2xl font-bold text-white mt-2">${(stats?.monthlyRevenue ?? 0).toFixed(2)}</p>
                 </div>
                 
-                <div className="bg-[#0a1f29] p-4 rounded-lg">
+                <div className="bg-white/5 p-4 rounded-lg">
                   <h4 className="text-gray-400">Reseller Commissions</h4>
                   <p className="text-2xl font-bold text-white mt-2">
                     ${commissions.reduce((sum, c) => sum + (c.status === 'PAID' ? c.amount : 0), 0).toFixed(2)}
@@ -740,12 +740,12 @@ export default function ForArtistsPage() {
               </div>
             </div>
             
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-black p-6 rounded-xl">
               <h3 className="text-xl font-bold text-white mb-4">Commission History</h3>
-              <div className="bg-[#0a1f29] rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-gray-400 text-left border-b border-[#0a3747]">
+                    <tr className="text-gray-400 text-left border-b border-white/10">
                       <th className="p-3">Track</th>
                       <th className="p-3">Amount</th>
                       <th className="p-3">Status</th>
@@ -754,7 +754,7 @@ export default function ForArtistsPage() {
                   </thead>
                   <tbody>
                     {(commissions || []).map(commission => (
-                      <tr key={commission.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50 transition-colors">
+                      <tr key={commission.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
                         <td className="p-3 text-white">{commission.media.title}</td>
                         <td className="p-3 text-green-400">
                           {commission.currency} {(commission.amount ?? 0).toFixed(2)}
@@ -783,10 +783,10 @@ export default function ForArtistsPage() {
       case 'reseller':
         return (
           <div className="space-y-6">
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-white/5 p-6 rounded-xl">
               <h3 className="text-xl font-bold text-white mb-4">Reseller Program</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-[#0a1f29] p-6 rounded-lg">
+                <div className="bg-white/10 p-6 rounded-lg">
                   <h4 className="text-white font-bold mb-2">Program Benefits</h4>
                   <ul className="text-gray-400 space-y-2">
                     <li className="flex items-center gap-2">
@@ -808,7 +808,7 @@ export default function ForArtistsPage() {
                   </ul>
                 </div>
                 
-                <div className="bg-[#0a1f29] p-6 rounded-lg">
+                <div className="bg-white/10 p-6 rounded-lg">
                   <h4 className="text-white font-bold mb-2">Quick Stats</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between">
@@ -834,11 +834,11 @@ export default function ForArtistsPage() {
               </div>
             </div>
 
-            <div className="bg-[#0a3747]/70 p-6 rounded-xl">
+            <div className="bg-white/5 p-6 rounded-xl">
               <h3 className="text-xl font-bold text-white mb-4">Reseller Settings</h3>
               <div className="space-y-4">
                 {(media || []).map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-4 bg-[#0a1f29] rounded-lg">
+                  <div key={item.id} className="flex items-center justify-between p-4 bg-white/10 rounded-lg">
                     <div>
                       <h4 className="text-white">{item.title}</h4>
                       <p className="text-sm text-gray-400">{item.genre}</p>
@@ -884,7 +884,7 @@ export default function ForArtistsPage() {
     <RoleGuard allowedRoles={['ARTIST']} 
       requireKYC={false}
       requireEmailVerification={false}>
-          <div className="bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
+          <div className="bg-black min-h-screen">
         {/* Your artist dashboard content */}
         {user?.kycStatus !== 'APPROVED' && (
           <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
@@ -901,7 +901,7 @@ export default function ForArtistsPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-[#0a3747] rounded-xl p-6 w-full max-w-md"
+              className="bg-black/95 rounded-xl p-6 w-full max-w-md border border-white/10"
             >
               <h2 className="text-xl font-bold text-white mb-6">Upload New Media</h2>
               
@@ -912,7 +912,7 @@ export default function ForArtistsPage() {
                       <span className="text-gray-400 text-sm">Uploading...</span>
                       <span className="text-white font-medium">{uploadProgress}%</span>
                     </div>
-                    <div className="w-full bg-[#0a1f29] rounded-full h-3 overflow-hidden border border-[#0a3747]">
+                    <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden border border-white/10">
                       <motion.div 
                         className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d]"
                         initial={{ width: 0 }}
@@ -931,7 +931,7 @@ export default function ForArtistsPage() {
                     <label className="block text-gray-400 mb-2">Title *</label>
                     <input
                       type="text"
-                      className="w-full bg-[#0a1f29] border border-[#0a3747] rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
                       placeholder="Enter media title"
                       value={newMedia.title}
                       onChange={(e) => setNewMedia({...newMedia, title: e.target.value})}
@@ -942,7 +942,7 @@ export default function ForArtistsPage() {
                   <div>
                     <label className="block text-gray-400 mb-2">Type *</label>
                     <select
-                      className="w-full bg-[#0a1f29] border border-[#0a3747] rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
                       value={newMedia.type}
                       onChange={(e) => setNewMedia({
                         ...newMedia, 
@@ -959,7 +959,7 @@ export default function ForArtistsPage() {
 
                   <div>
                     <label className="block text-gray-400 mb-2">File * (Max 10MB)</label>
-                    <div className="border-2 border-dashed border-[#0a3747] rounded-lg p-6 text-center hover:border-[#e51f48] transition-colors">
+                    <div className="border-2 border-dashed border-white/10 rounded-lg p-6 text-center hover:border-[#e51f48] transition-colors">
                       <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
                         <Upload className="w-8 h-8" />
                         <input
@@ -983,13 +983,13 @@ export default function ForArtistsPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-3 pt-4 border-t border-[#0a3747]">
+                  <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
                     <button
                       onClick={() => {
                         setShowUploadModal(false);
                         setNewMedia({ title: '', type: 'AUDIO', file: null });
                       }}
-                      className="px-4 py-2 bg-[#0a1f29] text-gray-300 rounded-lg hover:bg-[#0a3747] transition-colors"
+                      className="px-4 py-2 bg-white/5 text-white rounded-lg hover:bg-white/10 transition-colors"
                       disabled={isUploading}
                     >
                       Cancel
@@ -1021,7 +1021,7 @@ export default function ForArtistsPage() {
           </div>
           
           <div className="flex items-center gap-3">
-            <button className="px-4 py-2 bg-[#0a3747] text-gray-300 rounded-lg hover:bg-[#0a3747]/80 transition-colors flex items-center gap-2">
+            <button className="px-4 py-2 bg-white/5 text-white rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2">
               <Settings className="w-5 h-5" />
               Settings
             </button>
@@ -1036,7 +1036,7 @@ export default function ForArtistsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex overflow-x-auto border-b border-[#0a3747] mb-6">
+        <div className="flex overflow-x-auto border-b border-white/10 mb-6">
           {[
             { id: 'dashboard', label: 'Dashboard', icon: <BarChart2 className="w-5 h-5" /> },
             { id: 'content', label: 'Content', icon: <Music className="w-5 h-5" /> },

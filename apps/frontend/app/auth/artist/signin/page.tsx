@@ -120,14 +120,14 @@ export default function ArtistSignIn() {
 
   return (
     <>
-      <div className="min-h-screen bg-primary-gradient flex items-center justify-center p-4">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-purple-500/30 shadow-2xl"
+          className="bg-white/5 border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl"
         >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaMusic className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Artist Portal</h1>
@@ -144,7 +144,7 @@ export default function ArtistSignIn() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="your@email.com"
               />
               {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -159,7 +159,7 @@ export default function ArtistSignIn() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent pr-12"
                   placeholder="••••••••"
                 />
                 <button
@@ -178,7 +178,7 @@ export default function ArtistSignIn() {
                 <input
                   type="checkbox"
                   id="remember"
-                  className="w-4 h-4 text-white bg-gray-100 border-purple-500/40 rounded focus:ring-purple-500 focus:ring-2"
+                  className="w-4 h-4 text-[#e51f48] bg-transparent border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
                 />
                 <label htmlFor="remember" className="ml-2 text-sm text-white">
                   Remember me
@@ -192,7 +192,7 @@ export default function ArtistSignIn() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
@@ -212,7 +212,7 @@ export default function ArtistSignIn() {
               <div className="flex gap-4">
                 <button
                   onClick={() => handleSocialSignIn('google')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0a3747] text-gray-800 rounded-xl hover:bg-[#0a3747] transition-colors font-medium border border-purple-500/40"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/15 transition-colors font-medium border border-white/10"
                 >
                   <FaGoogle className="w-5 h-5" />
                   Google
@@ -230,7 +230,7 @@ export default function ArtistSignIn() {
             <div className="text-center mt-8 pt-6 border-t border-purple-500/20">
               <p className="text-gray-300">
                 Don&lsquo;t have an artist account?{' '}
-                <a href="/auth/artist/signup" className="text-white hover:underline font-semibold">
+                <a href="/auth/artist/signup" className="text-[#e51f48] hover:underline font-semibold">
                   Sign Up
                 </a>
               </p>

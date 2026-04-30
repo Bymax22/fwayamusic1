@@ -175,14 +175,14 @@ export default function ArtistSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1f29] to-[#0a3747] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-[#1a2e3d] to-[#051420] rounded-2xl p-8 w-full max-w-2xl border border-purple-500/30 shadow-2xl"
+        className="bg-white/5 border border-white/10 rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaMusic className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Artist</h1>
@@ -197,10 +197,10 @@ export default function ArtistSignUp() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                     step === s
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                      ? 'bg-[#e51f48] text-white'
                       : index < ['basic', 'artist', 'consent', 'verification'].indexOf(step)
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-700 text-gray-400'
+                      ? 'bg-white/10 text-white'
+                      : 'bg-white/10 text-gray-400'
                   }`}
                 >
                   {index < ['basic', 'artist', 'consent', 'verification'].indexOf(step) ? (
@@ -218,9 +218,9 @@ export default function ArtistSignUp() {
               </div>
             ))}
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-white/10 rounded-full h-2">
             <div
-              className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+              className="bg-[#e51f48] h-2 rounded-full transition-all duration-300"
               style={{
                 width: `${(['basic', 'artist', 'consent', 'verification'].indexOf(step) + 1) * 25}%`,
               }}
@@ -248,7 +248,7 @@ export default function ArtistSignUp() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                   placeholder="your@email.com"
                 />
                 {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -262,7 +262,7 @@ export default function ArtistSignUp() {
                   type="text"
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                   placeholder="username"
                 />
                 {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
@@ -277,7 +277,7 @@ export default function ArtistSignUp() {
                 type="text"
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="Your display name"
               />
             </div>
@@ -292,13 +292,13 @@ export default function ArtistSignUp() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent pr-12"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
@@ -314,7 +314,7 @@ export default function ArtistSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                   placeholder="••••••••"
                 />
                 {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
@@ -324,14 +324,14 @@ export default function ArtistSignUp() {
             <div className="flex justify-between pt-4">
               <Link
                 href="/auth/artist/signin"
-                className="flex items-center gap-2 px-6 py-3 border border-purple-500/40 text-white rounded-xl hover:bg-[#0a3747] transition-colors"
+                className="flex items-center gap-2 px-6 py-3 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
               >
                 <FaArrowLeft className="w-4 h-4" />
                 Back to Sign In
               </Link>
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-semibold"
+                className="px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -356,7 +356,7 @@ export default function ArtistSignUp() {
                 Profile Picture
               </label>
               <div className="flex items-center gap-4">
-                <div className="relative w-24 h-24 rounded-full bg-[#0a3747] border-2 border-purple-500/40 flex items-center justify-center overflow-hidden flex-shrink-0">
+                <div className="relative w-24 h-24 rounded-full bg-white/10 border-2 border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {avatarPreview ? (
                     <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
                   ) : (
@@ -376,7 +376,7 @@ export default function ArtistSignUp() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FaCamera className="text-sm" />
                     {uploading ? 'Uploading...' : 'Upload Picture'}
@@ -396,7 +396,7 @@ export default function ArtistSignUp() {
                   type="text"
                   value={formData.artistName}
                   onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                   placeholder="Your official artist name"
                 />
                 {errors.artistName && <p className="text-red-400 text-sm mt-1">{errors.artistName}</p>}
@@ -410,7 +410,7 @@ export default function ArtistSignUp() {
                   type="text"
                   value={formData.stageName}
                   onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                   placeholder="Your performance name"
                 />
                 {errors.stageName && <p className="text-red-400 text-sm mt-1">{errors.stageName}</p>}
@@ -426,7 +426,7 @@ export default function ArtistSignUp() {
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                   placeholder="+260 96 123 4567"
                 />
                 {errors.phoneNumber && <p className="text-red-400 text-sm mt-1">{errors.phoneNumber}</p>}
@@ -440,7 +440,7 @@ export default function ArtistSignUp() {
                   type="date"
                   value={formData.dateOfBirth}
                   onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 />
                 {errors.dateOfBirth && <p className="text-red-400 text-sm mt-1">{errors.dateOfBirth}</p>}
               </div>
@@ -454,7 +454,7 @@ export default function ArtistSignUp() {
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="Tell us about your music and artistic journey..."
               />
             </div>
@@ -467,7 +467,7 @@ export default function ArtistSignUp() {
                 type="url"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-purple-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="https://yourwebsite.com"
               />
             </div>
@@ -475,13 +475,13 @@ export default function ArtistSignUp() {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 border border-purple-500/40 text-white rounded-xl hover:bg-[#0a3747] transition-colors"
+                className="px-6 py-3 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-semibold"
+                className="px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -500,14 +500,14 @@ export default function ArtistSignUp() {
               Terms & Agreements
             </h2>
 
-            <div className="bg-[#0a3747] rounded-xl p-6 space-y-4">
+            <div className="bg-white/5 rounded-xl p-6 space-y-4">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms-artist"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0a3747] border-purple-500/40 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-[#e51f48] bg-transparent border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
                 />
                 <label htmlFor="terms-artist" className="text-white text-sm">
                   I agree to the <a href="/terms" className="text-purple-400 hover:text-purple-300 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple-400 hover:text-purple-300 hover:underline">Privacy Policy</a> *
@@ -521,7 +521,7 @@ export default function ArtistSignUp() {
                   id="privacy-artist"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0a3747] border-purple-500/40 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-[#e51f48] bg-transparent border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
                 />
                 <label htmlFor="privacy-artist" className="text-white text-sm">
                   I acknowledge that I have read and understood how my personal data will be processed *
@@ -535,7 +535,7 @@ export default function ArtistSignUp() {
                   id="marketing-artist"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0a3747] border-purple-500/40 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-[#e51f48] bg-transparent border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
                 />
                 <label htmlFor="marketing-artist" className="text-white text-sm">
                   I agree to receive marketing emails and promotional offers
@@ -548,7 +548,7 @@ export default function ArtistSignUp() {
                   id="dataSharing-artist"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0a3747] border-purple-500/40 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-[#e51f48] bg-transparent border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
                 />
                 <label htmlFor="dataSharing-artist" className="text-white text-sm">
                   I consent to my data being shared with trusted partners for service improvement
@@ -559,7 +559,7 @@ export default function ArtistSignUp() {
             <button
               onClick={() => handleSubmit()}
               disabled={loading || !formData.acceptedTerms || !formData.acceptedPrivacy}
-              className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
@@ -592,10 +592,10 @@ export default function ArtistSignUp() {
         )}
 
         {/* Navigation Links */}
-        <div className="text-center mt-8 pt-6 border-t border-gray-200">
+        <div className="text-center mt-8 pt-6 border-t border-white/10">
           <p className="text-gray-300">
             Already have an artist account?{' '}
-            <Link href="/auth/artist/signin" className="text-purple-400 hover:text-purple-300 hover:underline font-semibold">
+            <Link href="/auth/artist/signin" className="text-[#e51f48] hover:text-[#ff4d6d] hover:underline font-semibold">
               Sign In
             </Link>
           </p>
