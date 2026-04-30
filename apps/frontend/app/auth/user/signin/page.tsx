@@ -58,14 +58,14 @@ export default function UserSignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f2e3d] to-[#051420] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-blue-500/30 shadow-2xl"
+        className="backdrop-blur-md bg-white/5 rounded-2xl p-8 w-full max-w-md border border-white/10 shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaUser className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
@@ -81,7 +81,7 @@ export default function UserSignIn() {
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 bg-[#0a3747] border border-blue-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
               placeholder="your@email.com"
             />
             {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -96,7 +96,7 @@ export default function UserSignIn() {
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-blue-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent pr-12"
                 placeholder="••••••••"
               />
               <button
@@ -115,7 +115,7 @@ export default function UserSignIn() {
               <input
                 type="checkbox"
                 id="remember"
-                className="w-4 h-4 text-white bg-gray-100 border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
+                className="w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
               />
               <label htmlFor="remember" className="ml-2 text-sm text-white">
                 Remember me
@@ -129,7 +129,7 @@ export default function UserSignIn() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="w-full px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
@@ -139,21 +139,21 @@ export default function UserSignIn() {
           )}
         </form>
 
-        <div className="mt-8 pt-6 border-t border-blue-500/20">
+        <div className="mt-8 pt-6 border-t border-white/10">
           <div className="text-center mb-4">
-            <span className="text-gray-300 text-sm">Or continue with</span>
+            <span className="text-gray-400 text-sm">Or continue with</span>
           </div>
           <div className="flex gap-4">
             <button
               onClick={() => handleSocialSignIn('google')}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0a3747] text-gray-800 rounded-xl hover:bg-[#0a3747] transition-colors font-medium border border-blue-500/40"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 backdrop-blur-md bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors font-medium border border-white/20"
             >
               <FaGoogle className="w-5 h-5" />
               Google
             </button>
             <button
               onClick={() => handleSocialSignIn('facebook')}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-colors font-medium"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 backdrop-blur-md bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors font-medium border border-white/20"
             >
               <FaFacebook className="w-5 h-5" />
               Facebook
@@ -161,18 +161,18 @@ export default function UserSignIn() {
           </div>
         </div>
 
-        <div className="text-center mt-8 pt-6 border-t border-blue-500/20">
+        <div className="text-center mt-8 pt-6 border-t border-white/10">
           <p className="text-gray-300">
             Don&lsquo;t have an account?{' '}
-            <a href="/auth/user/signup" className="text-white hover:underline font-semibold">
+            <a href="/auth/user/signup" className="text-[#e51f48] hover:underline font-semibold">
               Sign Up
             </a>
           </p>
           <div className="mt-4 flex gap-4 justify-center">
-            <a href="/auth/artist/signin" className="text-sm text-purple-600 hover:underline">
+            <a href="/auth/artist/signin" className="text-sm text-white/80 hover:text-white hover:underline">
               Artist Sign In
             </a>
-            <a href="/auth/reseller/signin" className="text-sm text-green-600 hover:underline">
+            <a href="/auth/reseller/signin" className="text-sm text-white/80 hover:text-white hover:underline">
               Reseller Sign In
             </a>
           </div>

@@ -134,14 +134,14 @@ export default function UserSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1f29] to-[#0a3747] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-[#0f2e3d] to-[#051420] rounded-2xl p-8 w-full max-w-md border border-blue-500/30 shadow-2xl"
+        className="bg-white/5 rounded-2xl p-8 w-full max-w-md border border-white/10 shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaUser className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Listener</h1>
@@ -158,7 +158,7 @@ export default function UserSignUp() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="your@email.com"
               />
               {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -172,7 +172,7 @@ export default function UserSignUp() {
                 type="text"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="username"
               />
               {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
@@ -187,7 +187,7 @@ export default function UserSignUp() {
               type="text"
               value={formData.displayName}
               onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-              className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
               placeholder="Your display name"
             />
           </div>
@@ -202,7 +202,7 @@ export default function UserSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent pr-10"
                   placeholder="••••••••"
                 />
                 <button
@@ -224,7 +224,7 @@ export default function UserSignUp() {
                 type={showPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="••••••••"
               />
               {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
@@ -240,7 +240,7 @@ export default function UserSignUp() {
                 type="tel"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="+260 96 123 4567"
               />
             </div>
@@ -253,7 +253,7 @@ export default function UserSignUp() {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
               />
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function UserSignUp() {
               Profile Picture
             </label>
             <div className="flex items-center gap-4">
-              <div className="relative w-24 h-24 rounded-full bg-[#0a3747] border-2 border-blue-500/40 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div className="relative w-24 h-24 rounded-full bg-white/10 border-2 border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                 {avatarPreview ? (
                   <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
                 ) : (
@@ -284,7 +284,7 @@ export default function UserSignUp() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FaCamera className="text-sm" />
                   {uploading ? 'Uploading...' : 'Upload Picture'}
@@ -304,7 +304,7 @@ export default function UserSignUp() {
                 type="text"
                 value={formData.country}
                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="e.g., Zambia, USA, UK"
               />
             </div>
@@ -317,24 +317,24 @@ export default function UserSignUp() {
                 type="text"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0a3747] border border-blue-500/40 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="Street address"
               />
             </div>
           </div>
 
           {/* Consent Section */}
-          <div className="bg-[#0a2e3d]/50 rounded-lg p-4 space-y-3 border border-blue-500/30">
+          <div className="bg-white/10 rounded-lg p-4 space-y-3 border border-white/10">
             <div className="flex items-start gap-3">
               <input
                 type="checkbox"
                 id="terms"
                 checked={formData.acceptedTerms}
                 onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                className="mt-1 w-4 h-4 text-blue-500 bg-[#0a3747] border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
               />
               <label htmlFor="terms" className="text-sm text-gray-300">
-                I agree to the <a href="/terms" className="text-blue-300 hover:text-blue-200 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-300 hover:text-blue-200 hover:underline">Privacy Policy</a> *
+                I agree to the <a href="/terms" className="text-white/80 hover:text-white hover:underline">Terms of Service</a> and <a href="/privacy" className="text-white/80 hover:text-white hover:underline">Privacy Policy</a> *
               </label>
             </div>
             {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
@@ -345,7 +345,7 @@ export default function UserSignUp() {
                 id="privacy"
                 checked={formData.acceptedPrivacy}
                 onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                className="mt-1 w-4 h-4 text-blue-500 bg-[#0a3747] border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
               />
               <label htmlFor="privacy" className="text-sm text-gray-300">
                 I acknowledge that I have read and understood how my personal data will be processed *
@@ -359,7 +359,7 @@ export default function UserSignUp() {
                 id="marketing"
                 checked={formData.marketingEmails}
                 onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                className="mt-1 w-4 h-4 text-blue-500 bg-[#0a3747] border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
               />
               <label htmlFor="marketing" className="text-sm text-gray-300">
                 I agree to receive marketing emails and promotional offers
@@ -372,7 +372,7 @@ export default function UserSignUp() {
                 id="dataSharing"
                 checked={formData.dataSharing}
                 onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                className="mt-1 w-4 h-4 text-blue-500 bg-[#0a3747] border-blue-500/40 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
               />
               <label htmlFor="dataSharing" className="text-sm text-gray-300">
                 I consent to my data being shared with trusted partners for service improvement
@@ -384,7 +384,7 @@ export default function UserSignUp() {
           <button
             type="submit"
             disabled={loading || uploading}
-            className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow-lg"
+            className="w-full px-4 py-3 bg-[#e51f48] text-white rounded-lg hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow-lg"
           >
             {loading ? 'Creating Account...' : uploading ? 'Uploading Avatar...' : 'Create Account'}
           </button>
@@ -394,18 +394,18 @@ export default function UserSignUp() {
           )}
         </form>
 
-        <div className="text-center mt-6 pt-4 border-t border-blue-500/30">
+        <div className="text-center mt-6 pt-4 border-t border-white/10">
           <p className="text-gray-300">
             Already have an account?{' '}
-            <a href="/auth/user/signin" className="text-blue-400 hover:text-blue-300 hover:underline font-semibold">
+            <a href="/auth/user/signin" className="text-[#e51f48] hover:text-[#ff4d6d] hover:underline font-semibold">
               Sign In
             </a>
           </p>
           <div className="mt-4 flex gap-4 justify-center">
-            <a href="/auth/artist/signup" className="text-sm text-purple-400 hover:text-purple-300 hover:underline">
+            <a href="/auth/artist/signup" className="text-sm text-white/80 hover:text-white hover:underline">
               Artist Sign Up
             </a>
-            <a href="/auth/reseller/signup" className="text-sm text-green-600 hover:underline">
+            <a href="/auth/reseller/signup" className="text-sm text-white/80 hover:text-white hover:underline">
               Reseller Sign Up
             </a>
           </div>

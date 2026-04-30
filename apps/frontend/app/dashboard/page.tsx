@@ -216,28 +216,28 @@ const UserDashboard: React.FC = () => {
       value: Math.floor(libraryStats.totalMinutes).toString(),
       icon: <FaHeadphones />,
       change: '+12%',
-      color: 'from-[#5B0EA6] to-[#9B5DE5]'
+      color: 'bg-white/10'
     },
     {
       label: 'Tracks',
       value: libraryStats.totalSongs.toString(),
       icon: <FaMusic />,
       change: '+5',
-      color: 'from-[#5B0EA6] to-[#9B5DE5]'
+      color: 'bg-white/10'
     },
     {
       label: 'Playlists',
       value: libraryStats.totalPlaylists.toString(),
       icon: <FaList />,
       change: '+2',
-      color: 'from-[#5B0EA6] to-[#9B5DE5]'
+      color: 'bg-white/10'
     },
     {
       label: 'Artists',
       value: libraryStats.totalArtists.toString(),
       icon: <FaUsers />,
       change: '+3',
-      color: 'from-[#5B0EA6] to-[#9B5DE5]'
+      color: 'bg-white/10'
     }
   ];
 
@@ -248,28 +248,28 @@ const UserDashboard: React.FC = () => {
       value: `$${((user?.totalEarnings) ?? 0).toFixed(2)}`, 
       icon: <FaDollarSign />, 
       change: '+15%',
-      color: 'from-green-500 to-emerald-500'
+      color: 'bg-green-500/20'
     },
     { 
       label: 'Plays', 
       value: userMedia.reduce((sum, media) => sum + media.views, 0).toLocaleString(), 
       icon: <FaHeadphones />, 
       change: '+23%',
-      color: 'from-blue-500 to-cyan-500'
+      color: 'bg-blue-500/20'
     },
     { 
       label: 'Uploads', 
       value: userMedia.length.toString(), 
       icon: <FaUpload />, 
       change: '+2',
-      color: 'from-purple-500 to-pink-500'
+      color: 'bg-purple-500/20'
     },
     { 
       label: 'Rating', 
       value: '4.8', 
       icon: <FaStar />, 
       change: '+0.2',
-      color: 'from-amber-500 to-orange-500'
+      color: 'bg-amber-500/20'
     }
   ] : user.role === 'RESELLER' ? [
     { 
@@ -277,28 +277,28 @@ const UserDashboard: React.FC = () => {
       value: `$${((user?.totalCommission) ?? 0).toFixed(2)}`, 
       icon: <FaDollarSign />, 
       change: '+18%',
-      color: 'from-green-500 to-emerald-500'
+      color: 'bg-green-500/20'
     },
     { 
       label: 'Paid', 
       value: `$${((user?.paidCommission) ?? 0).toFixed(2)}`, 
       icon: <FaChartLine />, 
       change: '+12%',
-      color: 'from-blue-500 to-cyan-500'
+      color: 'bg-blue-500/20'
     },
     { 
       label: 'Links', 
       value: '24', 
       icon: <FaShare />, 
       change: '+3',
-      color: 'from-purple-500 to-pink-500'
+      color: 'bg-purple-500/20'
     },
     { 
       label: 'Conversion', 
       value: '8.5%', 
       icon: <FaChartLine />, 
       change: '+1.2%',
-      color: 'from-amber-500 to-orange-500'
+      color: 'bg-amber-500/20'
     }
   ] : [];
 
@@ -382,9 +382,9 @@ const UserDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#2E055E] to-[#5B0EA6] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-3 border-[#5B0EA6] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <div className="w-12 h-12 border-3 border-white/20 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
           <p className="text-gray-400 mobile-text-sm">Loading dashboard...</p>
         </div>
       </div>
@@ -393,9 +393,9 @@ const UserDashboard: React.FC = () => {
 
   return (
     <RoleGuard allowedRoles={['USER']} customLoadingComponent={<DashboardLoading/>}>
-      <div className="min-h-screen bg-gradient-to-b from-[#2E055E] to-[#5B0EA6] text-white pb-20">
+      <div className="min-h-screen bg-black text-white pb-20">
         {/* Mobile-Optimized Header */}
-        <header className="bg-[#2E055E]/80 backdrop-blur-lg border-b border-[#2E055E] sticky top-[64px] z-40">
+        <header className="bg-black/95 backdrop-blur-lg border-b border-white/10 sticky top-[64px] z-40">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -406,10 +406,10 @@ const UserDashboard: React.FC = () => {
                       alt={user.displayName || user.username}
                       width={50}
                       height={50}
-                      className="rounded-full border-2 border-[#5B0EA6]"
+                      className="rounded-full border-2 border-white/10"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B0EA6] to-[#9B5DE5] flex items-center justify-center border-2 border-[#5B0EA6]">
+                    <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border-2 border-white/10">
                       <FaUser className="text-white text-lg" />
                     </div>
                   )}
@@ -437,7 +437,7 @@ const UserDashboard: React.FC = () => {
               </div>
               
               <div className="flex items-center gap-2">
-                <div className="bg-[#2E055E] rounded-full p-2 border border-[#5B0EA6]">
+                <div className="bg-white/5 rounded-full p-2 border border-white/10">
                   {user.walletBalance && user.walletBalance > 0 ? (
                     <div className="flex items-center gap-1 text-sm mobile-text-sm">
                       <FaDollarSign className="text-green-400" />
@@ -446,7 +446,7 @@ const UserDashboard: React.FC = () => {
                   ) : (
                     <button
                       onClick={() => router.push('/reseller-dashboard')}
-                      className="px-2 py-1 bg-[#5B0EA6] hover:bg-[#9B5DE5] text-white rounded-full text-xs font-semibold transition-colors mobile-text-xs"
+                      className="px-2 py-1 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-full text-xs font-semibold transition-colors mobile-text-xs"
                     >
                       Reseller
                     </button>
@@ -456,7 +456,7 @@ const UserDashboard: React.FC = () => {
             </div>
 
             {/* Mobile-Optimized Navigation Tabs */}
-            <nav className="flex space-x-1 bg-[#2E055E] rounded-lg p-1 border border-[#5B0EA6] overflow-x-auto">
+            <nav className="flex space-x-1 bg-white/5 rounded-lg p-1 border border-white/10 overflow-x-auto">
               {[
                 { id: 'overview', label: 'Overview', icon: <FaChartLine className="w-3 h-3" /> },
                 { id: 'library', label: 'Library', icon: <FaMusic className="w-3 h-3" /> },
@@ -470,7 +470,7 @@ const UserDashboard: React.FC = () => {
                   className={`flex items-center gap-1 px-3 py-2 rounded-md transition-all flex-shrink-0 mobile-text-xs ${
                     activeTab === tab.id
                       ? 'bg-[#e51f48] text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white hover:bg-[#0a3747]'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   {tab.icon}
@@ -557,13 +557,13 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center gap-1">
                 <button 
                   onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-lg ${viewMode === 'grid' ? 'bg-[#e51f48] text-white' : 'bg-[#0a3747] text-gray-400'}`}
+                  className={`p-1.5 rounded-lg ${viewMode === 'grid' ? 'bg-[#e51f48] text-white' : 'bg-white/5 text-gray-400'}`}
                 >
                   <FaThLarge className="w-3 h-3" />
                 </button>
                 <button 
                   onClick={() => setViewMode('list')}
-                  className={`p-1.5 rounded-lg ${viewMode === 'list' ? 'bg-[#e51f48] text-white' : 'bg-[#0a3747] text-gray-400'}`}
+                  className={`p-1.5 rounded-lg ${viewMode === 'list' ? 'bg-[#e51f48] text-white' : 'bg-white/5 text-gray-400'}`}
                 >
                   <FaList className="w-3 h-3" />
                 </button>
@@ -578,7 +578,7 @@ const UserDashboard: React.FC = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center gap-3 p-3 hover:bg-[#0a3747]/50 rounded-xl cursor-pointer group transition-all border border-transparent hover:border-[#0a4a5f] touch-target"
+                    className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl cursor-pointer group transition-all border border-transparent hover:border-white/10 touch-target"
                     onClick={() => handlePlay(track)}
                   >
                     <div className="relative flex-shrink-0">
@@ -635,7 +635,7 @@ const UserDashboard: React.FC = () => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-[#0a3747]/50 rounded-xl overflow-hidden hover:bg-[#0a3747]/70 transition-all group cursor-pointer border border-transparent hover:border-[#0a4a5f]"
+                    className="bg-white/5 rounded-xl overflow-hidden hover:bg-white/10 transition-all group cursor-pointer border border-transparent hover:border-white/10"
                     onClick={() => handlePlay(track)}
                   >
                     <div className="relative">
@@ -689,7 +689,7 @@ const UserDashboard: React.FC = () => {
           {/* Recommendations & Quick Actions Side by Side on Mobile */}
           <div className="grid grid-cols-1 gap-6">
             {/* Recommendations */}
-            <section className="bg-[#0a3747]/50 rounded-xl p-4 border border-[#0a4a5f]">
+            <section className="bg-white/5 rounded-xl p-4 border border-white/10">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="font-bold flex items-center gap-2 mobile-text-base">
                   <FaStar className="text-amber-400" />
@@ -707,7 +707,7 @@ const UserDashboard: React.FC = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center gap-3 p-2 hover:bg-[#0a3747] rounded-lg cursor-pointer group transition-colors touch-target"
+                    className="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg cursor-pointer group transition-colors touch-target"
                     onClick={() => handlePlay(track)}
                   >
                     <div className="relative flex-shrink-0">
@@ -736,7 +736,7 @@ const UserDashboard: React.FC = () => {
             </section>
 
             {/* Quick Actions */}
-            <section className="bg-[#0a3747]/50 rounded-xl p-4 border border-[#0a4a5f]">
+            <section className="bg-white/5 rounded-xl p-4 border border-white/10">
               <h2 className="font-bold mb-3 mobile-text-base">Quick Actions</h2>
               <div className="grid grid-cols-3 gap-2">
                 {[
@@ -769,7 +769,7 @@ const UserDashboard: React.FC = () => {
 
           {/* Recent Playlists */}
           {userPlaylists.length > 0 && (
-            <section className="mt-6 bg-[#0a3747]/50 rounded-xl p-4 border border-[#0a4a5f]">
+            <section className="mt-6 bg-white/5 rounded-xl p-4 border border-white/10">
               <h2 className="font-bold mb-3 mobile-text-base">Your Playlists</h2>
               <div className="grid grid-cols-2 gap-3">
                 {userPlaylists.slice(0, 4).map((playlist, index) => (
@@ -778,7 +778,7 @@ const UserDashboard: React.FC = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center gap-2 p-2 hover:bg-[#0a3747] rounded-lg cursor-pointer transition-colors touch-target"
+                    className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg cursor-pointer transition-colors touch-target"
                   >
                     <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                       <FaMusic className="text-white text-sm" />
@@ -813,7 +813,7 @@ const UserDashboard: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-[#0a3747]/50 rounded-xl p-3 hover:bg-[#0a3747]/70 transition-colors border border-[#0a4a5f]"
+                    className="bg-white/5 rounded-xl p-3 hover:bg-white/10 transition-colors border border-white/10"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Image
@@ -847,7 +847,7 @@ const UserDashboard: React.FC = () => {
           <motion.div
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="fixed bottom-16 left-0 right-0 bg-[#0a3747]/95 backdrop-blur-lg border-t border-[#0a4a5f] p-3 shadow-2xl mx-4 rounded-t-xl"
+            className="fixed bottom-16 left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 p-3 shadow-2xl mx-4 rounded-t-xl"
           >
             <div className="flex items-center justify-between">
               {/* Track Info */}
@@ -886,7 +886,7 @@ const UserDashboard: React.FC = () => {
             {/* Progress Bar */}
             <div className="w-full flex items-center gap-2 mt-2">
               <span className="text-xs text-gray-400 w-8 text-right mobile-text-xs">0:00</span>
-              <div className="flex-1 h-1 bg-[#0a1f29] rounded-full overflow-hidden">
+              <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full" 
                   style={{ width: '30%' }}
