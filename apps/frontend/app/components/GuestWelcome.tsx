@@ -144,20 +144,20 @@ export default function GuestWelcome() {
 
   const heroContent = [
     {
-      title: "Lost in the Echo (Killsonik Remix)",
-      subtitle: "Linkin Park — Recharged",
+      title: "We are fwaya (Remix)",
+      subtitle: "Lusaka — Recharged",
       primaryButton: "Play",
       secondaryButton: "Save"
     },
     {
-      title: "Electric Dreams",
-      subtitle: "The Midnight — Infinite",
+      title: "My Dreams",
+      subtitle: "Zed — Infinite",
       primaryButton: "Listen Now",
       secondaryButton: "Add to Playlist"
     },
     {
-      title: "Midnight Skies",
-      subtitle: "Owl City — Ocean Eyes",
+      title: "Birthday",
+      subtitle: "Fwaya — Enjoy",
       primaryButton: "Stream",
       secondaryButton: "Download"
     }
@@ -212,7 +212,7 @@ export default function GuestWelcome() {
       {/* ================= MOBILE ================= */}
           <div className="lg:hidden pb-24 px-5">
             <div className="flex items-center justify-between mb-4">
-              <div className={`text-white text-lg font-semibold ${isDiscoverAnimating ? 'animate-pulse' : ''}`}>
+              <div className={`text-white text-2xl font-semibold ${isDiscoverAnimating ? 'animate-pulse' : ''}`}>
                 {isPlaying ? (
                   'Discover'.split('').map((letter, i) => (
                     <span
@@ -228,7 +228,7 @@ export default function GuestWelcome() {
                     </span>
                   ))
                 ) : (
-                  'Fwaya'
+                  <Image src="/fwayalogo-01.png" alt="Fwaya" width={120} height={40} className="h-12 w-auto" />
                 )}
               </div>
               <div className="flex items-center gap-2">
