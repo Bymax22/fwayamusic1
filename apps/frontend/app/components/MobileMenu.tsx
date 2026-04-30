@@ -118,33 +118,35 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   ];
 
   const MenuSection = ({ title, items }: { title: string; items: { title: string; icon: ReactNode; href: string; description: string }[] }) => (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wider px-4 py-2 border-l-2 border-purple-500 bg-white/5 rounded-r-2xl">
         {title}
       </h3>
-      {items.map((item, index) => (
-        <motion.div
-          key={item.title}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.05 }}
-        >
-          <Link
-            href={item.href}
-            className={`flex items-center gap-3 px-4 py-3 rounded-3xl text-white transition-all duration-300 group mx-2 border border-white/10 hover:border-purple-500/30 shadow-sm shadow-purple-500/10 ${isDarkMode ? 'bg-[#090b14]/90 hover:bg-[#121827]' : 'bg-[#12131f]/90 hover:bg-[#1c1d29]'}`}
-            onClick={onClose}
+      <div className="space-y-2">
+        {items.map((item, index) => (
+          <motion.div
+            key={item.title}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.05 }}
           >
-            <span className="flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
-              {item.icon}
-            </span>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">{item.title}</p>
-              <p className="text-xs text-gray-400 truncate">{item.description}</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-purple-300 group-hover:text-white transition-colors" />
-          </Link>
-        </motion.div>
-      ))}
+            <Link
+              href={item.href}
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-white transition-all duration-300 group mx-2 border border-white/10 hover:border-purple-500/30 shadow-sm shadow-purple-500/10 ${isDarkMode ? 'bg-[#090b14]/90 hover:bg-[#121827]' : 'bg-[#12131f]/90 hover:bg-[#1c1d29]'}`}
+              onClick={onClose}
+            >
+              <span className="flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                {item.icon}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold truncate">{item.title}</p>
+                <p className="text-xs text-gray-400 truncate">{item.description}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-purple-300 group-hover:text-white transition-colors flex-shrink-0" />
+            </Link>
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 
@@ -188,10 +190,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               damping: 30, 
               stiffness: 300 
             }}
-            className={`fixed bottom-0 left-0 right-0 h-[90vh] rounded-t-[32px] z-50 overflow-hidden border-t border-white/10 shadow-[0_-30px_120px_-50px_rgba(94,43,255,0.35)] backdrop-blur-2xl ${isDarkMode ? 'bg-[#020206]/95' : 'bg-[#12131f]/95'}`}
+            className={`fixed bottom-0 left-0 right-0 h-[90vh] rounded-t-[32px] z-50 overflow-hidden border-t border-white/10 shadow-[0_-30px_120px_-50px_rgba(94,43,255,0.35)] backdrop-blur-2xl ${isDarkMode ? 'bg-[#020206]/95' : 'bg-[#12131f]/95'} flex flex-col`}
           >
             {/* Header with search */}
-            <div className={`p-6 ${isDarkMode ? 'bg-[#0a0a0d]/20' : 'bg-[#12131f]/20'} border-b border-white/10 backdrop-blur-2xl`}>
+            <div className={`flex-shrink-0 p-6 ${isDarkMode ? 'bg-[#0a0a0d]/20' : 'bg-[#12131f]/20'} border-b border-white/10 backdrop-blur-2xl`}>
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
                   <motion.div 
@@ -320,7 +322,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             {/* User Info */}
             {user ? (
               <motion.div 
-                className="px-6 py-4 bg-[#0a0a0d]"
+                className="flex-shrink-0 px-6 py-4 bg-[#0a0a0d]"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -351,16 +353,16 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </motion.div>
             ) : (
               <motion.div 
-                className="px-6 py-4 bg-[#0a0a0d]"
+                className="flex-shrink-0 px-6 py-4 bg-[#0a0a0d]"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {/* Guest Plan Info */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 rounded-full bg-[#080a13] flex items-center justify-center">
+                  <div className="flex items-center justify-between bg-[#080a13] rounded-2xl p-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-full bg-[#0d1420] flex items-center justify-center">
                         <User className="w-4 h-4 text-gray-300" />
                       </div>
                       <div>
@@ -373,13 +375,49 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     </div>
                   </div>
 
-                  {/* Premium Plan CTA */}
-                  <div className="bg-[#080a13] rounded-3xl p-3">
+                  {/* Auth Actions */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalMode('signin')}
+                      className="py-2.5 px-3 rounded-xl bg-[#080a13] text-white text-sm font-medium hover:bg-[#0a0d18] transition-colors"
+                    >
+                      Login
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalMode('signup')}
+                      className="py-2.5 px-3 rounded-xl bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
+                    >
+                      Sign Up
+                    </button>
+                  </div>
+
+                  {/* Artist Actions */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
+                      href="/auth/artist/signin"
+                      className="py-2.5 px-3 rounded-xl border border-white/10 bg-[#0b1520] text-white text-sm font-medium hover:bg-[#121c2b] transition-colors text-center"
+                      onClick={onClose}
+                    >
+                      Artist Login
+                    </Link>
+                    <Link
+                      href="/auth/artist/signup"
+                      className="py-2.5 px-3 rounded-xl bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors text-center"
+                      onClick={onClose}
+                    >
+                      Artist Sign Up
+                    </Link>
+                  </div>
+
+                  {/* Premium CTA */}
+                  <div className="bg-gradient-to-r from-purple-600/20 to-violet-600/20 rounded-2xl p-3 border border-purple-500/20">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Crown className="w-4 h-4 text-purple-400" />
                         <div>
-                          <p className="text-sm font-medium text-white">Premium Plan</p>
+                          <p className="text-sm font-medium text-white">Go Premium</p>
                           <p className="text-xs text-purple-300">Unlimited access</p>
                         </div>
                       </div>
@@ -392,44 +430,12 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       </motion.button>
                     </div>
                   </div>
-
-                  {/* Artist login/create actions */}
-                  <div className="grid gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setAuthModalMode('signin')}
-                      className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-[#080a13] text-white text-sm font-medium hover:bg-[#0a0d18] transition-colors"
-                    >
-                      Login
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAuthModalMode('signup')}
-                      className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
-                    >
-                      Create Account
-                    </button>
-                  </div>
-                  <div className="grid gap-3 mt-3">
-                    <Link
-                      href="/auth/artist/signin"
-                      className="w-full inline-flex items-center justify-center py-2 rounded-xl border border-white/10 bg-[#0b1520] text-white text-sm font-medium hover:bg-[#121c2b] transition-colors"
-                    >
-                      Artist Login
-                    </Link>
-                    <Link
-                      href="/auth/artist/signup"
-                      className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors"
-                    >
-                      Artist Sign Up
-                    </Link>
-                  </div>
                 </div>
               </motion.div>
             )}
 
             {/* Tabs */}
-            <div className="px-6 py-4">
+            <div className="flex-shrink-0 px-6 py-4">
               <div className="flex space-x-2 bg-[#080a13] rounded-2xl p-1">
                 {menuTabs.map((tab, index) => {
                   const Icon = tab.icon;
@@ -458,40 +464,42 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </div>
 
             {/* Scrollable Content */}
-            <div className="h-[calc(100%-240px)] overflow-y-auto pb-6">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeMenuTab}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="space-y-6 py-4"
-                >
-                  {activeItems.length > 0 ? (
-                    <MenuSection title={currentSectionLabel} items={activeItems} />
-                  ) : (
-                    <div className="mx-4 rounded-3xl border border-white/10 bg-[#080a13]/90 p-6 text-center text-gray-400 shadow-[0_25px_80px_-40px_rgba(94,43,255,0.28)]">
-                      <p className="text-sm font-semibold text-white mb-2">No menu items found.</p>
-                      <p className="text-sm text-gray-400">Try a different search or switch to another section.</p>
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-6 py-4 pb-8">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeMenuTab}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="space-y-6"
+                  >
+                    {activeItems.length > 0 ? (
+                      <MenuSection title={currentSectionLabel} items={activeItems} />
+                    ) : (
+                      <div className="mx-2 rounded-3xl border border-white/10 bg-[#080a13]/90 p-6 text-center text-gray-400 shadow-[0_25px_80px_-40px_rgba(94,43,255,0.28)]">
+                        <p className="text-sm font-semibold text-white mb-2">No menu items found.</p>
+                        <p className="text-sm text-gray-400">Try a different search or switch to another section.</p>
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
 
-              {/* Footer with enhanced styling */}
-              <motion.div 
-                className="px-6 mt-8 text-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-              >
-                <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-[#080a13]">
-                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                  <p className="text-xs text-gray-400">
-                    Fwaya Music v1.5.3 • Developed by BymaxZM
-                  </p>
-                </div>
-              </motion.div>
+                {/* Footer with enhanced styling */}
+                <motion.div 
+                  className="mt-8 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-[#080a13]">
+                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                    <p className="text-xs text-gray-400">
+                      Fwaya Music v1.5.3 • Developed by BymaxZM
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </motion.div>
         </>
