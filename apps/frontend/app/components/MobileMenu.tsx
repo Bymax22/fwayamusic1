@@ -1,11 +1,10 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, PlayCircle, Shuffle, SkipBack, SkipForward, Play, Pause, Volume2, Bell, Moon, Sun, ChevronRight, Crown, Zap } from "lucide-react";
+import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, Bell, Moon, Sun, ChevronRight, Crown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -22,12 +21,10 @@ const Icon = ({ children }: { children: React.ReactNode }) => (
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
   const [activeMenuTab, setActiveMenuTab] = useState("menu");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [volume, setVolume] = useState(70);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [authModalMode, setAuthModalMode] = useState<"signin" | "signup" | null>(null);
 
   // Only close menu if pathname changes after menu is already open
   const prevPathnameRef = useRef(pathname);
@@ -82,10 +79,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   // Auth items (shown when not logged in)
   const authMenuItems = [
-    { title: "Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/login", description: "Sign in to your account" },
+    { title: "Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/signin", description: "Sign in to your account" },
     { title: "Create Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/signup", description: "Join Fwaya Music" },
-    { title: "Artist Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/login?role=artist", description: "Sign in as an artist" },
-    { title: "Create Artist Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/signup?role=artist", description: "Sign up as an artist" },
+    { title: "Artist Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/artist/signin", description: "Sign in as an artist" },
+    { title: "Create Artist Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/artist/signup", description: "Sign up as an artist" },
   ];
 
   // Menu tabs with enhanced icons
@@ -96,12 +93,28 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { id: "account", label: "Account", icon: User },
   ];
 
-  // Quick actions
-  const quickActions = [
-    { icon: Shuffle, label: "Shuffle", action: () => setIsShuffled(!isShuffled) },
-    { icon: isPlaying ? Pause : Play, label: isPlaying ? "Pause" : "Play", action: () => togglePlay },
-    { icon: SkipBack, label: "Previous", action: () => {} },
-    { icon: SkipForward, label: "Next", action: () => {} },
+  const authOptions = [
+    {
+      title: "Music Lover",
+      subtitle: "User account",
+      description: "Stream music, create playlists, and follow artists.",
+      signinHref: "/auth/user/signin",
+      signupHref: "/auth/user/signup",
+    },
+    {
+      title: "Artist",
+      subtitle: "Artist account",
+      description: "Upload music, manage your profile, and access artist tools.",
+      signinHref: "/auth/artist/signin",
+      signupHref: "/auth/artist/signup",
+    },
+    {
+      title: "Reseller",
+      subtitle: "Reseller account",
+      description: "Sell music, earn commissions, and manage customers.",
+      signinHref: "/auth/reseller/signin",
+      signupHref: "/auth/reseller/signup",
+    },
   ];
 
   const MenuSection = ({ title, items }: { title: string; items: { title: string; icon: ReactNode; href: string; description: string }[] }) => (
@@ -242,6 +255,68 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </motion.div>
             </div>
 
+            <AnimatePresence>
+              {authModalMode && (
+                <motion.div
+                  key="auth-modal"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/70"
+                  onClick={() => setAuthModalMode(null)}
+                >
+                  <motion.div
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 30, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 18 }}
+                    className="w-full max-w-md rounded-3xl border border-white/10 bg-[#07101d] p-6 shadow-2xl"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <div className="flex items-start justify-between gap-4 mb-5">
+                      <div>
+                        <p className="text-sm uppercase tracking-[0.24em] text-purple-300">Choose account</p>
+                        <h3 className="mt-2 text-2xl font-semibold text-white">
+                          {authModalMode === 'signin' ? 'Sign in to Fwaya' : 'Create a new account'}
+                        </h3>
+                        <p className="mt-2 text-sm text-gray-400">
+                          Pick your account type to continue with the right experience.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAuthModalMode(null)}
+                        className="rounded-full p-2 bg-white/5 text-white hover:bg-white/10 transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="grid gap-3">
+                      {authOptions.map((option) => (
+                        <Link
+                          key={option.title}
+                          href={authModalMode === 'signin' ? option.signinHref : option.signupHref}
+                          className="group block rounded-3xl border border-white/10 bg-[#0d1420] p-5 transition hover:border-purple-500/30 hover:bg-[#111925]"
+                          onClick={onClose}
+                        >
+                          <div className="flex items-center justify-between gap-4">
+                            <div>
+                              <p className="text-lg font-semibold text-white">{option.title}</p>
+                              <p className="text-sm text-gray-400">{option.subtitle}</p>
+                            </div>
+                            <div className="rounded-2xl bg-purple-600 px-3 py-2 text-xs font-semibold text-white uppercase">
+                              {authModalMode === 'signin' ? 'Sign In' : 'Sign Up'}
+                            </div>
+                          </div>
+                          <p className="mt-3 text-sm text-gray-400">{option.description}</p>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* User Info */}
             {user ? (
               <motion.div 
@@ -320,17 +395,33 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
                   {/* Artist login/create actions */}
                   <div className="grid gap-3">
-                    <Link
-                      href="/auth/login?role=artist"
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalMode('signin')}
                       className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-[#080a13] text-white text-sm font-medium hover:bg-[#0a0d18] transition-colors"
                     >
                       Login
-                    </Link>
-                    <Link
-                      href="/auth/signup?role=artist"
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalMode('signup')}
                       className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
                     >
                       Create Account
+                    </button>
+                  </div>
+                  <div className="grid gap-3 mt-3">
+                    <Link
+                      href="/auth/artist/signin"
+                      className="w-full inline-flex items-center justify-center py-2 rounded-xl border border-white/10 bg-[#0b1520] text-white text-sm font-medium hover:bg-[#121c2b] transition-colors"
+                    >
+                      Artist Login
+                    </Link>
+                    <Link
+                      href="/auth/artist/signup"
+                      className="w-full inline-flex items-center justify-center py-2 rounded-xl bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors"
+                    >
+                      Artist Sign Up
                     </Link>
                   </div>
                 </div>
@@ -367,7 +458,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </div>
 
             {/* Scrollable Content */}
-            <div className="h-[calc(100%-280px)] overflow-y-auto pb-6">
+            <div className="h-[calc(100%-240px)] overflow-y-auto pb-6">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeMenuTab}
@@ -386,95 +477,6 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   )}
                 </motion.div>
               </AnimatePresence>
-
-              {/* Enhanced Now Playing with Controls */}
-              <motion.div 
-                className="mx-4 mt-6 rounded-3xl border border-white/10 bg-[#080a13]/95 p-5 shadow-[0_25px_80px_-40px_rgba(94,43,255,0.28)]"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <motion.div 
-                      className="w-14 h-14 rounded-xl bg-purple-600 flex items-center justify-center"
-                      whileHover={{ scale: 1.05 }}
-                      animate={{ rotate: isPlaying ? 360 : 0 }}
-                      transition={{ duration: 2, repeat: isPlaying ? Infinity : 0, ease: "linear" }}
-                    >
-                      <Music className="w-7 h-7 text-white" />
-                    </motion.div>
-                    <div>
-                      <p className="text-sm font-semibold text-white">
-                        {currentTrack ? currentTrack.title : "No track playing"}
-                      </p>
-                      <p className="text-xs text-purple-300">
-                        {currentTrack ? currentTrack.artist : "Select a song"}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {currentTrack ? (currentTrack.accessType === 'PREMIUM' ? 'Premium' : 'Free') : ""}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <motion.button
-                      onClick={() => setIsShuffled(!isShuffled)}
-                      className={`p-2 rounded-full transition-all duration-200 ${
-                        isShuffled ? 'bg-purple-600 text-white' : 'bg-white/10 hover:bg-white/20 text-white'
-                      }`}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <Shuffle className="w-4 h-4" />
-                    </motion.button>
-                    <motion.button
-                      onClick={togglePlay}
-                      className="p-2 rounded-full bg-purple-600 hover:bg-purple-700 text-white transition-all duration-200"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                    </motion.button>
-                    <motion.button
-                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <SkipForward className="w-4 h-4" />
-                    </motion.button>
-                  </div>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="w-full bg-white/20 rounded-full h-1 mb-3">
-                  <motion.div 
-                    className="bg-purple-600 h-1 rounded-full"
-                    initial={{ width: "0%" }}
-                    animate={{ width: isPlaying ? "60%" : "30%" }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </div>
-                <div className="flex justify-between text-xs text-gray-400 mb-3">
-                  <span>0:00</span>
-                  <span>{currentTrack?.duration ? `${Math.floor(currentTrack.duration / 60)}:${(currentTrack.duration % 60).toString().padStart(2, '0')}` : "0:00"}</span>
-                </div>
-
-                {/* Volume Control */}
-                <div className="flex items-center space-x-3">
-                  <Volume2 className="w-4 h-4 text-purple-400" />
-                  <div className="flex-1">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={volume}
-                      onChange={(e) => setVolume(Number(e.target.value))}
-                      className="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer slider"
-                    />
-                  </div>
-                  <span className="text-xs text-gray-400 w-8">{volume}%</span>
-                </div>
-              </motion.div>
 
               {/* Footer with enhanced styling */}
               <motion.div 
