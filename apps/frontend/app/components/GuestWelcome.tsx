@@ -228,7 +228,7 @@ export default function GuestWelcome() {
                     </span>
                   ))
                 ) : (
-                  <Image src="/fwayalogo-01.png" alt="Fwaya" width={120} height={40} className="h-12 w-auto" />
+                  <img src="/fwayalogo-01.png" alt="Fwaya" className="h-14 w-auto object-contain" />
                 )}
               </div>
               <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export default function GuestWelcome() {
             </div>
 
             <div className="mb-4">
-              <div className="flex items-center gap-3 bg-white/5 rounded-full px-4 py-3 text-white/80">
+              <div className="flex items-center gap-3 bg-transparent rounded-full px-4 py-3 text-white/80">
                 <FaSearch className="text-white/60" />
                 <input
                   type="search"
@@ -288,7 +288,7 @@ export default function GuestWelcome() {
             <button
               key={i}
               className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
-                activeTab === tab.key ? "bg-purple-600 text-white" : "bg-white/5 text-gray-300 hover:bg-white/10"
+                activeTab === tab.key ? "bg-purple-600 text-white" : "bg-transparent text-gray-300 hover:bg-white/10"
               }`}
               onClick={() => setActiveTab(tab.key)}
             >
@@ -434,7 +434,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-[#0a0a0d]">
+                  <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent">
                     <div 
                       className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
                       style={{
@@ -443,7 +443,7 @@ export default function GuestWelcome() {
                         backgroundPosition: 'center'
                       }}
                     />
-                    <div className="p-3 bg-black/20">
+                    <div className="p-3 bg-transparent">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                       <p className="text-xs text-gray-400">{item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks</p>
@@ -507,7 +507,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[120px] bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
+                  <div key={i} className="min-w-[120px] bg-transparent rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
                     <div 
                       className="w-full aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-2"
                       style={{
@@ -584,7 +584,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-[#0a0a0d]">
+                  <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent">
                     <div 
                       className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
                       style={{
@@ -593,7 +593,7 @@ export default function GuestWelcome() {
                         backgroundPosition: 'center'
                       }}
                     />
-                    <div className="p-3 bg-black/20">
+                    <div className="p-3 bg-transparent">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                       <p className="text-xs text-gray-400">{item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks</p>
@@ -659,9 +659,9 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[120px] bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
+                  <div key={i} className="min-w-[120px] rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0 bg-transparent">
                     <div 
-                      className="w-full aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-2"
+                      className="w-full aspect-square bg-black rounded-lg mb-2"
                       style={{
                         backgroundImage: item.coverUrl ? `url(${item.coverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -761,10 +761,10 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-[#0a0a0d]">
+                  <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent">
                     <div className="relative">
                       <div 
-                        className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
+                        className="aspect-square bg-black"
                         style={{
                           backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -772,7 +772,7 @@ export default function GuestWelcome() {
                         }}
                       />
                     </div>
-                    <div className="p-3 bg-black/20">
+                    <div className="p-3 bg-transparent">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                     </div>
@@ -839,7 +839,7 @@ export default function GuestWelcome() {
               </div>
               <div className="space-y-3">
                 {featuredArtists.slice(0, 4).map((artist: any, i: number) => (
-                  <div key={i} className="rounded-3xl bg-white/5 p-4">
+                  <div key={i} className="rounded-3xl bg-transparent p-4">
                     <div className="flex items-center gap-3">
                       <div
                         className="w-12 h-12 rounded-full bg-black flex-shrink-0"
@@ -1098,7 +1098,7 @@ export default function GuestWelcome() {
               {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
                 <div
                   key={i}
-                  className="text-center cursor-pointer hover:bg-white/5 rounded-xl p-3 transition-colors"
+                  className="text-center cursor-pointer hover:bg-transparent rounded-xl p-3 transition-colors"
                 >
                   {/* ARTIST IMAGE */}
                   <div
@@ -1221,7 +1221,7 @@ export default function GuestWelcome() {
                 {topCharts.slice(0, 5).map((track: any, index: number) => (
                   <div
                     key={track.id || index}
-                    className="flex gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer"
+                    className="flex gap-3 p-3 rounded-xl hover:bg-transparent transition-colors cursor-pointer"
                   >
                     <div className="flex flex-col items-center justify-center flex-shrink-0">
                       <span className="text-sm font-bold text-purple-400">{index + 1}</span>
@@ -1320,7 +1320,7 @@ export default function GuestWelcome() {
                 { title: "Electric Dreams", artist: "The Midnight" },
                 { title: "The Rock Revival", artist: "Various Artists" }
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+                <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-transparent transition-colors cursor-pointer">
                   <div className="w-8 h-8 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{item.title}</p>
