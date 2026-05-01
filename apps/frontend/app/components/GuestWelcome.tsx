@@ -212,7 +212,7 @@ export default function GuestWelcome() {
       {/* ================= MOBILE ================= */}
           <div className="lg:hidden pb-24 px-5">
             <div className="flex items-center justify-between mb-4">
-              <div className={`text-white text-2xl font-semibold ${isDiscoverAnimating ? 'animate-pulse' : ''}`}>
+              <div className="flex items-center gap-2 text-white text-2xl font-semibold">
                 {isPlaying ? (
                   'Discover'.split('').map((letter, i) => (
                     <span
@@ -228,7 +228,10 @@ export default function GuestWelcome() {
                     </span>
                   ))
                 ) : (
-                  <img src="/fwayalogo-01.png" alt="Fwaya" className="h-14 w-auto object-contain" />
+                  <div className="flex items-center gap-2">
+                    <img src="/fwayalogo-01.png" alt="Fwaya" className="h-10 w-auto object-contain opacity-100" />
+                    <span className="text-xl font-semibold text-white">Fwaya</span>
+                  </div>
                 )}
               </div>
               <div className="flex items-center gap-2">
@@ -242,7 +245,7 @@ export default function GuestWelcome() {
             </div>
 
             <div className="mb-4">
-              <div className="flex items-center gap-3 bg-transparent rounded-full px-4 py-3 text-white/80">
+              <div className="flex items-center gap-3 bg-white/5 rounded-full px-4 py-3 text-white/80">
                 <FaSearch className="text-white/60" />
                 <input
                   type="search"
