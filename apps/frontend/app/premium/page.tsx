@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useMemo, useState } from 'react';
 import { Crown, Play, Pause, Heart, Download, Music } from 'lucide-react';
 import Image from "next/image";
