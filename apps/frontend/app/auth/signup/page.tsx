@@ -16,7 +16,7 @@ import {
   FaFacebook
 } from 'react-icons/fa';
 
-type UserRole = 'USER' | 'ARTIST' | 'RESELLER';
+type UserRole = 'USER' | 'ARTIST' | 'RESELLER' | 'ADMIN' | 'MODERATOR';
 type SignupStep = 'role' | 'details' | 'kyc' | 'consent' | 'verification';
 
 export default function SignUp() {
@@ -166,6 +166,9 @@ export default function SignUp() {
         return '/for-artists';
       case 'RESELLER':
         return '/reseller-dashboard';
+      case 'ADMIN':
+      case 'MODERATOR':
+        return '/admin';
       default:
         return '/dashboard';
     }
