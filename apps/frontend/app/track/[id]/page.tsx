@@ -74,6 +74,9 @@ export default function TrackPage() {
   const params = useParams();
   const router = useRouter();
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
+  const paramId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const trackId = typeof paramId === 'string' ? paramId : undefined;
+  const trackIdNumber = trackId ? Number(trackId) : undefined;
   
   const [track, setTrack] = useState<MediaItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,7 +95,7 @@ export default function TrackPage() {
   useEffect(() => {
     const fetchTrack = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${params.id}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${trackId}`);
         if (!response.ok) {
           throw new Error('Track not found');
         }
@@ -100,7 +103,7 @@ export default function TrackPage() {
         setTrack(data);
 
         // Fetch comments
-        const commentsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${params.id}/comments`);
+        const commentsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${trackId}/comments`);
         if (commentsRes.ok) {
           const commentsData = await commentsRes.json();
           setComments(commentsData);
@@ -110,7 +113,7 @@ export default function TrackPage() {
         const relatedRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media?genre=${data.genre}&limit=5`);
         if (relatedRes.ok) {
           const relatedData = await relatedRes.json();
-          setRelatedTracks(relatedData.filter((t: MediaItem) => t.id !== params.id).slice(0, 4));
+          setRelatedTracks(relatedData.filter((t: MediaItem) => trackIdNumber === undefined ? true : t.id !== trackIdNumber).slice(0, 4));
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load track');
@@ -119,10 +122,10 @@ export default function TrackPage() {
       }
     };
 
-    if (params.id) {
+    if (trackId) {
       fetchTrack();
     }
-  }, [params.id]);
+  }, [trackId]);
 
   const handlePlayTrack = async () => {
     if (!track) return;
