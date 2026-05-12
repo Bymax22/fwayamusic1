@@ -357,12 +357,12 @@ useEffect(() => {
     }
 
     if (license.expiresAt && new Date(license.expiresAt) < new Date()) {
-      return { status: 'expired', color: 'text-yellow-400' };
+      return { status: 'expired', color: 'text-purple-300' };
     }
 
     return { 
       status: license.restrictionLevel.toLowerCase(), 
-      color: 'text-green-400' 
+      color: 'text-purple-300' 
     };
   };
 
@@ -374,7 +374,7 @@ useEffect(() => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
-              <Download className="w-6 h-6 sm:w-8 sm:h-8 text-[#e51f48]" />
+              <Download className="w-6 h-6 sm:w-8 sm:h-8 text-purple-300" />
               My Downloads
             </h1>
             <p className="text-sm sm:text-base text-gray-400">Access your offline music library</p>
@@ -390,7 +390,7 @@ useEffect(() => {
             </div>
             <div className="w-full sm:w-32 h-2 bg-[#0a3747] rounded-full overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full" 
+                className="h-full bg-gradient-to-r from-purple-500 to-violet-500 rounded-full" 
                 style={{ width: `${calculateStoragePercentage()}%` }}
               />
             </div>
@@ -398,7 +398,7 @@ useEffect(() => {
               onClick={() => setIsOfflineMode(!isOfflineMode)}
               className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center ${
                 isOfflineMode 
-                  ? 'bg-[#e51f48] text-white' 
+                  ? 'bg-purple-500 text-white' 
                   : 'bg-[#0a3747] text-gray-300'
               }`}
             >
@@ -412,7 +412,7 @@ useEffect(() => {
         <div className="bg-[#0a3747]/50 rounded-lg p-3 sm:p-4 mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-green-400" />
+              <Shield className="w-4 h-4 text-purple-300" />
               <span className="text-xs sm:text-sm text-gray-300">
                 Device: {currentDeviceId.substring(0, 8)}...
               </span>
@@ -434,7 +434,7 @@ useEffect(() => {
                   onClick={() => setActiveTab(tab)}
                   className={`px-3 py-2 text-sm sm:text-base font-medium whitespace-nowrap ${
                     activeTab === tab
-                      ? 'text-[#e51f48] border-b-2 border-[#e51f48]'
+                      ? 'text-purple-300 border-b-2 border-purple-500'
                       : 'text-gray-400 hover:text-gray-300'
                   }`}
                 >
@@ -483,9 +483,9 @@ useEffect(() => {
                           <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg ${
                             item.isDRMProtected && !drmStatus 
                               ? 'bg-gray-600 cursor-not-allowed' 
-                              : 'bg-[#e51f48]'
+                              : 'bg-purple-500'
                           }`}>
-                            <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                            <Play className="w-4 h-4 sm:h-5 sm:w-5 text-white" />
                           </div>
                         </button>
                         {item.downloadStatus === 'pending' && (
@@ -493,8 +493,8 @@ useEffect(() => {
                             onClick={() => handleDownload(item)}
                             className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
                           >
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0a3747] border-2 border-[#e51f48] flex items-center justify-center shadow-lg">
-                              <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#e51f48]" />
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0a3747] border-2 border-purple-500 flex items-center justify-center shadow-lg">
+                              <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300" />
                             </div>
                           </button>
                         )}
@@ -512,7 +512,7 @@ useEffect(() => {
                     
                     {/* Premium badge */}
                     {item.accessType === 'PREMIUM' && (
-                      <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-amber-500 text-white text-xs font-medium flex items-center gap-1">
+                      <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-purple-600 text-white text-xs font-medium flex items-center gap-1">
                         <Crown className="w-3 h-3" />
                         Premium
                       </div>
@@ -553,13 +553,13 @@ useEffect(() => {
                       <div className="flex gap-1 sm:gap-2 items-center">
                         {item.downloadStatus === 'completed' ? (
                           <>
-                            <span className="text-xs text-green-500 flex items-center gap-1">
+                            <span className="text-xs text-purple-300 flex items-center gap-1">
                               <Check className="w-3 h-3" />
                               <span className="hidden sm:inline">Downloaded</span>
                             </span>
                             <button 
                               onClick={() => handleDelete(item.id)}
-                              className="text-xs text-gray-400 hover:text-[#e51f48]"
+                              className="text-xs text-gray-400 hover:text-purple-100"
                             >
                               Delete
                             </button>
@@ -567,14 +567,14 @@ useEffect(() => {
                         ) : item.downloadStatus === 'downloading' ? (
                           <div className="w-16 sm:w-20 bg-[#0a3747] rounded-full h-1.5">
                             <div 
-                              className="bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] h-1.5 rounded-full" 
+                              className="bg-gradient-to-r from-purple-500 to-violet-500 h-1.5 rounded-full" 
                               style={{ width: `${item.progress || 0}%` }}
                             />
                           </div>
                         ) : (
                           <button 
                             onClick={() => handleDownload(item)}
-                            className="text-xs text-[#e51f48] hover:text-[#ff4d6d] flex items-center gap-1"
+                            className="text-xs text-purple-300 hover:text-purple-200 flex items-center gap-1"
                           >
                             <ArrowDown className="w-3 h-3" />
                             <span className="hidden sm:inline">Download</span>
@@ -603,9 +603,9 @@ useEffect(() => {
               {activeTab === 'downloaded' && (
                 <button 
                   onClick={() => setActiveTab('suggested')}
-                  className="mt-2 sm:mt-3 text-[#e51f48] hover:text-[#ff4d6d] text-xs sm:text-sm flex items-center justify-center gap-1 mx-auto"
+                  className="mt-2 sm:mt-3 text-purple-300 hover:text-purple-200 text-xs sm:text-sm flex items-center justify-center gap-1 mx-auto"
                 >
-                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-purple-300" />
                   View suggestions
                 </button>
               )}
@@ -618,10 +618,10 @@ useEffect(() => {
           <div className="mt-8 sm:mt-12">
             <div className="flex justify-between items-center mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#e51f48]" />
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-purple-300" />
                 Smart Recommendations
               </h2>
-              <button className="text-xs sm:text-sm text-[#e51f48] hover:text-[#ff4d6d]">
+              <button className="text-xs sm:text-sm text-purple-300 hover:text-purple-200">
                 View all
               </button>
             </div>
@@ -639,7 +639,7 @@ useEffect(() => {
                     />
                     <button 
                       onClick={() => handleDownload(item)}
-                      className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-6 h-6 sm:w-8 sm:h-8 bg-[#e51f48] rounded-full flex items-center justify-center shadow-lg hover:bg-[#ff4d6d] transition-colors"
+                      className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-6 h-6 sm:w-8 sm:h-8 bg-purple-500 rounded-full flex items-center justify-center shadow-lg hover:bg-purple-400 transition-colors"
                     >
                       <ArrowDown className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                     </button>
@@ -660,7 +660,7 @@ useEffect(() => {
         {downloads.filter(d => d.downloadStatus === 'downloading').length > 0 && (
           <div className="mt-8 sm:mt-12 bg-[#0a3747]/70 rounded-xl p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
-              <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#e51f48]" />
+              <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300" />
               Download Queue
             </h2>
             <div className="space-y-2 sm:space-y-3">
@@ -678,7 +678,7 @@ useEffect(() => {
                     <p className="text-xs sm:text-sm text-gray-400 truncate">{item.artist}</p>
                     <div className="w-full bg-[#0a1f29] rounded-full h-1 sm:h-1.5 mt-1 sm:mt-2">
                       <div 
-                        className="bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] h-full rounded-full" 
+                        className="bg-gradient-to-r from-purple-500 to-violet-500 h-full rounded-full" 
                         style={{ width: `${item.progress || 0}%` }}
                       />
                     </div>

@@ -158,7 +158,7 @@ export default function PopularPage() {
           <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr] items-end mb-10">
             <div className="rounded-[2rem] bg-[#111827]/80 p-6 shadow-xl shadow-slate-900/20">
               <div className="space-y-3">
-                <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">
+                <p className="inline-flex items-center gap-2 rounded-full bg-purple-500/10 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">
                   <Flame className="w-4 h-4 text-purple-400" /> Popular
                 </p>
                 <h1 className="text-4xl font-semibold tracking-tight">Popular tracks & artists</h1>
@@ -174,7 +174,7 @@ export default function PopularPage() {
                     className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                       category === tab
                         ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20'
-                        : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                        : 'bg-purple-500/10 text-gray-300 hover:bg-purple-500/15'
                     }`}
                   >
                     {tab === 'tracks' ? 'Tracks' : tab === 'artists' ? 'Artists' : 'Genres'}
@@ -187,11 +187,11 @@ export default function PopularPage() {
               <div className="rounded-[2rem] bg-[#111827]/80 p-6">
                 <h2 className="text-lg font-semibold text-white">Top Metrics</h2>
                 <div className="mt-4 grid grid-cols-2 gap-3">
-                  <div className="rounded-3xl bg-white/5 p-4">
+                  <div className="rounded-3xl bg-purple-500/10 p-4">
                     <p className="text-sm text-gray-400">Top plays</p>
                     <p className="mt-2 text-2xl font-semibold text-white">{media.reduce((sum, item) => sum + item.views, 0).toLocaleString()}</p>
                   </div>
-                  <div className="rounded-3xl bg-white/5 p-4">
+                  <div className="rounded-3xl bg-purple-500/10 p-4">
                     <p className="text-sm text-gray-400">Available tracks</p>
                     <p className="mt-2 text-2xl font-semibold text-white">{media.length}</p>
                   </div>
@@ -203,7 +203,7 @@ export default function PopularPage() {
                   {topGenres.map((genre) => (
                     <button
                       key={genre}
-                      className="rounded-3xl bg-white/10 px-4 py-3 text-left text-white transition hover:bg-white/15"
+                      className="rounded-3xl bg-purple-500/10 px-4 py-3 text-left text-white transition hover:bg-purple-500/15"
                     >
                       <p className="font-medium">{genre}</p>
                       <p className="text-sm text-gray-400">{media.filter((item) => item.genre === genre).length} tracks</p>
@@ -221,7 +221,7 @@ export default function PopularPage() {
                 <h2 className="text-2xl font-semibold">Top picks for today</h2>
               </div>
               <div className="flex flex-wrap gap-3">
-                <button className="rounded-full bg-white/10 px-4 py-2 text-sm text-gray-300 hover:bg-white/15 transition">Refresh</button>
+                <button className="rounded-full bg-purple-500/10 px-4 py-2 text-sm text-gray-300 hover:bg-purple-500/15 transition">Refresh</button>
                 <button className="rounded-full bg-purple-500 px-4 py-2 text-sm font-medium text-white hover:bg-purple-400 transition">Upload</button>
               </div>
             </div>
@@ -234,7 +234,7 @@ export default function PopularPage() {
                   <div
                     key={item.id}
                     className={`group rounded-[1.8rem] bg-[#111827]/90 p-4 transition ${
-                      currentTrack?.id === item.id ? 'bg-[#1a1f2a]' : 'hover:bg-white/5'
+                      currentTrack?.id === item.id ? 'bg-[#1a1f2a]' : 'hover:bg-purple-500/10'
                     }`}
                   >
                     <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center">
@@ -280,7 +280,7 @@ export default function PopularPage() {
             ) : category === 'artists' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {topArtists.map((artist) => (
-                  <div key={artist.id} className="rounded-[1.8rem] bg-[#111827]/90 p-5 transition hover:bg-white/5">
+                  <div key={artist.id} className="rounded-[1.8rem] bg-[#111827]/90 p-5 transition hover:bg-purple-500/10">
                     <div className="relative mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-slate-900">
                       <Image
                         src={artist.avatar || '/default-avatar.jpg'}
@@ -305,7 +305,7 @@ export default function PopularPage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {topGenres.map((genre) => (
-                  <div key={genre} className="rounded-[1.8rem] bg-[#111827]/90 p-5 transition hover:bg-white/5">
+                  <div key={genre} className="rounded-[1.8rem] bg-[#111827]/90 p-5 transition hover:bg-purple-500/10">
                     <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-purple-500/10 text-purple-300 text-xl font-semibold">
                       {genre.charAt(0)}
                     </div>

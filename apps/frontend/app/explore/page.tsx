@@ -68,12 +68,12 @@ export default function ExplorePage() {
 
         // Mock categories
         const mockCategories: Category[] = [
-          { id: 1, name: 'Top Charts', description: 'Most popular tracks', color: 'from-purple-500 to-pink-500', count: trending.length },
-          { id: 2, name: 'New Releases', description: 'Fresh music just dropped', color: 'from-blue-500 to-cyan-500', count: newReleases.length },
-          { id: 3, name: 'Popular Artists', description: 'Trending creators', color: 'from-green-500 to-emerald-500', count: 24 },
-          { id: 4, name: 'Radio Stations', description: 'Live streaming', color: 'from-orange-500 to-red-500', count: 12 },
+          { id: 1, name: 'Top Charts', description: 'Most popular tracks', color: 'from-purple-500 to-fuchsia-500', count: trending.length },
+          { id: 2, name: 'New Releases', description: 'Fresh music just dropped', color: 'from-cyan-500 to-violet-500', count: newReleases.length },
+          { id: 3, name: 'Popular Artists', description: 'Trending creators', color: 'from-violet-500 to-purple-600', count: 24 },
+          { id: 4, name: 'Radio Stations', description: 'Live streaming', color: 'from-purple-600 to-fuchsia-500', count: 12 },
           { id: 5, name: 'Genres', description: 'Explore by style', color: 'from-indigo-500 to-purple-500', count: 18 },
-          { id: 6, name: 'Mood & Activity', description: 'Music for every moment', color: 'from-yellow-500 to-orange-500', count: 15 },
+          { id: 6, name: 'Mood & Activity', description: 'Music for every moment', color: 'from-purple-500 to-violet-500', count: 15 },
         ];
         setCategories(mockCategories);
       } catch (err) {
@@ -139,10 +139,10 @@ export default function ExplorePage() {
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-[#e51f48]" />
+            <TrendingUp className="w-6 h-6 text-purple-300" />
             Trending Now
           </h2>
-          <button className="text-[#e51f48] hover:text-[#ff4d6d] transition-colors">
+          <button className="text-purple-300 hover:text-purple-100 transition-colors">
             View all
           </button>
         </div>
@@ -167,7 +167,7 @@ export default function ExplorePage() {
                     onClick={() => handlePlay(file)}
                     className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
                   >
-                    <div className="w-12 h-12 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
+                    <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center shadow-lg">
                       {currentTrack?.id === file.id && isPlaying ? (
                         <div className="w-5 h-5 bg-white rounded-sm"></div>
                       ) : (
@@ -176,7 +176,7 @@ export default function ExplorePage() {
                     </div>
                   </button>
                 </div>
-                <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
+                <div className="absolute top-3 right-3 bg-[#0f172a]/70 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
                   {file.views} plays
                 </div>
               </div>
@@ -197,10 +197,10 @@ export default function ExplorePage() {
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Music className="w-6 h-6 text-[#e51f48]" />
+            <Music className="w-6 h-6 text-purple-300" />
             New Releases
           </h2>
-          <button className="text-[#e51f48] hover:text-[#ff4d6d] transition-colors">
+          <button className="text-purple-300 hover:text-purple-100 transition-colors">
             View all
           </button>
         </div>
@@ -209,7 +209,7 @@ export default function ExplorePage() {
           {newReleases.map(file => (
             <div 
               key={file.id} 
-              className="bg-[#0a3747]/70 rounded-xl overflow-hidden hover:bg-[#0a3747] transition-colors group"
+              className="bg-[#111827]/70 rounded-xl overflow-hidden hover:bg-[#111827] transition-colors group"
             >
               <div className="relative">
                 <Image 
@@ -225,12 +225,12 @@ export default function ExplorePage() {
                     onClick={() => handlePlay(file)}
                     className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
                   >
-                    <div className="w-12 h-12 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
+                    <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center shadow-lg">
                       <Play className="w-5 h-5 text-white" />
                     </div>
                   </button>
                 </div>
-                <div className="absolute top-3 left-3 bg-[#e51f48] rounded-full px-2 py-1 text-xs text-white">
+                <div className="absolute top-3 left-3 bg-purple-500 rounded-full px-2 py-1 text-xs text-white">
                   NEW
                 </div>
               </div>
@@ -246,7 +246,7 @@ export default function ExplorePage() {
       {/* Popular Genres */}
       <section>
         <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-          <Mic2 className="w-6 h-6 text-[#e51f48]" />
+          <Mic2 className="w-6 h-6 text-purple-300" />
           Popular Genres
         </h2>
 
@@ -254,9 +254,9 @@ export default function ExplorePage() {
 {popularGenres.map((genre, index) => (
   <div 
     key={genre ?? `unknown-${index}`}
-    className="bg-[#0a3747]/70 rounded-xl p-4 text-center hover:bg-[#0a3747] transition-colors cursor-pointer group"
+    className="bg-[#111827]/70 rounded-xl p-4 text-center hover:bg-[#111827] transition-colors cursor-pointer group"
   >
-    <div className="w-12 h-12 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
       <Music className="w-6 h-6 text-white" />
     </div>
     <h3 className="font-medium text-white mb-1">{genre}</h3>
