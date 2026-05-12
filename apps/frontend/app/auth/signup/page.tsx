@@ -253,7 +253,7 @@ export default function SignUp() {
                 return (
                   <button
                     key={role.id}
-                    onClick={() => setFormData({ ...formData, role: role.id as UserRole })}
+                    onClick={() => setFormData({ ...formData, role: role.id as SignupRole })}
                     className={`p-6 rounded-xl border-2 transition-all ${
                       formData.role === role.id
                         ? `border-[#e51f48] bg-gradient-to-br ${role.color}`
