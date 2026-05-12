@@ -115,10 +115,10 @@ export default function ArtistsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#050d12] p-4 md:p-8">
+    <div className="min-h-screen bg-black p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
-          <Users className="w-8 h-8 text-green-500" />
+          <Users className="w-8 h-8 text-purple-400" />
           <h1 className="text-4xl font-bold text-white">Featured Artists</h1>
         </div>
 
@@ -132,14 +132,14 @@ export default function ArtistsPage() {
                 placeholder="Search artists..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-[#0f2935]/50 border border-green-500/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-500/50"
+                className="w-full pl-10 pr-4 py-3 bg-white/5 rounded-full text-white placeholder-gray-400 focus:outline-none focus:bg-white/10 transition-colors"
               />
             </div>
             <div className="flex gap-2">
               <select
                 value={selectedGenre}
                 onChange={(e) => setSelectedGenre(e.target.value)}
-                className="px-4 py-3 bg-[#0f2935]/50 border border-green-500/20 rounded-lg text-white focus:outline-none focus:border-green-500/50"
+                className="px-4 py-3 bg-white/5 rounded-full text-white focus:outline-none focus:bg-white/10 transition-colors"
               >
                 <option value="all">All Genres</option>
                 {availableGenres.map(genre => (
@@ -153,24 +153,24 @@ export default function ArtistsPage() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => toggleSort('name')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                sortBy === 'name' ? 'bg-green-500/20 text-green-400' : 'bg-[#0f2935]/50 text-gray-400 hover:text-white'
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${
+                sortBy === 'name' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:text-white'
               }`}
             >
               Name {sortBy === 'name' && (sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />)}
             </button>
             <button
               onClick={() => toggleSort('streams')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                sortBy === 'streams' ? 'bg-green-500/20 text-green-400' : 'bg-[#0f2935]/50 text-gray-400 hover:text-white'
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${
+                sortBy === 'streams' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:text-white'
               }`}
             >
               Streams {sortBy === 'streams' && (sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />)}
             </button>
             <button
               onClick={() => toggleSort('genre')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                sortBy === 'genre' ? 'bg-green-500/20 text-green-400' : 'bg-[#0f2935]/50 text-gray-400 hover:text-white'
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${
+                sortBy === 'genre' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:text-white'
               }`}
             >
               Genre {sortBy === 'genre' && (sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />)}
@@ -185,26 +185,26 @@ export default function ArtistsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="group bg-[#0f2935]/50 backdrop-blur-lg rounded-xl overflow-hidden border border-green-500/20 hover:border-green-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/10"
+              className="group cursor-pointer"
             >
               <Link href={`/artists/${track.user?.id}`} className="block">
-                <div className="relative p-6 text-center cursor-pointer">
+                <div className="relative p-6 text-center">
                   <div className="relative mb-4">
                     <Image
                       src={track.user?.avatarUrl || track.coverArt || '/default-avatar.jpg'}
                       alt={track.user?.displayName || track.artist}
                       width={150}
                       height={150}
-                      className="w-full max-w-[150px] aspect-square object-cover rounded-full mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg"
+                      className="w-full max-w-[150px] aspect-square object-cover rounded-full mx-auto group-hover:scale-110 transition-transform duration-300"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/default-avatar.jpg';
                       }}
                     />
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
 
                   <div className="mb-4">
-                    <h3 className="font-semibold text-white text-lg mb-1 group-hover:text-green-400 transition-colors">
+                    <h3 className="font-semibold text-white text-lg mb-1 group-hover:text-purple-400 transition-colors">
                       {track.user?.displayName || track.artist}
                     </h3>
                     <p className="text-sm text-gray-400 mb-2">{track.genre || 'Multiple Genres'}</p>
@@ -215,7 +215,7 @@ export default function ArtistsPage() {
                     </div>
 
                     <div className="text-xs text-gray-400 mb-3">
-                      <span className="text-green-400 font-semibold">{(track.views || 0).toLocaleString()}</span> streams
+                      <span className="text-purple-400 font-semibold">{(track.views || 0).toLocaleString()}</span> streams
                     </div>
                   </div>
                 </div>
@@ -223,7 +223,7 @@ export default function ArtistsPage() {
 
               <div className="px-6 pb-6">
                 <div className="flex gap-2">
-                  <button className="flex-1 p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors text-xs font-semibold">
+                  <button className="flex-1 p-2 bg-white/10 text-white rounded-full hover:bg-white/15 transition-colors text-xs font-semibold">
                     Follow
                   </button>
                   <button 
@@ -231,7 +231,7 @@ export default function ArtistsPage() {
                       e.preventDefault();
                       playTrack(track);
                     }}
-                    className="flex-1 p-2 bg-[#0a3747] text-gray-300 rounded-lg hover:bg-[#0f4a5f] transition-colors text-xs font-semibold flex items-center justify-center gap-1"
+                    className="flex-1 p-2 bg-purple-600 text-white rounded-full hover:bg-purple-500 transition-colors text-xs font-semibold flex items-center justify-center gap-1"
                   >
                     <Play className="w-4 h-4" /> Listen
                   </button>
