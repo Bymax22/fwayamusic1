@@ -171,7 +171,7 @@ export default function ProfilePage() {
       {/* Profile Content */}
       <div className="px-6 -mt-16 relative z-10">
         {/* Profile Header */}
-        <div className="rounded-[2rem] bg-[#111827]/90 p-8 ring-1 ring-white/10 shadow-xl shadow-slate-900/20 mb-8">
+        <div className="rounded-[2rem] bg-[#111827]/90 p-8 shadow-xl shadow-slate-900/20 mb-8">
         <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-end">
           {/* Avatar */}
           <div className="relative">
@@ -180,7 +180,7 @@ export default function ProfilePage() {
               alt={profile.displayName}
               width={128}
               height={128}
-              className="w-32 h-32 rounded-full border-4 border-[#0a3747] object-cover"
+              className="w-32 h-32 rounded-full object-cover shadow-2xl"
               onError={() => {
                 setProfile((prev) => ({ ...prev, avatar: '/default-avatar.jpg' }));
               }}
@@ -201,7 +201,7 @@ export default function ProfilePage() {
                     type="text"
                     value={editForm.displayName}
                     onChange={(e) => setEditForm((p) => ({ ...p, displayName: e.target.value }))}
-                    className="text-3xl font-bold bg-transparent border-b border-gray-600 focus:outline-none focus:border-[#e51f48]"
+                    className="text-3xl font-bold bg-white/5 rounded-2xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 ) : (
                   <h1 className="text-3xl font-bold">{profile.displayName}</h1>
@@ -242,7 +242,7 @@ export default function ProfilePage() {
                 <textarea
                   value={editForm.bio}
                   onChange={(e) => setEditForm((p) => ({ ...p, bio: e.target.value }))}
-                  className="w-full bg-transparent border border-gray-600 rounded-lg p-2 focus:outline-none focus:border-[#e51f48] resize-none"
+                  className="w-full bg-white/5 rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                   rows={3}
                 />
               ) : (
@@ -257,7 +257,7 @@ export default function ProfilePage() {
                       type="text"
                       value={editForm.location}
                       onChange={(e) => setEditForm((p) => ({ ...p, location: e.target.value }))}
-                      className="bg-transparent border-b border-gray-600 focus:outline-none focus:border-[#e51f48]"
+                      className="bg-white/5 rounded-2xl px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   ) : (
                     <span>{profile.location}</span>
@@ -271,10 +271,10 @@ export default function ProfilePage() {
                       type="text"
                       value={editForm.website}
                       onChange={(e) => setEditForm((p) => ({ ...p, website: e.target.value }))}
-                      className="bg-transparent border-b border-gray-600 focus:outline-none focus:border-[#e51f48]"
+                      className="bg-white/5 rounded-2xl px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   ) : (
-                    <a href={profile.website ? `https://${profile.website}` : '#'} className="hover:text-[#e51f48] transition-colors">
+                    <a href={profile.website ? `https://${profile.website}` : '#'} className="hover:text-purple-400 transition-colors">
                       {profile.website || '—'}
                     </a>
                   )}
@@ -307,11 +307,11 @@ export default function ProfilePage() {
           <div className="lg:col-span-2">
             <h2 className="text-2xl font-bold text-white mb-6">Recent Activity</h2>
 
-            <div className="rounded-[2rem] bg-[#111827]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+            <div className="rounded-[2rem] bg-[#111827]/90 p-6 shadow-xl shadow-slate-900/20">
               {profile.recentActivity.length > 0 ? (
                 <div className="space-y-4">
                   {profile.recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-center gap-4 p-3 bg-[#0a3747] rounded-lg">
+                    <div key={activity.id} className="flex items-center gap-4 p-3 bg-[#111827] rounded-3xl">
                       <div className={`p-2 rounded-lg ${getActivityColor(activity.type)} bg-opacity-20`}>
                         {getActivityIcon(activity.type)}
                       </div>
@@ -339,7 +339,7 @@ export default function ProfilePage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Stats */}
-            <div className="rounded-[2rem] bg-[#111827]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+            <div className="rounded-[2rem] bg-[#111827]/90 p-6 shadow-xl shadow-slate-900/20">
               <h3 className="text-lg font-bold text-white mb-4">Listening Stats</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
@@ -358,7 +358,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Account Details */}
-            <div className="rounded-[2rem] bg-[#111827]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+            <div className="rounded-[2rem] bg-[#111827]/90 p-6 shadow-xl shadow-slate-900/20">
               <h3 className="text-lg font-bold text-white mb-4">Account Details</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">

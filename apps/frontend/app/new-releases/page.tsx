@@ -43,10 +43,10 @@ function getReleaseBadge(releaseDate: string) {
   const diffTime = Math.abs(now.getTime() - release.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return { text: 'Just Released', color: 'bg-green-500' };
-  if (diffDays === 1) return { text: 'Yesterday', color: 'bg-blue-500' };
+  if (diffDays === 0) return { text: 'Just Released', color: 'bg-purple-600' };
+  if (diffDays === 1) return { text: 'Yesterday', color: 'bg-purple-500' };
   if (diffDays <= 7) return { text: 'This Week', color: 'bg-purple-500' };
-  if (diffDays <= 30) return { text: 'This Month', color: 'bg-orange-500' };
+  if (diffDays <= 30) return { text: 'This Month', color: 'bg-purple-400' };
   return { text: 'New', color: 'bg-gray-500' };
 }
 
@@ -108,26 +108,26 @@ export default function NewReleasesPage() {
   }, [filter, media]);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-black min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
-              <Calendar className="w-8 h-8 text-[#e51f48]" />
+              <Calendar className="w-8 h-8 text-purple-400" />
               New Releases
             </h1>
             <p className="text-gray-400">Fresh music just dropped</p>
           </div>
           
-          <div className="flex gap-2 bg-[#0a3747] rounded-xl p-1">
+          <div className="flex flex-wrap gap-2 bg-white/5 rounded-full p-1">
             {(['all', 'this-week', 'this-month'] as const).map(timeFilter => (
               <button
                 key={timeFilter}
                 onClick={() => setFilter(timeFilter)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   filter === timeFilter
-                    ? 'bg-[#e51f48] text-white'
+                    ? 'bg-purple-600 text-white'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -151,7 +151,7 @@ export default function NewReleasesPage() {
             return (
               <div 
                 key={release.id} 
-                className="bg-[#0a3747]/70 rounded-xl overflow-hidden hover:bg-[#0a3747] transition-colors group"
+                className="bg-[#111827] rounded-3xl overflow-hidden transition-colors group"
               >
                 <div className="relative">
                   <Image 
@@ -204,7 +204,7 @@ export default function NewReleasesPage() {
                     <span className="text-xs text-gray-400">
                       {formatDate(release.releaseDate || release.createdAt || '')}
                     </span>
-                    <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
+                    <button className="text-gray-400 hover:text-purple-400 transition-colors">
                       <Heart className="w-4 h-4" />
                     </button>
                   </div>

@@ -84,10 +84,10 @@ export default function PremiumPage() {
     <div className="min-h-screen bg-black text-white">
       <div className="relative overflow-hidden">
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
-          <div className="rounded-[2rem] bg-[#111827]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+          <div className="rounded-[2rem] bg-[#111827]/90 p-6 shadow-xl shadow-slate-900/20">
             <div className="mb-10">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">
-                <Crown className="w-4 h-4 text-yellow-400" />
+                <Crown className="w-4 h-4 text-purple-400" />
                 Premium Collection
               </p>
               <h1 className="mt-4 text-4xl font-semibold tracking-tight">Exclusive Premium Tracks</h1>
@@ -101,7 +101,7 @@ export default function PremiumPage() {
                 {media.map((track) => (
                   <div
                     key={track.id}
-                    className="group rounded-[2rem] bg-[#0f1720]/90 overflow-hidden ring-1 ring-white/10 transition hover:ring-yellow-400/20 shadow-lg shadow-black/20"
+                    className="group rounded-[2rem] bg-[#111827]/90 overflow-hidden transition hover:ring-purple-500/20 shadow-lg shadow-black/20"
                   >
                     <div className="relative overflow-hidden">
                       <Image
@@ -115,7 +115,7 @@ export default function PremiumPage() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                      <div className="absolute top-4 left-4 rounded-full bg-yellow-500 px-3 py-1 text-xs font-semibold text-black">
+                      <div className="absolute top-4 left-4 rounded-full bg-purple-600 px-3 py-1 text-xs font-semibold text-white">
                         PREMIUM
                       </div>
                       {track.isExplicit && (
@@ -131,7 +131,7 @@ export default function PremiumPage() {
                         </div>
                         <button
                           onClick={() => handlePlay(track)}
-                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500 text-black transition hover:bg-yellow-400 flex-shrink-0"
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500 flex-shrink-0"
                         >
                           {currentTrack?.id === track.id && isPlaying ? (
                             <Pause className="w-5 h-5" />

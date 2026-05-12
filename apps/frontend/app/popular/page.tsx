@@ -52,8 +52,8 @@ function normalizeArtist(item: any): Artist {
 }
 
 function getTrendIcon(trend: 'up' | 'down' | 'stable') {
-  if (trend === 'up') return <TrendingUp className="w-4 h-4 text-green-400" />;
-  if (trend === 'down') return <TrendingUp className="w-4 h-4 text-red-400 transform rotate-180" />;
+  if (trend === 'up') return <TrendingUp className="w-4 h-4 text-purple-400" />;
+  if (trend === 'down') return <TrendingUp className="w-4 h-4 text-gray-400 transform rotate-180" />;
   return <TrendingUp className="w-4 h-4 text-gray-400" />;
 }
 
@@ -156,10 +156,10 @@ export default function PopularPage() {
       <div className="relative overflow-hidden">
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
           <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr] items-end mb-10">
-            <div className="rounded-[2rem] bg-[#111827]/80 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+            <div className="rounded-[2rem] bg-[#111827]/80 p-6 shadow-xl shadow-slate-900/20">
               <div className="space-y-3">
                 <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">
-                  <Flame className="w-4 h-4 text-[#e51f48]" /> Popular
+                  <Flame className="w-4 h-4 text-purple-400" /> Popular
                 </p>
                 <h1 className="text-4xl font-semibold tracking-tight">Popular tracks & artists</h1>
                 <p className="max-w-2xl text-gray-400">
@@ -184,7 +184,7 @@ export default function PopularPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[2rem] bg-[#111827]/80 p-6 ring-1 ring-white/10">
+              <div className="rounded-[2rem] bg-[#111827]/80 p-6">
                 <h2 className="text-lg font-semibold text-white">Top Metrics</h2>
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   <div className="rounded-3xl bg-white/5 p-4">
@@ -197,7 +197,7 @@ export default function PopularPage() {
                   </div>
                 </div>
               </div>
-              <div className="rounded-[2rem] bg-[#111827]/80 p-6 ring-1 ring-white/10">
+              <div className="rounded-[2rem] bg-[#111827]/80 p-6">
                 <h2 className="text-lg font-semibold text-white">Rising genres</h2>
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   {topGenres.map((genre) => (
@@ -214,7 +214,7 @@ export default function PopularPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] bg-[#111827]/80 p-6 ring-1 ring-white/10">
+          <div className="rounded-[2rem] bg-[#111827]/80 p-6 shadow-lg shadow-slate-900/10">
             <div className="flex flex-col gap-4 mb-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.24em] text-purple-300">Popular</p>
@@ -233,8 +233,8 @@ export default function PopularPage() {
                 {popularTracks.map((item, index) => (
                   <div
                     key={item.id}
-                    className={`group rounded-[1.8rem] bg-black/80 p-4 ring-1 ring-white/5 transition ${
-                      currentTrack?.id === item.id ? 'ring-purple-400/40 bg-[#1a1f2a]' : 'hover:ring-purple-400/20'
+                    className={`group rounded-[1.8rem] bg-[#111827]/90 p-4 transition ${
+                      currentTrack?.id === item.id ? 'bg-[#1a1f2a]' : 'hover:bg-white/5'
                     }`}
                   >
                     <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center">
@@ -280,7 +280,7 @@ export default function PopularPage() {
             ) : category === 'artists' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {topArtists.map((artist) => (
-                  <div key={artist.id} className="rounded-[1.8rem] bg-black/80 p-5 ring-1 ring-white/5 hover:ring-purple-400/20 transition">
+                  <div key={artist.id} className="rounded-[1.8rem] bg-[#111827]/90 p-5 transition hover:bg-white/5">
                     <div className="relative mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-slate-900">
                       <Image
                         src={artist.avatar || '/default-avatar.jpg'}
@@ -305,7 +305,7 @@ export default function PopularPage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {topGenres.map((genre) => (
-                  <div key={genre} className="rounded-[1.8rem] bg-black/80 p-5 ring-1 ring-white/5 hover:ring-purple-400/20 transition">
+                  <div key={genre} className="rounded-[1.8rem] bg-[#111827]/90 p-5 transition hover:bg-white/5">
                     <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-purple-500/10 text-purple-300 text-xl font-semibold">
                       {genre.charAt(0)}
                     </div>

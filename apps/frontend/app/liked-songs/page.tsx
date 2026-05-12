@@ -122,11 +122,11 @@ export default function LikedSongsPage() {
   if (loading) {
     return (
       <div className="p-6 max-w-7xl mx-auto bg-black min-h-screen">
-        <div className="animate-pulse">
+        <div className="animate-pulse space-y-6">
           <div className="h-48 bg-[#111827] rounded-[2rem] mb-8"></div>
           <div className="space-y-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-16 bg-[#111827] rounded-lg"></div>
+              <div key={i} className="h-16 bg-[#111827] rounded-2xl"></div>
             ))}
           </div>
         </div>
@@ -139,15 +139,15 @@ export default function LikedSongsPage() {
       <div className="min-h-screen bg-black text-white pb-32">
         <div className="px-6 max-w-7xl mx-auto">
           {/* Header */}
-          <div className="rounded-[2rem] bg-gradient-to-r from-purple-600 to-purple-500 p-8 mb-8 mt-6">
-            <div className="flex items-end gap-6">
-              <div className="w-48 h-48 bg-white/10 rounded-[2rem] flex items-center justify-center shadow-2xl ring-1 ring-white/10">
-                <Heart className="w-16 h-16 text-white" fill="currentColor" />
+          <div className="rounded-[2rem] bg-[#111827] p-8 mb-8 mt-6">
+            <div className="flex flex-col lg:flex-row items-start lg:items-end gap-6">
+              <div className="w-48 h-48 bg-[#0f1720] rounded-[2rem] flex items-center justify-center">
+                <Heart className="w-16 h-16 text-purple-400" fill="currentColor" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium mb-2 text-white/90">PLAYLIST</p>
+                <p className="text-sm font-medium mb-2 text-purple-300">PLAYLIST</p>
                 <h1 className="text-4xl font-bold mb-4">Liked Songs</h1>
-                <div className="flex items-center gap-2 text-white/90">
+                <div className="flex flex-wrap items-center gap-2 text-white/80 text-sm">
                   <span className="font-medium">Your favorites</span>
                   <span>•</span>
                   <span>{likedSongs.length} songs</span>
@@ -159,28 +159,28 @@ export default function LikedSongsPage() {
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-4 mb-8">
+          <div className="flex flex-wrap items-center gap-4 mb-8">
             <button 
               onClick={handlePlayAll}
-              className="w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center shadow-lg transition-colors"
+              className="w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center transition-colors"
             >
               <Play className="w-6 h-6 text-white" fill="currentColor" />
             </button>
             
-            <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors ring-1 ring-white/10">
+            <button className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
               <Shuffle className="w-5 h-5 text-gray-400" />
             </button>
 
-            <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors ring-1 ring-white/10">
+            <button className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
               <Share2 className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
           {/* Songs List */}
           {likedSongs.length > 0 ? (
-            <div className="rounded-[2rem] bg-[#111827]/90 overflow-hidden ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+            <div className="rounded-[2rem] bg-[#111827] overflow-hidden">
               {/* Table Header */}
-              <div className="grid grid-cols-12 gap-4 items-center p-6 border-b border-white/10 text-gray-400 text-sm font-medium">
+              <div className="grid grid-cols-12 gap-4 items-center p-6 border-b border-white/5 text-gray-400 text-sm font-medium">
                 <div className="col-span-1">#</div>
                 <div className="col-span-5">TITLE</div>
                 <div className="col-span-3">ARTIST</div>
@@ -243,7 +243,7 @@ export default function LikedSongsPage() {
                     </div>
                     
                     <div className="col-span-2">
-                      <span className="px-3 py-1 bg-white/10 text-gray-300 rounded-full text-xs ring-1 ring-white/10">
+                      <span className="px-3 py-1 bg-white/5 text-gray-300 rounded-full text-xs">
                         {song.genre}
                       </span>
                     </div>
