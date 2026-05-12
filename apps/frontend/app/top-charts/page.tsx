@@ -82,9 +82,9 @@ export default function TopChartsPage() {
 
   const getPositionColor = (position: number) => {
     switch (position) {
-      case 1: return 'text-yellow-400';
+      case 1: return 'text-purple-400';
       case 2: return 'text-gray-400';
-      case 3: return 'text-orange-400';
+      case 3: return 'text-purple-300';
       default: return 'text-gray-500';
     }
   };
@@ -97,7 +97,7 @@ export default function TopChartsPage() {
             <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr] items-end mb-10">
               <div>
                 <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">
-                  <TrendingUp className="w-4 h-4 text-[#e51f48]" />
+                  <TrendingUp className="w-4 h-4 text-purple-400" />
                   Top Charts
                 </p>
                 <h1 className="mt-4 text-4xl font-semibold tracking-tight">Most-played tracks right now.</h1>
