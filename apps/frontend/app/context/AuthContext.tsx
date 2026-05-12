@@ -53,9 +53,9 @@ interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   loading: boolean;
   signUp: (data: SignUpData) => Promise<User>;
-  signIn: (email: string, password: string, role?: UserRole) => Promise<void>;
-  signInWithGoogle: (role?: UserRole) => Promise<void>;
-  signInWithFacebook: (role?: UserRole) => Promise<void>;
+  signIn: (email: string, password: string, role?: UserRole) => Promise<User>;
+  signInWithGoogle: (role?: UserRole) => Promise<User>;
+  signInWithFacebook: (role?: UserRole) => Promise<User>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   getToken: () => Promise<string | null>;
@@ -85,6 +85,28 @@ interface SignUpData {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const getDashboardPath = (role?: UserRole | string) => {
+  switch (role?.toUpperCase()) {
+    case 'ARTIST':
+      return '/for-artists';
+    case 'RESELLER':
+      return '/reseller-dashboard';
+    case 'ADMIN':
+    case 'MODERATOR':
+      return '/admin';
+    default:
+      return '/';
+  }
+};
+
+const ensureRoleMatch = async (userData: User, expectedRole?: UserRole) => {
+  if (expectedRole && userData.role.toUpperCase() !== expectedRole.toUpperCase()) {
+    await signOut(auth);
+    throw new Error(`Access denied. This page is for ${expectedRole.toLowerCase()}s only.`);
+  }
+  return userData;
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -322,12 +344,9 @@ const signUp = async (data: SignUpData): Promise<User> => {
       if (!userData) {
         await signOut(auth);
         throw new Error('Failed to load user profile after sign in.');
-     }
-      // Check role access
-      if (role && userData.role.toUpperCase() !== role.toUpperCase()) {
-        await signOut(auth);
-        throw new Error(`Access denied. This page is for ${role.toLowerCase()}s only.`);
       }
+      await ensureRoleMatch(userData, role);
+      return userData;
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Sign in error:', error);
@@ -388,11 +407,12 @@ const signUp = async (data: SignUpData): Promise<User> => {
     }
   };
 
-const signInWithGoogle = async () => {
+const signInWithGoogle = async (role?: UserRole) => {
   try {
     setLoading(true);
     const result = await signInWithPopup(auth, googleProvider);
-    await handleSocialSignIn(result.user);
+    const userData = await handleSocialSignIn(result.user, role);
+    return userData;
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error('Google sign in error:', error);
@@ -406,11 +426,12 @@ const signInWithGoogle = async () => {
   }
 };
 
-const signInWithFacebook = async () => {
+const signInWithFacebook = async (role?: UserRole) => {
   try {
     setLoading(true);
     const result = await signInWithPopup(auth, facebookProvider);
-    await handleSocialSignIn(result.user);
+    const userData = await handleSocialSignIn(result.user, role);
+    return userData;
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error('Facebook sign in error:', error);
@@ -424,7 +445,7 @@ const signInWithFacebook = async () => {
   }
 };
 
-  const handleSocialSignIn = async (firebaseUser: FirebaseUser) => {
+  const handleSocialSignIn = async (firebaseUser: FirebaseUser, role?: UserRole) => {
     const token = await firebaseUser.getIdToken();
     if (typeof window !== 'undefined' && token) localStorage.setItem('authToken', token);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/social-login`, {
@@ -443,7 +464,9 @@ const signInWithFacebook = async () => {
 
     if (response.ok) {
       const userData = await response.json();
+      await ensureRoleMatch(userData, role);
       setUser(userData);
+      return userData;
     } else {
       throw new Error('Failed to sync social login with backend');
     }

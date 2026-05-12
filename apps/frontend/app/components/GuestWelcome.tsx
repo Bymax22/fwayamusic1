@@ -214,19 +214,26 @@ export default function GuestWelcome() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 text-white text-2xl font-semibold">
                 {isPlaying ? (
-                  'Discover'.split('').map((letter, i) => (
+                  <div className="relative overflow-hidden">
                     <span
-                      key={i}
-                      className="inline-block animate-bounce"
+                      className="text-2xl font-semibold bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent"
                       style={{
-                        animationDelay: `${i * 0.1}s`,
-                        animationDuration: '0.6s',
-                        animationIterationCount: 'infinite'
+                        backgroundSize: '200% 200%',
+                        animation: 'fwayaColorShift 3s ease-in-out infinite'
                       }}
                     >
-                      {letter}
+                      Fwaya
                     </span>
-                  ))
+                    <style>{`
+                      @keyframes fwayaColorShift {
+                        0% { background-position: 0% 50%; }
+                        25% { background-position: 50% 0%; }
+                        50% { background-position: 100% 50%; }
+                        75% { background-position: 50% 100%; }
+                        100% { background-position: 0% 50%; }
+                      }
+                    `}</style>
+                  </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <img src="/fwayalogo-01.png" alt="Fwaya" className="h-10 w-auto object-contain opacity-100" />

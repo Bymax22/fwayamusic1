@@ -12,6 +12,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase-config';
 import RoleGuard from '@/components/RoleGuard';
+import { DashboardCard } from '@/components/DashboardCard';
+import DashboardHeader from '@/components/DashboardHeader';
 
 
 
@@ -357,73 +359,53 @@ export default function ForArtistsPage() {
       case 'dashboard':
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-black p-6 rounded-xl">
-              <h3 className="text-gray-400 flex items-center gap-2">
-                <BarChart2 className="w-5 h-5" />
-                Total Plays
-              </h3>
-              <p className="text-3xl font-bold text-white mt-2">{(stats?.totalPlays || 0).toLocaleString()}</p>
-              <p className="text-sm text-gray-400 mt-1">
-                <span className="text-green-500">+{stats?.monthlyPlays || 0}</span> this month
-              </p>
-            </div>
-            
-            <div className="bg-black p-6 rounded-xl">
-              <h3 className="text-gray-400 flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Followers
-              </h3>
-              <p className="text-3xl font-bold text-white mt-2">{(stats?.followerCount || 0).toLocaleString()}</p>
-              <p className="text-sm text-gray-400 mt-1">
-                <span className="text-green-500">↑ 8%</span> from last month
-              </p>
-            </div>
-            
-            <div className="bg-black p-6 rounded-xl">
-              <h3 className="text-gray-400 flex items-center gap-2">
-                <Download className="w-5 h-5" />
-                Downloads
-              </h3>
-              <p className="text-3xl font-bold text-white mt-2">{(stats?.totalDownloads || 0).toLocaleString()}</p>
-              <p className="text-sm text-gray-400 mt-1">
-                <span className="text-green-500">↑ 15%</span> from last month
-              </p>
-            </div>
-            
-            <div className="bg-black p-6 rounded-xl">
-              <h3 className="text-gray-400 flex items-center gap-2">
-                <DollarSign className="w-5 h-5" />
-                Total Revenue
-              </h3>
-              <p className="text-3xl font-bold text-white mt-2">${(stats?.totalRevenue ?? 0).toFixed(2)}</p>
-              <p className="text-sm text-gray-400 mt-1">
-                <span className="text-green-500">${(stats?.monthlyRevenue ?? 0).toFixed(2)}</span> this month
-              </p>
-            </div>
+            <DashboardCard
+              title="Total Plays"
+              value={(stats?.totalPlays || 0).toLocaleString()}
+              icon={<BarChart2 className="w-5 h-5" />}
+              change={`+${stats?.monthlyPlays || 0} this month`}
+              color="bg-gradient-to-br from-blue-500/20 to-cyan-500/20"
+            />
 
-            <div className="bg-black p-6 rounded-xl">
-              <h3 className="text-gray-400 flex items-center gap-2">
-                <Music className="w-5 h-5" />
-                Active Tracks
-              </h3>
-              <p className="text-3xl font-bold text-white mt-2">{stats?.activeTracks}</p>
-              <p className="text-sm text-gray-400 mt-1">
-                {stats?.conversionRate}% conversion rate
-              </p>
-            </div>
+            <DashboardCard
+              title="Followers"
+              value={(stats?.followerCount || 0).toLocaleString()}
+              icon={<Users className="w-5 h-5" />}
+              change="↑ 8% from last month"
+              color="bg-gradient-to-br from-purple-500/20 to-pink-500/20"
+            />
 
-            <div className="bg-black p-6 rounded-xl">
-              <h3 className="text-gray-400 flex items-center gap-2">
-                <Share2 className="w-5 h-5" />
-                Reseller Sales
-              </h3>
-              <p className="text-3xl font-bold text-white mt-2">
-                {commissions.filter(c => c.status === 'PAID').length}
-              </p>
-              <p className="text-sm text-gray-400 mt-1">
-                Through reseller program
-              </p>
-            </div>
+            <DashboardCard
+              title="Downloads"
+              value={(stats?.totalDownloads || 0).toLocaleString()}
+              icon={<Download className="w-5 h-5" />}
+              change="↑ 15% from last month"
+              color="bg-gradient-to-br from-green-500/20 to-emerald-500/20"
+            />
+
+            <DashboardCard
+              title="Total Revenue"
+              value={`$${(stats?.totalRevenue ?? 0).toFixed(2)}`}
+              icon={<DollarSign className="w-5 h-5" />}
+              change={`$${(stats?.monthlyRevenue ?? 0).toFixed(2)} this month`}
+              color="bg-gradient-to-br from-yellow-500/20 to-orange-500/20"
+            />
+
+            <DashboardCard
+              title="Active Tracks"
+              value={String(stats?.activeTracks || 0)}
+              icon={<Music className="w-5 h-5" />}
+              change={`${stats?.conversionRate}% conversion rate`}
+              color="bg-gradient-to-br from-indigo-500/20 to-blue-500/20"
+            />
+
+            <DashboardCard
+              title="Reseller Sales"
+              value={String(commissions.filter(c => c.status === 'PAID').length)}
+              icon={<Share2 className="w-5 h-5" />}
+              change="Through reseller program"
+              color="bg-gradient-to-br from-teal-500/20 to-cyan-500/20"
+            />
             
             <div className="md:col-span-2 lg:col-span-3 bg-black p-6 rounded-xl">
               <h3 className="text-gray-400 mb-4">Plays Over Time</h3>
@@ -1008,6 +990,9 @@ export default function ForArtistsPage() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Mobile Header */}
+      <DashboardHeader logoText="Artist Dashboard" />
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}

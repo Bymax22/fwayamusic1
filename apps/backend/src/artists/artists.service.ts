@@ -11,7 +11,10 @@ export class ArtistsService {
       where: { role: 'ARTIST' },
       include: {
         _count: {
-          select: { media: true }
+          select: {
+            media: true,
+            followers: true,
+          }
         },
         media: {
           select: {
@@ -27,7 +30,7 @@ export class ArtistsService {
       name: artist.displayName || artist.username,
       imageUrl: artist.avatarUrl || '/default-artist.png',
       avatarUrl: artist.avatarUrl || '/default-artist.png',
-      followers: Math.floor(Math.random() * 10000) + 1000, // Placeholder - implement proper follower count later
+      followers: artist._count.followers,
       isVerified: artist.status === 'VERIFIED',
       isFollowing: false, // This would be user-specific
       mediaCount: artist._count.media
@@ -36,7 +39,7 @@ export class ArtistsService {
 
   async getArtistById(id: number) {
     const artist = await this.prisma.user.findUnique({
-      where: { id, role: 'ARTIST' },
+      where: { id },
       include: {
         media: {
           include: {
@@ -53,12 +56,15 @@ export class ArtistsService {
           orderBy: { createdAt: 'desc' }
         },
         _count: {
-          select: { media: true }
+          select: {
+            media: true,
+            followers: true,
+          }
         }
       }
     });
 
-    if (!artist) {
+    if (!artist || artist.role !== 'ARTIST') {
       throw new Error('Artist not found');
     }
 
@@ -75,7 +81,7 @@ export class ArtistsService {
       avatarUrl: artist.avatarUrl || '/default-artist.png',
       bio: artist.bio,
       website: artist.website,
-      followers: Math.floor(Math.random() * 10000) + 1000, // Placeholder
+      followers: artist._count.followers,
       isVerified: artist.status === 'VERIFIED',
       isFollowing: false, // This would be user-specific
       mediaCount: artist._count.media,

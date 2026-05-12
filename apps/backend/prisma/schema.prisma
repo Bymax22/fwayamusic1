@@ -232,6 +232,7 @@ model User {
   resellerLinks  ResellerLink[]
   notifications  Notification[]
   libraries      Library[]
+  mediaComments  MediaComment[]
   payoutRequests PayoutRequest[]
   deviceLicenses DeviceLicense[]
 
@@ -299,6 +300,7 @@ model Media {
   libraryItems    LibraryItem[]
   user            User               @relation(fields: [userId], references: [id])
   interactions    MediaInteraction[]
+  comments        MediaComment[]
   categories      MediaCategory[]
   playlistEntries PlaylistEntry[]
   nowPlaying      NowPlaying[]
@@ -311,6 +313,24 @@ model Media {
   @@index([accessType])
   @@index([allowReselling])
   @@map("media")
+}
+
+model MediaComment {
+  id         Int      @id @default(autoincrement())
+  mediaId    Int      @map("media_id")
+  userId     Int      @map("user_id")
+  parentId   Int?     @map("parent_id")
+  content    String
+  likes      Int      @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  media Media @relation(fields: [mediaId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+  parent MediaComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies MediaComment[] @relation("CommentReplies")
+
+  @@map("media_comments")
 }
 
 model News {

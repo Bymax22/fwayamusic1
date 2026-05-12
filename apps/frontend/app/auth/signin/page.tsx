@@ -9,11 +9,25 @@ import { useRouter } from 'next/navigation';
 
 export default function SignIn() {
   const router = useRouter();
-  const { signIn, signInWithGoogle, signInWithFacebook, loading, user } = useAuth();
+  const { signIn, signInWithGoogle, signInWithFacebook, loading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  const getRedirectPath = (role?: string) => {
+    switch (role?.toUpperCase()) {
+      case 'ARTIST':
+        return '/for-artists';
+      case 'RESELLER':
+        return '/reseller-dashboard';
+      case 'ADMIN':
+      case 'MODERATOR':
+        return '/admin';
+      default:
+        return '/';
+    }
+  };
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -30,30 +44,9 @@ const handleSubmit = async (e: React.FormEvent) => {
     }
 
   try {
-    await signIn(formData.email, formData.password);
-
-    // wait for auth context to populate user (small poll)
-    const waitForUser = async (timeout = 3000) => {
-      const start = Date.now();
-      while (!user && Date.now() - start < timeout) {
-        await new Promise((r) => setTimeout(r, 100));
-      }
-      return user;
-    };
-
-    const currentUser = await waitForUser(3000);
-
-    // fallback: if signIn returns user or user is immediately available, use it
+    const currentUser = await signIn(formData.email, formData.password);
     const role = currentUser?.role;
-
-    if (role === 'ARTIST') {
-      router.push('/for-artists');
-    } else if (role === 'RESELLER') {
-      router.push('/reseller-dashboard');
-    } else {
-      // default user dashboard
-      router.push('/');
-    }
+    router.push(getRedirectPath(role));
   } catch (error: unknown) {
     if (error instanceof Error) {
       setErrors({ submit: error.message });
@@ -65,11 +58,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
   try {
-    if (provider === 'google') {
-      await signInWithGoogle();
-    } else {
-      await signInWithFacebook();
-    }
+    const currentUser = provider === 'google'
+      ? await signInWithGoogle()
+      : await signInWithFacebook();
+
+    router.push(getRedirectPath(currentUser.role));
   } catch (error: unknown) { // <-- use unknown
     if (error instanceof Error) {
       setErrors({ submit: error.message });

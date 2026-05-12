@@ -160,21 +160,32 @@ export default function SignUp() {
     }
   };
 
+  const getRedirectPath = (role: UserRole) => {
+    switch (role) {
+      case 'ARTIST':
+        return '/for-artists';
+      case 'RESELLER':
+        return '/reseller-dashboard';
+      default:
+        return '/dashboard';
+    }
+  };
+
   const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
     try {
-      if (provider === 'google') {
-        await signInWithGoogle();
+      const currentUser = provider === 'google'
+        ? await signInWithGoogle(formData.role)
+        : await signInWithFacebook(formData.role);
+
+      router.push(getRedirectPath(currentUser.role));
+    } catch (error: unknown) { // <-- use unknown
+      if (error instanceof Error) {
+        setErrors({ submit: error.message });
       } else {
-        await signInWithFacebook();
+        setErrors({ submit: 'An unexpected error occurred.' });
       }
-  } catch (error: unknown) { // <-- use unknown
-    if (error instanceof Error) {
-      setErrors({ submit: error.message });
-    } else {
-      setErrors({ submit: 'An unexpected error occurred.' });
     }
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a1f29] via-[#0a3747] to-[#0a1f29] flex items-center justify-center p-4">

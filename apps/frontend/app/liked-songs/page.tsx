@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { Play, Pause, Heart, Share2, Clock, Shuffle } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Play, Pause, Heart, Share2, Clock, Shuffle, Music } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from "next/image";
@@ -121,12 +121,12 @@ export default function LikedSongsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#2E055E]/95 to-[#5B0EA6]/95 min-h-screen">
+      <div className="p-6 max-w-7xl mx-auto bg-black min-h-screen">
         <div className="animate-pulse">
-          <div className="h-48 bg-[#2E055E] rounded-xl mb-8"></div>
+          <div className="h-48 bg-[#111827] rounded-[2rem] mb-8"></div>
           <div className="space-y-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-16 bg-[#2E055E] rounded-lg"></div>
+              <div key={i} className="h-16 bg-[#111827] rounded-lg"></div>
             ))}
           </div>
         </div>
@@ -136,138 +136,142 @@ export default function LikedSongsPage() {
 
   return (
     <Protected>
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#2E055E]/95 to-[#5B0EA6]/95 min-h-screen pb-32">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-[#5B0EA6] to-[#9B5DE5] rounded-xl p-8 mb-8">
-        <div className="flex items-end gap-6">
-          <div className="w-48 h-48 bg-white/20 rounded-xl flex items-center justify-center shadow-2xl">
-            <Heart className="w-16 h-16 text-white" fill="currentColor" />
-          </div>
-          <div className="flex-1 text-white">
-            <p className="text-sm font-medium mb-2">PLAYLIST</p>
-            <h1 className="text-4xl font-bold mb-4">Liked Songs</h1>
-            <div className="flex items-center gap-2 text-white/90">
-              <span className="font-medium">Your favorites</span>
-              <span>•</span>
-              <span>{likedSongs.length} songs</span>
-              <span>•</span>
-              <span>{formatDuration(totalDuration)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Controls */}
-      <div className="flex items-center gap-4 mb-8">
-        <button 
-          onClick={handlePlayAll}
-          className="w-14 h-14 rounded-full bg-[#5B0EA6] hover:bg-[#9B5DE5] flex items-center justify-center shadow-lg transition-colors"
-        >
-          <Play className="w-6 h-6 text-white" fill="currentColor" />
-        </button>
-        
-        <button className="w-10 h-10 rounded-full bg-[#2E055E] hover:bg-[#2E055E]/80 flex items-center justify-center transition-colors">
-          <Shuffle className="w-5 h-5 text-gray-400" />
-        </button>
-
-        <button className="w-10 h-10 rounded-full bg-[#2E055E] hover:bg-[#2E055E]/80 flex items-center justify-center transition-colors">
-          <Share2 className="w-5 h-5 text-gray-400" />
-        </button>
-      </div>
-
-      {/* Songs List */}
-      {likedSongs.length > 0 ? (
-        <div className="bg-[#2E055E]/70 rounded-xl overflow-hidden">
-          {/* Table Header */}
-          <div className="grid grid-cols-12 gap-4 items-center p-4 border-b border-[#2E055E] text-gray-400 text-sm font-medium">
-            <div className="col-span-1">#</div>
-            <div className="col-span-5">TITLE</div>
-            <div className="col-span-3">ARTIST</div>
-            <div className="col-span-2">GENRE</div>
-            <div className="col-span-1 flex justify-end">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-
-          {/* Songs */}
-          <div className="divide-y divide-[#2E055E]">
-            {likedSongs.map((song, index) => (
-              <div 
-                key={song.id} 
-                className={`grid grid-cols-12 gap-4 items-center p-4 transition-colors ${
-                  currentTrack?.id === song.id 
-                    ? 'bg-[#2E055E]' 
-                    : 'hover:bg-[#2E055E]/50'
-                }`}
-              >
-                <div className="col-span-1 text-gray-400">
-                  {currentTrack?.id === song.id && isPlaying ? (
-                    <Pause 
-                      className="w-5 h-5 text-[#5B0EA6] cursor-pointer" 
-                      onClick={() => handlePlay(song)}
-                    />
-                  ) : (
-                    <span 
-                      className="cursor-pointer hover:text-[#5B0EA6] transition-colors"
-                      onClick={() => handlePlay(song)}
-                    >
-                      {index + 1}
-                    </span>
-                  )}
-                </div>
-                
-                <div className="col-span-5 flex items-center gap-3">
-                  <Image 
-                    src={song.coverArt} 
-                    alt={song.title} 
-                    className="w-12 h-12 rounded-lg object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/default-cover.jpg';
-                    }}
-                  />
-                  <div>
-                    <p className={`font-medium ${
-                      currentTrack?.id === song.id ? 'text-[#5B0EA6]' : 'text-white'
-                    }`}>
-                      {song.title}
-                    </p>
-                    <p className="text-sm text-gray-400">{song.genre}</p>
-                  </div>
-                </div>
-                
-                <div className="col-span-3 text-gray-300">
-                  {song.artist}
-                </div>
-                
-                <div className="col-span-2">
-                  <span className="px-3 py-1 bg-[#2E055E] text-gray-300 rounded-full text-xs">
-                    {song.genre}
-                  </span>
-                </div>
-                
-                <div className="col-span-1 flex justify-end gap-3">
-                  <button 
-                    onClick={() => handleUnlike(song.id)}
-                    className="text-[#5B0EA6] hover:text-[#9B5DE5] transition-colors"
-                    aria-label="Unlike"
-                  >
-                    <Heart className="w-5 h-5" fill="currentColor" />
-                  </button>
-                  <span className="text-gray-400 text-sm w-12 text-right">
-                    {formatDuration(song.duration)}
-                  </span>
+      <div className="min-h-screen bg-black text-white pb-32">
+        <div className="px-6 max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="rounded-[2rem] bg-gradient-to-r from-purple-600 to-purple-500 p-8 mb-8 mt-6">
+            <div className="flex items-end gap-6">
+              <div className="w-48 h-48 bg-white/10 rounded-[2rem] flex items-center justify-center shadow-2xl ring-1 ring-white/10">
+                <Heart className="w-16 h-16 text-white" fill="currentColor" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium mb-2 text-white/90">PLAYLIST</p>
+                <h1 className="text-4xl font-bold mb-4">Liked Songs</h1>
+                <div className="flex items-center gap-2 text-white/90">
+                  <span className="font-medium">Your favorites</span>
+                  <span>•</span>
+                  <span>{likedSongs.length} songs</span>
+                  <span>•</span>
+                  <span>{formatDuration(totalDuration)}</span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
+
+          {/* Controls */}
+          <div className="flex items-center gap-4 mb-8">
+            <button 
+              onClick={handlePlayAll}
+              className="w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center shadow-lg transition-colors"
+            >
+              <Play className="w-6 h-6 text-white" fill="currentColor" />
+            </button>
+            
+            <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors ring-1 ring-white/10">
+              <Shuffle className="w-5 h-5 text-gray-400" />
+            </button>
+
+            <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors ring-1 ring-white/10">
+              <Share2 className="w-5 h-5 text-gray-400" />
+            </button>
+          </div>
+
+          {/* Songs List */}
+          {likedSongs.length > 0 ? (
+            <div className="rounded-[2rem] bg-[#111827]/90 overflow-hidden ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+              {/* Table Header */}
+              <div className="grid grid-cols-12 gap-4 items-center p-6 border-b border-white/10 text-gray-400 text-sm font-medium">
+                <div className="col-span-1">#</div>
+                <div className="col-span-5">TITLE</div>
+                <div className="col-span-3">ARTIST</div>
+                <div className="col-span-2">GENRE</div>
+                <div className="col-span-1 flex justify-end">
+                  <Clock className="w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Songs */}
+              <div className="divide-y divide-white/5">
+                {likedSongs.map((song, index) => (
+                  <div 
+                    key={song.id} 
+                    className={`grid grid-cols-12 gap-4 items-center p-6 transition-colors ${
+                      currentTrack?.id === song.id 
+                        ? 'bg-white/5' 
+                        : 'hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="col-span-1 text-gray-400">
+                      {currentTrack?.id === song.id && isPlaying ? (
+                        <Pause 
+                          className="w-5 h-5 text-purple-500 cursor-pointer" 
+                          onClick={() => handlePlay(song)}
+                        />
+                      ) : (
+                        <span 
+                          className="cursor-pointer hover:text-purple-500 transition-colors"
+                          onClick={() => handlePlay(song)}
+                        >
+                          {index + 1}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="col-span-5 flex items-center gap-3">
+                      <Image 
+                        src={song.coverArt} 
+                        alt={song.title} 
+                        width={48}
+                        height={48}
+                        className="w-12 h-12 rounded-lg object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/default-cover.jpg';
+                        }}
+                      />
+                      <div>
+                        <p className={`font-medium ${
+                          currentTrack?.id === song.id ? 'text-purple-400' : 'text-white'
+                        }`}>
+                          {song.title}
+                        </p>
+                        <p className="text-sm text-gray-400">{song.genre}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="col-span-3 text-gray-300">
+                      {song.artist}
+                    </div>
+                    
+                    <div className="col-span-2">
+                      <span className="px-3 py-1 bg-white/10 text-gray-300 rounded-full text-xs ring-1 ring-white/10">
+                        {song.genre}
+                      </span>
+                    </div>
+                    
+                    <div className="col-span-1 flex justify-end gap-3">
+                      <button 
+                        onClick={() => handleUnlike(song.id)}
+                        className="text-purple-500 hover:text-purple-400 transition-colors"
+                        aria-label="Unlike"
+                      >
+                        <Heart className="w-5 h-5" fill="currentColor" />
+                      </button>
+                      <span className="text-gray-400 text-sm w-12 text-right">
+                        {formatDuration(song.duration)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Music className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-medium text-gray-400 mb-2">No liked songs yet</h3>
+              <p className="text-gray-500">Like some songs to see them here</p>
+            </div>
+              )}
         </div>
-      ) : (
-        <div className="text-center py-12">
-          <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-gray-400 mb-2">No liked songs yet</h3>
-          <p className="text-gray-500">Like some songs to see them here</p>
-        </div>
-      )}
       </div>
     </Protected>
   );

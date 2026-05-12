@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { DashboardLoading } from '@/components/DashboardLoading';
+import { DashboardCard } from '@/components/DashboardCard';
+import DashboardHeader from '@/components/DashboardHeader';
 import { getAuth } from 'firebase/auth';
 import {
   FaPlay,
@@ -394,120 +396,46 @@ const UserDashboard: React.FC = () => {
   return (
     <RoleGuard allowedRoles={['USER']} customLoadingComponent={<DashboardLoading/>}>
       <div className="min-h-screen bg-black text-white pb-20">
-        {/* Mobile-Optimized Header */}
-        <header className="bg-black/95 backdrop-blur-lg border-b border-white/10 sticky top-[64px] z-40">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="lg:hidden">
-                  {user.avatarUrl ? (
-                    <Image
-                      src={user.avatarUrl}
-                      alt={user.displayName || user.username}
-                      width={50}
-                      height={50}
-                      className="rounded-full border-2 border-white/10"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border-2 border-white/10">
-                      <FaUser className="text-white text-lg" />
-                    </div>
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-lg font-bold truncate mobile-text-lg">
-                      {user.displayName || user.username}
-                    </h1>
-                    {user.role !== 'USER' && (
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold mobile-text-xs ${
-                        user.role === 'ARTIST' ? 'bg-purple-500/20 text-purple-400' :
-                        user.role === 'RESELLER' ? 'bg-green-500/20 text-green-400' :
-                        'bg-blue-500/20 text-blue-400'
-                      }`}>
-                        {user.role}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-gray-300 mobile-text-xs flex items-center gap-1">
-                    <FaMapPin className="w-3 h-3" />
-                    {user.country || 'Global'}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <div className="bg-white/5 rounded-full p-2 border border-white/10">
-                  {user.walletBalance && user.walletBalance > 0 ? (
-                    <div className="flex items-center gap-1 text-sm mobile-text-sm">
-                      <FaDollarSign className="text-green-400" />
-                      <span className="font-semibold">${user.walletBalance.toFixed(2)}</span>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => router.push('/reseller-dashboard')}
-                      className="px-2 py-1 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-full text-xs font-semibold transition-colors mobile-text-xs"
-                    >
-                      Reseller
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
+        {/* Mobile Header */}
+        <DashboardHeader />
 
-            {/* Mobile-Optimized Navigation Tabs */}
-            <nav className="flex space-x-1 bg-white/5 rounded-lg p-1 border border-white/10 overflow-x-auto">
-              {[
-                { id: 'overview', label: 'Overview', icon: <FaChartLine className="w-3 h-3" /> },
-                { id: 'library', label: 'Library', icon: <FaMusic className="w-3 h-3" /> },
-                { id: 'playlists', label: 'Playlists', icon: <FaList className="w-3 h-3" /> },
-                ...(user.role === 'ARTIST' ? [{ id: 'uploads', label: 'Uploads', icon: <FaUpload className="w-3 h-3" /> }] : []),
-                ...(user.role === 'RESELLER' ? [{ id: 'reseller', label: 'Reseller', icon: <FaShare className="w-3 h-3" /> }] : []),
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-md transition-all flex-shrink-0 mobile-text-xs ${
-                    activeTab === tab.id
-                      ? 'bg-[#e51f48] text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {tab.icon}
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-        </header>
+        {/* Mobile-Optimized Navigation Tabs */}
+        <nav className="flex space-x-1 bg-white/5 rounded-lg p-1 border border-white/10 mx-4 mt-4 overflow-x-auto">
+          {[
+            { id: 'overview', label: 'Overview', icon: <FaChartLine className="w-3 h-3" /> },
+            { id: 'library', label: 'Library', icon: <FaMusic className="w-3 h-3" /> },
+            { id: 'playlists', label: 'Playlists', icon: <FaList className="w-3 h-3" /> },
+            ...(user.role === 'ARTIST' ? [{ id: 'uploads', label: 'Uploads', icon: <FaUpload className="w-3 h-3" /> }] : []),
+            ...(user.role === 'RESELLER' ? [{ id: 'reseller', label: 'Reseller', icon: <FaShare className="w-3 h-3" /> }] : []),
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1 px-3 py-2 rounded-md transition-all flex-shrink-0 mobile-text-xs ${
+                activeTab === tab.id
+                  ? 'bg-[#e51f48] text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </nav>
 
         <main className="p-4">
           {/* Compact Stats Grid */}
           <div className="grid grid-cols-2 gap-3 mb-6">
             {quickStats.map((stat, index) => (
-              <motion.div
+              <DashboardCard
                 key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`bg-gradient-to-br ${stat.color} p-4 rounded-xl shadow-lg hover:scale-105 transition-transform cursor-pointer`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-xl font-bold text-white mb-1 mobile-text-lg">{stat.value}</div>
-                    <div className="text-white/90 text-xs mobile-text-xs">{stat.label}</div>
-                  </div>
-                  <div className="text-white/80 text-lg">
-                    {stat.icon}
-                  </div>
-                </div>
-                {stat.change && (
-                  <div className="mt-2 text-white/80 text-xs flex items-center gap-1 mobile-text-xs">
-                    <FaChartLine className="w-2 h-2" />
-                    {stat.change}
-                  </div>
-                )}
-              </motion.div>
+                title={stat.label}
+                value={stat.value}
+                icon={stat.icon}
+                change={stat.change}
+                color={stat.color}
+                className="mobile-text-lg"
+              />
             ))}
           </div>
 
@@ -520,28 +448,15 @@ const UserDashboard: React.FC = () => {
               </h2>
               <div className="grid grid-cols-2 gap-3">
                 {businessStats.map((stat, index) => (
-                  <motion.div
+                  <DashboardCard
                     key={stat.label}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`bg-gradient-to-br ${stat.color} p-3 rounded-xl shadow-lg`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-lg font-bold text-white mobile-text-lg">{stat.value}</div>
-                        <div className="text-white/80 text-xs mobile-text-xs">{stat.label}</div>
-                      </div>
-                      <div className="text-white/80 text-lg">
-                        {stat.icon}
-                      </div>
-                    </div>
-                    {stat.change && (
-                      <div className="mt-1 text-white/80 text-xs mobile-text-xs">
-                        {stat.change}
-                      </div>
-                    )}
-                  </motion.div>
+                    title={stat.label}
+                    value={stat.value}
+                    icon={stat.icon}
+                    change={stat.change}
+                    color={stat.color}
+                    className="mobile-text-lg"
+                  />
                 ))}
               </div>
             </div>

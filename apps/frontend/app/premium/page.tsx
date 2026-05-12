@@ -1,9 +1,8 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { Crown, Play, Heart, Download } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Crown, Play, Pause, Heart, Download, Music } from 'lucide-react';
 import Image from "next/image";
-import { motion } from 'framer-motion';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { formatDuration } from '@/lib/utils';
 
 interface MediaFile {
   id: number;
@@ -14,25 +13,44 @@ interface MediaFile {
   coverArt: string;
   views: number;
   genre?: string;
-  accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
+  accessType?: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
+  isExplicit?: boolean;
+}
+
+function normalizeMedia(item: any): MediaFile {
+  return {
+    id: item.id,
+    title: item.title || 'Untitled',
+    artist: item.artist || item.user?.displayName || 'Unknown Artist',
+    url: item.url || item.audioUrl || item.mediaUrl || '',
+    duration: item.duration || item.length || 0,
+    coverArt: item.coverArt || item.artCoverUrl || item.coverUrl || '/default-cover.jpg',
+    genre: item.genre || item.type || 'Unknown',
+    views: item.views || item.playCount || 0,
+    accessType: item.accessType || item.access_type || 'FREE',
+    isExplicit: item.isExplicit || item.explicit || false,
+  };
 }
 
 export default function PremiumPage() {
   const [media, setMedia] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const { playTrack } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
 
   useEffect(() => {
     const fetchPremiumMedia = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`);
-        if (res.ok) {
-          const data = await res.json();
-          // Filter premium tracks
-          const premium = data.filter((m: MediaFile) => m.accessType === 'PREMIUM' || m.accessType === 'PAY_PER_VIEW');
-          setMedia(premium.slice(0, 50));
-        }
+        const response = await fetch('/api/media', { credentials: 'include' });
+        const data = await response.json();
+        const mediaArray = Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : [];
+        
+        const normalized = mediaArray
+          .map(normalizeMedia)
+          .filter((m: MediaFile) => m.accessType === 'PREMIUM' || m.accessType === 'PAY_PER_VIEW')
+          .slice(0, 50);
+        
+        setMedia(normalized);
       } catch (error) {
         console.error('Failed to fetch premium media:', error);
       } finally {
@@ -43,74 +61,109 @@ export default function PremiumPage() {
     fetchPremiumMedia();
   }, []);
 
-  if (loading) return <div className="p-4 text-center">Loading premium tracks...</div>;
+  const handlePlay = (track: MediaFile) => {
+    if (currentTrack?.id === track.id) {
+      togglePlay();
+      return;
+    }
+
+    playTrack({
+      id: track.id,
+      title: track.title,
+      artist: track.artist,
+      url: track.url,
+      coverArt: track.coverArt,
+      duration: track.duration,
+    });
+  };
+
+  if (loading) return <div className="p-6 max-w-7xl mx-auto bg-black text-white min-h-screen text-center py-20">Loading premium tracks...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#2E055E] to-[#5B0EA6] p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <Crown className="w-8 h-8 text-yellow-500" />
-          <h1 className="text-4xl font-bold text-white">Premium Collection</h1>
-        </div>
+    <div className="min-h-screen bg-black text-white">
+      <div className="relative overflow-hidden">
+        <div className="relative p-6 max-w-7xl mx-auto pb-32">
+          <div className="rounded-[2rem] bg-[#111827]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+            <div className="mb-10">
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">
+                <Crown className="w-4 h-4 text-yellow-400" />
+                Premium Collection
+              </p>
+              <h1 className="mt-4 text-4xl font-semibold tracking-tight">Exclusive Premium Tracks</h1>
+              <p className="mt-3 max-w-2xl text-gray-400">
+                Unlock premium and exclusive content available only to premium members.
+              </p>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {media.map((track, index) => (
-            <motion.div
-              key={track.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="group bg-[#0f2935]/50 backdrop-blur-lg rounded-lg overflow-hidden border border-yellow-500/20 hover:border-yellow-500/50 transition-all"
-            >
-              <div className="relative">
-                <Image
-                  src={track.coverArt || '/default-cover.jpg'}
-                  alt={track.title}
-                  width={300}
-                  height={300}
-                  className="w-full aspect-square object-cover group-hover:scale-110 transition-transform"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/default-cover.jpg';
-                  }}
-                />
-                <div className="absolute top-2 right-2 bg-yellow-500/80 text-black px-2 py-1 rounded text-xs font-bold">
-                  PREMIUM
-                </div>
-                <button
-                  onClick={() => playTrack(track)}
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <Play className="w-12 h-12 text-yellow-500 fill-yellow-500" />
-                </button>
+            {media.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {media.map((track) => (
+                  <div
+                    key={track.id}
+                    className="group rounded-[2rem] bg-[#0f1720]/90 overflow-hidden ring-1 ring-white/10 transition hover:ring-yellow-400/20 shadow-lg shadow-black/20"
+                  >
+                    <div className="relative overflow-hidden">
+                      <Image
+                        src={track.coverArt}
+                        alt={track.title}
+                        width={520}
+                        height={520}
+                        className="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/default-cover.jpg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      <div className="absolute top-4 left-4 rounded-full bg-yellow-500 px-3 py-1 text-xs font-semibold text-black">
+                        PREMIUM
+                      </div>
+                      {track.isExplicit && (
+                        <div className="absolute top-4 right-4 rounded-full bg-gray-600 px-2 py-1 text-xs font-semibold text-white">E</div>
+                      )}
+                    </div>
+
+                    <div className="p-5">
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-lg font-semibold text-white truncate">{track.title}</p>
+                          <p className="text-sm text-gray-400 truncate">{track.artist}</p>
+                        </div>
+                        <button
+                          onClick={() => handlePlay(track)}
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500 text-black transition hover:bg-yellow-400 flex-shrink-0"
+                        >
+                          {currentTrack?.id === track.id && isPlaying ? (
+                            <Pause className="w-5 h-5" />
+                          ) : (
+                            <Play className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-400 mb-3">
+                        <span>{track.views.toLocaleString()} plays</span>
+                        <span>{track.genre || 'Genre'}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm text-gray-400">
+                        <span>{formatDuration(track.duration)}</span>
+                        <button className="text-gray-300 hover:text-white transition">
+                          <Heart className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div className="p-4">
-                <h3 className="font-semibold text-white truncate mb-1">{track.title}</h3>
-                <p className="text-sm text-gray-400 truncate mb-3">{track.artist}</p>
-                
-                <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
-                  <span>{(track.views || 0).toLocaleString()} plays</span>
-                  <span className="px-2 py-1 bg-[#2E055E] rounded text-yellow-500 font-semibold">{track.genre || 'Unknown'}</span>
-                </div>
-
-                <div className="flex gap-2">
-                  <button className="flex-1 p-2 bg-yellow-500/20 text-yellow-500 rounded hover:bg-yellow-500/30 transition-colors text-xs font-semibold">
-                    <Heart className="w-4 h-4 inline mr-1" /> Like
-                  </button>
-                  <button className="flex-1 p-2 bg-[#2E055E] text-gray-300 rounded hover:bg-[#5B0EA6] transition-colors text-xs font-semibold">
-                    <Download className="w-4 h-4 inline mr-1" /> Get
-                  </button>
-                </div>
+            ) : (
+              <div className="text-center py-16 text-gray-400">
+                <Music className="mx-auto mb-4 h-16 w-16 opacity-50" />
+                <p className="text-lg font-semibold">No premium tracks available</p>
+                <p>Premium content will be added soon.</p>
               </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {media.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-400">No premium tracks available</p>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

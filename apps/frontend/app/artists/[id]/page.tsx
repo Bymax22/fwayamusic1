@@ -7,6 +7,7 @@ import {
   FaPlay,
   FaPause,
   FaRegHeart,
+  FaHeart,
   FaShare,
   FaUserFriends,
   FaMusic,
@@ -15,9 +16,14 @@ import {
   FaGlobe,
   FaArrowLeft,
   FaDownload,
-  FaCrown
+  FaCrown,
+  FaPlus,
+  FaListUl,
+  FaComment,
+  FaStar
 } from 'react-icons/fa';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { useAuth } from '@/context/AuthContext';
 import { formatDuration } from '@/lib/utils';
 
 interface Artist {
@@ -71,6 +77,10 @@ export default function ArtistPage() {
   const [artist, setArtist] = useState<Artist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [likedSongs, setLikedSongs] = useState<Set<number>>(new Set());
+  const { getToken } = useAuth();
+  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
+  const [selectedSong, setSelectedSong] = useState<MediaItem | null>(null);
 
   useEffect(() => {
     const fetchArtist = async () => {
@@ -93,6 +103,31 @@ export default function ArtistPage() {
     }
   }, [params.id]);
 
+  useEffect(() => {
+    const fetchFollowStatus = async () => {
+      if (!params.id) return;
+      const token = await getToken();
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/follow/status/${params.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setArtist((prev) => (prev ? { ...prev, isFollowing: data.isFollowing } : prev));
+        }
+      } catch (err) {
+        console.warn('Unable to load follow status:', err);
+      }
+    };
+
+    fetchFollowStatus();
+  }, [params.id, getToken]);
+
   const handlePlaySong = (song: MediaItem) => {
     playTrack({
       id: song.id.toString(),
@@ -103,9 +138,80 @@ export default function ArtistPage() {
     });
   };
 
-  const handleFollow = () => {
-    // TODO: Implement follow functionality
-    setArtist(prev => prev ? { ...prev, isFollowing: !prev.isFollowing } : null);
+  const handleFollow = async () => {
+    if (!artist) return;
+
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to follow artists.');
+      return;
+    }
+
+    const method = artist.isFollowing ? 'DELETE' : 'POST';
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/follow/${artist.id}`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error('Failed to update follow status', response.statusText);
+      return;
+    }
+
+    setArtist((prev) =>
+      prev
+        ? {
+            ...prev,
+            isFollowing: !prev.isFollowing,
+            followers: prev.followers + (prev.isFollowing ? -1 : 1),
+          }
+        : prev,
+    );
+  };
+
+  const handleLikeSong = (songId: number) => {
+    setLikedSongs(prev => {
+      const newLiked = new Set(prev);
+      if (newLiked.has(songId)) {
+        newLiked.delete(songId);
+      } else {
+        newLiked.add(songId);
+      }
+      return newLiked;
+    });
+    // TODO: API call to like/unlike song
+  };
+
+  const handleShareSong = (song: MediaItem) => {
+    if (navigator.share) {
+      navigator.share({
+        title: song.title,
+        text: `Check out "${song.title}" by ${song.artist} on Fwaya Music`,
+        url: `${window.location.origin}/songs/${song.id}`
+      });
+    } else {
+      navigator.clipboard.writeText(`${window.location.origin}/songs/${song.id}`);
+      // TODO: Show toast notification
+    }
+  };
+
+  const handleDownloadSong = (song: MediaItem) => {
+    // TODO: Implement download functionality
+    if (song.accessType === 'FREE') {
+      // Trigger download
+      console.log('Downloading:', song.title);
+    } else {
+      // Show premium upgrade prompt
+      console.log('Premium required for download');
+    }
+  };
+
+  const handleAddToPlaylist = (song: MediaItem) => {
+    setSelectedSong(song);
+    setShowPlaylistModal(true);
+    // TODO: Implement playlist modal
   };
 
   const handleShare = () => {
@@ -289,18 +395,38 @@ export default function ArtistPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
-                  <FaRegHeart size={16} />
+                <button 
+                  onClick={() => handleLikeSong(song.id)}
+                  className={`transition-colors ${likedSongs.has(song.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                >
+                  {likedSongs.has(song.id) ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
                 </button>
 
                 {song.accessType === 'FREE' && (
-                  <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
+                  <button 
+                    onClick={() => handleDownloadSong(song)}
+                    className="text-gray-400 hover:text-[#e51f48] transition-colors"
+                  >
                     <FaDownload size={16} />
                   </button>
                 )}
 
-                <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
+                <button 
+                  onClick={() => handleAddToPlaylist(song)}
+                  className="text-gray-400 hover:text-[#e51f48] transition-colors"
+                >
+                  <FaPlus size={16} />
+                </button>
+
+                <button 
+                  onClick={() => handleShareSong(song)}
+                  className="text-gray-400 hover:text-[#e51f48] transition-colors"
+                >
                   <FaShare size={16} />
+                </button>
+
+                <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
+                  <FaComment size={16} />
                 </button>
               </div>
             </motion.div>
@@ -314,6 +440,54 @@ export default function ArtistPage() {
           </div>
         )}
       </div>
+
+      {/* Playlist Modal */}
+      {showPlaylistModal && selectedSong && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#0f2935] rounded-xl p-6 max-w-md w-full"
+          >
+            <h3 className="text-white text-lg font-semibold mb-4">Add to Playlist</h3>
+            <p className="text-gray-400 mb-4">Add "{selectedSong.title}" to a playlist</p>
+            
+            <div className="space-y-2 mb-6">
+              {/* TODO: Replace with actual playlists */}
+              <button className="w-full text-left p-3 bg-[#0a3747] rounded-lg text-white hover:bg-[#0c3f52] transition-colors">
+                <FaListUl className="inline mr-2" />
+                My Favorites
+              </button>
+              <button className="w-full text-left p-3 bg-[#0a3747] rounded-lg text-white hover:bg-[#0c3f52] transition-colors">
+                <FaListUl className="inline mr-2" />
+                Workout Mix
+              </button>
+              <button className="w-full text-left p-3 bg-[#0a3747] rounded-lg text-white hover:bg-[#0c3f52] transition-colors">
+                <FaPlus className="inline mr-2" />
+                Create New Playlist
+              </button>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowPlaylistModal(false)}
+                className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // TODO: Add to playlist logic
+                  setShowPlaylistModal(false);
+                }}
+                className="flex-1 px-4 py-2 bg-[#e51f48] text-white rounded-lg hover:bg-[#c41e3d] transition-colors"
+              >
+                Add
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

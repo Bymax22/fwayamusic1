@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import GuestWelcome from "@/components/GuestWelcome";
 import UserDashboard from "./dashboard/page";
+import { DashboardLoading } from '@/components/DashboardLoading';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -32,7 +33,10 @@ export default function Home() {
     }
   }, [user, loading, router]);
 
-  // If user is not authenticated, show guest welcome page immediately
+  if (loading) {
+    return <DashboardLoading />;
+  }
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
@@ -41,10 +45,11 @@ export default function Home() {
     );
   }
 
-  // If user is authenticated and is a regular USER, show user dashboard
-  if (user && user.role === 'USER') {
-     return <UserDashboard />;
+  if (user.role === 'USER') {
+    return <UserDashboard />;
   }
+
+  return <DashboardLoading />;
 }
 
 

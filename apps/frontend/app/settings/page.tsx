@@ -55,40 +55,40 @@ export default function SettingsPage() {
 
   return (
     <Protected>
-      <div className="p-6 max-w-6xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32" />
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
-          <Settings className="w-8 h-8 text-[#e51f48]" />
-          Settings
-        </h1>
-        <p className="text-gray-400">Customize your FwayaMusic experience</p>
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar Navigation */}
-        <div className="lg:w-64 bg-[#0a3747]/70 rounded-xl p-4">
-          <div className="space-y-2">
-            {sections.map(section => (
-              <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id as 'general' | 'audio' | 'privacy' | 'account')}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                  activeSection === section.id
-                    ? 'bg-[#e51f48] text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-[#0a3747]'
-                }`}
-              >
-                {section.icon}
-                {section.label}
-              </button>
-            ))}
-          </div>
+      <div className="min-h-screen bg-black text-white pb-32 px-6">
+        {/* Header */}
+        <div className="mb-8 max-w-6xl mx-auto pt-6">
+          <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
+            <Settings className="w-8 h-8 text-purple-500" />
+            Settings
+          </h1>
+          <p className="text-gray-400">Customize your FwayaMusic experience</p>
         </div>
 
-        {/* Settings Content */}
-        <div className="flex-1 bg-[#0a3747]/70 rounded-xl p-6">
-          {activeSection === 'general' && (
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
+          {/* Sidebar Navigation */}
+          <div className="lg:w-64 rounded-[2rem] bg-[#111827]/90 p-4 ring-1 ring-white/10 shadow-xl shadow-slate-900/20 h-fit">
+            <div className="space-y-2">
+              {sections.map(section => (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id as 'general' | 'audio' | 'privacy' | 'account')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeSection === section.id
+                      ? 'bg-purple-600 text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  {section.icon}
+                  {section.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Settings Content */}
+          <div className="flex-1 rounded-[2rem] bg-[#111827]/90 p-8 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+            {activeSection === 'general' && (
             <div>
               <h2 className="text-2xl font-bold text-white mb-6">General Settings</h2>
               
@@ -102,7 +102,7 @@ export default function SettingsPage() {
                   <select 
                     value={settings.theme}
                     onChange={(e) => handleSettingChange('theme', e.target.value)}
-                    className="px-4 py-2 bg-[#0a3747] border border-[#0a3747] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                    className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="dark">Dark</option>
                     <option value="light">Light</option>
@@ -119,7 +119,7 @@ export default function SettingsPage() {
                   <select 
                     value={settings.language}
                     onChange={(e) => handleSettingChange('language', e.target.value)}
-                    className="px-4 py-2 bg-[#0a3747] border border-[#0a3747] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                    className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="en">English</option>
                     <option value="es">Spanish</option>
@@ -161,7 +161,7 @@ export default function SettingsPage() {
                   <select 
                     value={settings.audioQuality}
                     onChange={(e) => handleSettingChange('audioQuality', e.target.value)}
-                    className="px-4 py-2 bg-[#0a3747] border border-[#0a3747] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                    className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="low">Low (96 kbps)</option>
                     <option value="normal">Normal (160 kbps)</option>

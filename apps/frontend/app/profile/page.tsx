@@ -157,9 +157,9 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <div className="min-h-screen bg-black text-white pb-32">
       {/* Cover Image */}
-      <div className="relative h-64 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d]">
+      <div className="relative h-64 bg-gradient-to-r from-purple-600 to-purple-500">
         <div className="absolute inset-0 bg-black/20" />
         {isEditing && (
           <button className="absolute top-4 right-4 px-4 py-2 bg-black/50 hover:bg-black/70 text-white rounded-lg transition-colors">
@@ -171,7 +171,8 @@ export default function ProfilePage() {
       {/* Profile Content */}
       <div className="px-6 -mt-16 relative z-10">
         {/* Profile Header */}
-        <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-end mb-8">
+        <div className="rounded-[2rem] bg-[#111827]/90 p-8 ring-1 ring-white/10 shadow-xl shadow-slate-900/20 mb-8">
+        <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-end">
           {/* Avatar */}
           <div className="relative">
             <Image
@@ -298,13 +299,15 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        </div>
+
         {/* Content Tabs and Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recent Activity */}
           <div className="lg:col-span-2">
             <h2 className="text-2xl font-bold text-white mb-6">Recent Activity</h2>
 
-            <div className="bg-[#0a3747]/70 rounded-xl p-6">
+            <div className="rounded-[2rem] bg-[#111827]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
               {profile.recentActivity.length > 0 ? (
                 <div className="space-y-4">
                   {profile.recentActivity.map((activity) => (
@@ -336,7 +339,7 @@ export default function ProfilePage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Stats */}
-            <div className="bg-[#0a3747]/70 rounded-xl p-6">
+            <div className="rounded-[2rem] bg-[#111827]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
               <h3 className="text-lg font-bold text-white mb-4">Listening Stats</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
@@ -355,7 +358,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Account Details */}
-            <div className="bg-[#0a3747]/70 rounded-xl p-6">
+            <div className="rounded-[2rem] bg-[#111827]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
               <h3 className="text-lg font-bold text-white mb-4">Account Details</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">

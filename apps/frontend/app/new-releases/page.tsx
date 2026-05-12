@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Play, Pause, Heart, Calendar, Clock } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration, formatDate } from '@/lib/utils';
-import Image from "next/image";
+import Image from 'next/image';
 
-interface NewRelease {
+interface MediaFile {
   id: number;
   title: string;
   artist: string;
@@ -13,126 +13,99 @@ interface NewRelease {
   duration: number;
   coverArt: string;
   genre?: string;
-  releaseDate: string;
-  isExplicit: boolean;
+  releaseDate?: string;
+  createdAt?: string;
+  isExplicit?: boolean;
+}
+
+function normalizeMedia(item: any): MediaFile {
+  return {
+    id: item.id,
+    title: item.title || 'Untitled',
+    artist: item.artist || item.user?.displayName || 'Unknown Artist',
+    url: item.url || item.audioUrl || item.mediaUrl || '',
+    duration: item.duration || item.length || 0,
+    coverArt: item.coverArt || item.artCoverUrl || item.coverUrl || '/default-cover.jpg',
+    genre: item.genre || item.type || 'Unknown',
+    releaseDate: item.releaseDate || item.publishedAt || item.createdAt || item.created_at || '',
+    createdAt: item.createdAt || item.created_at || item.publishedAt || '',
+    isExplicit: item.isExplicit || item.explicit || false,
+  };
+}
+
+function getReleaseTimestamp(media: MediaFile) {
+  return new Date(media.releaseDate || media.createdAt || 0).getTime();
+}
+
+function getReleaseBadge(releaseDate: string) {
+  const now = new Date();
+  const release = new Date(releaseDate);
+  const diffTime = Math.abs(now.getTime() - release.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return { text: 'Just Released', color: 'bg-green-500' };
+  if (diffDays === 1) return { text: 'Yesterday', color: 'bg-blue-500' };
+  if (diffDays <= 7) return { text: 'This Week', color: 'bg-purple-500' };
+  if (diffDays <= 30) return { text: 'This Month', color: 'bg-orange-500' };
+  return { text: 'New', color: 'bg-gray-500' };
 }
 
 export default function NewReleasesPage() {
-  const [newReleases, setNewReleases] = useState<NewRelease[]>([]);
+  const [media, setMedia] = useState<MediaFile[]>([]);
   const [filter, setFilter] = useState<'all' | 'this-week' | 'this-month'>('all');
+  const [loading, setLoading] = useState(true);
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
 
   useEffect(() => {
     const fetchNewReleases = async () => {
-      // Mock new releases data
-      const mockReleases: NewRelease[] = [
-        {
-          id: 1,
-          title: "Summer Vibes",
-          artist: "Various Artists",
-          url: "/music/summer-vibes.mp3",
-          duration: 180,
-          coverArt: "/covers/summer-vibes.jpg",
-          genre: "Compilation",
-          releaseDate: new Date().toISOString(),
-          isExplicit: false
-        },
-        {
-          id: 2,
-          title: "Dark Paradise",
-          artist: "Lana Del Rey",
-          url: "/music/dark-paradise.mp3",
-          duration: 245,
-          coverArt: "/covers/dark-paradise.jpg",
-          genre: "Alternative",
-          releaseDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
-          isExplicit: true
-        },
-        {
-          id: 3,
-          title: "Electric Dreams",
-          artist: "Kavinsky",
-          url: "/music/electric-dreams.mp3",
-          duration: 265,
-          coverArt: "/covers/electric-dreams.jpg",
-          genre: "Electronic",
-          releaseDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // 3 days ago
-          isExplicit: false
-        },
-        {
-          id: 4,
-          title: "Midnight Sonata",
-          artist: "Beethoven",
-          url: "/music/midnight-sonata.mp3",
-          duration: 320,
-          coverArt: "/covers/midnight-sonata.jpg",
-          genre: "Classical",
-          releaseDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days ago
-          isExplicit: false
-        },
-        {
-          id: 5,
-          title: "Urban Legends",
-          artist: "Drake",
-          url: "/music/urban-legends.mp3",
-          duration: 195,
-          coverArt: "/covers/urban-legends.jpg",
-          genre: "Hip Hop",
-          releaseDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), // 1 week ago
-          isExplicit: true
-        }
-      ];
-
-      setNewReleases(mockReleases);
+      try {
+        setLoading(true);
+        const response = await fetch('/api/media', { credentials: 'include' });
+        const data = await response.json();
+        const mediaArray = Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : [];
+        setMedia(mediaArray.map(normalizeMedia));
+      } catch (error) {
+        console.error('Failed to fetch new releases:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchNewReleases();
-  }, [filter]);
+  }, []);
 
-  const handlePlay = (track: NewRelease) => {
+  const handlePlay = (track: MediaFile) => {
     if (currentTrack?.id === track.id) {
       togglePlay();
-    } else {
-      playTrack({
-        id: track.id,
-        title: track.title,
-        artist: track.artist,
-        url: track.url,
-        coverArt: track.coverArt,
-        duration: track.duration
-      });
+      return;
     }
-  };
 
-  const getFilteredReleases = () => {
-    const now = new Date();
-    return newReleases.filter(release => {
-      const releaseDate = new Date(release.releaseDate);
-      const diffTime = Math.abs(now.getTime() - releaseDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      switch (filter) {
-        case 'this-week': return diffDays <= 7;
-        case 'this-month': return diffDays <= 30;
-        default: return true;
-      }
+    playTrack({
+      id: track.id,
+      title: track.title,
+      artist: track.artist,
+      url: track.url,
+      coverArt: track.coverArt,
+      duration: track.duration,
     });
   };
 
-  const getReleaseBadge = (releaseDate: string) => {
+  const filteredReleases = useMemo(() => {
     const now = new Date();
-    const release = new Date(releaseDate);
-    const diffTime = Math.abs(now.getTime() - release.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return { text: 'Just Released', color: 'bg-green-500' };
-    if (diffDays === 1) return { text: 'Yesterday', color: 'bg-blue-500' };
-    if (diffDays <= 7) return { text: 'This Week', color: 'bg-purple-500' };
-    if (diffDays <= 30) return { text: 'This Month', color: 'bg-orange-500' };
-    return { text: 'New', color: 'bg-gray-500' };
-  };
+    return [...media]
+      .sort((a, b) => getReleaseTimestamp(b) - getReleaseTimestamp(a))
+      .filter((release) => {
+        if (!release.releaseDate && !release.createdAt) return true;
 
-  const filteredReleases = getFilteredReleases();
+        const timestamp = getReleaseTimestamp(release);
+        const diffDays = Math.ceil((now.getTime() - timestamp) / (1000 * 60 * 60 * 24));
+
+        if (filter === 'this-week') return diffDays <= 7;
+        if (filter === 'this-month') return diffDays <= 30;
+        return true;
+      });
+  }, [filter, media]);
 
   return (
     <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
@@ -168,10 +141,12 @@ export default function NewReleasesPage() {
       </div>
 
       {/* New Releases Grid */}
-      {filteredReleases.length > 0 ? (
+      {loading ? (
+        <div className="py-20 text-center text-gray-400">Loading new releases...</div>
+      ) : filteredReleases.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredReleases.map(release => {
-            const badge = getReleaseBadge(release.releaseDate);
+            const badge = getReleaseBadge(release.releaseDate || release.createdAt || '');
             
             return (
               <div 
@@ -227,7 +202,7 @@ export default function NewReleasesPage() {
                   </div>
                   <div className="flex justify-between items-center mt-3">
                     <span className="text-xs text-gray-400">
-                      {formatDate(release.releaseDate)}
+                      {formatDate(release.releaseDate || release.createdAt || '')}
                     </span>
                     <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
                       <Heart className="w-4 h-4" />

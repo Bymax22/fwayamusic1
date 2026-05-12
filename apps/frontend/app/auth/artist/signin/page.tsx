@@ -34,7 +34,7 @@ export default function ArtistSignIn() {
 
     try {
       console.log('Starting sign in for:', formData.email);
-      await signIn(formData.email, formData.password);
+      await signIn(formData.email, formData.password, 'ARTIST');
       console.log('Sign in successful, current user:', user?.email, 'role:', user?.role);
       
       // Send OTP for additional verification

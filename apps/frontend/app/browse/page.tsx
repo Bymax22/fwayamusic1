@@ -12,6 +12,8 @@ import Waveform from '@/components/Waveform';
 import { formatDuration, formatFileSize } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from "../context/AuthContext";
 import { MobileMoneyPaymentModal } from '../components/modal/MobileMoneyPaymentModal';
 
@@ -112,6 +114,7 @@ interface PlaylistAPI {
 
 export default function Browse() {
   const { getToken } = useAuth();
+  const router = useRouter();
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<MediaFile[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(20); // new: how many items to show
@@ -970,19 +973,21 @@ export default function Browse() {
                       }}
                     />
                     <div className="flex-1 min-w-0">
-                      <p className={`font-medium flex items-center gap-2 ${
-                        String(currentTrack?.id) === String(file.id) 
-                          ? 'text-[#a855f7]' 
-                          : 'text-white'
-                      }`}>
-                        {file.title}
-                        {file.isExplicit && (
-                          <span className="px-1.5 py-0.5 bg-gray-600 text-gray-300 rounded text-xs">E</span>
-                        )}
-                        {file.isDRMProtected && (
-                          <Lock className="w-3 h-3 text-gray-600" />
-                        )}
-                      </p>
+                      <Link href={`/track/${file.id}`}>
+                        <p className={`font-medium flex items-center gap-2 cursor-pointer hover:text-green-400 transition-colors ${
+                          String(currentTrack?.id) === String(file.id) 
+                            ? 'text-[#a855f7]' 
+                            : 'text-white'
+                        }`}>
+                          {file.title}
+                          {file.isExplicit && (
+                            <span className="px-1.5 py-0.5 bg-gray-600 text-gray-300 rounded text-xs">E</span>
+                          )}
+                          {file.isDRMProtected && (
+                            <Lock className="w-3 h-3 text-gray-600" />
+                          )}
+                        </p>
+                      </Link>
                       <div className="flex items-center gap-3 text-sm text-gray-400">
                         <span>{file.views} plays</span>
                         <span>•</span>
@@ -1144,7 +1149,9 @@ export default function Browse() {
                 </div>
 
                 <div className="p-4">
-                  <h3 className="font-medium text-white truncate mb-1">{file.title}</h3>
+                  <Link href={`/track/${file.id}`}>
+                    <h3 className="font-medium text-white truncate mb-1 hover:text-green-400 transition-colors cursor-pointer">{file.title}</h3>
+                  </Link>
                   <div className="flex items-center gap-2 mb-2">
                     {file.user?.avatarUrl && (
                       <Image
@@ -1226,25 +1233,27 @@ export default function Browse() {
                 {/* Track info - 2 lines only */}
                 <div className="flex-1 min-w-0 py-0.5">
                   {/* Line 1: Title - Artist (with horizontal scroll animation when playing) */}
-                  <div className="overflow-hidden">
-                    <p 
-                      className={`font-medium text-white text-sm whitespace-nowrap ${
-                        String(currentTrack?.id) === String(file.id) && isPlaying
-                          ? 'animate-scroll'
-                          : ''
-                      }`}
-                      style={
-                        String(currentTrack?.id) === String(file.id) && isPlaying
-                          ? {
-                              animation: 'scroll-left 8s linear infinite',
-                              paddingRight: '2rem'
-                            }
-                          : {}
-                      }
-                    >
-                      {file.title} <span className="text-gray-400">• {file.artist}</span>
-                    </p>
-                  </div>
+                  <Link href={`/track/${file.id}`}>
+                    <div className="overflow-hidden cursor-pointer hover:text-green-400 transition-colors">
+                      <p 
+                        className={`font-medium text-white text-sm whitespace-nowrap ${
+                          String(currentTrack?.id) === String(file.id) && isPlaying
+                            ? 'animate-scroll'
+                            : ''
+                        }`}
+                        style={
+                          String(currentTrack?.id) === String(file.id) && isPlaying
+                            ? {
+                                animation: 'scroll-left 8s linear infinite',
+                                paddingRight: '2rem'
+                              }
+                            : {}
+                        }
+                      >
+                        {file.title} <span className="text-gray-400">• {file.artist}</span>
+                      </p>
+                    </div>
+                  </Link>
 
                   {/* Line 2: Access Type | Genre | Duration | Play Count */}
                   <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
