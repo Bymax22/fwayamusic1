@@ -16,7 +16,8 @@ import {
   FaFacebook
 } from 'react-icons/fa';
 
-type UserRole = 'USER' | 'ARTIST' | 'RESELLER' | 'ADMIN' | 'MODERATOR';
+type SignupRole = 'USER' | 'ARTIST' | 'RESELLER';
+type UserRole = SignupRole | 'ADMIN' | 'MODERATOR';
 type SignupStep = 'role' | 'details' | 'kyc' | 'consent' | 'verification';
 
 export default function SignUp() {
@@ -29,7 +30,7 @@ export default function SignUp() {
     confirmPassword: '',
     username: '',
     displayName: '',
-    role: 'USER' as UserRole,
+    role: 'USER' as SignupRole,
     phoneNumber: '',
     dateOfBirth: '',
     artistName: '',
