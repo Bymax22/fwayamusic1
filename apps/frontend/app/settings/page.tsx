@@ -55,14 +55,14 @@ export default function SettingsPage() {
 
   return (
     <Protected>
-      <div className="min-h-screen bg-black text-white pb-32 px-6">
+      <div className="min-h-screen bg-black text-white pb-32 px-6"/>
         {/* Header */}
         <div className="mb-8 max-w-6xl mx-auto pt-6">
           <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
             <Settings className="w-8 h-8 text-purple-500" />
             Settings
           </h1>
-          <p className="text-gray-400">Customize your FwayaMusic experience</p>
+          <p className="text-gray-400">Customize your Fwaya experience</p>
         </div>
 
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
