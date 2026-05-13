@@ -34,24 +34,18 @@ export default function Home() {
   }, [user, loading, router]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-      </div>
-    );
+    return null;
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
-        <GuestWelcome />
-      </div>
-    );
+    return <GuestWelcome />;
   }
 
   if (user.role === 'USER') {
     return <UserDashboard />;
   }
+
+  return null;
 }
 
 
