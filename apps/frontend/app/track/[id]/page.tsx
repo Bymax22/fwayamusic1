@@ -18,6 +18,7 @@ import {
   FaUser,
   FaTimes,
   FaMusic,
+  FaClock,
   FaFire,
   FaStar,
   FaEye,
@@ -333,403 +334,328 @@ export default function TrackPage() {
     }
   };
 
+  const artistDisplay = track?.user?.displayName || track?.artist || 'Unknown Artist';
+  const coverArtUrl = track?.coverArt || '/default-cover.jpg';
+  const viewCount = typeof track?.views === 'number' ? track.views : 0;
+  const likeCount = typeof track?.likes === 'number' ? track.likes : 0;
+  const downloadCount = typeof track?.downloads === 'number' ? track.downloads : 0;
+  const shareCount = typeof track?.shares === 'number' ? track.shares : 0;
+  const emojiOptions = ['👍', '❤️', '😂', '🔥', '🎉'];
+
+  const formatLargeNumber = (value: number) => {
+    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
+    return value.toString();
+  };
+
+  const handleAddEmoji = (emoji: string) => {
+    setNewComment((prev) => `${prev}${emoji}`);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#050d12] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500" />
       </div>
     );
   }
 
-  if (error || !track) {
+  if (!track) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#050d12] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Track Not Found</h1>
-          <button
-            onClick={() => router.back()}
-            className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-500 transition-colors"
-          >
-            Go Back
-          </button>
-        </div>
+      <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white">
+        {error || 'Track not found.'}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#050d12]">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#0a1f29]/95 backdrop-blur border-b border-white/10 p-4">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-white hover:text-purple-300 transition-colors"
-        >
-          <FaArrowLeft size={16} />
-          Back
-        </button>
-      </div>
+    <div className="min-h-screen bg-black text-white">
+      <div className="absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-purple-500/10 to-transparent pointer-events-none" />
+      <div className="relative max-w-7xl mx-auto px-4 py-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-white/5 rounded-full px-4 py-2 hover:bg-white/10 transition"
+          >
+            <FaArrowLeft size={14} />
+            Back
+          </button>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left: Track Info and Player */}
-          <div className="lg:col-span-2">
-            {/* Cover Art and Play Button */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="relative mb-8"
-            >
-              <Image
-                src={track.coverArt}
-                alt={track.title}
-                width={400}
-                height={400}
-                className="w-full rounded-2xl shadow-2xl"
-              />
-              
-              {/* Overlay Gradient */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
+              <FaMusic size={12} />
+              {track.genre || 'Unknown Genre'}
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
+              <FaClock size={12} />
+              {formatDuration(track.duration)}
+            </span>
+            {track.accessType !== 'FREE' && (
+              <span className="inline-flex items-center gap-2 rounded-full bg-purple-600/20 px-3 py-1 text-purple-200">
+                <FaCrown size={12} />
+                {track.accessType}
+              </span>
+            )}
+          </div>
+        </div>
 
-              {/* Play Button Overlay */}
-              <button
-                onClick={handlePlayTrack}
-                className="absolute inset-0 flex items-center justify-center rounded-2xl hover:bg-black/20 transition-colors"
-              >
-                <div className="w-20 h-20 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center transition-colors shadow-lg">
-                  {currentTrack?.id === track.id && isPlaying ? (
-                    <FaPause size={32} className="text-white ml-1" />
-                  ) : (
-                    <FaPlay size={32} className="text-white ml-2" />
-                  )}
-                </div>
-              </button>
-
-              {/* Badge */}
-              {track.accessType === 'PREMIUM' && (
-                <div className="absolute top-4 left-4 flex items-center gap-2 px-4 py-2 bg-purple-600 rounded-full text-white font-semibold text-sm">
-                  <FaCrown size={14} />
-                  Premium
-                </div>
-              )}
-            </motion.div>
-
-            {/* Track Info */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mb-8"
-            >
-              <h1 className="text-4xl font-bold text-white mb-2">{track.title}</h1>
-              
-              <div className="flex items-center gap-3 mb-6">
-                {track.user?.avatarUrl && (
-                  <Image
-                    src={track.user.avatarUrl}
-                    alt={track.artist}
-                    width={48}
-                    height={48}
-                    className="rounded-full"
-                  />
-                )}
-                <div>
-                  <p className="text-lg text-white font-semibold flex items-center gap-2">
-                    {track.artist}
-                    {track.user?.isVerified && <FaCheckCircle className="text-purple-400" size={16} />}
-                  </p>
-                  <p className="text-gray-400 text-sm">{track.genre}</p>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3 mb-8">
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
+          <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-[320px_1fr] items-start">
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#111827]/90 shadow-2xl">
+                <Image
+                  src={coverArtUrl}
+                  alt={track.title}
+                  width={600}
+                  height={600}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/default-cover.jpg';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <button
-                  onClick={handleLike}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
-                    isLiked
-                      ? 'bg-purple-600 text-white hover:bg-purple-500'
-                      : 'bg-white/10 text-white hover:bg-white/20'
-                  }`}
+                  onClick={handlePlayTrack}
+                  className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition"
                 >
-                  {isLiked ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
-                  {track.likes + (isLiked ? 1 : 0)}
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg transition hover:bg-purple-500">
+                    {currentTrack?.id === track.id && isPlaying ? (
+                      <FaPause size={28} />
+                    ) : (
+                      <FaPlay size={28} />
+                    )}
+                  </div>
                 </button>
-
-                <button
-                  onClick={handleShare}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all font-semibold"
-                >
-                  <FaShare size={16} />
-                  Share
-                </button>
-
-                {track.accessType === 'FREE' && (
-                  <button
-                    onClick={handleDownload}
-                    className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all font-semibold"
-                  >
-                    <FaDownload size={16} />
-                    Download
-                  </button>
-                )}
-
                 {track.accessType === 'PREMIUM' && (
-                  <button className="flex items-center gap-2 px-6 py-3 rounded-full bg-purple-600 text-white hover:bg-purple-500 transition-all font-semibold">
-                    <FaCrown size={16} />
+                  <div className="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full bg-purple-600 px-3 py-2 text-xs font-semibold text-white">
+                    <FaCrown size={12} />
                     Premium
-                  </button>
+                  </div>
                 )}
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-4 gap-4 p-4 bg-white/5 rounded-xl mb-8">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-purple-400 mb-1">
-                    <FaEye size={14} />
-                    <span className="text-lg font-bold">{(track.views / 1000).toFixed(1)}K</span>
-                  </div>
-                  <p className="text-gray-400 text-xs">Views</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-purple-300 mb-1">
-                    <FaHeart size={14} />
-                    <span className="text-lg font-bold">{(track.likes / 1000).toFixed(1)}K</span>
-                  </div>
-                  <p className="text-gray-400 text-xs">Likes</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-purple-300 mb-1">
-                    <FaDownload size={14} />
-                    <span className="text-lg font-bold">{(track.downloads / 1000).toFixed(1)}K</span>
-                  </div>
-                  <p className="text-gray-400 text-xs">Downloads</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-purple-400 mb-1">
-                    <FaShare size={14} />
-                    <span className="text-lg font-bold">{(track.shares / 1000).toFixed(1)}K</span>
-                  </div>
-                  <p className="text-gray-400 text-xs">Shares</p>
-                </div>
-              </div>
+              <div className="space-y-5">
+                <div className="rounded-[2rem] border border-white/10 bg-[#111827]/90 p-6 shadow-xl">
+                  <p className="text-xs uppercase tracking-[0.35em] text-purple-300">Now playing</p>
+                  <h1 className="mt-4 text-4xl font-semibold text-white leading-tight">{track.title}</h1>
+                  <p className="mt-3 text-lg text-gray-300 flex items-center gap-2">
+                    <FaCheckCircle className="text-purple-400" size={16} />
+                    {artistDisplay}
+                  </p>
 
-              {/* Description */}
-              {track.description && (
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-white mb-3">About this track</h3>
-                  <p className="text-gray-300 leading-relaxed">{track.description}</p>
-                </div>
-              )}
-
-              {/* Tags */}
-              {track.tags.length > 0 && (
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-white mb-3">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {track.tags.map((tag, index) => (
-                      <button
-                        key={index}
-                        className="px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full hover:bg-purple-500/30 transition-colors text-sm"
-                      >
-                        #{tag}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Tabs */}
-              <div className="flex gap-4 border-b border-white/10 mb-6">
-                <button
-                  onClick={() => setShowDetails(true)}
-                  className={`pb-3 font-semibold transition-colors ${
-                    showDetails
-                      ? 'text-purple-400 border-b-2 border-purple-400'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Details
-                </button>
-                <button
-                  onClick={() => setShowDetails(false)}
-                  className={`pb-3 font-semibold transition-colors ${
-                    !showDetails
-                      ? 'text-purple-400 border-b-2 border-purple-400'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Lyrics
-                </button>
-              </div>
-
-              {/* Details or Lyrics */}
-              {showDetails ? (
-                <div className="space-y-4 mb-8">
-                  <div className="flex justify-between py-2 border-b border-white/10">
-                    <span className="text-gray-400">Duration</span>
-                    <span className="text-white font-semibold">{formatDuration(track.duration)}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-white/10">
-                    <span className="text-gray-400">Released</span>
-                    <span className="text-white font-semibold">{new Date(track.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-white/10">
-                    <span className="text-gray-400">Genre</span>
-                    <span className="text-white font-semibold">{track.genre}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-white/10">
-                    <span className="text-gray-400">Type</span>
-                    <span className="text-white font-semibold capitalize">{track.accessType}</span>
-                  </div>
-                  {track.isDRMProtected && (
-                    <div className="flex justify-between py-2 border-b border-white/10">
-                      <span className="text-gray-400">Protection</span>
-                      <span className="text-purple-300 font-semibold">DRM Protected</span>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-3xl bg-white/5 p-4">
+                      <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Plays</p>
+                      <p className="mt-2 text-xl font-semibold text-white">{formatLargeNumber(viewCount)}</p>
                     </div>
-                  )}
+                    <div className="rounded-3xl bg-white/5 p-4">
+                      <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Likes</p>
+                      <p className="mt-2 text-xl font-semibold text-white">{formatLargeNumber(likeCount)}</p>
+                    </div>
+                    <div className="rounded-3xl bg-white/5 p-4">
+                      <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Downloads</p>
+                      <p className="mt-2 text-xl font-semibold text-white">{formatLargeNumber(downloadCount)}</p>
+                    </div>
+                    <div className="rounded-3xl bg-white/5 p-4">
+                      <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Shares</p>
+                      <p className="mt-2 text-xl font-semibold text-white">{formatLargeNumber(shareCount)}</p>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="bg-white/5 rounded-lg p-6 mb-8">
-                  {track.lyrics ? (
-                    <div className="whitespace-pre-wrap text-gray-300 leading-relaxed">
-                      {track.lyrics}
+
+                <div className="rounded-[2rem] border border-white/10 bg-[#111827]/90 p-6 shadow-xl">
+                  <div className="flex items-center justify-between gap-4 mb-5">
+                    <div>
+                      <h2 className="text-2xl font-semibold text-white">Details</h2>
+                      <p className="text-gray-400 text-sm">Track metadata, release info, and status.</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowDetails(true)}
+                        className={`text-sm font-semibold transition ${showDetails ? 'text-purple-300 border-b-2 border-purple-400 pb-1' : 'text-gray-400 hover:text-white'}`}
+                      >
+                        Details
+                      </button>
+                      <button
+                        onClick={() => setShowDetails(false)}
+                        className={`text-sm font-semibold transition ${!showDetails ? 'text-purple-300 border-b-2 border-purple-400 pb-1' : 'text-gray-400 hover:text-white'}`}
+                      >
+                        Lyrics
+                      </button>
+                    </div>
+                  </div>
+
+                  {showDetails ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-3xl bg-white/5 p-4">
+                        <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Artist</p>
+                        <p className="mt-2 text-white font-semibold">{artistDisplay}</p>
+                      </div>
+                      <div className="rounded-3xl bg-white/5 p-4">
+                        <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Released</p>
+                        <p className="mt-2 text-white font-semibold">{track.createdAt ? new Date(track.createdAt).toLocaleDateString() : 'Unknown'}</p>
+                      </div>
+                      <div className="rounded-3xl bg-white/5 p-4">
+                        <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Genre</p>
+                        <p className="mt-2 text-white font-semibold">{track.genre || 'Unknown'}</p>
+                      </div>
+                      <div className="rounded-3xl bg-white/5 p-4">
+                        <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Access</p>
+                        <p className="mt-2 text-white font-semibold">{track.isDRMProtected ? 'DRM Protected' : track.accessType}</p>
+                      </div>
                     </div>
                   ) : (
-                    <p className="text-gray-400 text-center py-8">No lyrics available for this track</p>
+                    <div className="rounded-3xl bg-white/5 p-6 text-gray-300 leading-relaxed whitespace-pre-wrap">
+                      {track.lyrics ? track.lyrics : 'No lyrics are available for this track.'}
+                    </div>
                   )}
                 </div>
-              )}
-            </motion.div>
+              </div>
+            </div>
 
-            {/* Related Tracks */}
             {relatedTracks.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
+                className="rounded-[2rem] border border-white/10 bg-[#111827]/90 p-6 shadow-xl"
               >
-                <h3 className="text-2xl font-bold text-white mb-6">Related Tracks</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {relatedTracks.map((relatedTrack, index) => (
-                    <motion.button
-                      key={relatedTrack.id}
-                      onClick={() => router.push(`/track/${relatedTrack.id}`)}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 + index * 0.1 }}
-                      className="group text-left p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-all"
-                    >
-                      <div className="flex gap-3">
-                        <Image
-                          src={relatedTrack.coverArt}
-                          alt={relatedTrack.title}
-                          width={60}
-                          height={60}
-                          className="rounded w-16 h-16 object-cover"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-white group-hover:text-purple-400 transition-colors truncate">
-                            {relatedTrack.title}
-                          </p>
-                          <p className="text-gray-400 text-sm truncate">{relatedTrack.artist}</p>
-                          <p className="text-xs text-gray-500 mt-1">{formatDuration(relatedTrack.duration)}</p>
+                <div className="flex items-center justify-between gap-3 mb-5">
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white">Related tracks</h3>
+                    <p className="text-gray-400 text-sm">Swipe horizontally for more music.</p>
+                  </div>
+                  <span className="text-xs uppercase tracking-[0.3em] text-purple-300">Browse</span>
+                </div>
+                <div className="-mx-2 overflow-x-auto pb-2">
+                  <div className="flex gap-4 px-2 snap-x snap-mandatory">
+                    {relatedTracks.map((relatedTrack) => (
+                      <button
+                        key={relatedTrack.id}
+                        onClick={() => router.push(`/track/${relatedTrack.id}`)}
+                        className="snap-start min-w-[240px] max-w-[240px] rounded-3xl bg-white/5 p-4 text-left transition hover:bg-white/10"
+                      >
+                        <div className="relative mb-4 h-44 overflow-hidden rounded-3xl bg-slate-900">
+                          <Image
+                            src={relatedTrack.coverArt || '/default-cover.jpg'}
+                            alt={relatedTrack.title}
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/default-cover.jpg';
+                            }}
+                          />
                         </div>
-                      </div>
-                    </motion.button>
-                  ))}
+                        <p className="font-semibold text-white truncate">{relatedTrack.title}</p>
+                        <p className="text-sm text-gray-400 truncate">{relatedTrack.artist}</p>
+                        <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                          <FaFire size={12} />
+                          <span>{formatLargeNumber(relatedTrack.views || 0)} plays</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
           </div>
 
-          {/* Right: Comments Section */}
-          <div className="lg:col-span-1">
+          <aside className="space-y-6">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white/5 rounded-xl p-6 sticky top-24"
+              className="rounded-[2rem] border border-white/10 bg-[#111827]/90 p-6 shadow-xl"
             >
-              <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                <FaComment size={18} />
-                Comments ({comments.length})
-              </h2>
-
-              {/* Comment Input */}
-              <div className="mb-6">
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Add a comment..."
-                  className="w-full bg-white/10 text-white placeholder-gray-500 rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
-                  rows={3}
-                />
-                <button
-                  onClick={handlePostComment}
-                  disabled={!newComment.trim()}
-                  className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-white font-semibold rounded-lg transition-colors"
-                >
-                  Post Comment
-                </button>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-semibold text-white">Comments</h2>
+                  <p className="text-gray-400 text-sm">Add reactions and feedback</p>
+                </div>
+                <span className="text-sm text-gray-500">{comments.length} total</span>
               </div>
 
-              {/* Comments List */}
-              <div className="space-y-4 max-h-[600px] overflow-y-auto">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Share your thoughts..."
+                className="w-full min-h-[120px] resize-none rounded-3xl border border-white/10 bg-black/70 px-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {emojiOptions.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    onClick={() => handleAddEmoji(emoji)}
+                    className="rounded-full bg-white/10 px-3 py-2 text-lg transition hover:bg-white/20"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={handlePostComment}
+                disabled={!newComment.trim()}
+                className="mt-4 w-full rounded-full bg-purple-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:bg-gray-700"
+              >
+                Post comment
+              </button>
+
+              <div className="mt-6 space-y-4 max-h-[600px] overflow-y-auto pr-2">
                 {comments.length === 0 ? (
-                  <p className="text-gray-400 text-center py-8">No comments yet. Be the first!</p>
+                  <div className="rounded-3xl bg-white/5 p-6 text-center text-gray-400">No comments yet. Be the first!</div>
                 ) : (
                   comments.map((comment) => (
                     <motion.div
                       key={comment.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-white/10 rounded-lg p-4"
+                      className="rounded-3xl bg-white/10 p-4"
                     >
                       <div className="flex gap-3">
-                        <Image
-                          src={comment.userAvatar}
-                          alt={comment.userName}
-                          width={32}
-                          height={32}
-                          className="rounded-full w-8 h-8"
-                        />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/20 text-purple-300">
+                          <FaUser size={16} />
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className="font-semibold text-white text-sm">{comment.userName}</p>
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <p className="font-semibold text-white text-sm truncate">{comment.userName}</p>
                             {comment.isVerified && <FaCheckCircle className="text-purple-400" size={12} />}
+                            <span className="text-xs text-gray-500">{new Date(comment.timestamp).toLocaleDateString()}</span>
                           </div>
-                          <p className="text-gray-300 text-sm mb-2">{comment.content}</p>
-                          <div className="flex items-center gap-3 text-xs text-gray-400">
-                            <span>{new Date(comment.timestamp).toLocaleDateString()}</span>
-                            <button className="hover:text-purple-300 transition-colors flex items-center gap-1">
-                              <FaHeart size={10} />
+                          <p className="text-gray-300 text-sm leading-relaxed mb-3">{comment.content}</p>
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                            <button className="inline-flex items-center gap-1 rounded-full bg-white/5 px-3 py-1 hover:bg-white/10 transition">
+                              <FaHeart size={12} />
                               {comment.likes}
                             </button>
                             <button
                               onClick={() => setReplyingTo(comment.id)}
-                              className="hover:text-purple-300 transition-colors flex items-center gap-1"
+                              className="inline-flex items-center gap-1 rounded-full bg-white/5 px-3 py-1 hover:bg-white/10 transition"
                             >
-                              <FaReply size={10} />
+                              <FaReply size={12} />
                               Reply
                             </button>
+                            <div className="flex gap-1 text-lg">
+                              {emojiOptions.map((emoji) => (
+                                <span key={emoji} className="select-none">{emoji}</span>
+                              ))}
+                            </div>
                           </div>
 
-                          {/* Reply Input */}
                           {replyingTo === comment.id && (
-                            <div className="mt-3 pt-3 border-t border-white/10">
+                            <div className="mt-4 rounded-3xl bg-white/5 p-4">
                               <textarea
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
                                 placeholder="Write a reply..."
-                                className="w-full bg-white/10 text-white placeholder-gray-500 rounded p-2 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm mb-2"
-                                rows={2}
+                                className="w-full min-h-[90px] resize-none rounded-2xl border border-white/10 bg-black/60 px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm mb-2"
                               />
-                              <div className="flex gap-2">
+                              <div className="flex flex-wrap gap-2">
                                 <button
                                   onClick={() => handleReply(comment.id)}
-                                  className="flex-1 px-3 py-1 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded transition-colors"
+                                  className="rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-500 transition"
                                 >
                                   Reply
                                 </button>
@@ -738,7 +664,7 @@ export default function TrackPage() {
                                     setReplyingTo(null);
                                     setReplyText('');
                                   }}
-                                  className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-sm rounded transition-colors"
+                                  className="rounded-full bg-white/10 px-4 py-2 text-sm text-gray-300 hover:bg-white/20 transition"
                                 >
                                   Cancel
                                 </button>
@@ -746,13 +672,12 @@ export default function TrackPage() {
                             </div>
                           )}
 
-                          {/* Replies */}
                           {comment.replies && comment.replies.length > 0 && (
                             <div className="mt-3 space-y-2 pl-3 border-l-2 border-white/10">
                               {comment.replies.map((reply) => (
-                                <div key={reply.id} className="text-xs">
-                                  <p className="font-semibold text-gray-300">{reply.userName}</p>
-                                  <p className="text-gray-400">{reply.content}</p>
+                                <div key={reply.id} className="text-xs text-gray-400">
+                                  <p className="font-semibold text-gray-200">{reply.userName}</p>
+                                  <p>{reply.content}</p>
                                 </div>
                               ))}
                             </div>
@@ -768,7 +693,7 @@ export default function TrackPage() {
                 )}
               </div>
             </motion.div>
-          </div>
+          </aside>
         </div>
       </div>
     </div>
