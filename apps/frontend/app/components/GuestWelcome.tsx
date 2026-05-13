@@ -201,23 +201,24 @@ export default function GuestWelcome() {
       <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black relative">
       {isLoading && (
         <div className="absolute inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-50">
-          <div className="h-28 w-28 rounded-full bg-white/5 border border-purple-500/15 flex items-center justify-center shadow-[0_0_60px_rgba(155,93,229,0.22)]">
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-0 rounded-2xl bg-purple-500/0 animate-fwaya-overlay" />
             <Image
               src="/fwaya lp-01.png"
               alt="Loading"
               width={64}
               height={64}
-              className="animate-fwaya-loader"
+              className="relative z-10"
             />
           </div>
 
           <style>{`
-            @keyframes fwayaLogoPulse {
-              0%, 100% { opacity: 0.95; filter: hue-rotate(0deg); transform: scale(1); }
-              50% { opacity: 0.35; filter: hue-rotate(240deg); transform: scale(0.92); }
+            @keyframes fwayaOverlayPulse {
+              0%, 100% { opacity: 0; }
+              50% { opacity: 0.95; }
             }
-            .animate-fwaya-loader {
-              animation: fwayaLogoPulse 1.6s ease-in-out infinite;
+            .animate-fwaya-overlay {
+              animation: fwayaOverlayPulse 3s ease-in-out infinite;
             }
           `}</style>
         </div>
