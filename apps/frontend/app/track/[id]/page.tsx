@@ -414,10 +414,10 @@ export default function TrackPage() {
           </div>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[1.3fr_0.95fr]">
-          <div className="space-y-5">
-            <div className="grid gap-4 md:grid-cols-[280px_1fr] items-start">
-              <div className="relative overflow-hidden rounded-[32px] bg-black shadow-sm">
+        <div className="grid gap-5 lg:grid-cols-[1.3fr_0.95fr] min-w-0">
+          <div className="space-y-5 min-w-0">
+            <div className="grid gap-4 md:grid-cols-[minmax(0,280px)_1fr] items-start">
+              <div className="relative overflow-hidden rounded-[32px] bg-black shadow-sm w-full max-w-full h-[260px] sm:h-[320px] md:h-[420px]">
                 <Image
                   src={coverArtUrl}
                   alt={track.title}
@@ -535,8 +535,8 @@ export default function TrackPage() {
                   </div>
                   <span className="text-xs uppercase tracking-[0.3em] text-purple-300">Browse</span>
                 </div>
-                <div className="overflow-x-auto pb-2">
-                  <div className="flex gap-2 px-2 snap-x snap-mandatory">
+                <div className="overflow-x-auto pb-2 w-full">
+                  <div className="flex gap-2 px-2 snap-x snap-mandatory w-full">
                     {relatedTracks.map((relatedTrack) => (
                       <button
                         key={relatedTrack.id}
@@ -568,7 +568,7 @@ export default function TrackPage() {
             )}
           </div>
 
-          <aside className="space-y-6">
+          <aside className="space-y-6 min-w-0">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
