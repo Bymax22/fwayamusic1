@@ -399,10 +399,10 @@ export default function TrackPage() {
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
-          <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-[320px_1fr] items-start">
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#111827]/90 shadow-2xl">
+        <div className="grid gap-5 lg:grid-cols-[1.3fr_0.95fr]">
+          <div className="space-y-5">
+            <div className="grid gap-4 md:grid-cols-[280px_1fr] items-start">
+              <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[#0d0c14] shadow-lg">
                 <Image
                   src={coverArtUrl}
                   alt={track.title}
@@ -418,7 +418,7 @@ export default function TrackPage() {
                   onClick={handlePlayTrack}
                   className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition"
                 >
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg transition hover:bg-purple-500">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg transition hover:bg-purple-500">
                     {currentTrack?.id === track.id && isPlaying ? (
                       <FaPause size={28} />
                     ) : (
@@ -435,9 +435,9 @@ export default function TrackPage() {
               </div>
 
               <div className="space-y-5">
-                <div className="rounded-[2rem] border border-white/10 bg-[#111827]/90 p-6 shadow-xl">
+                <div className="rounded-[32px] border border-white/10 bg-[#0d0c14] p-5 shadow-lg">
                   <p className="text-xs uppercase tracking-[0.35em] text-purple-300">Now playing</p>
-                  <h1 className="mt-4 text-4xl font-semibold text-white leading-tight">{track.title}</h1>
+                  <h1 className="mt-4 text-3xl sm:text-4xl font-semibold text-white leading-tight">{track.title}</h1>
                   <p className="mt-3 text-lg text-gray-300 flex items-center gap-2">
                     <FaCheckCircle className="text-purple-400" size={16} />
                     {artistDisplay}
@@ -463,7 +463,7 @@ export default function TrackPage() {
                   </div>
                 </div>
 
-                <div className="rounded-[2rem] border border-white/10 bg-[#111827]/90 p-6 shadow-xl">
+                <div className="rounded-[32px] border border-white/10 bg-[#0d0c14] p-5 shadow-lg">
                   <div className="flex items-center justify-between gap-4 mb-5">
                     <div>
                       <h2 className="text-2xl font-semibold text-white">Details</h2>
@@ -505,7 +505,7 @@ export default function TrackPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="rounded-3xl bg-white/5 p-6 text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    <div className="rounded-3xl bg-white/5 p-5 text-gray-300 leading-relaxed whitespace-pre-wrap">
                       {track.lyrics ? track.lyrics : 'No lyrics are available for this track.'}
                     </div>
                   )}
@@ -518,7 +518,7 @@ export default function TrackPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="rounded-[2rem] border border-white/10 bg-[#111827]/90 p-6 shadow-xl"
+                className="rounded-[32px] border border-white/10 bg-[#0d0c14] p-5 shadow-lg"
               >
                 <div className="flex items-center justify-between gap-3 mb-5">
                   <div>
@@ -535,7 +535,7 @@ export default function TrackPage() {
                         onClick={() => router.push(`/track/${relatedTrack.id}`)}
                         className="snap-start min-w-[240px] max-w-[240px] rounded-3xl bg-white/5 p-4 text-left transition hover:bg-white/10"
                       >
-                        <div className="relative mb-4 h-44 overflow-hidden rounded-3xl bg-slate-900">
+                        <div className="relative mb-4 h-36 overflow-hidden rounded-3xl bg-slate-900">
                           <Image
                             src={relatedTrack.coverArt || '/default-cover.jpg'}
                             alt={relatedTrack.title}
@@ -565,7 +565,7 @@ export default function TrackPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-[2rem] border border-white/10 bg-[#111827]/90 p-6 shadow-xl"
+              className="rounded-[32px] border border-white/10 bg-[#0d0c14] p-5 shadow-lg"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
@@ -579,7 +579,7 @@ export default function TrackPage() {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Share your thoughts..."
-                className="w-full min-h-[120px] resize-none rounded-3xl border border-white/10 bg-black/70 px-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full min-h-[100px] resize-none rounded-3xl border border-white/10 bg-[#0d0c14] px-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -603,7 +603,7 @@ export default function TrackPage() {
                 Post comment
               </button>
 
-              <div className="mt-6 space-y-4 max-h-[600px] overflow-y-auto pr-2">
+              <div className="mt-6 space-y-4 max-h-[520px] overflow-y-auto pr-2">
                 {comments.length === 0 ? (
                   <div className="rounded-3xl bg-white/5 p-6 text-center text-gray-400">No comments yet. Be the first!</div>
                 ) : (
