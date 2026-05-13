@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { DashboardLoading } from '@/components/DashboardLoading';
 import { DashboardCard } from '@/components/DashboardCard';
 import DashboardHeader from '@/components/DashboardHeader';
 import { getAuth } from 'firebase/auth';
@@ -210,7 +209,11 @@ const UserDashboard: React.FC = () => {
     fetchUserData();
   }, [user]);
 
-  if (authLoading || !user) return <DashboardLoading />;
+  if (authLoading || !user) return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+    </div>
+  );
 
   const quickStats: StatCard[] = [
     {
@@ -394,7 +397,7 @@ const UserDashboard: React.FC = () => {
   }
 
   return (
-    <RoleGuard allowedRoles={['USER']} customLoadingComponent={<DashboardLoading/>}>
+    <RoleGuard allowedRoles={['USER']}>
       <div className="min-h-screen bg-black text-white pb-20">
         {/* Mobile Header */}
         <DashboardHeader />

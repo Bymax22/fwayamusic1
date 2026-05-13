@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import GuestWelcome from "@/components/GuestWelcome";
 import UserDashboard from "./dashboard/page";
-import { DashboardLoading } from '@/components/DashboardLoading';
+
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -34,7 +34,11 @@ export default function Home() {
   }, [user, loading, router]);
 
   if (loading) {
-    return <DashboardLoading />;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
   }
 
   if (!user) {
@@ -48,8 +52,6 @@ export default function Home() {
   if (user.role === 'USER') {
     return <UserDashboard />;
   }
-
-  return <DashboardLoading />;
 }
 
 
