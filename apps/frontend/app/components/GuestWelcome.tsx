@@ -201,84 +201,20 @@ export default function GuestWelcome() {
     <>
       <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black relative">
       {isLoading && (
-        <div className="absolute inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-50">
-          <svg
-            width="220"
-            height="220"
-            viewBox="0 0 512 512"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="overflow-visible"
+        <div className="absolute inset-0 bg-black/85 flex items-center justify-center z-50">
+          <motion.div
+            className="relative"
+            animate={{ opacity: [0.7, 1, 0.7], scale: [0.95, 1.05, 0.95] }}
+            transition={{ duration: 2.2, ease: "easeInOut", repeat: Infinity }}
           >
-            <defs>
-              <filter id="purpleGlow" x="-50%" y="-50%" width="200%" height="200%"/>
-                <feGaussianBlur stdDeviation="6" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              
-            </defs>
-
-            <image
-              href="/fwaya lp-01.png"
-              x="56"
-              y="56"
-              width="400"
-              height="400"
-              opacity="0.12"
-              preserveAspectRatio="xMidYMid meet"
+            <Image
+              src="/fwaya lp-01.png"
+              alt="Fwaya loading logo"
+              width={96}
+              height={96}
+              className="block"
             />
-
-            <motion.path
-              d="M108 50
-                 C108 28 132 10 154 10
-                 H224
-                 C250 10 280 34 280 60
-                 V218
-                 L408 300
-                 C436 319 436 354 408 373
-                 L284 470
-                 C254 500 212 500 182 470
-                 C152 440 128 395 128 345
-                 V140
-                 C128 110 142 80 172 70
-                 H200
-                 C230 70 246 90 246 120
-                 V220
-                 C246 260 216 280 182 272
-                 C152 264 134 240 134 212
-                 V140
-                 C134 86 120 64 108 50
-                 Z
-
-                 M220 360
-                 A72 72 0 1 1 220 216
-                 A72 72 0 1 1 220 360"
-              stroke="#B066FF"
-              strokeWidth="8"
-              fill="transparent"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              filter="url(#purpleGlow)"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 4, ease: "linear", repeat: Infinity }}
-            />
-
-            <motion.circle
-              r="8"
-              fill="#D7A8FF"
-              filter="url(#purpleGlow)"
-            >
-              <animateMotion
-                dur="4s"
-                repeatCount="indefinite"
-                rotate="auto"
-                path="M108 50 C108 28 132 10 154 10 H224 C250 10 280 34 280 60 V218 L408 300 C436 319 436 354 408 373 L284 470 C254 500 212 500 182 470 C152 440 128 395 128 345 V140 C128 110 142 80 172 70 H200 C230 70 246 90 246 120 V220 C246 260 216 280 182 272 C152 264 134 240 134 212 V140 C134 86 120 64 108 50 Z M220 360 A72 72 0 1 1 220 216 A72 72 0 1 1 220 360"
-              />
-            </motion.circle>
-          </svg>
+          </motion.div>
         </div>
       )}
 
