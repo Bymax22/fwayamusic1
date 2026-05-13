@@ -389,6 +389,22 @@ export default function TrackPage() {
               <FaClock size={12} />
               {formatDuration(track.duration)}
             </span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
+              <FaEye size={12} />
+              {formatLargeNumber(viewCount)} plays
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
+              <FaHeart size={12} />
+              {formatLargeNumber(likeCount)} likes
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
+              <FaDownload size={12} />
+              {formatLargeNumber(downloadCount)} downloads
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
+              <FaShare size={12} />
+              {formatLargeNumber(shareCount)} shares
+            </span>
             {track.accessType !== 'FREE' && (
               <span className="inline-flex items-center gap-2 rounded-full bg-purple-600/20 px-3 py-1 text-purple-200">
                 <FaCrown size={12} />
@@ -431,6 +447,26 @@ export default function TrackPage() {
                     Premium
                   </div>
                 )}
+                <div className="absolute bottom-4 right-4 flex gap-2 z-10">
+                  <button
+                    onClick={handleLike}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+                  >
+                    {isLiked ? <FaHeart size={16} className="text-red-500" /> : <FaRegHeart size={16} />}
+                  </button>
+                  <button
+                    onClick={handleDownload}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+                  >
+                    <FaDownload size={16} />
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+                  >
+                    <FaShare size={16} />
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-5">
@@ -441,25 +477,6 @@ export default function TrackPage() {
                     <FaCheckCircle className="text-purple-400" size={16} />
                     {artistDisplay}
                   </p>
-
-                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-3xl bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Plays</p>
-                      <p className="mt-2 text-xl font-semibold text-white">{formatLargeNumber(viewCount)}</p>
-                    </div>
-                    <div className="rounded-3xl bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Likes</p>
-                      <p className="mt-2 text-xl font-semibold text-white">{formatLargeNumber(likeCount)}</p>
-                    </div>
-                    <div className="rounded-3xl bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Downloads</p>
-                      <p className="mt-2 text-xl font-semibold text-white">{formatLargeNumber(downloadCount)}</p>
-                    </div>
-                    <div className="rounded-3xl bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Shares</p>
-                      <p className="mt-2 text-xl font-semibold text-white">{formatLargeNumber(shareCount)}</p>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="rounded-[32px] bg-black p-5 shadow-sm">
@@ -485,23 +502,15 @@ export default function TrackPage() {
                   </div>
 
                   {showDetails ? (
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-3xl bg-white/5 p-4">
-                        <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Artist</p>
-                        <p className="mt-2 text-white font-semibold">{artistDisplay}</p>
-                      </div>
-                      <div className="rounded-3xl bg-white/5 p-4">
-                        <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Released</p>
-                        <p className="mt-2 text-white font-semibold">{track.createdAt ? new Date(track.createdAt).toLocaleDateString() : 'Unknown'}</p>
-                      </div>
-                      <div className="rounded-3xl bg-white/5 p-4">
-                        <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Genre</p>
-                        <p className="mt-2 text-white font-semibold">{track.genre || 'Unknown'}</p>
-                      </div>
-                      <div className="rounded-3xl bg-white/5 p-4">
-                        <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Access</p>
-                        <p className="mt-2 text-white font-semibold">{track.isDRMProtected ? 'DRM Protected' : track.accessType}</p>
-                      </div>
+                    <div className="flex flex-wrap gap-4 text-sm">
+                      <span className="text-gray-400">Artist:</span>
+                      <span className="text-white font-semibold">{artistDisplay}</span>
+                      <span className="text-gray-400">Released:</span>
+                      <span className="text-white font-semibold">{track.createdAt ? new Date(track.createdAt).toLocaleDateString() : 'Unknown'}</span>
+                      <span className="text-gray-400">Genre:</span>
+                      <span className="text-white font-semibold">{track.genre || 'Unknown'}</span>
+                      <span className="text-gray-400">Access:</span>
+                      <span className="text-white font-semibold">{track.isDRMProtected ? 'DRM Protected' : track.accessType}</span>
                     </div>
                   ) : (
                     <div className="rounded-3xl bg-white/5 p-5 text-gray-300 leading-relaxed whitespace-pre-wrap">
@@ -526,13 +535,13 @@ export default function TrackPage() {
                   </div>
                   <span className="text-xs uppercase tracking-[0.3em] text-purple-300">Browse</span>
                 </div>
-                <div className="-mx-2 overflow-x-auto pb-2">
-                  <div className="flex gap-3 px-2 snap-x snap-mandatory">
+                <div className="overflow-x-auto pb-2">
+                  <div className="flex gap-2 px-2 snap-x snap-mandatory">
                     {relatedTracks.map((relatedTrack) => (
                       <button
                         key={relatedTrack.id}
                         onClick={() => router.push(`/track/${relatedTrack.id}`)}
-                        className="snap-start min-w-[85px] max-w-[85px] sm:min-w-[120px] sm:max-w-[120px] lg:min-w-[240px] lg:max-w-[240px] rounded-[32px] bg-black p-2 sm:p-3 lg:p-4 text-left transition hover:bg-white/5 shadow-sm"
+                        className="snap-start min-w-[110px] max-w-[110px] sm:min-w-[120px] sm:max-w-[120px] lg:min-w-[240px] lg:max-w-[240px] rounded-[32px] bg-black p-2 sm:p-3 lg:p-4 text-left transition hover:bg-white/5 shadow-sm"
                       >
                         <div className="relative mb-2 sm:mb-3 lg:mb-4 h-20 sm:h-28 lg:h-36 overflow-hidden rounded-3xl bg-slate-900">
                           <Image
