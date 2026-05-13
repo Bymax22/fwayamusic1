@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import {
   FaPlay,
   FaPause,
@@ -201,36 +202,104 @@ export default function GuestWelcome() {
       <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black relative">
       {isLoading && (
         <div className="absolute inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-50">
-          <div className="relative flex items-center justify-center w-24 h-24">
-            <Image
-              src="/fwaya lp-01.png"
-              alt="Loading"
-              width={64}
-              height={64}
-              className="relative z-10"
-              style={{
-                filter: 'drop-shadow(0 0 0 rgb(168, 85, 247))',
-                animation: 'logoEdgeTrace 2.5s ease-in-out infinite',
+          <svg
+            width="200"
+            height="200"
+            viewBox="0 0 512 512"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="overflow-visible"
+          >
+            <defs>
+              <filter id="purpleGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="6" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <motion.path
+              d="M130 70
+                 Q130 40 160 40
+                 H220
+                 Q240 40 255 55
+                 L320 105
+                 Q350 125 350 160
+                 V330
+                 L460 250
+                 Q490 230 490 256
+                 Q490 282 460 302
+                 L350 382
+                 V420
+                 Q350 460 310 480
+                 Q270 500 220 500
+                 H200
+                 Q150 500 130 460
+                 Q110 430 110 390
+                 V130
+                 Q110 90 130 70
+
+                 M220 360
+                 A60 60 0 1 1 220 240
+                 A60 60 0 1 1 220 360"
+              stroke="#B066FF"
+              strokeWidth="6"
+              fill="transparent"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              filter="url(#purpleGlow)"
+              initial={{
+                pathLength: 0,
+              }}
+              animate={{
+                pathLength: 1,
+              }}
+              transition={{
+                duration: 4,
+                ease: "linear",
+                repeat: Infinity,
               }}
             />
-          </div>
 
-          <style>{`
-            @keyframes logoEdgeTrace {
-              0% {
-                filter: drop-shadow(0 0 8px rgb(168, 85, 247)) drop-shadow(0 0 0px rgba(168, 85, 247, 0.8));
-                opacity: 0.3;
-              }
-              50% {
-                filter: drop-shadow(0 0 16px rgb(168, 85, 247)) drop-shadow(2px 2px 8px rgba(168, 85, 247, 0.6));
-                opacity: 1;
-              }
-              100% {
-                filter: drop-shadow(0 0 8px rgb(168, 85, 247)) drop-shadow(0 0 0px rgba(168, 85, 247, 0.2));
-                opacity: 0.3;
-              }
-            }
-          `}</style>
+            <motion.circle
+              r="8"
+              fill="#D7A8FF"
+              filter="url(#purpleGlow)"
+            >
+              <animateMotion
+                dur="4s"
+                repeatCount="indefinite"
+                rotate="auto"
+                path="
+                  M130 70
+                  Q130 40 160 40
+                  H220
+                  Q240 40 255 55
+                  L320 105
+                  Q350 125 350 160
+                  V330
+                  L460 250
+                  Q490 230 490 256
+                  Q490 282 460 302
+                  L350 382
+                  V420
+                  Q350 460 310 480
+                  Q270 500 220 500
+                  H200
+                  Q150 500 130 460
+                  Q110 430 110 390
+                  V130
+                  Q110 90 130 70
+
+                  M220 360
+                  A60 60 0 1 1 220 240
+                  A60 60 0 1 1 220 360
+                "
+              />
+            </motion.circle>
+          </svg>
         </div>
       )}
 
