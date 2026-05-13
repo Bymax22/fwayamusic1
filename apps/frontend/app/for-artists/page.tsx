@@ -630,7 +630,7 @@ export default function ForArtistsPage() {
     return (
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <motion.div 
-          className="bg-slate-900 rounded-2xl p-6 max-w-lg w-full max-h-96 overflow-y-auto"
+          className="bg-black rounded-2xl p-6 max-w-lg w-full max-h-96 overflow-y-auto ring-1 ring-white/10"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
@@ -648,7 +648,7 @@ export default function ForArtistsPage() {
                 type="text"
                 value={editingMedia.title}
                 onChange={(e) => setEditingMedia({ ...editingMedia, title: e.target.value })}
-                className="w-full bg-slate-800 text-white rounded-lg px-3 py-2 border border-slate-700 focus:border-purple-500 outline-none"
+                className="w-full bg-white/5 text-white rounded-lg px-3 py-2 border border-white/10 focus:border-purple-500 outline-none"
               />
             </div>
 
@@ -657,7 +657,7 @@ export default function ForArtistsPage() {
               <textarea
                 value={editingMedia.description || ''}
                 onChange={(e) => setEditingMedia({ ...editingMedia, description: e.target.value })}
-                className="w-full bg-slate-800 text-white rounded-lg px-3 py-2 border border-slate-700 focus:border-purple-500 outline-none h-20 resize-none"
+                className="w-full bg-white/5 text-white rounded-lg px-3 py-2 border border-white/10 focus:border-purple-500 outline-none h-20 resize-none"
               />
             </div>
 
@@ -667,14 +667,14 @@ export default function ForArtistsPage() {
                 type="text"
                 value={editingMedia.genre || ''}
                 onChange={(e) => setEditingMedia({ ...editingMedia, genre: e.target.value })}
-                className="w-full bg-slate-800 text-white rounded-lg px-3 py-2 border border-slate-700 focus:border-purple-500 outline-none"
+                className="w-full bg-white/5 text-white rounded-lg px-3 py-2 border border-white/10 focus:border-purple-500 outline-none"
               />
             </div>
 
             <div className="flex gap-3 pt-4">
               <button
                 onClick={() => setEditingMedia(null)}
-                className="flex-1 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition"
+                className="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/15 transition"
               >
                 Cancel
               </button>
@@ -709,7 +709,7 @@ export default function ForArtistsPage() {
     return (
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <motion.div 
-          className="bg-slate-900 rounded-2xl p-6 max-w-lg w-full"
+          className="bg-black rounded-2xl p-6 max-w-lg w-full ring-1 ring-white/10"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
@@ -727,19 +727,19 @@ export default function ForArtistsPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-800 p-4 rounded-lg">
+              <div className="bg-white/5 p-4 rounded-lg">
                 <p className="text-gray-400 text-sm">Total Plays</p>
                 <p className="text-white font-bold text-2xl">{(trackAnalytics.plays || 0).toLocaleString()}</p>
               </div>
-              <div className="bg-slate-800 p-4 rounded-lg">
+              <div className="bg-white/5 p-4 rounded-lg">
                 <p className="text-gray-400 text-sm">Downloads</p>
                 <p className="text-white font-bold text-2xl">{(selectedMediaForAnalytics.downloadCount || 0).toLocaleString()}</p>
               </div>
-              <div className="bg-slate-800 p-4 rounded-lg">
+              <div className="bg-white/5 p-4 rounded-lg">
                 <p className="text-gray-400 text-sm">Shares</p>
                 <p className="text-white font-bold text-2xl">{(selectedMediaForAnalytics.shareCount || 0).toLocaleString()}</p>
               </div>
-              <div className="bg-slate-800 p-4 rounded-lg">
+              <div className="bg-white/5 p-4 rounded-lg">
                 <p className="text-gray-400 text-sm">Revenue</p>
                 <p className="text-green-400 font-bold text-2xl">{formatZMW(trackAnalytics.revenue ?? 0)}</p>
               </div>
@@ -747,7 +747,7 @@ export default function ForArtistsPage() {
 
             <button
               onClick={() => setSelectedMediaForAnalytics(null)}
-              className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition"
+              className="w-full px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/15 transition"
             >
               Close
             </button>
@@ -763,7 +763,7 @@ export default function ForArtistsPage() {
     return (
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <motion.div 
-          className="bg-slate-900 rounded-2xl p-6 max-w-lg w-full"
+          className="bg-black rounded-2xl p-6 max-w-lg w-full ring-1 ring-white/10"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
@@ -782,7 +782,7 @@ export default function ForArtistsPage() {
                   type="text"
                   value={shareLink}
                   readOnly
-                  className="flex-1 bg-slate-800 text-white rounded-lg px-3 py-2 border border-slate-700"
+                  className="flex-1 bg-white/5 text-white rounded-lg px-3 py-2 border border-white/10"
                 />
                 <button
                   onClick={() => copyToClipboard(shareLink)}
@@ -795,7 +795,7 @@ export default function ForArtistsPage() {
 
             <button
               onClick={() => setSelectedMediaForShare(null)}
-              className="w-full px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition"
+              className="w-full px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/15 transition"
             >
               Close
             </button>
