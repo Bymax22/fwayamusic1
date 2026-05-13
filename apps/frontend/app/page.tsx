@@ -33,10 +33,6 @@ export default function Home() {
     }
   }, [user, loading, router]);
 
-  if (loading) {
-    return null;
-  }
-
   if (!user) {
     return <GuestWelcome />;
   }
