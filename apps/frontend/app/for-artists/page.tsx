@@ -931,10 +931,10 @@ export default function ForArtistsPage() {
                     <div className="absolute inset-0 bg-gradient-to-r from-slate-950 to-slate-900 z-0" />
                   )}
                   
-                  <div className="relative z-10 grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center p-4 md:p-5">
+                  <div className="relative z-10 grid grid-cols-[auto_1fr_auto] gap-4 items-center p-4 md:p-5">
                     {/* Cover Art */}
-                    <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-slate-800 flex-shrink-0 md:block hidden">
-                      {item.artCoverUrl && (
+                    <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-slate-800 flex-shrink-0">
+                      {item.artCoverUrl ? (
                         <Image
                           src={item.artCoverUrl}
                           alt={item.title}
@@ -944,6 +944,10 @@ export default function ForArtistsPage() {
                             (e.target as HTMLImageElement).src = '/default-cover.jpg';
                           }}
                         />
+                      ) : (
+                        <div className="w-full h-full bg-slate-700 flex items-center justify-center">
+                          <Music className="w-6 h-6 text-gray-400" />
+                        </div>
                       )}
                     </div>
 
@@ -992,23 +996,7 @@ export default function ForArtistsPage() {
                       </div>
                     </div>
 
-                    {/* Reselling Status - Hidden on Mobile */}
-                    <div className="hidden lg:flex flex-col items-center gap-1">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                        item.allowReselling ? 'bg-green-600/20 text-green-300' : 'bg-gray-600/20 text-gray-400'
-                      }`}>
-                        {item.allowReselling ? 'Resale On' : 'Resale Off'}
-                      </span>
-                      {item.allowReselling && (
-                        <button
-                          onClick={() => generateResellerLink(item.id)}
-                          className="text-xs text-purple-400 hover:text-purple-300 transition flex items-center gap-1"
-                        >
-                          <Link className="w-3 h-3" />
-                          Link
-                        </button>
-                      )}
-                    </div>
+
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
@@ -1024,37 +1012,107 @@ export default function ForArtistsPage() {
                         )}
                       </button>
                     </div>
+                  </div>
 
-                    {/* More Actions Dropdown - Mobile */}
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <button 
-                        onClick={() => handleShareTrack(item)}
-                        className="text-gray-400 hover:text-purple-300 transition p-2"
-                        title="Share track"
-                      >
-                        <Share2 className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => setEditingMedia(item)}
-                        className="text-gray-400 hover:text-purple-300 transition p-2"
-                        title="Edit track"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => setSelectedMediaForAnalytics(item)}
-                        className="text-gray-400 hover:text-purple-300 transition p-2"
-                        title="View analytics"
-                      >
-                        <BarChart2 className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => deleteMedia(item.id)}
-                        className="text-gray-400 hover:text-red-400 transition p-2"
-                        title="Delete track"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                  {/* Mobile Actions Row */}
+                  <div className="relative z-10 px-4 pb-4 md:hidden">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        <button 
+                          onClick={() => handleShareTrack(item)}
+                          className="text-gray-400 hover:text-purple-300 transition p-2"
+                          title="Share track"
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => setEditingMedia(item)}
+                          className="text-gray-400 hover:text-purple-300 transition p-2"
+                          title="Edit track"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => setSelectedMediaForAnalytics(item)}
+                          className="text-gray-400 hover:text-purple-300 transition p-2"
+                          title="View analytics"
+                        >
+                          <BarChart2 className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => deleteMedia(item.id)}
+                          className="text-gray-400 hover:text-red-400 transition p-2"
+                          title="Delete track"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      {/* Reselling Status - Mobile */}
+                      <div className="flex flex-col items-end gap-1">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
+                          item.allowReselling ? 'bg-green-600/20 text-green-300' : 'bg-gray-600/20 text-gray-400'
+                        }`}>
+                          {item.allowReselling ? 'Resale On' : 'Resale Off'}
+                        </span>
+                        {item.allowReselling && (
+                          <button
+                            onClick={() => generateResellerLink(item.id)}
+                            className="text-xs text-purple-400 hover:text-purple-300 transition flex items-center gap-1"
+                          >
+                            <Link className="w-3 h-3" />
+                            Link
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Desktop Actions */}
+                  <div className="hidden md:flex relative z-10 items-center gap-1 md:gap-2 px-4 pb-4">
+                    <button 
+                      onClick={() => handleShareTrack(item)}
+                      className="text-gray-400 hover:text-purple-300 transition p-2"
+                      title="Share track"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => setEditingMedia(item)}
+                      className="text-gray-400 hover:text-purple-300 transition p-2"
+                      title="Edit track"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => setSelectedMediaForAnalytics(item)}
+                      className="text-gray-400 hover:text-purple-300 transition p-2"
+                      title="View analytics"
+                    >
+                      <BarChart2 className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => deleteMedia(item.id)}
+                      className="text-gray-400 hover:text-red-400 transition p-2"
+                      title="Delete track"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    {/* Reselling Status - Desktop */}
+                    <div className="flex flex-col items-center gap-1 ml-4">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
+                        item.allowReselling ? 'bg-green-600/20 text-green-300' : 'bg-gray-600/20 text-gray-400'
+                      }`}>
+                        {item.allowReselling ? 'Resale On' : 'Resale Off'}
+                      </span>
+                      {item.allowReselling && (
+                        <button
+                          onClick={() => generateResellerLink(item.id)}
+                          className="text-xs text-purple-400 hover:text-purple-300 transition flex items-center gap-1"
+                        >
+                          <Link className="w-3 h-3" />
+                          Link
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
