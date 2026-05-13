@@ -369,7 +369,7 @@ export default function TrackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
       <div className="relative max-w-7xl mx-auto px-4 py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <button
@@ -527,14 +527,14 @@ export default function TrackPage() {
                   <span className="text-xs uppercase tracking-[0.3em] text-purple-300">Browse</span>
                 </div>
                 <div className="-mx-2 overflow-x-auto pb-2">
-                  <div className="flex gap-4 px-2 snap-x snap-mandatory">
+                  <div className="flex gap-3 px-2 snap-x snap-mandatory">
                     {relatedTracks.map((relatedTrack) => (
                       <button
                         key={relatedTrack.id}
                         onClick={() => router.push(`/track/${relatedTrack.id}`)}
-                        className="snap-start min-w-[240px] max-w-[240px] rounded-[32px] bg-black p-4 text-left transition hover:bg-white/5 shadow-sm"
+                        className="snap-start min-w-[85px] max-w-[85px] sm:min-w-[120px] sm:max-w-[120px] lg:min-w-[240px] lg:max-w-[240px] rounded-[32px] bg-black p-2 sm:p-3 lg:p-4 text-left transition hover:bg-white/5 shadow-sm"
                       >
-                        <div className="relative mb-4 h-36 overflow-hidden rounded-3xl bg-slate-900">
+                        <div className="relative mb-2 sm:mb-3 lg:mb-4 h-20 sm:h-28 lg:h-36 overflow-hidden rounded-3xl bg-slate-900">
                           <Image
                             src={relatedTrack.coverArt || '/default-cover.jpg'}
                             alt={relatedTrack.title}
@@ -545,10 +545,10 @@ export default function TrackPage() {
                             }}
                           />
                         </div>
-                        <p className="font-semibold text-white truncate">{relatedTrack.title}</p>
-                        <p className="text-sm text-gray-400 truncate">{relatedTrack.artist}</p>
-                        <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
-                          <FaFire size={12} />
+                        <p className="font-semibold text-white text-xs sm:text-sm lg:text-base truncate">{relatedTrack.title}</p>
+                        <p className="text-xs sm:text-sm text-gray-400 truncate">{relatedTrack.artist}</p>
+                        <div className="mt-1 sm:mt-2 lg:mt-3 flex items-center gap-1 sm:gap-2 text-xs text-gray-500">
+                          <FaFire size={10} />
                           <span>{formatLargeNumber(relatedTrack.views || 0)} plays</span>
                         </div>
                       </button>
