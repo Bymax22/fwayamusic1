@@ -362,7 +362,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-                  <div key={i} className="flex-shrink-0 text-center cursor-pointer">
+                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="flex-shrink-0 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
                       style={{
@@ -379,7 +379,7 @@ export default function GuestWelcome() {
                     </div>
                     <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
                     <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -739,7 +739,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-                  <div key={i} className="flex-shrink-0 text-center cursor-pointer">
+                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="flex-shrink-0 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
                       style={{
@@ -756,7 +756,7 @@ export default function GuestWelcome() {
                     </div>
                     <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
                     <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -850,7 +850,7 @@ export default function GuestWelcome() {
               </div>
               <div className="space-y-3">
                 {featuredArtists.slice(0, 4).map((artist: any, i: number) => (
-                  <div key={i} className="rounded-3xl bg-transparent p-4">
+                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="rounded-3xl bg-transparent p-4 block">
                     <div className="flex items-center gap-3">
                       <div
                         className="w-12 h-12 rounded-full bg-black flex-shrink-0"
@@ -865,7 +865,7 @@ export default function GuestWelcome() {
                         <p className="text-xs text-gray-400">Latest update from your favorite artists</p>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -882,7 +882,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-                  <div key={i} className="flex-shrink-0 text-center cursor-pointer">
+                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="flex-shrink-0 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
                       style={{
@@ -899,7 +899,7 @@ export default function GuestWelcome() {
                     </div>
                     <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
                     <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -1107,8 +1107,9 @@ export default function GuestWelcome() {
             {/* GRID LAYOUT - 6 ARTISTS */}
             <div className="grid grid-cols-6 gap-3">
               {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-                <div
+                <Link
                   key={i}
+                  href={`/artists/${artist.id || artist._id}`}
                   className="text-center cursor-pointer hover:bg-transparent rounded-xl p-3 transition-colors"
                 >
                   {/* ARTIST IMAGE */}
@@ -1128,7 +1129,7 @@ export default function GuestWelcome() {
                   <p className="text-xs text-gray-400">
                     {artist.followers ? `${artist.followers.length} followers` : '0 followers'}
                   </p>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
