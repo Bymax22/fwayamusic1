@@ -5,7 +5,7 @@ import {
   Music, BarChart2, Users, Download, Settings, 
   PlusCircle, Edit3, Trash2, DollarSign, 
   MessageSquare, Video, Podcast, Mic,
-  Headphones, Upload, Share2, Link,
+  Headphones, Upload, Share2, Link, X,
   TrendingUp, UserCheck, Shield
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -957,14 +957,24 @@ export default function ForArtistsPage() {
       {/* Upload Modal */}
       <AnimatePresence>
         {showUploadModal && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-[120] p-2 sm:p-4">
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-slate-950 rounded-3xl p-6 w-full max-w-md shadow-2xl"
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[#050509] border border-white/10 rounded-[28px] p-4 sm:p-5 w-full max-w-[26rem] shadow-2xl max-h-[calc(100vh-5rem)] overflow-y-auto"
             >
-              <h2 className="text-xl font-bold text-white mb-6">Upload New Media</h2>
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <h2 className="text-xl font-bold text-white">Upload New Media</h2>
+                <button
+                  type="button"
+                  onClick={() => setShowUploadModal(false)}
+                  className="rounded-full p-2 text-gray-400 hover:text-white hover:bg-white/10 transition"
+                  aria-label="Close upload modal"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
               
               {isUploading ? (
                 <div className="space-y-4">
@@ -973,7 +983,7 @@ export default function ForArtistsPage() {
                       <span className="text-gray-400 text-sm">Uploading...</span>
                       <span className="text-white font-medium">{uploadProgress}%</span>
                     </div>
-                    <div className="w-full bg-slate-900 rounded-full h-3 overflow-hidden">
+                    <div className="w-full bg-[#11131c] rounded-full h-3 overflow-hidden">
                       <motion.div 
                         className="h-full bg-purple-500"
                         initial={{ width: 0 }}
@@ -987,12 +997,12 @@ export default function ForArtistsPage() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
                     <label className="block text-gray-400 mb-2">Title *</label>
                     <input
                       type="text"
-                      className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Enter media title"
                       value={newMedia.title}
                       onChange={(e) => setNewMedia({...newMedia, title: e.target.value})}
@@ -1003,7 +1013,7 @@ export default function ForArtistsPage() {
                   <div>
                     <label className="block text-gray-400 mb-2">Type *</label>
                     <select
-                      className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       value={newMedia.type}
                       onChange={(e) => setNewMedia({
                         ...newMedia, 
@@ -1022,7 +1032,7 @@ export default function ForArtistsPage() {
                     <label className="block text-gray-400 mb-2">Genre</label>
                     <input
                       type="text"
-                      className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Enter genre (e.g. Afrobeats, Hip Hop, Gospel)"
                       value={newMedia.genre}
                       onChange={(e) => setNewMedia({ ...newMedia, genre: e.target.value })}
@@ -1032,7 +1042,7 @@ export default function ForArtistsPage() {
 
                   <div>
                     <label className="block text-gray-400 mb-2">Cover Art (optional)</label>
-                    <div className="bg-slate-900 rounded-3xl p-4 text-center">
+                    <div className="bg-[#08080e] rounded-3xl p-3 text-center">
                       <input
                         type="file"
                         className="hidden"
@@ -1041,21 +1051,21 @@ export default function ForArtistsPage() {
                         accept="image/*"
                         disabled={isUploading}
                       />
-                      <label htmlFor="cover-upload" className="cursor-pointer inline-flex flex-col items-center gap-2 text-gray-400">
+                      <label htmlFor="cover-upload" className="cursor-pointer inline-flex flex-col items-center gap-1 text-gray-400">
                         <Upload className="w-6 h-6 text-purple-400" />
                         <span className="text-white font-medium">Upload cover art</span>
                         <span className="text-xs">JPG, PNG, WEBP</span>
                       </label>
                       {newMedia.artCoverPreview && (
-                        <img src={newMedia.artCoverPreview} alt="Cover preview" className="mx-auto mt-4 h-32 w-32 rounded-3xl object-cover" />
+                        <img src={newMedia.artCoverPreview} alt="Cover preview" className="mx-auto mt-3 h-20 w-20 rounded-3xl object-cover" />
                       )}
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-gray-400 mb-2">File * (Max 10MB)</label>
-                    <div className="bg-slate-900 rounded-3xl p-6 text-center">
-                      <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
+                    <div className="bg-[#08080e] rounded-3xl p-4 text-center">
+                      <div className="flex flex-col items-center justify-center gap-1 text-gray-400">
                         <Upload className="w-8 h-8 text-purple-400" />
                         <input
                           type="file"
@@ -1082,7 +1092,7 @@ export default function ForArtistsPage() {
                     <label className="block text-gray-400 mb-2">Pricing</label>
                     <div className="grid grid-cols-1 gap-3">
                       <select
-                        className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                         value={newMedia.accessType}
                         onChange={(e) => setNewMedia({ ...newMedia, accessType: e.target.value as 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW' })}
                         disabled={isUploading}
@@ -1094,7 +1104,7 @@ export default function ForArtistsPage() {
                       {newMedia.accessType !== 'FREE' && (
                         <input
                           type="text"
-                          className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                           placeholder="Set price in ZMW"
                           value={newMedia.price}
                           onChange={(e) => setNewMedia({ ...newMedia, price: e.target.value })}
@@ -1108,7 +1118,7 @@ export default function ForArtistsPage() {
                     <label className="block text-gray-400 mb-2">Optional Lyrics</label>
                     <textarea
                       rows={4}
-                      className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Add lyrics or production notes"
                       value={newMedia.lyrics}
                       onChange={(e) => setNewMedia({ ...newMedia, lyrics: e.target.value })}
@@ -1116,13 +1126,13 @@ export default function ForArtistsPage() {
                     />
                   </div>
 
-                  <div className="flex justify-end gap-3 pt-4">
+                  <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
                     <button
                       onClick={() => {
                         setShowUploadModal(false);
                         setNewMedia({ title: '', type: 'AUDIO', file: null, artCoverFile: null, artCoverPreview: null, accessType: 'FREE', price: '', genre: '', lyrics: '' });
                       }}
-                      className="px-4 py-2 bg-slate-900 text-white rounded-3xl hover:bg-slate-800 transition-colors"
+                      className="px-4 py-2 bg-[#11131c] text-white rounded-3xl hover:bg-[#161a24] transition-colors"
                       disabled={isUploading}
                     >
                       Cancel
@@ -1145,7 +1155,7 @@ export default function ForArtistsPage() {
       {/* Mobile Header */}
       <DashboardHeader logoText="Artist Dashboard" />
 
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-6 pb-32">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
