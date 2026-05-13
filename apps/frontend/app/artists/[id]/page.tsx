@@ -229,20 +229,20 @@ export default function ArtistPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a1f29] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e51f48]"></div>
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
       </div>
     );
   }
 
   if (error || !artist) {
     return (
-      <div className="min-h-screen bg-[#0a1f29] flex items-center justify-center">
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Artist Not Found</h1>
           <button
             onClick={() => router.back()}
-            className="bg-[#e51f48] text-white px-6 py-2 rounded-lg hover:bg-[#c41e3d] transition-colors"
+            className="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-400 transition-colors"
           >
             Go Back
           </button>
@@ -252,242 +252,195 @@ export default function ArtistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a1f29]">
-      {/* Header */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a3747]/50 to-[#0a1f29]/90"></div>
-        <div className="relative z-10 p-6">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-white hover:text-[#e51f48] transition-colors mb-6"
-          >
-            <FaArrowLeft size={16} />
-            Back
-          </button>
+    <div className="min-h-screen bg-black text-white">
+      <div className="relative overflow-hidden">
+        <div className="relative p-6 max-w-7xl mx-auto pb-32">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
+            <div className="space-y-3">
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Artist</p>
+              <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">{artist.name}</h1>
+              <p className="max-w-2xl text-gray-400">
+                {artist.followers.toLocaleString()} followers • {artist.mediaCount} songs • {artist.totalPlays.toLocaleString()} plays
+                {artist.isVerified && ' • Verified Artist'}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={handleFollow}
+                className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold shadow-lg transition ${
+                  artist.isFollowing
+                    ? 'bg-purple-500 text-white shadow-purple-500/20 hover:bg-purple-400'
+                    : 'bg-white text-black hover:bg-gray-200'
+                }`}
+              >
+                {artist.isFollowing ? 'Following' : 'Follow'}
+              </button>
+              <button
+                onClick={handleShare}
+                className="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-sm font-medium text-white hover:bg-white/15 transition"
+              >
+                <FaShare className="w-4 h-4" />
+                Share
+              </button>
+            </div>
+          </div>
 
-          <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
-            <div className="relative">
+          {/* Artist Avatar and Bio Section */}
+          <div className="flex flex-col lg:flex-row gap-8 mb-12">
+            <div className="relative flex-shrink-0">
               <Image
                 src={artist.avatarUrl}
                 alt={artist.name}
-                width={200}
-                height={200}
-                className="rounded-full object-cover shadow-2xl"
+                width={300}
+                height={300}
+                className="rounded-[32px] object-cover shadow-2xl"
               />
               {artist.isVerified && (
-                <div className="absolute -bottom-2 -right-2 bg-[#e51f48] rounded-full p-2">
-                  <FaCrown size={12} className="text-white" />
+                <div className="absolute -bottom-4 -right-4 bg-purple-500 rounded-full p-3 shadow-lg">
+                  <FaCrown size={16} className="text-white" />
                 </div>
               )}
             </div>
 
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-2">{artist.name}</h1>
-              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-gray-300 mb-4">
-                <span className="flex items-center gap-1">
-                  <FaUserFriends size={14} />
-                  {artist.followers.toLocaleString()} followers
-                </span>
-                <span className="flex items-center gap-1">
-                  <FaMusic size={14} />
-                  {artist.mediaCount} songs
-                </span>
-                <span className="flex items-center gap-1">
-                  <FaHeadphones size={14} />
-                  {artist.totalPlays.toLocaleString()} plays
-                </span>
-              </div>
-
+            <div className="flex-1 space-y-6">
               {artist.bio && (
-                <p className="text-gray-300 max-w-2xl mb-4">{artist.bio}</p>
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-white">About</h3>
+                  <p className="text-gray-300 leading-relaxed max-w-2xl">{artist.bio}</p>
+                </div>
               )}
 
-              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                <button
-                  onClick={handleFollow}
-                  className={`px-6 py-2 rounded-full font-medium transition-colors ${
-                    artist.isFollowing
-                      ? 'bg-[#e51f48] text-white hover:bg-[#c41e3d]'
-                      : 'bg-white text-black hover:bg-gray-200'
-                  }`}
-                >
-                  {artist.isFollowing ? 'Following' : 'Follow'}
-                </button>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white/5 rounded-2xl p-4">
+                  <div className="text-2xl font-bold text-white">{artist.followers.toLocaleString()}</div>
+                  <div className="text-sm text-gray-400">Followers</div>
+                </div>
+                <div className="bg-white/5 rounded-2xl p-4">
+                  <div className="text-2xl font-bold text-white">{artist.mediaCount}</div>
+                  <div className="text-sm text-gray-400">Songs</div>
+                </div>
+                <div className="bg-white/5 rounded-2xl p-4">
+                  <div className="text-2xl font-bold text-white">{artist.totalPlays.toLocaleString()}</div>
+                  <div className="text-sm text-gray-400">Total Plays</div>
+                </div>
+                <div className="bg-white/5 rounded-2xl p-4">
+                  <div className="text-2xl font-bold text-white">
+                    {artist.media.reduce((sum, song) => sum + (song.likes || 0), 0).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-gray-400">Total Likes</div>
+                </div>
+              </div>
 
-                <button
-                  onClick={handleShare}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#0b2936] text-white hover:bg-[#0c2f3d] transition-colors"
-                >
-                  <FaShare size={14} />
-                  Share
-                </button>
-
+              <div className="flex flex-wrap gap-3">
                 {artist.website && (
                   <a
                     href={artist.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#0b2936] text-white hover:bg-[#0c2f3d] transition-colors"
+                    className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/15 transition"
                   >
                     <FaGlobe size={14} />
                     Website
                   </a>
                 )}
-
-                <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#0b2936] text-white hover:bg-[#0c2f3d] transition-colors">
+                <button className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/15 transition">
                   <FaEnvelope size={14} />
                   Contact
                 </button>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Songs List */}
-      <div className="p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">Songs</h2>
+          {/* Songs Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 text-sm text-gray-400 mb-4">
+              <span className="inline-flex h-2 w-2 rounded-full bg-purple-400" />
+              <span>Songs</span>
+              <span className="text-white/70">({artist.media.length})</span>
+            </div>
 
-        <div className="space-y-2">
-          {artist.media.map((song, index) => (
-            <motion.div
-              key={song.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="flex items-center gap-4 p-4 rounded-lg bg-[#0a3747]/30 hover:bg-[#0a3747]/50 transition-colors group"
-            >
-              <div className="relative flex-shrink-0">
-                <Image
-                  src={song.coverArt || '/default-cover.png'}
-                  alt={song.title}
-                  width={50}
-                  height={50}
-                  className="rounded object-cover"
-                />
-                <button
-                  onClick={() => handlePlaySong(song)}
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded"
+            <div className="grid gap-4">
+              {artist.media.map((song, index) => (
+                <div
+                  key={song.id}
+                  className="group flex items-center gap-4 rounded-2xl bg-white/5 p-4 hover:bg-white/10 transition-all duration-300"
                 >
-                  {currentTrack?.id === song.id.toString() && isPlaying ? (
-                    <FaPause size={16} className="text-white" />
-                  ) : (
-                    <FaPlay size={16} className="text-white" />
-                  )}
-                </button>
-              </div>
+                  <div className="relative flex-shrink-0">
+                    <Image
+                      src={song.coverArt || '/default-cover.png'}
+                      alt={song.title}
+                      width={60}
+                      height={60}
+                      className="rounded-xl object-cover"
+                    />
+                    <button
+                      onClick={() => handlePlaySong(song)}
+                      className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"
+                    >
+                      {currentTrack?.id === song.id.toString() && isPlaying ? (
+                        <FaPause size={20} className="text-white" />
+                      ) : (
+                        <FaPlay size={20} className="text-white" />
+                      )}
+                    </button>
+                  </div>
 
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-white truncate">{song.title}</h3>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
-                  <span>{formatDuration(song.duration)}</span>
-                  <span className="flex items-center gap-1">
-                    <FaHeadphones size={10} />
-                    {(song.playCount || 0).toLocaleString()}
-                  </span>
-                  {song.accessType === 'PREMIUM' && (
-                    <span className="flex items-center gap-1 text-[#e51f48]">
-                      <FaCrown size={10} />
-                      Premium
-                    </span>
-                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-white truncate mb-1">{song.title}</h3>
+                    <div className="flex items-center gap-4 text-sm text-gray-400">
+                      <span>{formatDuration(song.duration)}</span>
+                      <span className="flex items-center gap-1">
+                        <FaHeadphones size={12} />
+                        {(song.playCount || song.views || 0).toLocaleString()}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <FaHeart size={12} />
+                        {song.likes || 0}
+                      </span>
+                      {song.accessType === 'PREMIUM' && (
+                        <span className="flex items-center gap-1 text-purple-400">
+                          <FaCrown size={12} />
+                          Premium
+                        </span>
+                      )}
+                      {song.isExplicit && (
+                        <span className="text-xs bg-gray-600 px-2 py-0.5 rounded">E</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleLikeSong(song.id)}
+                      className={`transition-colors ${likedSongs.has(song.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                    >
+                      {likedSongs.has(song.id) ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
+                    </button>
+                    <button
+                      onClick={() => handleShareSong(song)}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      <FaShare size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDownloadSong(song)}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      <FaDownload size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleAddToPlaylist(song)}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      <FaPlus size={16} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => handleLikeSong(song.id)}
-                  className={`transition-colors ${likedSongs.has(song.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
-                >
-                  {likedSongs.has(song.id) ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
-                </button>
-
-                {song.accessType === 'FREE' && (
-                  <button 
-                    onClick={() => handleDownloadSong(song)}
-                    className="text-gray-400 hover:text-[#e51f48] transition-colors"
-                  >
-                    <FaDownload size={16} />
-                  </button>
-                )}
-
-                <button 
-                  onClick={() => handleAddToPlaylist(song)}
-                  className="text-gray-400 hover:text-[#e51f48] transition-colors"
-                >
-                  <FaPlus size={16} />
-                </button>
-
-                <button 
-                  onClick={() => handleShareSong(song)}
-                  className="text-gray-400 hover:text-[#e51f48] transition-colors"
-                >
-                  <FaShare size={16} />
-                </button>
-
-                <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
-                  <FaComment size={16} />
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {artist.media.length === 0 && (
-          <div className="text-center py-12">
-            <FaMusic size={48} className="text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400">No songs available yet</p>
+              ))}
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* Playlist Modal */}
-      {showPlaylistModal && selectedSong && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#0f2935] rounded-xl p-6 max-w-md w-full"
-          >
-            <h3 className="text-white text-lg font-semibold mb-4">Add to Playlist</h3>
-            <p className="text-gray-400 mb-4">Add "{selectedSong.title}" to a playlist</p>
-            
-            <div className="space-y-2 mb-6">
-              {/* TODO: Replace with actual playlists */}
-              <button className="w-full text-left p-3 bg-[#0a3747] rounded-lg text-white hover:bg-[#0c3f52] transition-colors">
-                <FaListUl className="inline mr-2" />
-                My Favorites
-              </button>
-              <button className="w-full text-left p-3 bg-[#0a3747] rounded-lg text-white hover:bg-[#0c3f52] transition-colors">
-                <FaListUl className="inline mr-2" />
-                Workout Mix
-              </button>
-              <button className="w-full text-left p-3 bg-[#0a3747] rounded-lg text-white hover:bg-[#0c3f52] transition-colors">
-                <FaPlus className="inline mr-2" />
-                Create New Playlist
-              </button>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowPlaylistModal(false)}
-                className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  // TODO: Add to playlist logic
-                  setShowPlaylistModal(false);
-                }}
-                className="flex-1 px-4 py-2 bg-[#e51f48] text-white rounded-lg hover:bg-[#c41e3d] transition-colors"
-              >
-                Add
-              </button>
-            </div>
-          </motion.div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
