@@ -20,7 +20,7 @@
   --orange-accent: 255, 122, 0;
 
   /* 🌌 Background */
-  --bg-dark: 11, 11, 26;
+  --bg-dark: 54, 69, 79;
 
   /* 🧊 Glass System */
   --glass: 255, 255, 255;
@@ -39,6 +39,17 @@
   --sidebar-width: 220px;
   --nowplaying-width: 300px;
   --player-height: 90px;
+
+  /* Tailwind Variables */
+  --background: 0, 0, 0;
+  --foreground: 255, 255, 255;
+  --primary-accent: 155, 93, 229;
+  --primary-dark: 91, 14, 166;
+  --card: 54, 69, 79;
+  --card-foreground: 255, 255, 255;
+  --border: 54, 69, 79;
+  --input: 54, 69, 79;
+  --ring: 155, 93, 229;
 }
 
 /* Scrollbar Hide Utility */
@@ -95,11 +106,11 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
 
-  background: #0f0f2a;
+  background: #000000;
 }
 
 html {
-  background: #0f0f2a;
+  background: #000000;
 }
 
 /* ===============================

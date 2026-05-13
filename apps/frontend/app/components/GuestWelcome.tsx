@@ -200,42 +200,31 @@ export default function GuestWelcome() {
     <>
       <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black relative">
       {isLoading && (
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-xl flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-black/75 backdrop-blur-xl flex flex-col items-center justify-center z-50 px-4 text-center">
           <div className="relative flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full bg-white/5 blur-2xl" />
-            <div className="absolute inset-0 rounded-full border border-white/10" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-28 w-28 rounded-full bg-white/5 border border-purple-400/20 shadow-[0_0_80px_rgba(155,93,229,0.25)] animate-pulse" />
-            </div>
-            <div className="relative z-10 flex items-center justify-center">
+            <div className="h-28 w-28 rounded-full border border-purple-500/15 bg-white/5 flex items-center justify-center shadow-[0_0_60px_rgba(155,93,229,0.18)]">
               <Image
                 src="/fwaya lp-01.png"
                 alt="Loading"
                 width={64}
                 height={64}
-                className="animate-pulse"
+                className=""
               />
             </div>
-            <div className="absolute -bottom-10 flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-purple-400/80 animate-bounce-slow" />
-              <span className="h-3 w-3 rounded-full bg-white/70 animate-bounce-slow animation-delay-200" />
-              <span className="h-3 w-3 rounded-full bg-cyan-400/70 animate-bounce-slow animation-delay-400" />
-            </div>
           </div>
+
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <span className="h-2.5 w-2.5 rounded-full bg-purple-400 animate-pulse animation-delay-0" />
+            <span className="h-2.5 w-2.5 rounded-full bg-purple-400 animate-pulse animation-delay-150" />
+            <span className="h-2.5 w-2.5 rounded-full bg-purple-400 animate-pulse animation-delay-300" />
+          </div>
+
+          <p className="mt-4 text-sm text-gray-300">Loading your music experience...</p>
+
           <style>{`
-            @keyframes bounceSlow {
-              0%, 100% { transform: translateY(0); }
-              50% { transform: translateY(-6px); }
-            }
-            .animate-bounce-slow {
-              animation: bounceSlow 1.2s ease-in-out infinite;
-            }
-            .animation-delay-200 {
-              animation-delay: 0.2s;
-            }
-            .animation-delay-400 {
-              animation-delay: 0.4s;
-            }
+            .animation-delay-0 { animation-delay: 0s; }
+            .animation-delay-150 { animation-delay: 0.15s; }
+            .animation-delay-300 { animation-delay: 0.3s; }
           `}</style>
         </div>
       )}
