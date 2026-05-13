@@ -477,7 +477,7 @@ export default function GuestWelcome() {
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
                 {topCharts.slice(0, 6).map((track: any, i: number) => (
-                  <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
+                  <div key={track.id || i} className="bg-[#080a13] p-3 rounded-lg hover:bg-[#11131c] transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
                       <div className="w-10 h-10 rounded-md overflow-hidden bg-black flex-shrink-0 relative">
@@ -526,7 +526,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[120px] bg-transparent rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
+                  <div key={i} className="min-w-[120px] bg-transparent rounded-xl p-3 cursor-pointer hover:bg-[#11131c] transition-colors flex-shrink-0">
                     <div 
                       className={`w-full aspect-square ${item.coverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'} rounded-lg mb-2`}
                       style={{
@@ -627,7 +627,7 @@ export default function GuestWelcome() {
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
                 {topCharts.slice(0, 6).map((track: any, i: number) => (
-                  <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
+                  <div key={track.id || i} className="bg-[#080a13] p-3 rounded-lg hover:bg-[#11131c] transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
                       <div 
@@ -678,7 +678,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[120px] rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0 bg-transparent">
+                  <div key={i} className="min-w-[120px] rounded-xl p-3 cursor-pointer hover:bg-[#11131c] transition-colors flex-shrink-0 bg-transparent">
                     <div 
                       className="w-full aspect-square bg-black rounded-lg mb-2"
                       style={{
@@ -808,7 +808,7 @@ export default function GuestWelcome() {
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
                 {topCharts.slice(0, 6).map((track: any, i: number) => (
-                  <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
+                  <div key={track.id || i} className="bg-[#080a13] p-3 rounded-lg hover:bg-[#11131c] transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
                       <div 
@@ -1246,7 +1246,10 @@ export default function GuestWelcome() {
                       <span className="text-sm font-bold text-purple-400">{index + 1}</span>
                     </div>
                     <div
-                      className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0"
+                      className={
+                        "w-10 h-10 rounded-lg flex-shrink-0 " +
+                        (track.artCoverUrl ? "" : "bg-gradient-to-br from-purple-500 to-pink-500")
+                      }
                       style={{
                         backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
                         backgroundSize: 'cover',
