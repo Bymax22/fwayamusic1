@@ -200,31 +200,25 @@ export default function GuestWelcome() {
     <>
       <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black relative">
       {isLoading && (
-        <div className="absolute inset-0 bg-black/75 backdrop-blur-xl flex flex-col items-center justify-center z-50 px-4 text-center">
-          <div className="relative flex items-center justify-center">
-            <div className="h-28 w-28 rounded-full border border-purple-500/15 bg-white/5 flex items-center justify-center shadow-[0_0_60px_rgba(155,93,229,0.18)]">
-              <Image
-                src="/fwaya lp-01.png"
-                alt="Loading"
-                width={64}
-                height={64}
-                className=""
-              />
-            </div>
+        <div className="absolute inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-50">
+          <div className="h-28 w-28 rounded-full bg-white/5 border border-purple-500/15 flex items-center justify-center shadow-[0_0_60px_rgba(155,93,229,0.22)]">
+            <Image
+              src="/fwaya lp-01.png"
+              alt="Loading"
+              width={64}
+              height={64}
+              className="animate-fwaya-loader"
+            />
           </div>
-
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-purple-400 animate-pulse animation-delay-0" />
-            <span className="h-2.5 w-2.5 rounded-full bg-purple-400 animate-pulse animation-delay-150" />
-            <span className="h-2.5 w-2.5 rounded-full bg-purple-400 animate-pulse animation-delay-300" />
-          </div>
-
-          <p className="mt-4 text-sm text-gray-300">Loading your music experience...</p>
 
           <style>{`
-            .animation-delay-0 { animation-delay: 0s; }
-            .animation-delay-150 { animation-delay: 0.15s; }
-            .animation-delay-300 { animation-delay: 0.3s; }
+            @keyframes fwayaLogoPulse {
+              0%, 100% { opacity: 0.95; filter: hue-rotate(0deg); transform: scale(1); }
+              50% { opacity: 0.35; filter: hue-rotate(240deg); transform: scale(0.92); }
+            }
+            .animate-fwaya-loader {
+              animation: fwayaLogoPulse 1.6s ease-in-out infinite;
+            }
           `}</style>
         </div>
       )}
