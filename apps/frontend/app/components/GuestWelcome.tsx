@@ -201,7 +201,7 @@ export default function GuestWelcome() {
     <>
       <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black relative">
       {isLoading && (
-        <div className="absolute inset-0 bg-black/85 flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-50">
           <motion.div
             className="relative"
             animate={{ opacity: [0.7, 1, 0.7], scale: [0.95, 1.05, 0.95] }}
@@ -307,7 +307,7 @@ export default function GuestWelcome() {
             <button
               key={i}
               className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
-                activeTab === tab.key ? "bg-purple-600 text-white" : "bg-transparent text-gray-300 hover:bg-white/10"
+                activeTab === tab.key ? "bg-purple-600 text-white" : "bg-white/10 text-white hover:bg-white/15"
               }`}
               onClick={() => setActiveTab(tab.key)}
             >
@@ -455,7 +455,7 @@ export default function GuestWelcome() {
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
                   <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent">
                     <div 
-                      className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
+                      className={`aspect-square ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
                       style={{
                         backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -528,7 +528,7 @@ export default function GuestWelcome() {
                 {playlists.slice(0, 6).map((item: any, i: number) => (
                   <div key={i} className="min-w-[120px] bg-transparent rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
                     <div 
-                      className="w-full aspect-square bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mb-2"
+                      className={`w-full aspect-square ${item.coverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} rounded-lg mb-2`}
                       style={{
                         backgroundImage: item.coverUrl ? `url(${item.coverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -605,7 +605,7 @@ export default function GuestWelcome() {
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
                   <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent">
                     <div 
-                      className="aspect-square bg-gradient-to-br from-purple-500 to-pink-500"
+                      className={`aspect-square ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
                       style={{
                         backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -1027,14 +1027,13 @@ export default function GuestWelcome() {
                 >
                   {/* IMAGE */}
                   <div
-                    className="aspect-[4/5] bg-gradient-to-br from-purple-500 to-pink-500 group-hover:scale-105 transition-transform"
+                    className={`aspect-[4/5] ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} group-hover:scale-105 transition-transform`}
                     style={{
                       backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center'
                     }}
                   />
-
                   <div className="p-3 bg-[#080a13]">
                     <p className="text-xs font-medium truncate text-white">
                       {item.title}
@@ -1159,7 +1158,7 @@ export default function GuestWelcome() {
                 >
                   {/* IMAGE */}
                   <div
-                    className="aspect-[4/5] bg-gradient-to-br from-purple-500 to-pink-500 group-hover:scale-105 transition-transform"
+                    className={`aspect-[4/5] ${track.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} group-hover:scale-105 transition-transform`}
                     style={{
                       backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
                       backgroundSize: 'cover',
@@ -1205,7 +1204,7 @@ export default function GuestWelcome() {
                 >
                   {/* PLAYLIST COVER */}
                   <div
-                    className="aspect-[4/5] bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg group-hover:scale-105 transition-transform"
+                    className={`aspect-[4/5] ${playlist.coverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} rounded-lg group-hover:scale-105 transition-transform`}
                     style={{
                       backgroundImage: playlist.coverUrl ? `url(${playlist.coverUrl})` : undefined,
                       backgroundSize: 'cover',
