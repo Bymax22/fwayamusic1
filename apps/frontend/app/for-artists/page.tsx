@@ -663,9 +663,28 @@ export default function ForArtistsPage() {
               {(media || []).map(item => (
                 <div
                   key={item.id}
-                  className="group rounded-2xl bg-slate-900/50 overflow-hidden ring-1 ring-white/10 hover:ring-purple-400/30 transition"
+                  className="group rounded-2xl overflow-hidden ring-1 ring-white/10 hover:ring-purple-400/30 transition relative"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center p-4 md:p-5">
+                  {/* Background Art Cover */}
+                  {item.artCoverUrl && (
+                    <div className="absolute inset-0 z-0">
+                      <Image
+                        src={item.artCoverUrl}
+                        alt={item.title}
+                        fill
+                        className="object-cover blur-md opacity-20"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/default-cover.jpg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950" />
+                    </div>
+                  )}
+                  {!item.artCoverUrl && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950 to-slate-900 z-0" />
+                  )}
+                  
+                  <div className="relative z-10 grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center p-4 md:p-5">
                     {/* Cover Art */}
                     <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-slate-800 flex-shrink-0 md:block hidden">
                       {item.artCoverUrl && (
@@ -1042,20 +1061,20 @@ export default function ForArtistsPage() {
               <h3 className="text-xl font-bold text-white mb-4">Reseller Settings</h3>
               <div className="space-y-4">
                 {(media || []).map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-4 bg-slate-900 rounded-3xl">
-                    <div>
-                      <h4 className="text-white">{item.title}</h4>
-                      <p className="text-sm text-gray-400">{item.genre}</p>
+                  <div key={item.id} className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 bg-slate-900/50 rounded-2xl ring-1 ring-white/10 hover:ring-purple-400/20 transition">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-white font-medium truncate">{item.title}</h4>
+                      <p className="text-sm text-gray-400 truncate">{item.genre}</p>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className={`px-3 py-1 rounded-full text-sm ${
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                      <span className={`px-3 py-2 sm:py-1 rounded-full text-xs sm:text-sm text-center ${
                         item.allowReselling ? 'bg-green-600/30 text-green-400' : 'bg-gray-600/30 text-gray-400'
                       }`}>
-                        {item.allowReselling ? 'Reselling Enabled' : 'Reselling Disabled'}
+                        {item.allowReselling ? 'Enabled' : 'Disabled'}
                       </span>
                       <button
                         onClick={() => updateMediaSettings(item.id, { allowReselling: !item.allowReselling })}
-                        className={`px-4 py-2 rounded-3xl text-sm ${
+                        className={`px-3 py-2 rounded-full text-xs sm:text-sm font-medium transition whitespace-nowrap ${
                           item.allowReselling 
                             ? 'bg-purple-600/30 text-purple-300 hover:bg-purple-500/40' 
                             : 'bg-green-600/30 text-green-400 hover:bg-green-600/40'
@@ -1066,7 +1085,7 @@ export default function ForArtistsPage() {
                       {item.allowReselling && (
                         <button
                           onClick={() => generateResellerLink(item.id)}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-3xl hover:bg-purple-500 text-sm"
+                          className="px-3 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-500 transition text-xs sm:text-sm font-medium whitespace-nowrap"
                         >
                           Generate Link
                         </button>
