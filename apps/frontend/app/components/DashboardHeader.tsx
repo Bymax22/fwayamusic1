@@ -29,8 +29,8 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Fwaya Music',
-          text: 'Check out Fwaya Music - Your ultimate music streaming platform!',
+          title: 'Fwaya',
+          text: 'Check out Fwaya - Your ultimate music streaming platform!',
           url: window.location.origin,
         });
       } catch (error) {

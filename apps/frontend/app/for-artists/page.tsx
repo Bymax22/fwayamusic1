@@ -113,6 +113,12 @@ interface NewMedia {
   title: string;
   type: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM';
   file: File | null;
+  artCoverFile: File | null;
+  artCoverPreview: string | null;
+  accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
+  price: string;
+  genre: string;
+  lyrics: string;
 }
 
 export default function ForArtistsPage() {
@@ -130,9 +136,22 @@ export default function ForArtistsPage() {
   const [newMedia, setNewMedia] = useState<NewMedia>({
     title: '',
     type: 'AUDIO',
-    file: null
+    file: null,
+    artCoverFile: null,
+    artCoverPreview: null,
+    accessType: 'FREE',
+    price: '',
+    genre: '',
+    lyrics: '',
   });
 
+  const formatZMW = (amount: number) =>
+    amount.toLocaleString('en-ZM', {
+      style: 'currency',
+      currency: 'ZMW',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
   useEffect(() => {
     fetchDashboardData();
@@ -187,17 +206,50 @@ export default function ForArtistsPage() {
       return;
     }
 
+    if (newMedia.accessType !== 'FREE' && !newMedia.price.trim()) {
+      alert('Please set a price for premium or pay-per-view content');
+      return;
+    }
+
+    if (newMedia.price && isNaN(Number(newMedia.price))) {
+      alert('Please enter a valid price');
+      return;
+    }
+
     try {
       setIsUploading(true);
       setUploadProgress(0);
 
-      // Step 1: Upload directly to Cloudinary (10%)
+      let artCoverUrl: string | null = null;
+      if (newMedia.artCoverFile) {
+        const coverFormData = new FormData();
+        coverFormData.append('file', newMedia.artCoverFile);
+        coverFormData.append('upload_preset', 'bymaxdev1');
+        
+        const coverResponse = await fetch(
+          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+          {
+            method: 'POST',
+            body: coverFormData,
+          }
+        );
+
+        if (!coverResponse.ok) {
+          throw new Error('Cover art upload failed');
+        }
+
+        const coverData = await coverResponse.json();
+        artCoverUrl = coverData.secure_url;
+        setUploadProgress(20);
+      }
+
+      // Step 1: Upload media file to Cloudinary
       const cloudinaryFormData = new FormData();
       cloudinaryFormData.append('file', newMedia.file);
-      cloudinaryFormData.append('upload_preset', 'bymaxdev1'); // Same preset as avatar
-      cloudinaryFormData.append('resource_type', 'auto'); // Auto-detect video/audio
+      cloudinaryFormData.append('upload_preset', 'bymaxdev1');
+      cloudinaryFormData.append('resource_type', 'auto');
       
-      setUploadProgress(10);
+      setUploadProgress(30);
 
       const cloudinaryResponse = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/auto/upload`,
@@ -212,9 +264,9 @@ export default function ForArtistsPage() {
       }
 
       const cloudinaryData = await cloudinaryResponse.json();
-      setUploadProgress(60);
+      setUploadProgress(65);
 
-      // Step 2: Save metadata to database via backend API (70-90%)
+      // Step 2: Save metadata to database via backend API
       const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
       
       const dbFormData = new FormData();
@@ -225,8 +277,13 @@ export default function ForArtistsPage() {
       dbFormData.append('duration', cloudinaryData.duration?.toString() || '0');
       dbFormData.append('format', cloudinaryData.format);
       dbFormData.append('resourceType', cloudinaryData.resource_type);
+      if (artCoverUrl) dbFormData.append('artCoverUrl', artCoverUrl);
+      dbFormData.append('accessType', newMedia.accessType);
+      dbFormData.append('genre', newMedia.genre.trim());
+      if (newMedia.accessType !== 'FREE') dbFormData.append('price', newMedia.price.trim());
+      if (newMedia.lyrics.trim()) dbFormData.append('lyrics', newMedia.lyrics.trim());
 
-      setUploadProgress(70);
+      setUploadProgress(80);
 
       const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
@@ -248,7 +305,13 @@ export default function ForArtistsPage() {
           setNewMedia({
             title: '',
             type: 'AUDIO',
-            file: null
+            file: null,
+            artCoverFile: null,
+            artCoverPreview: null,
+            accessType: 'FREE',
+            price: '',
+            genre: '',
+            lyrics: '',
           });
           setUploadProgress(0);
           setIsUploading(false);
@@ -271,6 +334,23 @@ export default function ForArtistsPage() {
     if (file) {
       setNewMedia(prev => ({ ...prev, file }));
     }
+  };
+
+  const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image for the cover art');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewMedia(prev => ({ ...prev, artCoverPreview: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+    setNewMedia(prev => ({ ...prev, artCoverFile: file }));
   };
 
   const generateResellerLink = async (mediaId: number) => {
@@ -350,7 +430,7 @@ export default function ForArtistsPage() {
     if (isLoading) {
       return (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#e51f48]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
         </div>
       );
     }
@@ -385,9 +465,9 @@ export default function ForArtistsPage() {
 
             <DashboardCard
               title="Total Revenue"
-              value={`$${(stats?.totalRevenue ?? 0).toFixed(2)}`}
+              value={formatZMW(stats?.totalRevenue ?? 0)}
               icon={<DollarSign className="w-5 h-5" />}
-              change={`$${(stats?.monthlyRevenue ?? 0).toFixed(2)} this month`}
+              change={`${formatZMW(stats?.monthlyRevenue ?? 0)} this month`}
               color="bg-gradient-to-br from-yellow-500/20 to-orange-500/20"
             />
 
@@ -407,14 +487,14 @@ export default function ForArtistsPage() {
               color="bg-gradient-to-br from-teal-500/20 to-cyan-500/20"
             />
             
-            <div className="md:col-span-2 lg:col-span-3 bg-black p-6 rounded-xl">
+            <div className="md:col-span-2 lg:col-span-3 bg-slate-950 p-6 rounded-3xl">
               <h3 className="text-gray-400 mb-4">Plays Over Time</h3>
-              <div className="h-64 bg-white/5 rounded-lg p-4">
+              <div className="h-64 bg-slate-900 rounded-3xl p-4">
                 <div className="flex items-end h-full gap-1">
                   {(analytics?.playsByDay || []).map((count, i) => (
                     <div 
                       key={i}
-                      className="flex-1 bg-gradient-to-t from-[#e51f48] to-[#ff4d6d] rounded-t-sm"
+                      className="flex-1 bg-gradient-to-t from-purple-500 to-purple-600 rounded-t-sm"
                       style={{ height: `${Math.min(100, (count / Math.max(...(analytics?.playsByDay || [1]))) * 100)}%` }}
                     />
                   ))}
@@ -440,17 +520,17 @@ export default function ForArtistsPage() {
               <h2 className="text-xl font-bold text-white">Your Content</h2>
               <button 
                 onClick={() => setShowUploadModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600/10 hover:bg-purple-500/15 text-white rounded-3xl transition-colors"
               >
                 <PlusCircle className="w-5 h-5" />
                 Upload New
               </button>
             </div>
             
-            <div className="bg-black rounded-xl overflow-hidden">
+            <div className="bg-slate-950 rounded-3xl overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10 text-gray-400 text-left">
+                  <tr className="text-gray-400 text-left">
                     <th className="p-4">Title</th>
                     <th className="p-4">Type</th>
                     <th className="p-4">Access</th>
@@ -472,7 +552,7 @@ export default function ForArtistsPage() {
                 </thead>
                 <tbody>
                   {(media || []).map(item => (
-                    <tr key={item.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
+                    <tr key={item.id} className="hover:bg-slate-900 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           {item.artCoverUrl && (
@@ -510,11 +590,10 @@ export default function ForArtistsPage() {
                           item.accessType === 'PAY_PER_VIEW' ? 'bg-green-600/30 text-green-400' :
                           'bg-gray-600/30 text-gray-400'
                         }`}>
-                          {item.accessType === 'PREMIUM' && <DollarSign className="w-3 h-3" />}
                           {item.accessType}
                         </span>
                         {item.price && item.accessType !== 'FREE' && (
-                          <p className="text-xs text-gray-400 mt-1">${item.price}</p>
+                          <p className="text-xs text-gray-400 mt-1">ZMW {item.price}</p>
                         )}
                       </td>
                       <td className="p-4 text-gray-300">{(item.playCount || 0).toLocaleString()}</td>
@@ -528,7 +607,7 @@ export default function ForArtistsPage() {
                         {item.allowReselling && (
                           <button
                             onClick={() => generateResellerLink(item.id)}
-                            className="text-xs text-[#e51f48] hover:text-[#ff4d6d] mt-1 flex items-center gap-1"
+                            className="text-xs text-purple-500 hover:text-purple-600 mt-1 flex items-center gap-1"
                           >
                             <Link className="w-3 h-3" />
                             Generate Link
@@ -539,21 +618,21 @@ export default function ForArtistsPage() {
                         <div className="flex gap-2">
                           <button 
                             onClick={() => updateMediaSettings(item.id, { allowReselling: !item.allowReselling })}
-                            className="text-gray-400 hover:text-[#e51f48] transition-colors"
+                            className="text-gray-400 hover:text-purple-300 transition-colors"
                             title={item.allowReselling ? 'Disable reselling' : 'Allow reselling'}
                           >
                             <Share2 className="w-4 h-4" />
                           </button>
-                          <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
+                          <button className="text-gray-400 hover:text-purple-300 transition-colors">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button 
                             onClick={() => deleteMedia(item.id)}
-                            className="text-gray-400 hover:text-[#e51f48] transition-colors"
+                            className="text-gray-400 hover:text-purple-300 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
-                          <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
+                          <button className="text-gray-400 hover:text-purple-300 transition-colors">
                             <BarChart2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -569,12 +648,12 @@ export default function ForArtistsPage() {
       case 'analytics':
         return (
           <div className="space-y-8">
-            <div className="bg-black p-6 rounded-xl">
+            <div className="bg-slate-950 p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Top Tracks</h3>
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-slate-900 rounded-3xl p-4">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-gray-400 text-left border-b border-white/10">
+                    <tr className="text-gray-400 text-left">
                       <th className="p-3">Track</th>
                       <th className="p-3">Plays</th>
                       <th className="p-3">Revenue</th>
@@ -583,14 +662,14 @@ export default function ForArtistsPage() {
                   </thead>
                   <tbody>
                     {(analytics?.topTracks || []).map((track) => (
-                      <tr key={track.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
+                      <tr key={track.id} className="hover:bg-slate-900 transition-colors">
                         <td className="p-3 text-white">{track.title}</td>
                         <td className="p-3 text-gray-300">{(track.plays || 0).toLocaleString()}</td>
-                        <td className="p-3 text-green-400">${(track.revenue ?? 0).toFixed(2)}</td>
+                        <td className="p-3 text-green-400">{formatZMW(track.revenue ?? 0)}</td>
                         <td className="p-3">
-                          <div className="w-32 bg-white/10 rounded-full h-2 overflow-hidden">
+                          <div className="w-32 bg-slate-900 rounded-full h-2 overflow-hidden">
                             <div 
-                              className="h-full bg-[#e51f48] rounded-full"
+                              className="h-full bg-purple-500 rounded-full"
                               style={{ width: `${analytics?.topTracks && analytics.topTracks.length > 0 ? (track.plays / Math.max(...analytics.topTracks.map(t => t.plays))) * 100 : 0}%` }}
                             />
                           </div>
@@ -602,12 +681,12 @@ export default function ForArtistsPage() {
               </div>
             </div>
             
-            <div className="bg-black p-6 rounded-xl">
+            <div className="bg-slate-950 p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Top Countries</h3>
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-slate-900 rounded-3xl p-4">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-gray-400 text-left border-b border-white/10">
+                    <tr className="text-gray-400 text-left">
                       <th className="p-3">Country</th>
                       <th className="p-3">Plays</th>
                       <th className="p-3">% of Total</th>
@@ -615,14 +694,14 @@ export default function ForArtistsPage() {
                   </thead>
                   <tbody>
                     {(analytics?.topCountries || []).map((country, i) => (
-                      <tr key={i} className="border-b border-white/10 hover:bg-white/5 transition-colors">
+                      <tr key={i} className="hover:bg-slate-900 transition-colors">
                         <td className="p-3 text-white">{country.country}</td>
                         <td className="p-3 text-gray-300">{(country.plays || 0).toLocaleString()}</td>
                         <td className="p-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-32 bg-white/10 rounded-full h-2 overflow-hidden">
+                            <div className="w-32 bg-slate-900 rounded-full h-2 overflow-hidden">
                               <div 
-                                className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full"
+                                className="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"
                                 style={{ width: `${country.percentage}%` }}
                               />
                             </div>
@@ -649,10 +728,10 @@ export default function ForArtistsPage() {
               </div>
             </div>
             
-            <div className="bg-black rounded-xl overflow-hidden">
+            <div className="bg-slate-950 rounded-3xl overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10 text-gray-400 text-left">
+                  <tr className="text-gray-400 text-left">
                     <th className="p-4">Follower</th>
                     <th className="p-4">Followed Since</th>
                     <th className="p-4">Actions</th>
@@ -660,7 +739,7 @@ export default function ForArtistsPage() {
                 </thead>
                 <tbody>
                   {(followers || []).map(follower => (
-                    <tr key={follower.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
+                    <tr key={follower.id} className="hover:bg-slate-900 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           {follower.follower.avatarUrl && (
@@ -684,7 +763,7 @@ export default function ForArtistsPage() {
                         {new Date(follower.createdAt).toLocaleDateString()}
                       </td>
                       <td className="p-4">
-                        <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
+                        <button className="text-gray-400 hover:text-purple-300 transition-colors">
                           <MessageSquare className="w-4 h-4" />
                         </button>
                       </td>
@@ -699,35 +778,35 @@ export default function ForArtistsPage() {
       case 'monetization':
         return (
           <div className="space-y-6">
-            <div className="bg-black p-6 rounded-xl">
+            <div className="bg-slate-950 p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Earnings Overview</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-white/5 p-4 rounded-lg">
+                <div className="bg-slate-900 p-4 rounded-3xl">
                   <h4 className="text-gray-400">Total Earnings</h4>
-                  <p className="text-2xl font-bold text-white mt-2">${(stats?.totalRevenue ?? 0).toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-white mt-2">{formatZMW(stats?.totalRevenue ?? 0)}</p>
                 </div>
                 
-                <div className="bg-white/5 p-4 rounded-lg">
+                <div className="bg-slate-900 p-4 rounded-3xl">
                   <h4 className="text-gray-400">This Month</h4>
-                  <p className="text-2xl font-bold text-white mt-2">${(stats?.monthlyRevenue ?? 0).toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-white mt-2">{formatZMW(stats?.monthlyRevenue ?? 0)}</p>
                 </div>
                 
-                <div className="bg-white/5 p-4 rounded-lg">
+                <div className="bg-slate-900 p-4 rounded-3xl">
                   <h4 className="text-gray-400">Reseller Commissions</h4>
                   <p className="text-2xl font-bold text-white mt-2">
-                    ${commissions.reduce((sum, c) => sum + (c.status === 'PAID' ? c.amount : 0), 0).toFixed(2)}
+                    {formatZMW(commissions.reduce((sum, c) => sum + (c.status === 'PAID' ? c.amount : 0), 0))}
                   </p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-black p-6 rounded-xl">
+            <div className="bg-slate-950 p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Commission History</h3>
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-slate-900 rounded-3xl p-4">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-gray-400 text-left border-b border-white/10">
+                    <tr className="text-gray-400 text-left">
                       <th className="p-3">Track</th>
                       <th className="p-3">Amount</th>
                       <th className="p-3">Status</th>
@@ -736,7 +815,7 @@ export default function ForArtistsPage() {
                   </thead>
                   <tbody>
                     {(commissions || []).map(commission => (
-                      <tr key={commission.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
+                      <tr key={commission.id} className="hover:bg-slate-900 transition-colors">
                         <td className="p-3 text-white">{commission.media.title}</td>
                         <td className="p-3 text-green-400">
                           {commission.currency} {(commission.amount ?? 0).toFixed(2)}
@@ -745,7 +824,7 @@ export default function ForArtistsPage() {
                           <span className={`px-2 py-1 rounded-full text-xs ${
                             commission.status === 'PAID' ? 'bg-green-600/30 text-green-400' :
                             commission.status === 'PENDING' ? 'bg-yellow-600/30 text-yellow-400' :
-                            'bg-red-600/30 text-red-400'
+                            'bg-purple-600/30 text-purple-400'
                           }`}>
                             {commission.status}
                           </span>
@@ -765,10 +844,10 @@ export default function ForArtistsPage() {
       case 'reseller':
         return (
           <div className="space-y-6">
-            <div className="bg-white/5 p-6 rounded-xl">
+            <div className="bg-slate-950 p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Reseller Program</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white/10 p-6 rounded-lg">
+                <div className="bg-slate-900 p-6 rounded-3xl">
                   <h4 className="text-white font-bold mb-2">Program Benefits</h4>
                   <ul className="text-gray-400 space-y-2">
                     <li className="flex items-center gap-2">
@@ -790,7 +869,7 @@ export default function ForArtistsPage() {
                   </ul>
                 </div>
                 
-                <div className="bg-white/10 p-6 rounded-lg">
+                <div className="bg-slate-900 p-6 rounded-3xl">
                   <h4 className="text-white font-bold mb-2">Quick Stats</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between">
@@ -816,11 +895,11 @@ export default function ForArtistsPage() {
               </div>
             </div>
 
-            <div className="bg-white/5 p-6 rounded-xl">
+            <div className="bg-slate-950 p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Reseller Settings</h3>
               <div className="space-y-4">
                 {(media || []).map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-4 bg-white/10 rounded-lg">
+                  <div key={item.id} className="flex items-center justify-between p-4 bg-slate-900 rounded-3xl">
                     <div>
                       <h4 className="text-white">{item.title}</h4>
                       <p className="text-sm text-gray-400">{item.genre}</p>
@@ -833,9 +912,9 @@ export default function ForArtistsPage() {
                       </span>
                       <button
                         onClick={() => updateMediaSettings(item.id, { allowReselling: !item.allowReselling })}
-                        className={`px-4 py-2 rounded-lg text-sm ${
+                        className={`px-4 py-2 rounded-3xl text-sm ${
                           item.allowReselling 
-                            ? 'bg-red-600/30 text-red-400 hover:bg-red-600/40' 
+                            ? 'bg-purple-600/30 text-purple-300 hover:bg-purple-500/40' 
                             : 'bg-green-600/30 text-green-400 hover:bg-green-600/40'
                         }`}
                       >
@@ -844,7 +923,7 @@ export default function ForArtistsPage() {
                       {item.allowReselling && (
                         <button
                           onClick={() => generateResellerLink(item.id)}
-                          className="px-4 py-2 bg-[#e51f48] text-white rounded-lg hover:bg-[#ff4d6d] text-sm"
+                          className="px-4 py-2 bg-purple-600 text-white rounded-3xl hover:bg-purple-500 text-sm"
                         >
                           Generate Link
                         </button>
@@ -883,7 +962,7 @@ export default function ForArtistsPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-black/95 rounded-xl p-6 w-full max-w-md border border-white/10"
+              className="bg-slate-950 rounded-3xl p-6 w-full max-w-md shadow-2xl"
             >
               <h2 className="text-xl font-bold text-white mb-6">Upload New Media</h2>
               
@@ -894,9 +973,9 @@ export default function ForArtistsPage() {
                       <span className="text-gray-400 text-sm">Uploading...</span>
                       <span className="text-white font-medium">{uploadProgress}%</span>
                     </div>
-                    <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden border border-white/10">
+                    <div className="w-full bg-slate-900 rounded-full h-3 overflow-hidden">
                       <motion.div 
-                        className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d]"
+                        className="h-full bg-purple-500"
                         initial={{ width: 0 }}
                         animate={{ width: `${uploadProgress}%` }}
                         transition={{ duration: 0.3 }}
@@ -913,18 +992,18 @@ export default function ForArtistsPage() {
                     <label className="block text-gray-400 mb-2">Title *</label>
                     <input
                       type="text"
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
+                      className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Enter media title"
                       value={newMedia.title}
                       onChange={(e) => setNewMedia({...newMedia, title: e.target.value})}
                       disabled={isUploading}
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-gray-400 mb-2">Type *</label>
                     <select
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
+                      className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       value={newMedia.type}
                       onChange={(e) => setNewMedia({
                         ...newMedia, 
@@ -940,10 +1019,44 @@ export default function ForArtistsPage() {
                   </div>
 
                   <div>
+                    <label className="block text-gray-400 mb-2">Genre</label>
+                    <input
+                      type="text"
+                      className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Enter genre (e.g. Afrobeats, Hip Hop, Gospel)"
+                      value={newMedia.genre}
+                      onChange={(e) => setNewMedia({ ...newMedia, genre: e.target.value })}
+                      disabled={isUploading}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-400 mb-2">Cover Art (optional)</label>
+                    <div className="bg-slate-900 rounded-3xl p-4 text-center">
+                      <input
+                        type="file"
+                        className="hidden"
+                        id="cover-upload"
+                        onChange={handleCoverSelect}
+                        accept="image/*"
+                        disabled={isUploading}
+                      />
+                      <label htmlFor="cover-upload" className="cursor-pointer inline-flex flex-col items-center gap-2 text-gray-400">
+                        <Upload className="w-6 h-6 text-purple-400" />
+                        <span className="text-white font-medium">Upload cover art</span>
+                        <span className="text-xs">JPG, PNG, WEBP</span>
+                      </label>
+                      {newMedia.artCoverPreview && (
+                        <img src={newMedia.artCoverPreview} alt="Cover preview" className="mx-auto mt-4 h-32 w-32 rounded-3xl object-cover" />
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
                     <label className="block text-gray-400 mb-2">File * (Max 10MB)</label>
-                    <div className="border-2 border-dashed border-white/10 rounded-lg p-6 text-center hover:border-[#e51f48] transition-colors">
+                    <div className="bg-slate-900 rounded-3xl p-6 text-center">
                       <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
-                        <Upload className="w-8 h-8" />
+                        <Upload className="w-8 h-8 text-purple-400" />
                         <input
                           type="file"
                           className="hidden"
@@ -952,12 +1065,12 @@ export default function ForArtistsPage() {
                           accept="audio/*,video/*"
                           disabled={isUploading}
                         />
-                        <label htmlFor="file-upload" className="cursor-pointer">
-                          <p className="text-white font-medium">Click to select or drag file</p>
-                          <p className="text-sm">MP3, WAV, FLAC, MP4, MOV</p>
+                        <label htmlFor="file-upload" className="cursor-pointer text-white font-medium">
+                          Click to select file
                         </label>
+                        <p className="text-sm">MP3, WAV, FLAC, MP4, MOV</p>
                         {newMedia.file && (
-                          <p className="text-green-400 text-sm mt-2">
+                          <p className="text-purple-300 text-sm mt-2">
                             ✓ {newMedia.file.name}
                           </p>
                         )}
@@ -965,13 +1078,51 @@ export default function ForArtistsPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                  <div>
+                    <label className="block text-gray-400 mb-2">Pricing</label>
+                    <div className="grid grid-cols-1 gap-3">
+                      <select
+                        className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        value={newMedia.accessType}
+                        onChange={(e) => setNewMedia({ ...newMedia, accessType: e.target.value as 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW' })}
+                        disabled={isUploading}
+                      >
+                        <option value="FREE">Free</option>
+                        <option value="PREMIUM">Premium</option>
+                        <option value="PAY_PER_VIEW">Pay Per View</option>
+                      </select>
+                      {newMedia.accessType !== 'FREE' && (
+                        <input
+                          type="text"
+                          className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          placeholder="Set price in ZMW"
+                          value={newMedia.price}
+                          onChange={(e) => setNewMedia({ ...newMedia, price: e.target.value })}
+                          disabled={isUploading}
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-400 mb-2">Optional Lyrics</label>
+                    <textarea
+                      rows={4}
+                      className="w-full bg-slate-900 rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Add lyrics or production notes"
+                      value={newMedia.lyrics}
+                      onChange={(e) => setNewMedia({ ...newMedia, lyrics: e.target.value })}
+                      disabled={isUploading}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-4">
                     <button
                       onClick={() => {
                         setShowUploadModal(false);
-                        setNewMedia({ title: '', type: 'AUDIO', file: null });
+                        setNewMedia({ title: '', type: 'AUDIO', file: null, artCoverFile: null, artCoverPreview: null, accessType: 'FREE', price: '', genre: '', lyrics: '' });
                       }}
-                      className="px-4 py-2 bg-white/5 text-white rounded-lg hover:bg-white/10 transition-colors"
+                      className="px-4 py-2 bg-slate-900 text-white rounded-3xl hover:bg-slate-800 transition-colors"
                       disabled={isUploading}
                     >
                       Cancel
@@ -979,7 +1130,7 @@ export default function ForArtistsPage() {
                     <button
                       onClick={handleUpload}
                       disabled={!newMedia.title || !newMedia.file || isUploading}
-                      className="px-4 py-2 bg-[#e51f48] disabled:bg-gray-600 text-white rounded-lg hover:bg-[#ff4d6d] transition-colors disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-purple-600 disabled:bg-gray-600 text-white rounded-3xl hover:bg-purple-500 transition-colors disabled:cursor-not-allowed"
                     >
                       {isUploading ? 'Uploading...' : 'Upload'}
                     </button>
@@ -999,20 +1150,20 @@ export default function ForArtistsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <Music className="w-8 h-8 text-[#e51f48]" />
+              <Music className="w-8 h-8 text-purple-400" />
               Artist Dashboard
             </h1>
             <p className="text-gray-400">Manage your music, view analytics, and connect with fans</p>
           </div>
           
           <div className="flex items-center gap-3">
-            <button className="px-4 py-2 bg-white/5 text-white rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2">
+            <button className="px-4 py-2 bg-slate-900 text-white rounded-3xl hover:bg-slate-800 transition-colors flex items-center gap-2">
               <Settings className="w-5 h-5" />
               Settings
             </button>
             <button 
               onClick={() => setShowUploadModal(true)}
-              className="px-4 py-2 bg-[#e51f48] text-white rounded-lg hover:bg-[#ff4d6d] transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-purple-600 text-white rounded-3xl hover:bg-purple-500 transition-colors flex items-center gap-2"
             >
               <PlusCircle className="w-5 h-5" />
               Upload
@@ -1021,7 +1172,7 @@ export default function ForArtistsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex overflow-x-auto border-b border-white/10 mb-6">
+        <div className="flex overflow-x-auto mb-6">
           {[
             { id: 'dashboard', label: 'Dashboard', icon: <BarChart2 className="w-5 h-5" /> },
             { id: 'content', label: 'Content', icon: <Music className="w-5 h-5" /> },
@@ -1035,7 +1186,7 @@ export default function ForArtistsPage() {
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`px-4 py-3 font-medium whitespace-nowrap ${
                 activeTab === tab.id 
-                  ? 'text-[#e51f48] border-b-2 border-[#e51f48]' 
+                  ? 'text-purple-400 border-b-2 border-purple-400' 
                   : 'text-gray-400 hover:text-gray-300'
               }`}
             >
