@@ -455,7 +455,7 @@ export default function GuestWelcome() {
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
                   <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent">
                     <div 
-                      className={`aspect-square ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
+                      className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
                       style={{
                         backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -528,7 +528,7 @@ export default function GuestWelcome() {
                 {playlists.slice(0, 6).map((item: any, i: number) => (
                   <div key={i} className="min-w-[120px] bg-transparent rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
                     <div 
-                      className={`w-full aspect-square ${item.coverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} rounded-lg mb-2`}
+                      className={`w-full aspect-square ${item.coverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'} rounded-lg mb-2`}
                       style={{
                         backgroundImage: item.coverUrl ? `url(${item.coverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -605,7 +605,7 @@ export default function GuestWelcome() {
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
                   <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent">
                     <div 
-                      className={`aspect-square ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
+                      className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
                       style={{
                         backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                         backgroundSize: 'cover',
