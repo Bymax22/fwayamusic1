@@ -203,64 +203,67 @@ export default function GuestWelcome() {
       {isLoading && (
         <div className="absolute inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-50">
           <svg
-            width="200"
-            height="200"
+            width="220"
+            height="220"
             viewBox="0 0 512 512"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className="overflow-visible"
           >
             <defs>
-              <filter id="purpleGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <filter id="purpleGlow" x="-50%" y="-50%" width="200%" height="200%"/>
                 <feGaussianBlur stdDeviation="6" result="coloredBlur" />
                 <feMerge>
                   <feMergeNode in="coloredBlur" />
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
-              </filter>
+              
             </defs>
 
+            <image
+              href="/fwaya lp-01.png"
+              x="56"
+              y="56"
+              width="400"
+              height="400"
+              opacity="0.12"
+              preserveAspectRatio="xMidYMid meet"
+            />
+
             <motion.path
-              d="M130 70
-                 Q130 40 160 40
-                 H220
-                 Q240 40 255 55
-                 L320 105
-                 Q350 125 350 160
-                 V330
-                 L460 250
-                 Q490 230 490 256
-                 Q490 282 460 302
-                 L350 382
-                 V420
-                 Q350 460 310 480
-                 Q270 500 220 500
+              d="M108 50
+                 C108 28 132 10 154 10
+                 H224
+                 C250 10 280 34 280 60
+                 V218
+                 L408 300
+                 C436 319 436 354 408 373
+                 L284 470
+                 C254 500 212 500 182 470
+                 C152 440 128 395 128 345
+                 V140
+                 C128 110 142 80 172 70
                  H200
-                 Q150 500 130 460
-                 Q110 430 110 390
-                 V130
-                 Q110 90 130 70
+                 C230 70 246 90 246 120
+                 V220
+                 C246 260 216 280 182 272
+                 C152 264 134 240 134 212
+                 V140
+                 C134 86 120 64 108 50
+                 Z
 
                  M220 360
-                 A60 60 0 1 1 220 240
-                 A60 60 0 1 1 220 360"
+                 A72 72 0 1 1 220 216
+                 A72 72 0 1 1 220 360"
               stroke="#B066FF"
-              strokeWidth="6"
+              strokeWidth="8"
               fill="transparent"
               strokeLinecap="round"
               strokeLinejoin="round"
               filter="url(#purpleGlow)"
-              initial={{
-                pathLength: 0,
-              }}
-              animate={{
-                pathLength: 1,
-              }}
-              transition={{
-                duration: 4,
-                ease: "linear",
-                repeat: Infinity,
-              }}
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 4, ease: "linear", repeat: Infinity }}
             />
 
             <motion.circle
@@ -272,31 +275,7 @@ export default function GuestWelcome() {
                 dur="4s"
                 repeatCount="indefinite"
                 rotate="auto"
-                path="
-                  M130 70
-                  Q130 40 160 40
-                  H220
-                  Q240 40 255 55
-                  L320 105
-                  Q350 125 350 160
-                  V330
-                  L460 250
-                  Q490 230 490 256
-                  Q490 282 460 302
-                  L350 382
-                  V420
-                  Q350 460 310 480
-                  Q270 500 220 500
-                  H200
-                  Q150 500 130 460
-                  Q110 430 110 390
-                  V130
-                  Q110 90 130 70
-
-                  M220 360
-                  A60 60 0 1 1 220 240
-                  A60 60 0 1 1 220 360
-                "
+                path="M108 50 C108 28 132 10 154 10 H224 C250 10 280 34 280 60 V218 L408 300 C436 319 436 354 408 373 L284 470 C254 500 212 500 182 470 C152 440 128 395 128 345 V140 C128 110 142 80 172 70 H200 C230 70 246 90 246 120 V220 C246 260 216 280 182 272 C152 264 134 240 134 212 V140 C134 86 120 64 108 50 Z M220 360 A72 72 0 1 1 220 216 A72 72 0 1 1 220 360"
               />
             </motion.circle>
           </svg>
