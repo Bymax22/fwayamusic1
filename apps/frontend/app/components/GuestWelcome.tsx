@@ -201,30 +201,35 @@ export default function GuestWelcome() {
       <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black relative">
       {isLoading && (
         <div className="absolute inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-50">
-          <div 
-            className="relative flex items-center justify-center"
-            style={{
-              backgroundSize: '200% 200%',
-              animation: 'fwayaColorShift 3s ease-in-out infinite',
-              background: 'linear-gradient(135deg, #a855f7, #ec4899, #06b6d4, #a855f7)',
-            }}
-          >
+          <div className="relative flex items-center justify-center w-24 h-24">
             <Image
               src="/fwaya lp-01.png"
               alt="Loading"
               width={64}
               height={64}
-              className="relative z-10 mix-blend-screen"
+              className="relative z-10 animate-logo-trace"
             />
+            <div className="absolute inset-0 rounded-lg border-2 border-purple-400 animate-trace-border" />
           </div>
 
           <style>{`
-            @keyframes fwayaColorShift {
-              0% { background-position: 0% 50%; }
-              25% { background-position: 50% 0%; }
-              50% { background-position: 100% 50%; }
-              75% { background-position: 50% 100%; }
-              100% { background-position: 0% 50%; }
+            @keyframes logoTrace {
+              0% { opacity: 0; filter: blur(8px) brightness(0.5); }
+              50% { opacity: 0.6; filter: blur(4px) brightness(1); }
+              100% { opacity: 1; filter: blur(0px) brightness(1); }
+            }
+            @keyframes traceBorder {
+              0% { clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%); opacity: 1; }
+              25% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); opacity: 1; }
+              50% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); opacity: 0.6; }
+              75% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); opacity: 0.3; }
+              100% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); opacity: 0; }
+            }
+            .animate-logo-trace {
+              animation: logoTrace 2.5s ease-in-out infinite;
+            }
+            .animate-trace-border {
+              animation: traceBorder 2.5s ease-in-out infinite;
             }
           `}</style>
         </div>
