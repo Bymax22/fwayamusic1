@@ -166,10 +166,25 @@ export default function ForArtistsPage() {
     });
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    if (typeof window === 'undefined') return;
+
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const handleMediaChange = (event: MediaQueryListEvent) => setIsMobile(event.matches);
+
+    setIsMobile(mediaQuery.matches);
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleMediaChange);
+    } else {
+      mediaQuery.addListener(handleMediaChange);
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleMediaChange);
+      } else {
+        mediaQuery.removeListener(handleMediaChange);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -245,9 +260,7 @@ export default function ForArtistsPage() {
 
     setCurrentTrack(track);
     setIsPlaying(true);
-    if (isMobile) {
-      setIsMobilePlayerOpen(true);
-    }
+    setIsMobilePlayerOpen(true);
     setCurrentTime(0);
     setDuration(track.duration || 0);
   };
@@ -646,51 +659,33 @@ export default function ForArtistsPage() {
               </button>
             </div>
             
-            <div className="bg-slate-950 rounded-3xl overflow-hidden">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-gray-400 text-left">
-                    <th className="p-4">Title</th>
-                    <th className="p-4">Type</th>
-                    <th className="p-4">Access</th>
-                    <th className="p-4">
-                      <div className="flex items-center gap-1">
-                        <Headphones className="w-4 h-4" />
-                        Plays
-                      </div>
-                    </th>
-                    <th className="p-4">
-                      <div className="flex items-center gap-1">
-                        <Download className="w-4 h-4" />
-                        Downloads
-                      </div>
-                    </th>
-                    <th className="p-4">Reselling</th>
-                    <th className="p-4">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(media || []).map(item => (
-                    <tr key={item.id} className="hover:bg-slate-900 transition-colors">
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          {item.artCoverUrl && (
-                            <Image
-                              src={item.artCoverUrl}
-                              alt={item.title}
-                              width={40}
-                              height={40}
-                              className="rounded-lg object-cover"
-                            />
-                          )}
-                          <div>
-                            <p className="font-medium text-white">{item.title}</p>
-                            <p className="text-sm text-gray-400">{item.genre}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
+            <div className="space-y-4">
+              {(media || []).map(item => (
+                <div
+                  key={item.id}
+                  className="group rounded-2xl bg-slate-900/50 overflow-hidden ring-1 ring-white/10 hover:ring-purple-400/30 transition"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center p-4 md:p-5">
+                    {/* Cover Art */}
+                    <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-slate-800 flex-shrink-0 md:block hidden">
+                      {item.artCoverUrl && (
+                        <Image
+                          src={item.artCoverUrl}
+                          alt={item.title}
+                          fill
+                          className="object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/default-cover.jpg';
+                          }}
+                        />
+                      )}
+                    </div>
+
+                    {/* Title, Type, Genre Info */}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="truncate text-base font-semibold text-white">{item.title}</p>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs flex-shrink-0 ${
                           item.type === 'AUDIO' ? 'bg-blue-600/30 text-blue-400' :
                           item.type === 'VIDEO' ? 'bg-purple-600/30 text-purple-400' :
                           item.type === 'PODCAST' ? 'bg-amber-600/30 text-amber-400' :
@@ -700,77 +695,95 @@ export default function ForArtistsPage() {
                            item.type === 'VIDEO' ? <Video className="w-3 h-3" /> :
                            item.type === 'PODCAST' ? <Podcast className="w-3 h-3" /> :
                            <Mic className="w-3 h-3" />}
-                          {item.type}
                         </span>
-                      </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                          item.accessType === 'PREMIUM' ? 'bg-amber-600/30 text-amber-400' :
-                          item.accessType === 'PAY_PER_VIEW' ? 'bg-green-600/30 text-green-400' :
-                          'bg-gray-600/30 text-gray-400'
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                        <span>{item.genre || 'Unknown'}</span>
+                        <span>•</span>
+                        <span className={`px-2 py-0.5 rounded-full ${
+                          item.accessType === 'PREMIUM' ? 'bg-amber-600/20 text-amber-300' :
+                          item.accessType === 'PAY_PER_VIEW' ? 'bg-green-600/20 text-green-300' :
+                          'bg-gray-600/20 text-gray-300'
                         }`}>
                           {item.accessType}
                         </span>
                         {item.price && item.accessType !== 'FREE' && (
-                          <p className="text-xs text-gray-400 mt-1">ZMW {item.price}</p>
+                          <>
+                            <span>•</span>
+                            <span className="text-gray-300">ZMW {item.price}</span>
+                          </>
                         )}
-                      </td>
-                      <td className="p-4 text-gray-300">{(item.playCount || 0).toLocaleString()}</td>
-                      <td className="p-4 text-gray-300">{(item.downloadCount || 0).toLocaleString()}</td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                          item.allowReselling ? 'bg-green-600/30 text-green-400' : 'bg-gray-600/30 text-gray-400'
-                        }`}>
-                          {item.allowReselling ? 'Allowed' : 'Disabled'}
+                      </div>
+                      <div className="flex gap-3 text-xs text-gray-500 mt-2">
+                        <span className="flex items-center gap-1">
+                          <Headphones className="w-3 h-3" />
+                          {(item.playCount || 0).toLocaleString()}
                         </span>
-                        {item.allowReselling && (
-                          <button
-                            onClick={() => generateResellerLink(item.id)}
-                            className="text-xs text-purple-500 hover:text-purple-600 mt-1 flex items-center gap-1"
-                          >
-                            <Link className="w-3 h-3" />
-                            Generate Link
-                          </button>
+                        <span className="flex items-center gap-1">
+                          <Download className="w-3 h-3" />
+                          {(item.downloadCount || 0).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Reselling Status - Hidden on Mobile */}
+                    <div className="hidden lg:flex flex-col items-center gap-1">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
+                        item.allowReselling ? 'bg-green-600/20 text-green-300' : 'bg-gray-600/20 text-gray-400'
+                      }`}>
+                        {item.allowReselling ? 'Resale On' : 'Resale Off'}
+                      </span>
+                      {item.allowReselling && (
+                        <button
+                          onClick={() => generateResellerLink(item.id)}
+                          className="text-xs text-purple-400 hover:text-purple-300 transition flex items-center gap-1"
+                        >
+                          <Link className="w-3 h-3" />
+                          Link
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => playTrack(item)}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-600 text-white hover:bg-purple-500 transition flex-shrink-0"
+                        title={currentTrack?.id === item.id && isPlaying ? 'Pause track' : 'Play track'}
+                      >
+                        {currentTrack?.id === item.id && isPlaying ? (
+                          <Pause className="w-4 h-4" />
+                        ) : (
+                          <Play className="w-4 h-4" />
                         )}
-                      </td>
-                      <td className="p-4">
-                        <div className="flex gap-2">
-                          <button 
-                            onClick={() => updateMediaSettings(item.id, { allowReselling: !item.allowReselling })}
-                            className="text-gray-400 hover:text-purple-300 transition-colors"
-                            title={item.allowReselling ? 'Disable reselling' : 'Allow reselling'}
-                          >
-                            <Share2 className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => playTrack(item)}
-                            className="text-gray-400 hover:text-purple-300 transition-colors"
-                            title={currentTrack?.id === item.id && isPlaying ? 'Pause track' : 'Play track'}
-                          >
-                            {currentTrack?.id === item.id && isPlaying ? (
-                              <Pause className="w-4 h-4" />
-                            ) : (
-                              <Play className="w-4 h-4" />
-                            )}
-                          </button>
-                          <button className="text-gray-400 hover:text-purple-300 transition-colors">
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => deleteMedia(item.id)}
-                            className="text-gray-400 hover:text-purple-300 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                          <button className="text-gray-400 hover:text-purple-300 transition-colors">
-                            <BarChart2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </button>
+                    </div>
+
+                    {/* More Actions Dropdown - Mobile */}
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <button 
+                        onClick={() => updateMediaSettings(item.id, { allowReselling: !item.allowReselling })}
+                        className="text-gray-400 hover:text-purple-300 transition p-2"
+                        title={item.allowReselling ? 'Disable reselling' : 'Allow reselling'}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </button>
+                      <button className="text-gray-400 hover:text-purple-300 transition p-2">
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button className="text-gray-400 hover:text-purple-300 transition p-2">
+                        <BarChart2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => deleteMedia(item.id)}
+                        className="text-gray-400 hover:text-red-400 transition p-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         );
