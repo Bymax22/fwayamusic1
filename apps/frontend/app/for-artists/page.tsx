@@ -155,6 +155,11 @@ export default function ForArtistsPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [isTrackLoading, setIsTrackLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [editingMedia, setEditingMedia] = useState<Media | null>(null);
+  const [selectedMediaForAnalytics, setSelectedMediaForAnalytics] = useState<Media | null>(null);
+  const [selectedMediaForShare, setSelectedMediaForShare] = useState<Media | null>(null);
+  const [isEditLoading, setIsEditLoading] = useState(false);
+  const [shareLink, setShareLink] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const formatZMW = (amount: number) =>
@@ -552,10 +557,252 @@ export default function ForArtistsPage() {
       if (response.ok) {
         setMedia(prev => prev.filter(m => m.id !== mediaId));
         alert('Media deleted successfully');
+      } else {
+        alert('Failed to delete media');
       }
     } catch (error) {
       console.error('Error deleting media:', error);
+      alert('Error deleting media');
     }
+  };
+
+  const handleEditMedia = async (mediaId: number, updates: Partial<Media>) => {
+    if (!editingMedia) return;
+
+    try {
+      setIsEditLoading(true);
+      let token: string | null = null;
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken();
+      }
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`/api/artist/media/${mediaId}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(updates),
+      });
+
+      if (response.ok) {
+        const updatedMedia = await response.json();
+        setMedia(prev => prev.map(m => m.id === mediaId ? updatedMedia : m));
+        setEditingMedia(null);
+        alert('Track updated successfully');
+      } else {
+        alert('Failed to update track');
+      }
+    } catch (error) {
+      console.error('Error updating media:', error);
+      alert('Error updating track');
+    } finally {
+      setIsEditLoading(false);
+    }
+  };
+
+  const handleShareTrack = async (media: Media) => {
+    try {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      const trackUrl = `${baseUrl}/track/${media.id}`;
+      setSelectedMediaForShare(media);
+      setShareLink(trackUrl);
+    } catch (error) {
+      console.error('Error sharing track:', error);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('Link copied to clipboard!');
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+    }
+  };
+
+  const renderEditModal = () => {
+    if (!editingMedia) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <motion.div 
+          className="bg-slate-900 rounded-2xl p-6 max-w-lg w-full max-h-96 overflow-y-auto"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white">Edit Track</h3>
+            <button onClick={() => setEditingMedia(null)} className="text-gray-400 hover:text-white">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Title</label>
+              <input
+                type="text"
+                value={editingMedia.title}
+                onChange={(e) => setEditingMedia({ ...editingMedia, title: e.target.value })}
+                className="w-full bg-slate-800 text-white rounded-lg px-3 py-2 border border-slate-700 focus:border-purple-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Description</label>
+              <textarea
+                value={editingMedia.description || ''}
+                onChange={(e) => setEditingMedia({ ...editingMedia, description: e.target.value })}
+                className="w-full bg-slate-800 text-white rounded-lg px-3 py-2 border border-slate-700 focus:border-purple-500 outline-none h-20 resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Genre</label>
+              <input
+                type="text"
+                value={editingMedia.genre || ''}
+                onChange={(e) => setEditingMedia({ ...editingMedia, genre: e.target.value })}
+                className="w-full bg-slate-800 text-white rounded-lg px-3 py-2 border border-slate-700 focus:border-purple-500 outline-none"
+              />
+            </div>
+
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => setEditingMedia(null)}
+                className="flex-1 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleEditMedia(editingMedia.id, {
+                  title: editingMedia.title,
+                  description: editingMedia.description,
+                  genre: editingMedia.genre,
+                })}
+                disabled={isEditLoading}
+                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition disabled:opacity-50"
+              >
+                {isEditLoading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  };
+
+  const renderAnalyticsModal = () => {
+    if (!selectedMediaForAnalytics) return null;
+
+    const trackAnalytics = analytics?.topTracks?.find(t => t.id === selectedMediaForAnalytics.id) || {
+      id: selectedMediaForAnalytics.id,
+      title: selectedMediaForAnalytics.title,
+      plays: selectedMediaForAnalytics.playCount || 0,
+      revenue: 0,
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <motion.div 
+          className="bg-slate-900 rounded-2xl p-6 max-w-lg w-full"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white">Track Analytics</h3>
+            <button onClick={() => setSelectedMediaForAnalytics(null)} className="text-gray-400 hover:text-white">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <p className="text-gray-400 text-sm">Track</p>
+              <p className="text-white font-semibold truncate">{trackAnalytics.title}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-slate-800 p-4 rounded-lg">
+                <p className="text-gray-400 text-sm">Total Plays</p>
+                <p className="text-white font-bold text-2xl">{(trackAnalytics.plays || 0).toLocaleString()}</p>
+              </div>
+              <div className="bg-slate-800 p-4 rounded-lg">
+                <p className="text-gray-400 text-sm">Downloads</p>
+                <p className="text-white font-bold text-2xl">{(selectedMediaForAnalytics.downloadCount || 0).toLocaleString()}</p>
+              </div>
+              <div className="bg-slate-800 p-4 rounded-lg">
+                <p className="text-gray-400 text-sm">Shares</p>
+                <p className="text-white font-bold text-2xl">{(selectedMediaForAnalytics.shareCount || 0).toLocaleString()}</p>
+              </div>
+              <div className="bg-slate-800 p-4 rounded-lg">
+                <p className="text-gray-400 text-sm">Revenue</p>
+                <p className="text-green-400 font-bold text-2xl">{formatZMW(trackAnalytics.revenue ?? 0)}</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedMediaForAnalytics(null)}
+              className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition"
+            >
+              Close
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  };
+
+  const renderShareModal = () => {
+    if (!selectedMediaForShare || !shareLink) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <motion.div 
+          className="bg-slate-900 rounded-2xl p-6 max-w-lg w-full"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white">Share Track</h3>
+            <button onClick={() => setSelectedMediaForShare(null)} className="text-gray-400 hover:text-white">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <p className="text-gray-400 text-sm mb-2">Track Link</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={shareLink}
+                  readOnly
+                  className="flex-1 bg-slate-800 text-white rounded-lg px-3 py-2 border border-slate-700"
+                />
+                <button
+                  onClick={() => copyToClipboard(shareLink)}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedMediaForShare(null)}
+              className="w-full px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition"
+            >
+              Close
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
   };
 
   const renderTabContent = () => {
@@ -781,21 +1028,30 @@ export default function ForArtistsPage() {
                     {/* More Actions Dropdown - Mobile */}
                     <div className="flex items-center gap-1 md:gap-2">
                       <button 
-                        onClick={() => updateMediaSettings(item.id, { allowReselling: !item.allowReselling })}
+                        onClick={() => handleShareTrack(item)}
                         className="text-gray-400 hover:text-purple-300 transition p-2"
-                        title={item.allowReselling ? 'Disable reselling' : 'Allow reselling'}
+                        title="Share track"
                       >
                         <Share2 className="w-4 h-4" />
                       </button>
-                      <button className="text-gray-400 hover:text-purple-300 transition p-2">
+                      <button 
+                        onClick={() => setEditingMedia(item)}
+                        className="text-gray-400 hover:text-purple-300 transition p-2"
+                        title="Edit track"
+                      >
                         <Edit3 className="w-4 h-4" />
                       </button>
-                      <button className="text-gray-400 hover:text-purple-300 transition p-2">
+                      <button 
+                        onClick={() => setSelectedMediaForAnalytics(item)}
+                        className="text-gray-400 hover:text-purple-300 transition p-2"
+                        title="View analytics"
+                      >
                         <BarChart2 className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => deleteMedia(item.id)}
                         className="text-gray-400 hover:text-red-400 transition p-2"
+                        title="Delete track"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -1394,6 +1650,9 @@ export default function ForArtistsPage() {
             onToggleMute={toggleMute}
           />
         )}
+        {renderEditModal()}
+        {renderAnalyticsModal()}
+        {renderShareModal()}
         <audio ref={audioRef} className="hidden" />
       </div>
     </div>
