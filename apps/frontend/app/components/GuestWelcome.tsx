@@ -207,29 +207,28 @@ export default function GuestWelcome() {
               alt="Loading"
               width={64}
               height={64}
-              className="relative z-10 animate-logo-trace"
+              className="relative z-10"
+              style={{
+                filter: 'drop-shadow(0 0 0 rgb(168, 85, 247))',
+                animation: 'logoEdgeTrace 2.5s ease-in-out infinite',
+              }}
             />
-            <div className="absolute inset-0 rounded-lg border-2 border-purple-400 animate-trace-border" />
           </div>
 
           <style>{`
-            @keyframes logoTrace {
-              0% { opacity: 0; filter: blur(8px) brightness(0.5); }
-              50% { opacity: 0.6; filter: blur(4px) brightness(1); }
-              100% { opacity: 1; filter: blur(0px) brightness(1); }
-            }
-            @keyframes traceBorder {
-              0% { clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%); opacity: 1; }
-              25% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); opacity: 1; }
-              50% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); opacity: 0.6; }
-              75% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); opacity: 0.3; }
-              100% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); opacity: 0; }
-            }
-            .animate-logo-trace {
-              animation: logoTrace 2.5s ease-in-out infinite;
-            }
-            .animate-trace-border {
-              animation: traceBorder 2.5s ease-in-out infinite;
+            @keyframes logoEdgeTrace {
+              0% {
+                filter: drop-shadow(0 0 8px rgb(168, 85, 247)) drop-shadow(0 0 0px rgba(168, 85, 247, 0.8));
+                opacity: 0.3;
+              }
+              50% {
+                filter: drop-shadow(0 0 16px rgb(168, 85, 247)) drop-shadow(2px 2px 8px rgba(168, 85, 247, 0.6));
+                opacity: 1;
+              }
+              100% {
+                filter: drop-shadow(0 0 8px rgb(168, 85, 247)) drop-shadow(0 0 0px rgba(168, 85, 247, 0.2));
+                opacity: 0.3;
+              }
             }
           `}</style>
         </div>
