@@ -7,7 +7,7 @@ import { GlobalPlayerProvider } from "./hooks/useAudioPlayer";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Fwaya Music",
+  title: "Fwaya",
   description: "Stream, sell, and discover music worldwide",
   icons: {
     icon: [
