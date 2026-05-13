@@ -176,6 +176,7 @@ export class MediaService {
         platformCommissionRate: 0.5,
         user: { connect: { id: userId } },
         artCoverUrl: metadata.coverUrl || defaultCoverUrl,
+        thumbnailUrl: metadata.coverUrl || defaultCoverUrl,
       };
 
       const media = await this.prisma.media.create({

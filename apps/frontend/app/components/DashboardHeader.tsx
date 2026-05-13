@@ -81,11 +81,11 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
       <div className="px-5 py-4">
         <div className="flex items-center justify-between">
           {/* Logo/Brand */}
-          <div className="flex items-center gap-2 text-white text-xl font-semibold">
+          <div className="flex items-center gap-2 text-white text-2xl font-semibold">
             {showLogo && (
-              <img src="/fwayalogo-01.png" alt="Fwaya" className="h-8 w-auto object-contain opacity-100" />
+              <img src="/fwayalogo-01.png" alt="Fwaya" className="h-10 w-auto object-contain opacity-100" />
             )}
-            <span className="text-lg font-semibold text-white">{logoText}</span>
+            <span className="text-xl font-semibold text-white">{logoText}</span>
           </div>
 
           {/* Right side buttons */}

@@ -1,12 +1,12 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Music, BarChart2, Users, Download, Settings, 
   PlusCircle, Edit3, Trash2, DollarSign, 
   MessageSquare, Video, Podcast, Mic,
   Headphones, Upload, Share2, Link, X,
-  TrendingUp, UserCheck, Shield
+  TrendingUp, UserCheck, Shield, Play, Pause
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -14,6 +14,7 @@ import { auth } from '@/lib/firebase-config';
 import RoleGuard from '@/components/RoleGuard';
 import { DashboardCard } from '@/components/DashboardCard';
 import DashboardHeader from '@/components/DashboardHeader';
+import MobilePlayer from '@/components/MobilePlayer';
 
 
 
@@ -28,6 +29,7 @@ interface Media {
   type: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM';
   accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
   price: number | null;
+  duration?: number;
   isExplicit: boolean;
   playCount: number;
   downloadCount: number;
@@ -144,6 +146,16 @@ export default function ForArtistsPage() {
     genre: '',
     lyrics: '',
   });
+  const [currentTrack, setCurrentTrack] = useState<Media | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMobilePlayerOpen, setIsMobilePlayerOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isTrackLoading, setIsTrackLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const formatZMW = (amount: number) =>
     amount.toLocaleString('en-ZM', {
@@ -152,6 +164,102 @@ export default function ForArtistsPage() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const onLoadedMetadata = () => {
+      setDuration(audio.duration || 0);
+      setIsTrackLoading(false);
+    };
+
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onEnded = () => setIsPlaying(false);
+
+    audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('ended', onEnded);
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('ended', onEnded);
+    };
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentTrack) return;
+
+    if (audio.src !== currentTrack.url) {
+      audio.src = currentTrack.url;
+      audio.load();
+      setIsTrackLoading(true);
+    }
+
+    if (isPlaying) {
+      const playPromise = audio.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch((error) => {
+          console.warn('Playback interrupted:', error);
+          setIsPlaying(false);
+        });
+      }
+    } else {
+      audio.pause();
+    }
+  }, [currentTrack, isPlaying]);
+
+  const seekInTrack = (time: number) => {
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = time;
+    setCurrentTime(time);
+  };
+
+  const changeVolume = (value: number) => {
+    if (!audioRef.current) return;
+    audioRef.current.volume = value;
+    setVolume(value);
+    setIsMuted(value === 0);
+  };
+
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = !audioRef.current.muted;
+    setIsMuted(audioRef.current.muted);
+  };
+
+  const playTrack = (track: Media) => {
+    if (currentTrack?.id === track.id) {
+      setIsPlaying((prev) => !prev);
+      return;
+    }
+
+    setCurrentTrack(track);
+    setIsPlaying(true);
+    if (isMobile) {
+      setIsMobilePlayerOpen(true);
+    }
+    setCurrentTime(0);
+    setDuration(track.duration || 0);
+  };
+
+  const handlePlayPause = () => {
+    setIsPlaying((prev) => !prev);
+  };
+
+  const handleMobilePlayerClose = () => {
+    setIsMobilePlayerOpen(false);
+    setIsPlaying(false);
+  };
 
   useEffect(() => {
     fetchDashboardData();
@@ -298,6 +406,17 @@ export default function ForArtistsPage() {
       if (dbResponse.ok) {
         const uploadedMedia = await dbResponse.json() as Media;
         setMedia(prev => [uploadedMedia, ...prev]);
+        
+        // Log cover art validation
+        console.log('✅ Media Upload Successful:', {
+          id: uploadedMedia.id,
+          title: uploadedMedia.title,
+          artCoverUrl: uploadedMedia.artCoverUrl,
+          thumbnailUrl: uploadedMedia.thumbnailUrl,
+          url: uploadedMedia.url,
+          timestamp: new Date().toISOString(),
+        });
+        
         setUploadProgress(100);
         
         setTimeout(() => {
@@ -622,6 +741,17 @@ export default function ForArtistsPage() {
                             title={item.allowReselling ? 'Disable reselling' : 'Allow reselling'}
                           >
                             <Share2 className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => playTrack(item)}
+                            className="text-gray-400 hover:text-purple-300 transition-colors"
+                            title={currentTrack?.id === item.id && isPlaying ? 'Pause track' : 'Play track'}
+                          >
+                            {currentTrack?.id === item.id && isPlaying ? (
+                              <Pause className="w-4 h-4" />
+                            ) : (
+                              <Play className="w-4 h-4" />
+                            )}
                           </button>
                           <button className="text-gray-400 hover:text-purple-300 transition-colors">
                             <Edit3 className="w-4 h-4" />
@@ -1041,7 +1171,7 @@ export default function ForArtistsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-gray-400 mb-2">Cover Art (optional)</label>
+                    <label className="block text-gray-400 mb-2">Cover Art</label>
                     <div className="bg-[#08080e] rounded-3xl p-3 text-center">
                       <input
                         type="file"
@@ -1153,7 +1283,7 @@ export default function ForArtistsPage() {
       </AnimatePresence>
 
       {/* Mobile Header */}
-      <DashboardHeader logoText="Artist Dashboard" />
+      <DashboardHeader />
 
       <div className="max-w-7xl mx-auto p-6 pb-32">
         {/* Header */}
@@ -1210,6 +1340,29 @@ export default function ForArtistsPage() {
 
         {/* Content */}
         {renderTabContent()}
+        {isMobile && isMobilePlayerOpen && currentTrack && (
+          <MobilePlayer
+            track={{
+              id: currentTrack.id,
+              title: currentTrack.title,
+              imageUrl: currentTrack.artCoverUrl || currentTrack.thumbnailUrl || '/default-cover.jpg',
+              audioUrl: currentTrack.url,
+              duration: currentTrack.duration || 0,
+            }}
+            isPlaying={isPlaying}
+            currentTime={currentTime}
+            duration={duration}
+            volume={volume}
+            isMuted={isMuted}
+            isLoading={isTrackLoading}
+            onPlayPause={handlePlayPause}
+            onClose={handleMobilePlayerClose}
+            onSeek={seekInTrack}
+            onVolumeChange={changeVolume}
+            onToggleMute={toggleMute}
+          />
+        )}
+        <audio ref={audioRef} className="hidden" />
       </div>
     </div>
     </RoleGuard>

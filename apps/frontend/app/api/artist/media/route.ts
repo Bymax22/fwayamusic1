@@ -105,6 +105,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Create metadata object for database
+      const coverUrl = formData.get('artCoverUrl') || formData.get('coverUrl');
+
       const metadata = {
         title,
         type,
@@ -113,6 +115,7 @@ export async function POST(request: NextRequest) {
         duration: duration ? parseInt(duration as string) : 0,
         format,
         resourceType,
+        coverUrl: coverUrl ? String(coverUrl) : undefined,
       };
 
       // Send to backend to save metadata only (no file upload)
