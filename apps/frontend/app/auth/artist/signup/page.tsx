@@ -11,7 +11,7 @@ import Image from 'next/image';
 type SignupStep = 'basic' | 'artist' | 'consent' | 'verification';
 
 export default function ArtistSignUp() {
-  const { signUp, loading } = useAuth();
+  const { signUp, loading, verificationError } = useAuth();
   const [step, setStep] = useState<SignupStep>('basic');
   const [formData, setFormData] = useState({
     email: '',
@@ -581,6 +581,12 @@ export default function ArtistSignUp() {
               <FaCheck className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-lg font-semibold text-white">Check Your Email</h3>
+            {verificationError && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-3 text-left">
+                <p className="text-red-200 text-sm font-semibold">Verification email failed to send.</p>
+                <p className="text-red-100 text-xs break-words">{verificationError}</p>
+              </div>
+            )}
             <p className="text-sm text-gray-300">We&apos;ve sent a verification link to <strong>{formData.email}</strong></p>
             <p className="text-sm text-gray-400">Click the link in your email to verify your account and get started.</p>
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mt-4">

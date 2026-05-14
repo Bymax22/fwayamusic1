@@ -12,7 +12,7 @@ import Image from 'next/image';
 type SignupStep = 'basic' | 'business' | 'consent' | 'verification';
 
 export default function ResellerSignUp() {
-  const { signUp, loading } = useAuth();
+  const { signUp, loading, verificationError } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState<SignupStep>('basic');
   const [formData, setFormData] = useState({
@@ -593,6 +593,12 @@ export default function ResellerSignUp() {
               <h2 className="text-2xl font-semibold text-white mb-4">
                 Verify Your Email!
               </h2>
+              {verificationError && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-3 text-left">
+                  <p className="text-red-200 text-sm font-semibold">Verification email failed to send.</p>
+                  <p className="text-red-100 text-xs break-words">{verificationError}</p>
+                </div>
+              )}
               <p className="text-gray-300 mb-2">
                 We&lsquo;ve sent a verification link to <strong>{formData.email}</strong>
               </p>

@@ -62,6 +62,8 @@ interface AuthContextType {
   forgotPassword: (email: string) => Promise<void>;
   verifyOTP: (method: 'email' | 'phone', code: string) => Promise<boolean>;
   sendOTP: (method: 'email' | 'phone' | 'link', identifier: string) => Promise<void>;
+  verificationError: string | null;
+  clearVerificationError: () => void;
 }
 
 interface SignUpData {
@@ -120,6 +122,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [verificationError, setVerificationError] = useState<string | null>(null);
+
+  const clearVerificationError = () => setVerificationError(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
@@ -294,12 +299,16 @@ const signUp = async (data: SignUpData): Promise<User> => {
 
       // After backend user is created, send magic-link for ARTIST/RESELLER so Verification record exists
       if (data.role === 'ARTIST' || data.role === 'RESELLER') {
+        setVerificationError(null);
         try {
           await sendOTP('link', data.email);
           console.debug('Magic link sent after backend signup for', data.email);
         } catch (otpErr) {
-          console.error('Failed to send magic link after signup:', otpErr);
-          // do not block signup success — surface later in UI if needed
+          const message = otpErr instanceof Error
+            ? otpErr.message
+            : 'Failed to send verification link. Please check your email or try again.';
+          console.error('Failed to send magic link after signup:', message, otpErr);
+          setVerificationError(message);
         }
       }
 
@@ -371,7 +380,15 @@ const signUp = async (data: SignUpData): Promise<User> => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send OTP');
+        let errorText = `Failed to send OTP (status ${response.status})`;
+        try {
+          const errorData = await response.json();
+          errorText = errorData.message || errorData.error || JSON.stringify(errorData);
+        } catch {
+          const rawText = await response.text();
+          if (rawText) errorText = rawText;
+        }
+        throw new Error(errorText);
       }
     } catch (error) {
       console.error('OTP sending error:', error);
@@ -511,6 +528,8 @@ const logout = async () => {
     forgotPassword,
     verifyOTP,
     sendOTP,
+    verificationError,
+    clearVerificationError,
   };
 
   return (
