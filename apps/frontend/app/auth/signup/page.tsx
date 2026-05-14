@@ -21,7 +21,7 @@ type UserRole = SignupRole | 'ADMIN' | 'MODERATOR';
 type SignupStep = 'role' | 'details' | 'kyc' | 'consent' | 'verification';
 
 export default function SignUp() {
-  const { signUp, signInWithGoogle, signInWithFacebook, loading, verificationError } = useAuth();
+  const { signUp, signInWithGoogle, signInWithFacebook, sendOTP, verificationError, clearVerificationError, loading } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState<SignupStep>('role');
   const [formData, setFormData] = useState({
@@ -47,6 +47,19 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const handleResendVerificationEmail = async () => {
+    clearVerificationError();
+    setResendLoading(true);
+    try {
+      await sendOTP('link', formData.email);
+    } catch (error) {
+      console.error('Resend verification email failed:', error);
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const roles = [
     {
@@ -671,6 +684,14 @@ export default function SignUp() {
               <p className="text-gray-400 text-sm">
                 Click the link in the email to verify your account and complete your registration.
               </p>
+              <button
+                type="button"
+                onClick={handleResendVerificationEmail}
+                disabled={resendLoading}
+                className="mt-4 px-5 py-2 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors disabled:opacity-50"
+              >
+                {resendLoading ? 'Resending…' : 'Resend verification email'}
+              </button>
             </div>
 
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">

@@ -11,7 +11,7 @@ import Image from 'next/image';
 type SignupStep = 'basic' | 'artist' | 'consent' | 'verification';
 
 export default function ArtistSignUp() {
-  const { signUp, loading, verificationError } = useAuth();
+  const { signUp, loading, sendOTP, verificationError, clearVerificationError } = useAuth();
   const [step, setStep] = useState<SignupStep>('basic');
   const [formData, setFormData] = useState({
     email: '',
@@ -36,7 +36,20 @@ export default function ArtistSignUp() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleResendVerificationEmail = async () => {
+    clearVerificationError();
+    setResendLoading(true);
+    try {
+      await sendOTP('link', formData.email);
+    } catch (error) {
+      console.error('Resend verification email failed:', error);
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const validateStep = (currentStep: SignupStep): boolean => {
     const newErrors: Record<string, string> = {};
@@ -589,6 +602,14 @@ export default function ArtistSignUp() {
             )}
             <p className="text-sm text-gray-300">We&apos;ve sent a verification link to <strong>{formData.email}</strong></p>
             <p className="text-sm text-gray-400">Click the link in your email to verify your account and get started.</p>
+            <button
+              type="button"
+              onClick={handleResendVerificationEmail}
+              disabled={resendLoading}
+              className="mt-4 px-5 py-2 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors disabled:opacity-50"
+            >
+              {resendLoading ? 'Resending…' : 'Resend verification email'}
+            </button>
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mt-4">
               <p className="text-yellow-400 text-xs">
                 <strong>Note:</strong> After email verification, you&apos;ll need to complete KYC document verification to upload music.

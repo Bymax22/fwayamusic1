@@ -12,7 +12,7 @@ import Image from 'next/image';
 type SignupStep = 'basic' | 'business' | 'consent' | 'verification';
 
 export default function ResellerSignUp() {
-  const { signUp, loading, verificationError } = useAuth();
+  const { signUp, loading, sendOTP, verificationError, clearVerificationError } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState<SignupStep>('basic');
   const [formData, setFormData] = useState({
@@ -37,6 +37,19 @@ export default function ResellerSignUp() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const handleResendVerificationEmail = async () => {
+    clearVerificationError();
+    setResendLoading(true);
+    try {
+      await sendOTP('link', formData.email);
+    } catch (error) {
+      console.error('Resend verification email failed:', error);
+    } finally {
+      setResendLoading(false);
+    }
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const businessTypes = [
@@ -605,6 +618,14 @@ export default function ResellerSignUp() {
               <p className="text-gray-500 text-sm">
                 Click the link in the email to verify your account and complete your reseller registration.
               </p>
+              <button
+                type="button"
+                onClick={handleResendVerificationEmail}
+                disabled={resendLoading}
+                className="mt-4 px-5 py-2 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors disabled:opacity-50"
+              >
+                {resendLoading ? 'Resending…' : 'Resend verification email'}
+              </button>
             </div>
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
