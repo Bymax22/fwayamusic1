@@ -9,7 +9,8 @@ import {
   signInWithPopup,
   signOut,
   updateProfile,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  deleteUser,
 } from 'firebase/auth';
 import { auth, googleProvider, facebookProvider } from '@/lib/firebase-config';
 
@@ -108,6 +109,16 @@ const ensureRoleMatch = async (userData: User, expectedRole?: UserRole) => {
     throw new Error(`Access denied. This page is for ${expectedRole.toLowerCase()}s only.`);
   }
   return userData;
+};
+
+const cleanupFirebaseUser = async (user: FirebaseUser | null) => {
+  if (!user) return;
+  try {
+    await deleteUser(user);
+    console.debug('Deleted temporary Firebase user after signup failure:', user.email);
+  } catch (cleanupError) {
+    console.error('Failed to clean up Firebase user after signup failure:', cleanupError);
+  }
 };
 
 export const useAuth = () => {
@@ -217,6 +228,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
 const signUp = async (data: SignUpData): Promise<User> => {
+    let firebaseUser: FirebaseUser | null = null;
+
     try {
       setLoading(true);
 
@@ -290,6 +303,11 @@ const signUp = async (data: SignUpData): Promise<User> => {
           errorMessage = errorText || `HTTP ${backendResponse.status}`;
           console.error('Backend error response (text):', errorText);
         }
+
+        await cleanupFirebaseUser(firebaseUser);
+        await signOut(auth);
+        setUser(null);
+
         throw new Error(errorMessage);
       }
 
@@ -310,7 +328,7 @@ const signUp = async (data: SignUpData): Promise<User> => {
           console.error('Failed to send magic link after signup:', message, otpErr);
           setVerificationError(message);
 
-          // Prevent user from remaining signed in on a broken verification flow.
+          await cleanupFirebaseUser(firebaseUser);
           await signOut(auth);
           setUser(null);
 
