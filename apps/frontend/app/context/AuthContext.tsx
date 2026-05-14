@@ -309,6 +309,12 @@ const signUp = async (data: SignUpData): Promise<User> => {
             : 'Failed to send verification link. Please check your email or try again.';
           console.error('Failed to send magic link after signup:', message, otpErr);
           setVerificationError(message);
+
+          // Prevent user from remaining signed in on a broken verification flow.
+          await signOut(auth);
+          setUser(null);
+
+          throw new Error(`Verification email failed to send: ${message}`);
         }
       }
 
