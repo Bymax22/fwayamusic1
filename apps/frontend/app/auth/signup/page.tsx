@@ -659,12 +659,16 @@ export default function SignUp() {
               <h2 className="text-2xl font-semibold text-white mb-4">
                 Check Your Email!
               </h2>
-                {verificationError && (
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-3 text-left">
-                    <p className="text-red-200 text-sm font-semibold">Verification email failed to send.</p>
-                    <p className="text-red-100 text-xs break-words">{verificationError}</p>
-                  </div>
-                )}
+              {verificationError && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-3 text-left">
+                  <p className="text-red-200 text-sm font-semibold">Verification email failed to send.</p>
+                  <p className="text-red-100 text-xs break-words">{verificationError}</p>
+                </div>
+              )}
+              <p className="text-gray-300 mb-2">
+                We&lsquo;ve sent a verification link to <strong>{formData.email}</strong>
+              </p>
+              <p className="text-gray-400 text-sm">
                 Click the link in the email to verify your account and complete your registration.
               </p>
             </div>
