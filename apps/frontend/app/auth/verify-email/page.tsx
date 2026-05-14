@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FaCheck, FaTimes, FaSpinner } from 'react-icons/fa';
 
 type VerificationStatus = 'loading' | 'success' | 'error' | 'expired';
 
-export default function VerifyEmail() {
+function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<VerificationStatus>('loading');
@@ -138,5 +138,22 @@ export default function VerifyEmail() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmail() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] flex items-center justify-center p-4">
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
+          <FaSpinner className="w-16 h-16 text-blue-500 animate-spin mx-auto mb-4" />
+          <h1 className="text-2xl font-bold mb-4 text-blue-400">
+            Loading...
+          </h1>
+        </div>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }
