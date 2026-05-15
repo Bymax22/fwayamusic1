@@ -305,8 +305,9 @@ async findOrCreateUser(decodedFirebaseUser: any) {
         let htmlContent: string;
 
         if (method === 'link') {
-          const frontend = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
-          const verifyUrl = `${frontend.replace(/\/$/, '')}/auth/verify-email?token=${token}`;
+          // Always use the custom domain for verification emails
+          const frontend = 'https://fwaya.net';
+          const verifyUrl = `${frontend}/auth/verify-email?token=${token}`;
           subject = 'Verify your Fwaya Music account';
           htmlContent = `<div style="font-family: Arial, sans-serif; line-height:1.4;">
                     <h2 style="color:#0a3747">Verify your email</h2>

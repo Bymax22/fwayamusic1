@@ -47,18 +47,19 @@ export class AuthController {
 
     try {
       const result = await this.authService.verifyEmailToken(token);
-      const frontend = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
-      const safeRedirect = redirect && redirect.startsWith('/') ? `${frontend.replace(/\/$/, '')}${redirect}` : `${frontend.replace(/\/$/, '')}/for-artists`;
+      // Always use the custom domain for redirects
+      const frontend = 'https://fwaya.net';
+      const safeRedirect = redirect && redirect.startsWith('/') ? `${frontend}${redirect}` : `${frontend}/for-artists`;
 
       if (!result.success) {
         // Redirect to a friendly error page or show message
-        return res.redirect(`${frontend.replace(/\/$/, '')}/auth/verify-failed`);
+        return res.redirect(`${frontend}/auth/verify-failed`);
       }
 
       return res.redirect(safeRedirect);
     } catch (err) {
       console.error('verify-email error', err);
-      return res.redirect(`${process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/auth/verify-failed`);
+      return res.redirect(`https://fwaya.net/auth/verify-failed`);
     }
   }
 
