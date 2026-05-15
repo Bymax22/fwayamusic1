@@ -24,57 +24,19 @@ function VerifyEmailContent() {
         return;
       }
 
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/verify-email?token=${token}`, {
-          method: 'GET',
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setStatus('success');
-          setMessage('Email verified successfully!');
-
-          // Extract user role from response if available
-          if (data.user && data.user.role) {
-            setUserRole(data.user.role);
-          }
-
-          // Redirect after a short delay
-          setTimeout(() => {
-            if (callbackUrl) {
-              router.push(callbackUrl);
-            } else {
-              // Redirect based on role
-              switch (userRole.toUpperCase()) {
-                case 'ARTIST':
-                  router.push('/for-artists');
-                  break;
-                case 'RESELLER':
-                  router.push('/reseller-dashboard');
-                  break;
-                case 'ADMIN':
-                case 'MODERATOR':
-                  router.push('/admin');
-                  break;
-                default:
-                  router.push('/dashboard');
-              }
-            }
-          }, 2000);
-        } else {
-          const errorData = await response.json().catch(() => ({}));
-          setStatus('error');
-          setMessage(errorData.message || 'Verification failed. The link may be expired or invalid.');
-        }
-      } catch (error) {
-        console.error('Verification error:', error);
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!backendUrl) {
         setStatus('error');
-        setMessage('Network error. Please try again later.');
+        setMessage('Server configuration missing. Please try again later.');
+        return;
       }
+
+      const verifyUrl = `${backendUrl.replace(/\/$/, '')}/api/v1/auth/verify-email?token=${encodeURIComponent(token)}${callbackUrl ? `&redirect=${encodeURIComponent(callbackUrl)}` : ''}`;
+      window.location.href = verifyUrl;
     };
 
     verifyEmail();
-  }, [searchParams, router, userRole]);
+  }, [searchParams, router]);
 
   const getStatusIcon = () => {
     switch (status) {
