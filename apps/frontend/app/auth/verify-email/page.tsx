@@ -4,14 +4,13 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FaCheck, FaTimes, FaSpinner } from 'react-icons/fa';
 
-type VerificationStatus = 'loading' | 'success' | 'error' | 'expired';
+type VerificationStatus = 'loading' | 'success' | 'error';
 
 function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<VerificationStatus>('loading');
-  const [message, setMessage] = useState('');
-  const [userRole, setUserRole] = useState<string>('');
+  const [message, setMessage] = useState('Redirecting you to Fwaya...');
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -39,29 +38,14 @@ function VerifyEmailContent() {
   }, [searchParams, router]);
 
   const getStatusIcon = () => {
-    switch (status) {
-      case 'loading':
-        return <FaSpinner className="w-16 h-16 text-blue-500 animate-spin mx-auto mb-4" />;
-      case 'success':
-        return <FaCheck className="w-16 h-16 text-green-500 mx-auto mb-4" />;
-      case 'error':
-        return <FaTimes className="w-16 h-16 text-red-500 mx-auto mb-4" />;
-      default:
-        return null;
+    if (status === 'loading') {
+      return <FaSpinner className="w-16 h-16 text-[#8b5cf6] animate-spin mx-auto mb-4" />;
     }
+    return <FaTimes className="w-16 h-16 text-[#f43f5e] mx-auto mb-4" />;
   };
 
   const getStatusColor = () => {
-    switch (status) {
-      case 'loading':
-        return 'text-blue-400';
-      case 'success':
-        return 'text-green-400';
-      case 'error':
-        return 'text-red-400';
-      default:
-        return 'text-gray-400';
-    }
+    return status === 'loading' ? 'text-white' : 'text-white';
   };
 
   return (

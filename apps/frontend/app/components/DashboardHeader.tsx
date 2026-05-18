@@ -19,9 +19,12 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/');
+      // Redirect to logout page which will handle the redirect to home
+      window.location.href = '/auth/logout';
     } catch (error) {
       console.error('Logout error:', error);
+      // Still redirect even if logout fails
+      window.location.href = '/auth/logout';
     }
   };
 

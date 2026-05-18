@@ -516,15 +516,27 @@ const signInWithFacebook = async (role?: UserRole) => {
 const logout = async () => {
   try {
     setLoading(true);
-    await signOut(auth);
+    // Clear user state first
     setUser(null);
-    if (typeof window !== 'undefined') localStorage.removeItem('authToken');
+    setFirebaseUser(null);
+    // Clear local storage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('authToken');
+    }
+    // Sign out from Firebase
+    await signOut(auth);
+    console.log('Successfully logged out');
   } catch (error: unknown) {
+    console.error('Logout error:', error);
+    // Even if Firebase logout fails, clear local state
+    setUser(null);
+    setFirebaseUser(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('authToken');
+    }
     if (error instanceof Error) {
-      console.error('Logout error:', error);
       throw error;
     } else {
-      console.error('Logout error:', error);
       throw new Error('An unexpected error occurred.');
     }
   } finally {

@@ -273,7 +273,7 @@ model Media {
   lastPlayedAt       DateTime?       @map("last_played_at")
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
-  userId             Int             @map("user_id")
+  userId             Int?            @map("user_id")
   cloudinaryPublicId String?         @map("cloudinary_public_id")
 
   // Reseller & Commission Fields
@@ -298,7 +298,7 @@ model Media {
   // Relations
   commissions     Commission[]
   libraryItems    LibraryItem[]
-  user            User               @relation(fields: [userId], references: [id])
+  user            User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
   interactions    MediaInteraction[]
   comments        MediaComment[]
   categories      MediaCategory[]
