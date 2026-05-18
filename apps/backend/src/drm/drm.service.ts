@@ -206,7 +206,7 @@ const license = await this.prisma.deviceLicense.create({
         },
         mediaInfo: {
           title: media.title,
-          artist: media.user.displayName || media.user.username || 'Unknown Artist',
+          artist: media.user?.displayName || media.user?.username || 'Unknown Artist',
           duration: media.duration || 0,
           format: media.format || 'mp3',
           coverUrl: media.artCoverUrl,
