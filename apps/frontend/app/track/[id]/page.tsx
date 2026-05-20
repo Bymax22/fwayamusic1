@@ -248,17 +248,7 @@ export default function TrackPage() {
   const getTrackShareUrl = () => `${window.location.origin}/track/${track?.id}`;
 
   const buildTrackShareText = (item: MediaItem) => {
-    const durationText = item.duration ? `${Math.floor(item.duration / 60)}:${String(item.duration % 60).padStart(2, '0')}` : 'Unknown duration';
-    const lines = [
-      `Listen to "${item.title}" by ${item.artist} on Fwaya Music.`,
-      item.description || 'Play this new track instantly on Fwaya Music.',
-      `Genre: ${item.genre || 'Unknown'}`,
-      `Duration: ${durationText}`,
-      '',
-      `▶ Play now: ${getTrackShareUrl()}`,
-      item.coverArt ? `Cover art: ${item.coverArt}` : ''
-    ];
-    return lines.filter(Boolean).join('\n');
+    return getTrackShareUrl();
   };
 
   const handleShare = () => {

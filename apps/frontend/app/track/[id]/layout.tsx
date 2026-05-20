@@ -37,11 +37,6 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   const track = await fetchTrackMeta(params.id);
   const artistName = track?.user?.displayName || track?.user?.username || "Fwaya Music";
   const title = track?.title ? `${track.title} • ${artistName}` : "Fwaya Music";
-  const description = track?.description
-    ? track.description
-    : track?.title
-    ? `Listen to ${track.title} by ${artistName} on Fwaya Music.`
-    : "Stream music on Fwaya Music.";
   const image = `${baseUrl}/api/og/track/${params.id}`;
   const trackUrl = `${baseUrl}/track/${params.id}`;
 
@@ -50,11 +45,11 @@ export async function generateMetadata(props: any): Promise<Metadata> {
 
   return {
     title,
-    description,
+    description: '',
     openGraph: {
       type: "music.song",
       title,
-      description,
+      description: '',
       url: trackUrl,
       siteName: "Fwaya Music",
       images: [
@@ -70,7 +65,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title,
-      description,
+      description: '',
       images: [image],
       site: "@fwayamusic",
       creator: "@fwayamusic",
