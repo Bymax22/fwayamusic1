@@ -27,7 +27,8 @@ async function fetchTrackMeta(id: string): Promise<TrackMeta | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const { params } = props as { params: { id: string } };
   const requestHeaders = headers();
   const host = requestHeaders.get("x-forwarded-host") || requestHeaders.get("host") || "fwaya.net";
   const protocol = requestHeaders.get("x-forwarded-proto") || requestHeaders.get("x-forwarded-protocol") || "https";
