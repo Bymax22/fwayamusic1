@@ -13,6 +13,14 @@ interface TrackMeta {
 
 export default async function Head({ params }: { params: { id: string } }) {
   const requestHeaders = await headers();
+  try {
+    // Server-side debug: confirm Head() runs during server render for crawlers
+    // This will appear in Vercel function logs when invoked.
+    // eslint-disable-next-line no-console
+    console.log('[head] rendering Head for track id=', params.id);
+  } catch (e) {
+    // swallow in case logging is restricted
+  }
   const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host') || 'fwaya.net';
   const protocol = requestHeaders.get('x-forwarded-proto') || requestHeaders.get('x-forwarded-protocol') || 'https';
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
