@@ -4,9 +4,15 @@ export const runtime = 'edge';
 
 const DEFAULT_IMAGE = 'https://res.cloudinary.com/dayn5vifn/image/upload/v1777067980/fwaya-01_eeob6c.png';
 
+function toAbsoluteUrl(url: string | undefined, base: string) {
+  if (!url) return null;
+  return /^https?:\/\//i.test(url) ? url : `${base}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
 export async function GET(req: Request, context: any) {
   const trackId = context?.params?.id;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://fwayamusic.com';
   let track: { title?: string; artist?: string; description?: string; coverArt?: string; genre?: string } | null = null;
 
   if (trackId && apiUrl) {
@@ -23,7 +29,7 @@ export async function GET(req: Request, context: any) {
   const title = track?.title || 'Fwaya Music';
   const artist = track?.artist || 'Fwaya Music';
   const description = track?.description || `Listen to ${title} on Fwaya Music.`;
-  const coverUrl = track?.coverArt || DEFAULT_IMAGE;
+  const coverUrl = toAbsoluteUrl(track?.coverArt, baseUrl) || DEFAULT_IMAGE;
 
   return new ImageResponse(
     (
