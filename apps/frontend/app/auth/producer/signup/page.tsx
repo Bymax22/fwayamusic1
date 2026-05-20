@@ -4,8 +4,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { Music2, FaEye, FaEyeSlash, FaCheck, FaArrowLeft, FaCamera } from 'react-icons/fa';
-import { Eye, EyeOff, Check, ArrowLeft, Camera } from 'lucide-react';
+import { Music2, Eye, EyeOff, Check, ArrowLeft, Camera } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
