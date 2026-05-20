@@ -3,9 +3,11 @@ import { headers } from 'next/headers';
 interface TrackMeta {
   id: number;
   title: string;
-  artist: string;
+  // backend fields
   description?: string;
-  coverArt?: string;
+  artCoverUrl?: string;
+  thumbnailUrl?: string;
+  user?: { id: number; username?: string; displayName?: string };
   genre?: string;
 }
 
@@ -30,11 +32,12 @@ export default async function Head({ params }: { params: { id: string } }) {
     console.error('Failed to fetch track metadata for head:', error);
   }
 
-  const title = track?.title ? `${track.title} • ${track.artist}` : 'Fwaya Music';
+  const artistName = track?.user?.displayName || track?.user?.username || 'Fwaya Music';
+  const title = track?.title ? `${track.title} • ${artistName}` : 'Fwaya Music';
   const description = track?.description
     ? track.description
     : track?.title
-    ? `Listen to ${track.title} by ${track.artist} on Fwaya Music.`
+    ? `Listen to ${track.title} by ${artistName} on Fwaya Music.`
     : 'Stream music on Fwaya Music.';
   const image = `${baseUrl}/api/og/track/${params.id}`;
 

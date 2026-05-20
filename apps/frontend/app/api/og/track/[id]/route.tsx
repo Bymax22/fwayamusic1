@@ -14,7 +14,7 @@ export async function GET(req: Request, context: any) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const requestUrl = new URL(req.url);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin;
-  let track: { title?: string; artist?: string; description?: string; coverArt?: string; genre?: string } | null = null;
+  let track: { title?: string; description?: string; artCoverUrl?: string; thumbnailUrl?: string; user?: { id?: number; username?: string; displayName?: string }; genre?: string } | null = null;
 
   if (trackId && apiUrl) {
     try {
@@ -28,9 +28,9 @@ export async function GET(req: Request, context: any) {
   }
 
   const title = track?.title || 'Fwaya Music';
-  const artist = track?.artist || 'Fwaya Music';
+  const artist = track?.user?.displayName || track?.user?.username || 'Fwaya Music';
   const description = track?.description || `Listen to ${title} on Fwaya Music.`;
-  const coverUrl = toAbsoluteUrl(track?.coverArt, baseUrl) || DEFAULT_IMAGE;
+  const coverUrl = toAbsoluteUrl(track?.artCoverUrl || track?.thumbnailUrl || (track as any)?.coverArt, baseUrl) || DEFAULT_IMAGE;
 
   return new ImageResponse(
     (
