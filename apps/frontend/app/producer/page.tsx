@@ -300,7 +300,7 @@ export default function ProducerPage() {
   };
 
   return (
-    <RoleGuard requiredRole="PRODUCER">
+    <RoleGuard allowedRoles={["PRODUCER"]}>
       <div className="min-h-screen bg-black text-white">
         <div className="relative overflow-hidden">
           <div className="relative p-6 max-w-7xl mx-auto pb-32">
