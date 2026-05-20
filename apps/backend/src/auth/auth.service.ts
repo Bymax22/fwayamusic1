@@ -150,6 +150,25 @@ export class AuthService {
     }
   }
 
+  async checkAvailability(email?: string, username?: string) {
+    const result = {
+      emailTaken: false,
+      usernameTaken: false,
+    };
+
+    if (email) {
+      const existingByEmail = await this.prisma.user.findUnique({ where: { email } });
+      result.emailTaken = Boolean(existingByEmail);
+    }
+
+    if (username) {
+      const existingByUsername = await this.prisma.user.findUnique({ where: { username } });
+      result.usernameTaken = Boolean(existingByUsername);
+    }
+
+    return result;
+  }
+
   /**
    * Login - handled by Firebase (placeholder)
    */

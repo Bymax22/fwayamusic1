@@ -37,6 +37,7 @@ export default function ArtistSignUp() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleResendVerificationEmail = async () => {
@@ -48,6 +49,32 @@ export default function ArtistSignUp() {
       console.error('Resend verification email failed:', error);
     } finally {
       setResendLoading(false);
+    }
+  };
+
+  const checkAvailability = async () => {
+    const params = new URLSearchParams();
+    if (formData.email) params.set('email', formData.email.trim());
+    if (formData.username) params.set('username', formData.username.trim());
+
+    if (!params.toString()) {
+      return { emailTaken: false, usernameTaken: false };
+    }
+
+    setAvailabilityLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/check-availability?${params.toString()}`
+      );
+
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(body || 'Unable to verify username and email availability');
+      }
+
+      return (await response.json()) as { emailTaken: boolean; usernameTaken: boolean };
+    } finally {
+      setAvailabilityLoading(false);
     }
   };
 
@@ -144,10 +171,39 @@ export default function ArtistSignUp() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (step === 'basic') {
+      if (!validateStep(step)) return;
+
+      try {
+        const availability = await checkAvailability();
+        const availabilityErrors: Record<string, string> = {};
+
+        if (availability.emailTaken) {
+          availabilityErrors.email = 'This email is already in use. Please use a different email.';
+        }
+        if (availability.usernameTaken) {
+          availabilityErrors.username = 'This username is already taken. Please choose another one.';
+        }
+
+        if (availability.emailTaken || availability.usernameTaken) {
+          setErrors(availabilityErrors);
+          return;
+        }
+
+        setStep('artist');
+      } catch (error: unknown) {
+        setErrors({
+          ...errors,
+          submit: error instanceof Error ? error.message : 'Unable to verify username and email availability.',
+        });
+      }
+
+      return;
+    }
+
     if (validateStep(step)) {
-      if (step === 'basic') setStep('artist');
-      else if (step === 'artist') setStep('consent');
+      if (step === 'artist') setStep('consent');
     }
   };
 

@@ -15,6 +15,7 @@ export default function UserSignIn() {
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [socialLoading, setSocialLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,18 +43,22 @@ export default function UserSignIn() {
   };
 
   const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
+    setSocialLoading(true);
     try {
       if (provider === 'google') {
         await signInWithGoogle('USER');
       } else {
         await signInWithFacebook('USER');
       }
+      router.push('/dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {
         setErrors({ submit: error.message });
       } else {
         setErrors({ submit: "An unexpected error occurred." });
       }
+    } finally {
+      setSocialLoading(false);
     }
   };
 
@@ -70,6 +75,23 @@ export default function UserSignIn() {
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-gray-300">Sign in to your music listener account</p>
+        </div>
+
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={() => handleSocialSignIn('google')}
+            disabled={loading || socialLoading}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[#4285F4] text-white font-semibold hover:bg-[#357ae8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FaGoogle className="w-5 h-5" />
+            Sign in with Google
+          </button>
+          <div className="flex items-center gap-3 mt-4 text-xs text-gray-400">
+            <span className="h-px flex-1 bg-white/10" />
+            <span>or sign in with your email</span>
+            <span className="h-px flex-1 bg-white/10" />
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

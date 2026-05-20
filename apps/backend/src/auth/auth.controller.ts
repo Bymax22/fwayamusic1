@@ -28,6 +28,11 @@ export class AuthController {
     }
   }
 
+  @Get('check-availability')
+  async checkAvailability(@Query('email') email?: string, @Query('username') username?: string) {
+    return this.authService.checkAvailability(email, username);
+  }
+
   @Post('social-login')
   async socialLogin(@Body() dto: { email: string; displayName?: string; provider: string; avatarUrl?: string; role?: UserRole }) {
     return this.authService.socialLogin(dto);

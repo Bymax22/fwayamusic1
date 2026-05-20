@@ -92,6 +92,7 @@ export default function TrackPage() {
   const [showLyrics, setShowLyrics] = useState(false);
   const [showDetails, setShowDetails] = useState(true);
   const [relatedTracks, setRelatedTracks] = useState<MediaItem[]>([]);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     const fetchTrack = async () => {
@@ -244,20 +245,153 @@ export default function TrackPage() {
     }
   };
 
-  const handleShare = async () => {
+  const getTrackShareUrl = () => `${window.location.origin}/track/${track?.id}`;
+
+  const buildTrackShareText = (item: MediaItem) => {
+    const durationText = item.duration ? `${Math.floor(item.duration / 60)}:${String(item.duration % 60).padStart(2, '0')}` : 'Unknown duration';
+    const lines = [
+      `Listen to "${item.title}" by ${item.artist} on Fwaya Music.`,
+      item.description || 'Play this new track instantly on Fwaya Music.',
+      `Genre: ${item.genre || 'Unknown'}`,
+      `Duration: ${durationText}`,
+      '',
+      `▶ Play now: ${getTrackShareUrl()}`,
+      item.coverArt ? `Cover art: ${item.coverArt}` : ''
+    ];
+    return lines.filter(Boolean).join('\n');
+  };
+
+  const handleShare = () => {
+    setShowShareModal(true);
+  };
+
+  const handleShareViaWhatsApp = () => {
     if (!track) return;
-    
-    const shareUrl = `${window.location.origin}/track/${track.id}`;
+    const text = buildTrackShareText(track);
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const handleShareViaFacebook = () => {
+    if (!track) return;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getTrackShareUrl())}`, '_blank');
+  };
+
+  const handleShareViaEmail = () => {
+    if (!track) return;
+    const subject = `Listen to ${track.title} on Fwaya Music`;
+    const body = buildTrackShareText(track);
+    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+  };
+
+  const handleQuickShare = async () => {
+    if (!track) return;
+    const url = getTrackShareUrl();
+    const text = buildTrackShareText(track);
     if (navigator.share) {
-      navigator.share({
-        title: track.title,
-        text: `Check out "${track.title}" by ${track.artist} on Fwaya Music`,
-        url: shareUrl
-      });
+      await navigator.share({ title: track.title, text, url });
     } else {
-      navigator.clipboard.writeText(shareUrl);
+      navigator.clipboard.writeText(url);
       alert('Link copied to clipboard!');
     }
+  };
+
+  const renderShareModal = () => {
+    if (!track || !showShareModal) return null;
+
+    const shareUrl = getTrackShareUrl();
+    const coverUrl = track.coverArt || '/default-cover.jpg';
+
+    return (
+      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="bg-black rounded-2xl p-6 max-w-2xl w-full ring-1 ring-white/10 overflow-hidden">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <h3 className="text-xl font-bold text-white">Share Track</h3>
+              <p className="text-sm text-gray-400 mt-1">Share with art cover, track details and instant play link.</p>
+            </div>
+            <button onClick={() => setShowShareModal(false)} className="text-gray-400 hover:text-white">
+              <FaTimes size={20} />
+            </button>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-[200px_1fr] mb-4">
+            <div className="overflow-hidden rounded-3xl bg-white/5">
+              <Image src={coverUrl} alt={track.title} width={320} height={320} className="h-full w-full object-cover" />
+            </div>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-400">Track</p>
+                <p className="text-lg font-semibold text-white">{track.title}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-400">Artist</p>
+                <p className="text-white">{track.artist}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm text-gray-300">
+                <div>
+                  <p className="text-gray-500">Genre</p>
+                  <p>{track.genre || 'Unknown'}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Duration</p>
+                  <p>{track.duration ? `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}` : '—'}</p>
+                </div>
+              </div>
+              {track.description && (
+                <p className="text-sm text-gray-300">{track.description}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-4">
+            <button onClick={handleQuickShare} className="rounded-2xl bg-purple-600 px-4 py-3 text-white hover:bg-purple-500 transition">
+              Quick Share
+            </button>
+            <button onClick={handleShareViaWhatsApp} className="rounded-2xl bg-green-600 px-4 py-3 text-white hover:bg-green-500 transition">
+              WhatsApp
+            </button>
+            <button onClick={handleShareViaFacebook} className="rounded-2xl bg-blue-600 px-4 py-3 text-white hover:bg-blue-500 transition">
+              Facebook
+            </button>
+            <button onClick={handleShareViaEmail} className="rounded-2xl bg-gray-700 px-4 py-3 text-white hover:bg-gray-600 transition">
+              Email
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm text-gray-400 mb-2">Share link</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={shareUrl}
+                  readOnly
+                  className="flex-1 bg-white/5 text-white rounded-2xl px-3 py-2 border border-white/10"
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(shareUrl);
+                    alert('Link copied to clipboard!');
+                  }}
+                  className="rounded-2xl bg-white/10 px-4 py-2 text-white hover:bg-white/15 transition"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <a
+              href={shareUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="block rounded-2xl bg-white/5 px-4 py-3 text-center text-white hover:bg-white/10 transition"
+            >
+              Play Now
+            </a>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const handlePostComment = async () => {
@@ -704,6 +838,7 @@ export default function TrackPage() {
           </aside>
         </div>
       </div>
+      {renderShareModal()}
     </div>
   );
 }

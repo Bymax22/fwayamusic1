@@ -4,13 +4,14 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { FaUser, FaEye, FaEyeSlash, FaCamera } from 'react-icons/fa';
+import { FaUser, FaEye, FaEyeSlash, FaCamera, FaGoogle } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function UserSignUp() {
-  const { signUp, loading } = useAuth();
+  const { signUp, signInWithGoogle, loading } = useAuth();
   const router = useRouter();
+  const [socialLoading, setSocialLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -95,6 +96,24 @@ export default function UserSignUp() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleGoogleSignUp = async () => {
+    setSocialLoading(true);
+    setErrors({});
+
+    try {
+      await signInWithGoogle('USER');
+      router.push('/dashboard');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setErrors({ submit: error.message });
+      } else {
+        setErrors({ submit: 'An unexpected error occurred.' });
+      }
+    } finally {
+      setSocialLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -146,6 +165,23 @@ export default function UserSignUp() {
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Listener</h1>
           <p className="text-gray-300">Create your music listener account</p>
+        </div>
+
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={handleGoogleSignUp}
+            disabled={loading || socialLoading}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[#4285F4] text-white font-semibold hover:bg-[#357ae8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FaGoogle className="w-5 h-5" />
+            Continue with Google
+          </button>
+          <div className="flex items-center gap-3 mt-4 text-xs text-gray-400">
+            <span className="h-px flex-1 bg-white/10" />
+            <span>or continue with your email</span>
+            <span className="h-px flex-1 bg-white/10" />
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
