@@ -12,7 +12,8 @@ function toAbsoluteUrl(url: string | undefined, base: string) {
 export async function GET(req: Request, context: any) {
   const trackId = context?.params?.id;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://fwayamusic.com';
+  const requestUrl = new URL(req.url);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin;
   let track: { title?: string; artist?: string; description?: string; coverArt?: string; genre?: string } | null = null;
 
   if (trackId && apiUrl) {
