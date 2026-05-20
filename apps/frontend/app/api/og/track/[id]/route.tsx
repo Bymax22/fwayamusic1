@@ -82,8 +82,9 @@ export async function GET(req: Request, context: any) {
                 height: '96px',
                 borderRadius: '50%',
                 background: 'rgba(255,255,255,0.95)',
-                display: 'grid',
-                placeItems: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}>
                 <div style={{
                   width: 0,
