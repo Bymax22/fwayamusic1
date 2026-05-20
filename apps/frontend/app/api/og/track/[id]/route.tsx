@@ -113,7 +113,7 @@ export async function GET(req: Request, context: any) {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '20px' }}>
-            <div style={{ maxWidth: '68%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '68%' }}>
               <p style={{ margin: 0, color: '#D1D5DB', fontSize: '24px', lineHeight: 1.4, maxHeight: '144px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {description}
               </p>
