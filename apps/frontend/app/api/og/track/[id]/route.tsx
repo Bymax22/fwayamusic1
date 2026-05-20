@@ -81,7 +81,7 @@ export async function GET(req: Request, context: any) {
           height: '100%',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
-            <div style={{ maxWidth: '65%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '65%' }}>
               <p style={{ margin: 0, color: '#A78BFA', fontSize: '24px', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Fwaya Music</p>
               <h1 style={{ margin: '18px 0 0 0', color: '#fff', fontSize: '72px', lineHeight: '0.95', fontWeight: 800 }}>
                 {title}
