@@ -83,6 +83,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { title: "Create Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/signup", description: "Join Fwaya Music" },
     { title: "Artist Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/artist/signin", description: "Sign in as an artist" },
     { title: "Create Artist Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/artist/signup", description: "Sign up as an artist" },
+    { title: "Producer Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/producer/signin", description: "Sign in as a producer" },
+    { title: "Create Producer Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/producer/signup", description: "Sign up as a producer" },
   ];
 
   // Menu tabs with enhanced icons
@@ -107,6 +109,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       description: "Upload music, manage your profile, and access artist tools.",
       signinHref: "/auth/artist/signin",
       signupHref: "/auth/artist/signup",
+    },
+    {
+      title: "Producer",
+      subtitle: "Producer account",
+      description: "Create beats, upload productions, and manage sales.",
+      signinHref: "/auth/producer/signin",
+      signupHref: "/auth/producer/signup",
     },
     {
       title: "Reseller",
