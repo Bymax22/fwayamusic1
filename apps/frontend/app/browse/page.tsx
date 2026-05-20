@@ -630,7 +630,7 @@ export default function Browse() {
 
   const handleShare = async (file: MediaFile) => {
     try {
-      const shareUrl = `${window.location.origin}/media/${file.id}`;
+      const shareUrl = `${window.location.origin}/track/${file.id}`;
       
       if (navigator.share) {
         await navigator.share({
