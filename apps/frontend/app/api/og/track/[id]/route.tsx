@@ -16,21 +16,35 @@ export async function GET(req: Request, context: any) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin;
   let track: { title?: string; description?: string; coverArt?: string; artCoverUrl?: string; thumbnailUrl?: string; user?: { id?: number; username?: string; displayName?: string }; genre?: string } | null = null;
 
-  if (trackId && apiUrl) {
-    try {
-      const response = await fetch(`${apiUrl}/api/v1/media/${trackId}`);
-      if (response.ok) {
-        track = await response.json();
+  const backendUrls = Array.from(new Set([
+    apiUrl,
+    'https://fwayamusic1-backend.vercel.app',
+  ].filter(Boolean)));
+
+  if (trackId && backendUrls.length > 0) {
+    for (const backendUrl of backendUrls) {
+      try {
+        const response = await fetch(`${backendUrl}/api/v1/media/${trackId}`, {
+          next: { revalidate: 60 },
+        });
+        if (response.ok) {
+          track = await response.json();
+          break;
+        }
+        console.error(`OG image media fetch failed for ${backendUrl}:`, response.status, response.statusText);
+      } catch (error) {
+        console.error(`OG image fetch error for ${backendUrl}:`, error);
       }
-    } catch (error) {
-      console.error('OG image fetch error', error);
     }
   }
 
   const title = track?.title || 'Fwaya Music';
   const artist = track?.user?.displayName || track?.user?.username || 'Fwaya Music';
   const description = track?.description || `Listen to ${title} on Fwaya Music.`;
-  const coverUrl = toAbsoluteUrl(track?.coverArt || track?.artCoverUrl || track?.thumbnailUrl, baseUrl) || DEFAULT_IMAGE;
+  const coverUrl = toAbsoluteUrl(
+    track?.coverArt || track?.artCoverUrl || track?.thumbnailUrl || (track as any)?.coverUrl,
+    baseUrl,
+  ) || DEFAULT_IMAGE;
 
   return new ImageResponse(
     (
