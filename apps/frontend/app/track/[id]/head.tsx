@@ -31,7 +31,7 @@ export default async function Head({ params }: { params: { id: string } }) {
     : track?.title
     ? `Listen to ${track.title} by ${track.artist} on Fwaya Music.`
     : 'Stream music on Fwaya Music.';
-  const image = track?.coverArt || defaultImage;
+  const image = `${baseUrl}/api/og/track/${params.id}`;
 
   return (
     <>
@@ -42,6 +42,9 @@ export default async function Head({ params }: { params: { id: string } }) {
       <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
       <meta property="og:image:alt" content={`${track?.title || 'Track'} cover art`} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:type" content="image/png" />
       <meta property="og:url" content={trackUrl} />
       <meta property="og:site_name" content="Fwaya Music" />
       <meta name="twitter:card" content="summary_large_image" />
