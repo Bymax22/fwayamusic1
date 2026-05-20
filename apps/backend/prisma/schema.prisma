@@ -25,9 +25,10 @@ enum PlaylistType {
 enum UserRole {
   USER
   ARTIST
+  RESELLER
+  PRODUCER
   ADMIN
   MODERATOR
-  RESELLER
 }
 
 enum TransactionStatus {

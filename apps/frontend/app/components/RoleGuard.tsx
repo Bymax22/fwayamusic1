@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 
 interface EnhancedRoleGuardProps {
   children: React.ReactNode;
-  allowedRoles: ('USER' | 'ARTIST' | 'RESELLER' | 'ADMIN' | 'MODERATOR')[];
+  allowedRoles: ('USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER' | 'ADMIN' | 'MODERATOR')[];
   fallbackPath?: string;
   showLoading?: boolean;
   requireEmailVerification?: boolean;
@@ -47,6 +47,9 @@ export default function EnhancedRoleGuard({
             break;
           case 'RESELLER':
             redirectPath = '/reseller-dashboard';
+            break;
+          case 'PRODUCER':
+            redirectPath = '/producer';
             break;
           case 'ADMIN':
           case 'MODERATOR':

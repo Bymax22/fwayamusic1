@@ -22,6 +22,9 @@ export default function Home() {
         case 'RESELLER':
           router.push('/reseller-dashboard');
           break;
+        case 'PRODUCER':
+          router.push('/producer');
+          break;
         case 'ADMIN':
         case 'MODERATOR':
           router.push('/admin');

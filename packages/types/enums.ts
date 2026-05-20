@@ -16,9 +16,10 @@ export enum PlaylistType {
 export enum UserRole {
   USER = 'USER',
   ARTIST = 'ARTIST',
+  RESELLER = 'RESELLER',
+  PRODUCER = 'PRODUCER',
   ADMIN = 'ADMIN',
   MODERATOR = 'MODERATOR',
-  RESELLER = 'RESELLER',
 }
 
 export enum TransactionStatus {

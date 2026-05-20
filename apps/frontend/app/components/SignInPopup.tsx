@@ -10,15 +10,15 @@ interface SignInPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  defaultRole?: 'USER' | 'ARTIST' | 'RESELLER';
+  defaultRole?: 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER';
 }
 
 export default function SignInPopup({ isOpen, onClose, onSuccess, defaultRole = 'USER' }: SignInPopupProps) {
   const { signIn, signInWithGoogle, signInWithFacebook, loading } = useAuth();
-  const [formData, setFormData] = useState<{ email: string; password: string; role: 'USER' | 'ARTIST' | 'RESELLER' }>({
+  const [formData, setFormData] = useState<{ email: string; password: string; role: 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER' }>({
     email: '',
     password: '',
-    role: defaultRole as 'USER' | 'ARTIST' | 'RESELLER',
+    role: defaultRole as 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -102,7 +102,7 @@ export default function SignInPopup({ isOpen, onClose, onSuccess, defaultRole = 
 
               {/* Role Selector */}
               <div className="flex gap-2 mb-6 p-1 bg-gray-100 rounded-lg">
-                {(['USER', 'ARTIST', 'RESELLER'] as const).map((role) => (
+                {(['USER', 'ARTIST', 'RESELLER', 'PRODUCER'] as const).map((role) => (
                   <button
                     key={role}
                     onClick={() => setFormData({ ...formData, role })}
@@ -115,6 +115,7 @@ export default function SignInPopup({ isOpen, onClose, onSuccess, defaultRole = 
                     {role === 'USER' && 'Listener'}
                     {role === 'ARTIST' && 'Artist'}
                     {role === 'RESELLER' && 'Reseller'}
+                    {role === 'PRODUCER' && 'Producer'}
                   </button>
                 ))}
               </div>

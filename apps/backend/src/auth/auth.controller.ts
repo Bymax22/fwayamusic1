@@ -4,6 +4,7 @@ import { Controller, Post, Body, Req, UseGuards, Get, HttpException, HttpStatus,
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
+import { UserRole } from '@prisma/client';
 
 @Controller('v1/auth') // ✅ matches /api/v1/auth/*
 export class AuthController {
@@ -28,7 +29,7 @@ export class AuthController {
   }
 
   @Post('social-login')
-  async socialLogin(@Body() dto: { email: string; displayName?: string; provider: string; avatarUrl?: string }) {
+  async socialLogin(@Body() dto: { email: string; displayName?: string; provider: string; avatarUrl?: string; role?: UserRole }) {
     return this.authService.socialLogin(dto);
   }
 

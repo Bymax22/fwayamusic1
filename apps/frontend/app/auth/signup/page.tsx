@@ -16,7 +16,7 @@ import {
   FaFacebook
 } from 'react-icons/fa';
 
-type SignupRole = 'USER' | 'ARTIST' | 'RESELLER';
+type SignupRole = 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER';
 type UserRole = SignupRole | 'ADMIN' | 'MODERATOR';
 type SignupStep = 'role' | 'details' | 'kyc' | 'consent' | 'verification';
 
@@ -82,6 +82,13 @@ export default function SignUp() {
       description: 'Sell music and earn commissions, build your customer base',
       icon: FaStore,
       color: 'from-green-500 to-emerald-500'
+    },
+    {
+      id: 'PRODUCER',
+      title: 'Producer',
+      description: 'Create beats, upload productions, and manage sales on the platform',
+      icon: FaMusic,
+      color: 'from-indigo-500 to-violet-500'
     }
   ];
 
@@ -127,8 +134,13 @@ export default function SignUp() {
 
   const handleNext = () => {
     if (validateStep(step)) {
-      if (step === 'role') setStep('details');
-      else if (step === 'details') setStep('kyc');
+      if (step === 'role') {
+        if (formData.role === 'PRODUCER') {
+          router.push('/auth/producer/signup');
+          return;
+        }
+        setStep('details');
+      } else if (step === 'details') setStep('kyc');
       else if (step === 'kyc') setStep('consent');
     }
   };
@@ -161,6 +173,9 @@ export default function SignUp() {
         case 'RESELLER':
           router.push('/reseller-dashboard');
           break;
+        case 'PRODUCER':
+          router.push('/producer');
+          break;
         default:
           router.push('/');
       }
@@ -180,6 +195,8 @@ export default function SignUp() {
         return '/for-artists';
       case 'RESELLER':
         return '/reseller-dashboard';
+      case 'PRODUCER':
+        return '/producer';
       case 'ADMIN':
       case 'MODERATOR':
         return '/admin';

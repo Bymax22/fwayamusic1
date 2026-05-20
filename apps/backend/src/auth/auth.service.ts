@@ -173,7 +173,7 @@ if (!user) {
       isSocialAuth: true,
       provider: dto.provider,
       socialId: dto.socialId,
-      role: UserRole.USER,
+      role: (dto.role as UserRole) || UserRole.USER,
       status: UserStatus.ACTIVE,
       isEmailVerified: true,
       passwordHash: 'SOCIAL_LOGIN', // <-- Add this line

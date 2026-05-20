@@ -15,7 +15,7 @@ import {
 import { auth, googleProvider, facebookProvider } from '@/lib/firebase-config';
 
 // local UserRole type used by auth helpers/components
-type UserRole = 'USER' | 'ARTIST' | 'RESELLER' | 'ADMIN' | 'MODERATOR';
+type UserRole = 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER' | 'ADMIN' | 'MODERATOR';
 
 
 interface User {
@@ -24,7 +24,7 @@ interface User {
   username: string;
   displayName?: string | null;
   avatarUrl?: string;
-  role: 'USER' | 'ARTIST' | 'RESELLER' | 'ADMIN' | 'MODERATOR';
+  role: 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER' | 'ADMIN' | 'MODERATOR';
   status: 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'VERIFIED' | 'REJECTED';
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
@@ -72,7 +72,7 @@ interface SignUpData {
   password: string;
   username: string;
   displayName?: string;
-  role: 'USER' | 'ARTIST' | 'RESELLER';
+  role: 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER';
   phoneNumber?: string;
   dateOfBirth?: string;
   artistName?: string;
@@ -95,6 +95,8 @@ const getDashboardPath = (role?: UserRole | string) => {
       return '/for-artists';
     case 'RESELLER':
       return '/reseller-dashboard';
+    case 'PRODUCER':
+      return '/producer';
     case 'ADMIN':
     case 'MODERATOR':
       return '/admin';
@@ -500,6 +502,7 @@ const signInWithFacebook = async (role?: UserRole) => {
         displayName: firebaseUser.displayName,
         avatarUrl: firebaseUser.photoURL,
         provider: firebaseUser.providerData[0]?.providerId,
+        role,
       }),
     });
 

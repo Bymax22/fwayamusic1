@@ -21,6 +21,8 @@ export default function SignIn() {
         return '/for-artists';
       case 'RESELLER':
         return '/reseller-dashboard';
+      case 'PRODUCER':
+        return '/producer';
       case 'ADMIN':
       case 'MODERATOR':
         return '/admin';

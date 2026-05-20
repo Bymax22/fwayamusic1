@@ -12,6 +12,7 @@ export interface AdminStats {
   // User Stats
   totalUsers: number;
   totalArtists: number;
+  totalProducers: number;
   totalResellers: number;
   totalAdmins: number;
   premiumUsers: number;
@@ -42,6 +43,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     const [
       totalUsers,
       totalArtists,
+      totalProducers,
       totalResellers,
       totalAdmins,
       premiumUsers,
@@ -60,26 +62,27 @@ export async function getAdminStats(): Promise<AdminStats> {
     ] = await Promise.all([
       // User counts (5)
       prisma.user.count(),
-      prisma.user.count({ where: { role: 'ARTIST' } }),
-      prisma.user.count({ where: { role: 'RESELLER' } }),
-      prisma.user.count({ where: { role: 'ADMIN' } }),
+      prisma.user.count({ where: { role: UserRole.ARTIST } }),
+      prisma.user.count({ where: { role: UserRole.PRODUCER } }),
+      prisma.user.count({ where: { role: UserRole.RESELLER } }),
+      prisma.user.count({ where: { role: UserRole.ADMIN } }),
       prisma.user.count({ where: { isPremium: true } }),
       
       // Media counts (6)
       prisma.media.count(),
-      prisma.media.count({ where: { type: 'AUDIO' } }),
-      prisma.media.count({ where: { type: 'VIDEO' } }),
-      prisma.media.count({ where: { type: 'PODCAST' } }),
-      prisma.media.count({ where: { accessType: 'PREMIUM' } }),
-      prisma.media.count({ where: { accessType: 'PAY_PER_VIEW' } }),
+      prisma.media.count({ where: { type: MediaType.AUDIO } }),
+      prisma.media.count({ where: { type: MediaType.VIDEO } }),
+      prisma.media.count({ where: { type: MediaType.PODCAST } }),
+      prisma.media.count({ where: { accessType: MediaAccessType.PREMIUM } }),
+      prisma.media.count({ where: { accessType: MediaAccessType.PAY_PER_VIEW } }),
       
       // Financial data (3)
       prisma.transaction.aggregate({
         _sum: { amount: true },
-        where: { status: 'COMPLETED' },
+        where: { status: TransactionStatus.COMPLETED },
       }),
       prisma.transaction.count({
-        where: { status: 'PENDING', mediaId: { not: null } },
+        where: { status: TransactionStatus.PENDING, mediaId: { not: null } },
       }),
       prisma.commission.aggregate({
         _sum: { amount: true },
@@ -101,6 +104,7 @@ export async function getAdminStats(): Promise<AdminStats> {
       // User stats
       totalUsers,
       totalArtists,
+      totalProducers,
       totalResellers,
       totalAdmins,
       premiumUsers,
@@ -323,7 +327,7 @@ export async function getFlaggedMedia() {
       where: {
         OR: [
           { isExplicit: true },
-          { accessType: { in: ['PREMIUM', 'PAY_PER_VIEW'] } },
+          { accessType: { in: [MediaAccessType.PREMIUM, MediaAccessType.PAY_PER_VIEW] } },
         ],
       },
       include: {
