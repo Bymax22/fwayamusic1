@@ -29,6 +29,7 @@ export default function ShareModal({
   duration,
   description,
   shareText,
+  onShare,
 }: ShareModalProps) {
   if (!open) {
     return null;
