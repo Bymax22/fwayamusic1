@@ -75,8 +75,8 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       title,
       description: '',
       images: [fallbackImage, ogImage],
-      site: "@fwaya",
-      creator: "@fwaya",
+      site: "@fwayamusic",
+      creator: "@fwayamusic",
     },
   };
 }

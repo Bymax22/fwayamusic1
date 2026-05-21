@@ -18,7 +18,7 @@ function normalizeCoverUrl(url: string) {
 
 async function fetchImageDataUrl(url: string) {
   try {
-    const response = await fetch(url, { cache: 'no-store' });
+    const response = await fetch(url, { next: { revalidate: 60 } });
     if (!response.ok) {
       console.error(`Failed to fetch OG cover image: ${response.status} ${response.statusText}`);
       return null;
