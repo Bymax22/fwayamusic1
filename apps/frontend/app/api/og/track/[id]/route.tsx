@@ -9,6 +9,31 @@ function toAbsoluteUrl(url: string | undefined, base: string) {
   return /^https?:\/\//i.test(url) ? url : `${base}${url.startsWith('/') ? '' : '/'}${url}`;
 }
 
+async function fetchImageDataUrl(url: string) {
+  try {
+    const response = await fetch(url, { next: { revalidate: 60 } });
+    if (!response.ok) {
+      console.error(`Failed to fetch OG cover image: ${response.status} ${response.statusText}`);
+      return null;
+    }
+
+    const contentType = response.headers.get('content-type') || 'image/png';
+    const arrayBuffer = await response.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = '';
+    const chunkSize = 0x8000;
+
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+    }
+
+    return `data:${contentType};base64,${btoa(binary)}`;
+  } catch (error) {
+    console.error('Failed to fetch OG cover image:', error);
+    return null;
+  }
+}
+
 export async function GET(req: Request, context: any) {
   const trackId = context?.params?.id;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -45,6 +70,7 @@ export async function GET(req: Request, context: any) {
     track?.coverArt || track?.artCoverUrl || track?.thumbnailUrl || (track as any)?.coverUrl,
     baseUrl,
   ) || DEFAULT_IMAGE;
+  const coverImageUrl = (await fetchImageDataUrl(coverUrl)) || coverUrl;
 
 
   return new ImageResponse(
@@ -59,7 +85,7 @@ export async function GET(req: Request, context: any) {
         position: 'relative',
         fontFamily: 'Inter, sans-serif',
       }}>
-        <img src={coverUrl} alt="cover" style={{
+        <img src={coverImageUrl} alt="cover" style={{
           position: 'absolute',
           inset: 0,
           width: '100%',
