@@ -289,7 +289,7 @@ export default function TrackPage() {
     if (!track || !showShareModal) return null;
 
     const shareUrl = getTrackShareUrl();
-    const coverUrl = track.coverArt || '/default-cover.jpg';
+    const coverUrl = track.coverArt || (track as any).artCoverUrl || (track as any).thumbnailUrl || (track as any).coverUrl || '/default-cover.jpg';
 
     return (
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -458,8 +458,8 @@ export default function TrackPage() {
     }
   };
 
-  const artistDisplay = track?.user?.displayName || track?.artist || 'Unknown Artist';
-  const coverArtUrl = track?.coverArt || '/default-cover.jpg';
+    const artistDisplay = track?.user?.displayName || track?.artist || 'Unknown Artist';
+    const coverArtUrl = track?.coverArt || (track as any)?.artCoverUrl || (track as any)?.thumbnailUrl || (track as any)?.coverUrl || '/default-cover.jpg';
   const viewCount = typeof track?.views === 'number' ? track.views : 0;
   const likeCount = typeof track?.likes === 'number' ? track.likes : 0;
   const downloadCount = typeof track?.downloads === 'number' ? track.downloads : 0;
