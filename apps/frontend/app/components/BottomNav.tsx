@@ -14,7 +14,7 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
   const pathname = usePathname();
 
   const navItems = [
-    { id: "home", label: "Fwaya", icon: null, image: "/fwaya lp-01.png", inactiveImage: "/fwaya white icon-01.png", href: "/" },
+    { id: "home", label: "Fwaya", icon: null, image: "/fwaya-lp-01.png", inactiveImage: "/fwaya white icon-01.png", href: "/" },
     { id: "browse", label: "Browse", icon: Compass, href: "/browse" },
     { id: "search", label: "Search", icon: Search, href: "/search" },
     { id: "library", label: "Library", icon: Library, href: "/library" },

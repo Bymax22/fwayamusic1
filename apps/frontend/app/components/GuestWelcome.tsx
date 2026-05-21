@@ -208,7 +208,7 @@ export default function GuestWelcome() {
             transition={{ duration: 2.2, ease: "easeInOut", repeat: Infinity }}
           >
             <Image
-              src="/fwaya lp-01.png"
+              src="/fwaya-lp-01.png"
               alt="Fwaya loading logo"
               width={96}
               height={96}

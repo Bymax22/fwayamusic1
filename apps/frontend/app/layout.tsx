@@ -12,14 +12,25 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "https://res.cloudinary.com/dayn5vifn/image/upload/v1777067980/fwaya-01_eeob6c.png",
+        url: "/favicon.ico",
+        type: "image/x-icon",
+        sizes: "16x16 32x32 48x48 64x64 128x128 256x256",
+      },
+      {
+        url: "/fwaya-lp-01.png",
         sizes: "any",
       },
     ],
     apple: [
       {
-        url: "https://res.cloudinary.com/dayn5vifn/image/upload/v1777067980/fwaya-01_eeob6c.png",
+        url: "/fwaya-lp-01.png",
         sizes: "180x180",
+      },
+    ],
+    shortcut: [
+      {
+        url: "/favicon.ico",
+        type: "image/x-icon",
       },
     ],
   },
