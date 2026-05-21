@@ -295,20 +295,19 @@ export default function TrackPage() {
 
     return (
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div className="bg-black rounded-2xl p-6 max-w-2xl w-full ring-1 ring-white/10 overflow-hidden">
-          <div className="flex items-start justify-between gap-4 mb-4">
+        <div className="bg-black rounded-2xl p-4 max-w-md w-full ring-1 ring-white/10 max-h-[90vh] overflow-y-auto">
+          <div className="flex items-start justify-between gap-4 mb-3">
             <div>
               <h3 className="text-xl font-bold text-white">Share Track</h3>
-              <p className="text-sm text-gray-400 mt-1">Share with art cover, track details and instant play link.</p>
             </div>
             <button onClick={() => setShowShareModal(false)} className="text-gray-400 hover:text-white">
               <FaTimes size={20} />
             </button>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-[200px_1fr] mb-4">
-            <div className="overflow-hidden rounded-3xl bg-white/5">
-              <Image src={coverUrl} alt={track.title} width={320} height={320} className="h-full w-full object-cover" />
+          <div className="grid gap-4 grid-cols-[120px_1fr] mb-4 items-start">
+            <div className="overflow-hidden rounded-2xl bg-white/5 w-30 h-30">
+              <Image src={coverUrl} alt={track.title} width={160} height={160} className="object-cover w-40 h-40 rounded-lg" />
             </div>
             <div className="space-y-3">
               <div>
@@ -319,7 +318,7 @@ export default function TrackPage() {
                 <p className="text-sm text-gray-400">Artist</p>
                 <p className="text-white">{track.artist}</p>
               </div>
-              <div className="grid grid-cols-2 gap-3 text-sm text-gray-300">
+              <div className="grid grid-cols-2 gap-2 text-sm text-gray-300">
                 <div>
                   <p className="text-gray-500">Genre</p>
                   <p>{track.genre || 'Unknown'}</p>
