@@ -37,7 +37,8 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   const track = await fetchTrackMeta(params.id);
   const artistName = track?.user?.displayName || track?.user?.username || "Fwaya";
   const title = track?.title ? `${track.title} • ${artistName}` : "Fwaya";
-  const image = `${baseUrl}/api/og/track/${params.id}`;
+  const ogImage = `${baseUrl}/api/og/track/${params.id}`;
+  const fallbackImage = track?.artCoverUrl || track?.thumbnailUrl || ogImage;
   const trackUrl = `${baseUrl}/track/${params.id}`;
 
   // eslint-disable-next-line no-console
@@ -54,7 +55,14 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       siteName: "Fwaya",
       images: [
         {
-          url: image,
+          url: fallbackImage,
+          alt: `${track?.title || "Track"} cover art`,
+          width: 1200,
+          height: 630,
+          type: "image/png",
+        },
+        {
+          url: ogImage,
           alt: `${track?.title || "Track"} cover art`,
           width: 1200,
           height: 630,
@@ -66,7 +74,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description: '',
-      images: [image],
+      images: [fallbackImage, ogImage],
       site: "@fwaya",
       creator: "@fwaya",
     },

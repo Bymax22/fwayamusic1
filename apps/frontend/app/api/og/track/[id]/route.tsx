@@ -9,9 +9,16 @@ function toAbsoluteUrl(url: string | undefined, base: string) {
   return /^https?:\/\//i.test(url) ? url : `${base}${url.startsWith('/') ? '' : '/'}${url}`;
 }
 
+function normalizeCoverUrl(url: string) {
+  if (/res\.cloudinary\.com\/dayn5vifn\/image\/upload\//.test(url)) {
+    return url.replace('/upload/', '/upload/f_auto,q_auto,w_1200/');
+  }
+  return url;
+}
+
 async function fetchImageDataUrl(url: string) {
   try {
-    const response = await fetch(url, { next: { revalidate: 60 } });
+    const response = await fetch(url, { cache: 'no-store' });
     if (!response.ok) {
       console.error(`Failed to fetch OG cover image: ${response.status} ${response.statusText}`);
       return null;
@@ -66,12 +73,12 @@ export async function GET(req: Request, context: any) {
   const title = track?.title || 'Fwaya';
   const artist = track?.user?.displayName || track?.user?.username || 'Fwaya';
   const description = track?.description || `Listen to ${title} on Fwaya.`;
-  const coverUrl = toAbsoluteUrl(
+  const rawCoverUrl = toAbsoluteUrl(
     track?.coverArt || track?.artCoverUrl || track?.thumbnailUrl || (track as any)?.coverUrl,
     baseUrl,
   ) || DEFAULT_IMAGE;
+  const coverUrl = normalizeCoverUrl(rawCoverUrl);
   const coverImageUrl = (await fetchImageDataUrl(coverUrl)) || coverUrl;
-
 
   return new ImageResponse(
     (
