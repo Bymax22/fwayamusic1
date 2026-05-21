@@ -125,8 +125,8 @@ export async function GET(req: Request, context: any) {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <polygon points="30,18 30,62 60,40" fill="#111827" />
+                <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <polygon points="28,16 28,80 72,48" fill="#111827" />
                 </svg>
               </div>
               <span style={{ marginTop: '22px', color: '#E5E7EB', fontSize: '24px', fontWeight: 700 }}>Play</span>
