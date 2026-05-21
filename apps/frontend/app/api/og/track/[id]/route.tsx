@@ -83,6 +83,8 @@ export async function GET(req: Request, context: any) {
   return new ImageResponse(
     (
       <div style={{
+        display: 'flex',
+        flexDirection: 'column',
         width: '1200px',
         height: '630px',
         position: 'relative',
