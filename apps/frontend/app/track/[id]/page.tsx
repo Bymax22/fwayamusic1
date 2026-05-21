@@ -400,15 +400,6 @@ export default function TrackPage() {
                 </button>
               </div>
             </div>
-
-            <a
-              href={shareUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="block rounded-2xl bg-white/5 px-4 py-3 text-center text-white hover:bg-white/10 transition"
-            >
-              Play Now
-            </a>
           </div>
         </div>
       </div>
