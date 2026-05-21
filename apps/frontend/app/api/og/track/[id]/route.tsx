@@ -114,20 +114,11 @@ export async function GET(req: Request, context: any) {
           justifyContent: 'space-between',
           height: '100%',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '65%' }}>
-              <p style={{ margin: 0, color: '#A78BFA', fontSize: '24px', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Fwaya</p>
-              <h1 style={{ margin: '18px 0 0 0', color: '#fff', fontSize: '72px', lineHeight: '0.95', fontWeight: 800 }}>
-                {title}
-              </h1>
-              <p style={{ margin: '20px 0 0 0', color: '#E5E7EB', fontSize: '32px', lineHeight: 1.1 }}>
-                {artist}
-              </p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '160px', minHeight: '160px', borderRadius: '32px', background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(20px)' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '220px', minHeight: '220px', borderRadius: '32px', background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(20px)' }}>
               <div style={{
-                width: '96px',
-                height: '96px',
+                width: '130px',
+                height: '130px',
                 borderRadius: '50%',
                 background: 'rgba(255,255,255,0.95)',
                 display: 'flex',
@@ -137,18 +128,27 @@ export async function GET(req: Request, context: any) {
                 <div style={{
                   width: 0,
                   height: 0,
-                  borderTop: '16px solid transparent',
-                  borderBottom: '16px solid transparent',
-                  borderLeft: '24px solid #111827',
+                  borderTop: '26px solid transparent',
+                  borderBottom: '26px solid transparent',
+                  borderLeft: '38px solid #111827',
                 }} />
               </div>
-              <span style={{ marginTop: '16px', color: '#E5E7EB', fontSize: '18px', fontWeight: 700 }}>Play</span>
+              <span style={{ marginTop: '18px', color: '#E5E7EB', fontSize: '20px', fontWeight: 700 }}>Play</span>
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '20px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '68%' }}>
-              <p style={{ margin: 0, color: '#D1D5DB', fontSize: '24px', lineHeight: 1.4, maxHeight: '144px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <p style={{ margin: 0, color: '#A78BFA', fontSize: '24px', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Fwaya</p>
+                <h1 style={{ margin: '4px 0 0 0', color: '#fff', fontSize: '72px', lineHeight: '0.95', fontWeight: 800 }}>
+                  {title}
+                </h1>
+                <p style={{ margin: '16px 0 0 0', color: '#E5E7EB', fontSize: '32px', lineHeight: 1.1 }}>
+                  {artist}
+                </p>
+              </div>
+              <p style={{ margin: '24px 0 0 0', color: '#D1D5DB', fontSize: '24px', lineHeight: 1.4, maxHeight: '144px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {description}
               </p>
             </div>
