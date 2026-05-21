@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import Waveform from '@/components/Waveform';
+import ShareModal from '@/components/ShareModal';
 import { formatDuration, formatFileSize } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
@@ -128,6 +129,8 @@ export default function Browse() {
   const [activeFilter, setActiveFilter] = useState<'popular' | 'newest' | 'trending' | 'recommended'>('popular');
   const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
   const [showMediaMenu, setShowMediaMenu] = useState(false);
+  const [selectedMediaForShare, setSelectedMediaForShare] = useState<MediaFile | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
   const [showMobileMoneyModal, setShowMobileMoneyModal] = useState(false);
@@ -628,33 +631,16 @@ export default function Browse() {
     }
   };
 
-  const handleShare = async (file: MediaFile) => {
-    try {
-      const shareUrl = `${window.location.origin}/track/${file.id}`;
-      
-      if (navigator.share) {
-        await navigator.share({
-          title: file.title,
-          text: `Check out "${file.title}" by ${file.artist}`,
-          url: shareUrl,
-        });
-      } else {
-        await navigator.clipboard.writeText(shareUrl);
-        alert('Link copied to clipboard!');
-      }
+  const handleShare = (file: MediaFile) => {
+    setSelectedMediaForShare(file);
+    setShowShareModal(true);
+  };
 
-      // Update share count
-      setMediaFiles(mediaFiles.map(f => 
-        f.id === file.id ? { ...f, shareCount: f.shareCount + 1 } : f
-      ));
-
-    } catch (err) {
-      console.error('Share error:', err);
-      setError({
-        message: 'Failed to share',
-        details: err instanceof Error ? err.message : String(err)
-      });
-    }
+  const handleShareSuccess = () => {
+    if (!selectedMediaForShare) return;
+    setMediaFiles(mediaFiles.map(f => 
+      f.id === selectedMediaForShare.id ? { ...f, shareCount: f.shareCount + 1 } : f
+    ));
   };
 
   const handleAddToPlaylist = async (playlistId: number, mediaId: number) => {
@@ -1447,6 +1433,19 @@ export default function Browse() {
           </div>
         )}
       </AnimatePresence>
+
+      <ShareModal
+        open={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={selectedMediaForShare?.title ?? ''}
+        artist={selectedMediaForShare?.artist}
+        coverUrl={selectedMediaForShare?.coverArt}
+        url={selectedMediaForShare ? `${window.location.origin}/track/${selectedMediaForShare.id}` : ''}
+        genre={selectedMediaForShare?.genre ?? undefined}
+        duration={selectedMediaForShare ? formatDuration(selectedMediaForShare.duration) : undefined}
+        shareText={selectedMediaForShare ? `Check out "${selectedMediaForShare.title}" by ${selectedMediaForShare.artist} on Fwaya.\n${window.location.origin}/track/${selectedMediaForShare.id}` : undefined}
+        onShare={handleShareSuccess}
+      />
 
                     {/* Mobile Money Modal */}
             {showMobileMoneyModal && selectedMediaForPayment && (
