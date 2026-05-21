@@ -23,7 +23,7 @@ export const categories = [
     {
       id: 1,
       title: "CEO Wandi",
-      artist: "Fwaya Music",
+      artist: "Fwaya",
       category: "Gospel",
       artcover: "/update1.jpg",
       song: "/update1.mp3",
@@ -32,7 +32,7 @@ export const categories = [
     {
       id: 2,
       title: "Zambezi Vibes",
-      artist: "Fwaya Music",
+      artist: "Fwaya",
       category: "Afrobeat",
       artcover: "/update2.jpg",
       audio: "/update2.mp3",

@@ -28,7 +28,7 @@ export default function QueuePage() {
       {
         id: 1,
         title: "CEO Wandi",
-        artist: "Fwaya Music",
+        artist: "Fwaya",
         url: "/music/ceo-wandi.mp3",
         duration: 180,
         coverArt: "/covers/wt3.jpg",

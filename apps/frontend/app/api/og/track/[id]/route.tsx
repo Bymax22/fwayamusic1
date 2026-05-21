@@ -38,9 +38,9 @@ export async function GET(req: Request, context: any) {
     }
   }
 
-  const title = track?.title || 'Fwaya Music';
-  const artist = track?.user?.displayName || track?.user?.username || 'Fwaya Music';
-  const description = track?.description || `Listen to ${title} on Fwaya Music.`;
+  const title = track?.title || 'Fwaya';
+  const artist = track?.user?.displayName || track?.user?.username || 'Fwaya';
+  const description = track?.description || `Listen to ${title} on Fwaya.`;
   const coverUrl = toAbsoluteUrl(
     track?.coverArt || track?.artCoverUrl || track?.thumbnailUrl || (track as any)?.coverUrl,
     baseUrl,
@@ -82,7 +82,7 @@ export async function GET(req: Request, context: any) {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '65%' }}>
-              <p style={{ margin: 0, color: '#A78BFA', fontSize: '24px', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Fwaya Music</p>
+              <p style={{ margin: 0, color: '#A78BFA', fontSize: '24px', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Fwaya</p>
               <h1 style={{ margin: '18px 0 0 0', color: '#fff', fontSize: '72px', lineHeight: '0.95', fontWeight: 800 }}>
                 {title}
               </h1>

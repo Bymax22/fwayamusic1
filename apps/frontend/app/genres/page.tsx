@@ -27,7 +27,7 @@ export default function GenresPage() {
       color: "from-orange-500 to-red-500",
       trackCount: 2450,
       coverArt: "/genres/afrobeats.jpg",
-      popularArtists: ["Fwaya Music", "Burna Boy", "Wizkid", "Davido"]
+      popularArtists: ["Fwaya", "Burna Boy", "Wizkid", "Davido"]
     },
     {
       id: 2,

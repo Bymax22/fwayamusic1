@@ -327,17 +327,17 @@ async findOrCreateUser(decodedFirebaseUser: any) {
           // Always use the custom domain for verification emails
           const frontend = 'https://fwaya.net';
           const verifyUrl = `${frontend}/auth/verify-email?token=${token}`;
-          subject = 'Verify your Fwaya Music account';
+          subject = 'Verify your Fwaya account';
           htmlContent = `<div style="font-family: Arial, sans-serif; line-height:1.4;">
                     <h2 style="color:#0a3747">Verify your email</h2>
-                    <p>Click the link below to verify your Fwaya Music account. This link expires in 10 minutes.</p>
+                    <p>Click the link below to verify your Fwaya account. This link expires in 10 minutes.</p>
                     <a href="${verifyUrl}" style="display:inline-block;padding:10px 16px;background:#0a3747;color:white;border-radius:6px;text-decoration:none;margin-top:12px;">Verify Email</a>
                     <p style="margin-top:12px;color:#666;">If you did not request this, please ignore this email.</p>
                    </div>`;
         } else {
-          subject = 'Your Fwaya Music verification code';
+          subject = 'Your Fwaya verification code';
           htmlContent = `<div style="font-family: Arial, sans-serif; line-height:1.4;">
-                    <h2 style="color:#0a3747">Fwaya Music Verification</h2>
+                    <h2 style="color:#0a3747">Fwaya Verification</h2>
                     <p>Your verification code is:</p>
                     <div style="font-size:22px; font-weight:700; margin:12px 0; color:#e51f48">${code}</div>
                     <p>This code expires in 10 minutes.</p>
@@ -347,9 +347,9 @@ async findOrCreateUser(decodedFirebaseUser: any) {
 
         const payload = {
           sender: {
-            email: fromEmail,
-            name: 'Fwaya Music',
-          },
+              email: fromEmail,
+              name: 'Fwaya',
+            },
           to: [
             {
               email: user.email,

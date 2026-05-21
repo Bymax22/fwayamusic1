@@ -609,7 +609,7 @@ export default function ForArtistsPage() {
   const buildTrackShareText = (media: Media) => {
     const durationText = media.duration ? `${Math.floor(media.duration / 60)}:${String(media.duration % 60).padStart(2, '0')}` : 'Unknown duration';
     const lines = [
-      `Listen to "${media.title}" on Fwaya Music.`,
+      `Listen to "${media.title}" on Fwaya.`,
       media.description || 'Enjoy this fresh track instantly.',
       `Genre: ${media.genre || 'Unknown'}`,
       `Duration: ${durationText}`,
@@ -643,7 +643,7 @@ export default function ForArtistsPage() {
 
   const handleShareViaEmail = () => {
     if (!selectedMediaForShare || !shareLink) return;
-    const subject = `Listen to ${selectedMediaForShare.title} on Fwaya Music`;
+    const subject = `Listen to ${selectedMediaForShare.title} on Fwaya`;
     const body = buildTrackShareText(selectedMediaForShare);
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };

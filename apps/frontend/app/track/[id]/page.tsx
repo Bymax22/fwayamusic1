@@ -268,7 +268,7 @@ export default function TrackPage() {
 
   const handleShareViaEmail = () => {
     if (!track) return;
-    const subject = `Listen to ${track.title} on Fwaya Music`;
+    const subject = `Listen to ${track.title} on Fwaya`;
     const body = buildTrackShareText(track);
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };

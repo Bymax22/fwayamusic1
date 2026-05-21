@@ -80,7 +80,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   // Auth items (shown when not logged in)
   const authMenuItems = [
     { title: "Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/signin", description: "Sign in to your account" },
-    { title: "Create Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/signup", description: "Join Fwaya Music" },
+    { title: "Create Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/signup", description: "Join Fwaya" },
     { title: "Artist Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/artist/signin", description: "Sign in as an artist" },
     { title: "Create Artist Account", icon: <Icon><UserPlus size={20} /></Icon>, href: "/auth/artist/signup", description: "Sign up as an artist" },
     { title: "Producer Login", icon: <Icon><LogIn size={20} /></Icon>, href: "/auth/producer/signin", description: "Sign in as a producer" },

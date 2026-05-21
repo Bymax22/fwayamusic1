@@ -35,8 +35,8 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
 
   const track = await fetchTrackMeta(params.id);
-  const artistName = track?.user?.displayName || track?.user?.username || "Fwaya Music";
-  const title = track?.title ? `${track.title} • ${artistName}` : "Fwaya Music";
+  const artistName = track?.user?.displayName || track?.user?.username || "Fwaya";
+  const title = track?.title ? `${track.title} • ${artistName}` : "Fwaya";
   const image = `${baseUrl}/api/og/track/${params.id}`;
   const trackUrl = `${baseUrl}/track/${params.id}`;
 
@@ -51,7 +51,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       title,
       description: '',
       url: trackUrl,
-      siteName: "Fwaya Music",
+      siteName: "Fwaya",
       images: [
         {
           url: image,

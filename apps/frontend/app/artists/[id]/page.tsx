@@ -188,7 +188,7 @@ export default function ArtistPage() {
     if (navigator.share) {
       navigator.share({
         title: song.title,
-        text: `Check out "${song.title}" by ${song.artist} on Fwaya Music`,
+        text: `Check out "${song.title}" by ${song.artist} on Fwaya`,
         url: `${window.location.origin}/songs/${song.id}`
       });
     } else {
@@ -218,7 +218,7 @@ export default function ArtistPage() {
     if (navigator.share) {
       navigator.share({
         title: artist?.name,
-        text: `Check out ${artist?.name} on Fwaya Music`,
+        text: `Check out ${artist?.name} on Fwaya`,
         url: window.location.href
       });
     } else {

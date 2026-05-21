@@ -229,7 +229,7 @@ export default function SignUp() {
         className="bg-[#0a1f29] rounded-2xl p-8 w-full max-w-2xl border border-[#0a3747] shadow-xl"
       >
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Join Fwaya Music</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Join Fwaya</h1>
           <p className="text-gray-400">Create your account and start your musical journey</p>
         </div>
 

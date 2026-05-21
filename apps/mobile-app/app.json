@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Fwaya Music Mobile",
+    "name": "Fwaya Mobile",
     "slug": "fwaya-music-mobile",
     "version": "1.0.0",
     "platforms": ["ios", "android", "web"],

@@ -10,7 +10,7 @@ export default function MusicDashboard() {
     <div className="flex h-screen bg-gray-900 text-white">
       {/* Sidebar */}
       <div className={`w-64 bg-gray-800 p-4 ${isSidebarOpen ? "block" : "hidden"} md:block`}> 
-        <h1 className="text-2xl font-bold text-center mb-6">Fwaya Music</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">Fwaya</h1>
         <ul className="space-y-4">
           <li className="flex items-center space-x-3 hover:text-blue-500 cursor-pointer">
             <FaMusic /> <span>Songs</span>
@@ -52,7 +52,7 @@ export default function MusicDashboard() {
 
         {/* Content Area */}
         <div className="flex-grow bg-gray-800 rounded-lg p-6">
-          <h2 className="text-xl font-bold">Welcome to Fwaya Music</h2>
+          <h2 className="text-xl font-bold">Welcome to Fwaya</h2>
           <p className="text-gray-400 mt-2">Explore your favorite songs, albums, and news.</p>
         </div>
       </div>
