@@ -278,7 +278,8 @@ export default function TrackPage() {
     const url = getTrackShareUrl();
     const text = buildTrackShareText(track);
     if (navigator.share) {
-      await navigator.share({ title: track.title, text, url });
+      // share only the URL to avoid some apps duplicating text+url
+      await navigator.share({ url });
     } else {
       navigator.clipboard.writeText(url);
       alert('Link copied to clipboard!');
@@ -333,17 +334,17 @@ export default function TrackPage() {
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-4">
-            <button onClick={handleQuickShare} className="rounded-2xl bg-purple-600 px-4 py-3 text-white hover:bg-purple-500 transition">
+          <div className="flex gap-3 mb-4 overflow-x-auto">
+            <button onClick={handleQuickShare} className="rounded-full bg-purple-600 px-3 py-2 text-sm text-white hover:bg-purple-500 transition whitespace-nowrap">
               Quick Share
             </button>
-            <button onClick={handleShareViaWhatsApp} className="rounded-2xl bg-green-600 px-4 py-3 text-white hover:bg-green-500 transition">
+            <button onClick={handleShareViaWhatsApp} className="rounded-full bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-500 transition whitespace-nowrap">
               WhatsApp
             </button>
-            <button onClick={handleShareViaFacebook} className="rounded-2xl bg-blue-600 px-4 py-3 text-white hover:bg-blue-500 transition">
+            <button onClick={handleShareViaFacebook} className="rounded-full bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-500 transition whitespace-nowrap">
               Facebook
             </button>
-            <button onClick={handleShareViaEmail} className="rounded-2xl bg-gray-700 px-4 py-3 text-white hover:bg-gray-600 transition">
+            <button onClick={handleShareViaEmail} className="rounded-full bg-gray-700 px-3 py-2 text-sm text-white hover:bg-gray-600 transition whitespace-nowrap">
               Email
             </button>
           </div>
