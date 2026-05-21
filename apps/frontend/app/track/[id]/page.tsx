@@ -669,7 +669,7 @@ export default function TrackPage() {
                       >
                         <div className="relative mb-2 sm:mb-3 lg:mb-4 h-20 sm:h-28 lg:h-36 overflow-hidden rounded-3xl bg-slate-900">
                           <Image
-                            src={relatedTrack.coverArt || '/default-cover.jpg'}
+                            src={relatedTrack.coverArt || (relatedTrack as any).artCoverUrl || (relatedTrack as any).thumbnailUrl || (relatedTrack as any).coverUrl || '/default-cover.jpg'}
                             alt={relatedTrack.title}
                             fill
                             className="object-cover"

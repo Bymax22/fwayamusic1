@@ -46,31 +46,6 @@ export async function GET(req: Request, context: any) {
     baseUrl,
   ) || DEFAULT_IMAGE;
 
-  // Attempt to fetch the cover art and embed as a data URL so the OG image renderer
-  // reliably shows the track art as a background (avoids remote fetch/CORS issues).
-  let coverDataUrl = coverUrl;
-  try {
-    const res = await fetch(coverUrl);
-    if (res.ok) {
-      const contentType = res.headers.get('content-type') || 'image/png';
-      const ab = await res.arrayBuffer();
-      let base64: string;
-      if (typeof Buffer !== 'undefined') {
-        base64 = Buffer.from(ab).toString('base64');
-      } else {
-        let binary = '';
-        const bytes = new Uint8Array(ab);
-        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-        // btoa should be available in edge runtime
-        base64 = btoa(binary);
-      }
-      coverDataUrl = `data:${contentType};base64,${base64}`;
-    } else {
-      console.error('OG cover fetch failed:', res.status, res.statusText);
-    }
-  } catch (err) {
-    console.error('OG cover fetch error:', err);
-  }
 
   return new ImageResponse(
     (
@@ -84,12 +59,12 @@ export async function GET(req: Request, context: any) {
         position: 'relative',
         fontFamily: 'Inter, sans-serif',
       }}>
-        <div style={{
+        <img src={coverUrl} alt="cover" style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: `url("${coverDataUrl}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
           filter: 'brightness(0.55)',
         }} />
         <div style={{
