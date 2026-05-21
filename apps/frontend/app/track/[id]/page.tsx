@@ -24,6 +24,7 @@ import {
   FaEye,
   FaCheckCircle
 } from 'react-icons/fa';
+import { RiWhatsappLine, RiFacebookLine, RiInstagramLine, RiTwitterLine, RiTiktokLine, RiMailLine } from 'react-icons/ri';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import { formatDuration } from '@/lib/utils';
@@ -334,18 +335,48 @@ export default function TrackPage() {
             </div>
           </div>
 
-          <div className="flex gap-3 mb-4 overflow-x-auto">
-            <button onClick={handleQuickShare} className="rounded-full bg-purple-600 px-3 py-2 text-sm text-white hover:bg-purple-500 transition whitespace-nowrap">
-              Quick Share
+          <div className="flex items-center gap-3 mb-4">
+            <button onClick={handleShareViaWhatsApp} className="p-2 rounded-full hover:bg-white/5" aria-label="Share on WhatsApp">
+              <RiWhatsappLine className="text-purple-600" size={22} />
             </button>
-            <button onClick={handleShareViaWhatsApp} className="rounded-full bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-500 transition whitespace-nowrap">
-              WhatsApp
+            <button onClick={handleShareViaFacebook} className="p-2 rounded-full hover:bg-white/5" aria-label="Share on Facebook">
+              <RiFacebookLine className="text-purple-600" size={22} />
             </button>
-            <button onClick={handleShareViaFacebook} className="rounded-full bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-500 transition whitespace-nowrap">
-              Facebook
+            <button
+              onClick={() => {
+                const url = getTrackShareUrl();
+                if (navigator.share) {
+                  navigator.share({ url });
+                } else {
+                  navigator.clipboard.writeText(url);
+                  alert('Link copied to clipboard!');
+                }
+              }}
+              className="p-2 rounded-full hover:bg-white/5"
+              aria-label="Share on Instagram"
+            >
+              <RiInstagramLine className="text-purple-600" size={22} />
             </button>
-            <button onClick={handleShareViaEmail} className="rounded-full bg-gray-700 px-3 py-2 text-sm text-white hover:bg-gray-600 transition whitespace-nowrap">
-              Email
+            <button onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(getTrackShareUrl())}`, '_blank')} className="p-2 rounded-full hover:bg-white/5" aria-label="Share on X">
+              <RiTwitterLine className="text-purple-600" size={22} />
+            </button>
+            <button
+              onClick={() => {
+                const url = getTrackShareUrl();
+                if (navigator.share) {
+                  navigator.share({ url });
+                } else {
+                  navigator.clipboard.writeText(url);
+                  alert('Link copied to clipboard!');
+                }
+              }}
+              className="p-2 rounded-full hover:bg-white/5"
+              aria-label="Share on TikTok"
+            >
+              <RiTiktokLine className="text-purple-600" size={22} />
+            </button>
+            <button onClick={handleShareViaEmail} className="p-2 rounded-full hover:bg-white/5" aria-label="Share via Email">
+              <RiMailLine className="text-purple-600" size={22} />
             </button>
           </div>
 
