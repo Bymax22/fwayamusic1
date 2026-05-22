@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { FaTimes } from 'react-icons/fa';
-import { AiFillInstagram, AiFillTikTok, AiFillX } from 'react-icons/ai';
+import { AiFillInstagram, AiFillTikTok } from 'react-icons/ai';
 import { RiWhatsappLine, RiFacebookLine, RiMailLine, RiFileCopyLine } from 'react-icons/ri';
 
 interface ShareModalProps {
@@ -36,8 +36,7 @@ export default function ShareModal({
     return null;
   }
 
-  const fallbackText = `Listen to ${title}${artist ? ` by ${artist}` : ''} on Fwaya.\n${url}`;
-  const payload = shareText || fallbackText;
+  const payload = url;
   const subject = `Listen to ${title}${artist ? ` by ${artist}` : ''} on Fwaya`;
   const coverImage = coverUrl || '/default-cover.jpg';
 
@@ -66,11 +65,6 @@ export default function ShareModal({
     onShare?.();
   };
 
-  const handleX = () => {
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(payload)}`, '_blank');
-    onShare?.();
-  };
-
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
@@ -83,7 +77,7 @@ export default function ShareModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-black rounded-2xl p-5 max-w-md w-full ring-1 ring-white/10 max-h-[90vh] overflow-y-auto">
+      <div className="bg-black rounded-2xl p-5 max-w-md w-full ring-1 ring-white/10 max-h-[80vh] sm:max-h-[90vh] overflow-y-auto">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <h3 className="text-xl font-bold text-white">Share Track</h3>
@@ -93,7 +87,7 @@ export default function ShareModal({
           </button>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[110px_1fr] mb-4 items-start">
+        <div className="grid gap-4 grid-cols-[100px_1fr] mb-4 items-start">
           <div className="overflow-hidden rounded-3xl bg-white/5 h-28 w-full">
             <Image
               src={coverImage}
@@ -133,59 +127,47 @@ export default function ShareModal({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-5 gap-2 mb-4">
           <button
             onClick={handleWhatsApp}
-            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-2 text-white transition hover:border-purple-500 hover:text-purple-300"
             aria-label="Share on WhatsApp"
           >
-            <RiWhatsappLine size={22} />
+            <RiWhatsappLine size={18} />
           </button>
           <button
             onClick={handleFacebook}
-            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-2 text-white transition hover:border-purple-500 hover:text-purple-300"
             aria-label="Share on Facebook"
           >
-            <RiFacebookLine size={22} />
-          </button>
-          <button
-            onClick={handleEmail}
-            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
-            aria-label="Share via Email"
-          >
-            <RiMailLine size={22} />
-          </button>
-          <button
-            onClick={handleCopyLink}
-            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
-            aria-label="Copy link"
-          >
-            <RiFileCopyLine size={22} />
+            <RiFacebookLine size={18} />
           </button>
           <button
             onClick={handleInstagram}
-            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-2 text-white transition hover:border-purple-500 hover:text-purple-300"
             aria-label="Share on Instagram"
           >
-            <AiFillInstagram size={22} />
+            <AiFillInstagram size={18} />
           </button>
           <button
             onClick={handleTikTok}
-            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-2 text-white transition hover:border-purple-500 hover:text-purple-300"
             aria-label="Share on TikTok"
           >
-            <AiFillTikTok size={22} />
+            <AiFillTikTok size={18} />
           </button>
           <button
-            onClick={handleX}
-            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
-            aria-label="Share on X"
+            onClick={handleEmail}
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-2 text-white transition hover:border-purple-500 hover:text-purple-300"
+            aria-label="Share via Email"
           >
-            <AiFillX size={22} />
+            <RiMailLine size={18} />
           </button>
+        </div>
+        <div className="mb-4">
           <button
             onClick={handleCopyLink}
-            className="col-span-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:border-purple-500 hover:text-purple-300"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:border-purple-500 hover:text-purple-300"
           >
             Copy link
           </button>
