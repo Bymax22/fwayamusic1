@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { FaGoogle, FaFacebook, FaEye, FaEyeSlash, FaStore } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { parseAuthError, AuthErrorInfo } from '@/lib/auth-error-utils';
 import Link from 'next/link';
 
 export default function ResellerSignIn() {
@@ -16,6 +18,7 @@ export default function ResellerSignIn() {
     password: '',
     otp: '',
   });
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState<'credentials' | 'otp'>('credentials');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -41,11 +44,9 @@ export default function ResellerSignIn() {
       setStep('otp');
     } catch (error: unknown) {
         console.error('handleCredentialsSubmit error', error);
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: "An unexpected error occurred." });
-      }
+      const parsed = parseAuthError(error);
+      setAuthError(parsed);
+      setErrors({ submit: parsed.message });
     }
   };
 
@@ -83,7 +84,9 @@ export default function ResellerSignIn() {
       router.push('/reseller-dashboard');
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setErrors({ submit: error.message });
+        const parsed = parseAuthError(error);
+        setAuthError(parsed);
+        setErrors({ submit: parsed.message });
       } else {
         setErrors({ submit: "An unexpected error occurred." });
       }
@@ -111,6 +114,8 @@ export default function ResellerSignIn() {
           <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaStore className="w-8 h-8 text-white" />
           </div>
+
+            {step === 'credentials' && <AuthErrorBanner error={authError} />}
           <h1 className="text-3xl font-bold text-white mb-2">Reseller Portal</h1>
           <p className="text-gray-300">Sign in to your reseller account</p>
         </div>

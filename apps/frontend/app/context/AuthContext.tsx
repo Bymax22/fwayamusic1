@@ -13,6 +13,7 @@ import {
   deleteUser,
 } from 'firebase/auth';
 import { auth, googleProvider, facebookProvider } from '@/lib/firebase-config';
+import { getRoleMismatchMessage } from '@/lib/auth-error-utils';
 
 // local UserRole type used by auth helpers/components
 type UserRole = 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER' | 'ADMIN' | 'MODERATOR';
@@ -108,7 +109,7 @@ const getDashboardPath = (role?: UserRole | string) => {
 const ensureRoleMatch = async (userData: User, expectedRole?: UserRole) => {
   if (expectedRole && userData.role.toUpperCase() !== expectedRole.toUpperCase()) {
     await signOut(auth);
-    throw new Error(`Access denied. This page is for ${expectedRole.toLowerCase()}s only.`);
+    throw new Error(getRoleMismatchMessage(userData.role, expectedRole));
   }
   return userData;
 };

@@ -8,6 +8,8 @@ import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Music2 } from 'lucide-react';
 import OtpModal from '@/components/otp-modal';
 import { useRouter } from 'next/navigation';
+import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { parseAuthError, AuthErrorInfo } from '@/lib/auth-error-utils';
 
 export default function ProducerSignIn() {
   const router = useRouter();
@@ -17,6 +19,7 @@ export default function ProducerSignIn() {
     password: '',
     otp: '',
   });
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -46,11 +49,9 @@ export default function ProducerSignIn() {
       console.log('OTP modal state updated');
     } catch (error: unknown) {
       console.error('handleCredentialsSubmit error', error);
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: "An unexpected error occurred." });
-      }
+      const parsed = parseAuthError(error);
+      setAuthError(parsed);
+      setErrors({ submit: parsed.message });
     }
   };
 
@@ -100,11 +101,9 @@ export default function ProducerSignIn() {
       router.push('/producer');
     } catch (error: unknown) {
       console.error('Social signin error:', error);
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: "An unexpected error occurred." });
-      }
+      const parsed = parseAuthError(error);
+      setAuthError(parsed);
+      setErrors({ submit: parsed.message });
     }
   };
 
@@ -133,6 +132,8 @@ export default function ProducerSignIn() {
           <h1 className="text-3xl font-bold text-white mb-2">Producer Portal</h1>
           <p className="text-gray-300">Sign in to your producer account</p>
         </div>
+
+        <AuthErrorBanner error={authError} />
 
         {!showOtpModal ? (
           <form onSubmit={handleCredentialsSubmit} className="space-y-6">

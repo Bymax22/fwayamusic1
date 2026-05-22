@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { parseAuthError, AuthErrorInfo } from '@/lib/auth-error-utils';
 
 
 export default function SignIn() {
@@ -14,6 +16,7 @@ export default function SignIn() {
     email: '',
     password: '',
   });
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
 
   const getRedirectPath = (role?: string) => {
     switch (role?.toUpperCase()) {
@@ -32,9 +35,9 @@ export default function SignIn() {
   };
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
     const newErrors: Record<string, string> = {};
     if (!formData.email) newErrors.email = 'Email is required';
@@ -45,34 +48,32 @@ const handleSubmit = async (e: React.FormEvent) => {
       return;
     }
 
-  try {
-    const currentUser = await signIn(formData.email, formData.password);
-    const role = currentUser?.role;
-    router.push(getRedirectPath(role));
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      setErrors({ submit: error.message });
-    } else {
-      setErrors({ submit: "An unexpected error occurred." });
+    try {
+      setAuthError(null);
+      const currentUser = await signIn(formData.email, formData.password);
+      const role = currentUser?.role;
+      router.push(getRedirectPath(role));
+    } catch (error: unknown) {
+      const parsed = parseAuthError(error);
+      setAuthError(parsed);
+      setErrors({ submit: parsed.message });
     }
-  }
-};
+  };
 
-const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
-  try {
-    const currentUser = provider === 'google'
-      ? await signInWithGoogle()
-      : await signInWithFacebook();
+  const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
+    try {
+      setAuthError(null);
+      const currentUser = provider === 'google'
+        ? await signInWithGoogle()
+        : await signInWithFacebook();
 
-    router.push(getRedirectPath(currentUser.role));
-  } catch (error: unknown) { // <-- use unknown
-    if (error instanceof Error) {
-      setErrors({ submit: error.message });
-    } else {
-      setErrors({ submit: "An unexpected error occurred." });
+      router.push(getRedirectPath(currentUser.role));
+    } catch (error: unknown) {
+      const parsed = parseAuthError(error);
+      setAuthError(parsed);
+      setErrors({ submit: parsed.message });
     }
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a1f29] via-[#0a3747] to-[#0a1f29] flex items-center justify-center p-4">
@@ -85,6 +86,8 @@ const handleSocialSignIn = async (provider: 'google' | 'facebook') => {
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-gray-400">Sign in to your Fwaya account</p>
         </div>
+
+        <AuthErrorBanner error={authError} />
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

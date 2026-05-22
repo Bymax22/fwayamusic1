@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { FaGoogle, FaFacebook, FaEye, FaEyeSlash, FaUser } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { parseAuthError, AuthErrorInfo } from '@/lib/auth-error-utils';
 
 export default function UserSignIn() {
   const router = useRouter();
@@ -14,6 +16,7 @@ export default function UserSignIn() {
     email: '',
     password: '',
   });
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [socialLoading, setSocialLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -34,11 +37,9 @@ export default function UserSignIn() {
       await signIn(formData.email, formData.password, 'USER');
       router.push('/dashboard');
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: "An unexpected error occurred." });
-      }
+      const parsed = parseAuthError(error);
+      setAuthError(parsed);
+      setErrors({ submit: parsed.message });
     }
   };
 
@@ -52,11 +53,9 @@ export default function UserSignIn() {
       }
       router.push('/dashboard');
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: "An unexpected error occurred." });
-      }
+      const parsed = parseAuthError(error);
+      setAuthError(parsed);
+      setErrors({ submit: parsed.message });
     } finally {
       setSocialLoading(false);
     }
@@ -76,6 +75,8 @@ export default function UserSignIn() {
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-gray-300">Sign in to your music listener account</p>
         </div>
+
+        <AuthErrorBanner error={authError} />
 
         <div className="mb-6">
           <button
