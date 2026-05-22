@@ -263,45 +263,45 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 30, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 200, damping: 18 }}
-                    className="w-full max-w-md rounded-3xl bg-black p-6"
+                    className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl bg-black p-4 sm:p-6"
                     onClick={(event) => event.stopPropagation()}
                   >
-                    <div className="flex items-start justify-between gap-4 mb-5">
-                      <div>
-                        <p className="text-sm uppercase tracking-[0.24em] text-purple-300">Choose account</p>
-                        <h3 className="mt-2 text-2xl font-semibold text-white">
+                    <div className="flex items-start justify-between gap-2 sm:gap-4 mb-3 sm:mb-5">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm uppercase tracking-[0.24em] text-purple-300">Choose account</p>
+                        <h3 className="mt-2 text-lg sm:text-2xl font-semibold text-white">
                           {authModalMode === 'signin' ? 'Sign in to Fwaya' : 'Create a new account'}
                         </h3>
-                        <p className="mt-2 text-sm text-gray-400">
+                        <p className="mt-2 text-xs sm:text-sm text-gray-400">
                           Pick your account type to continue with the right experience.
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => setAuthModalMode(null)}
-                        className="rounded-full p-2 bg-white/10 text-white hover:bg-white/15 transition-colors"
+                        className="flex-shrink-0 rounded-full p-2 bg-white/10 text-white hover:bg-white/15 transition-colors"
                       >
                         <X className="w-5 h-5" />
                       </button>
                     </div>
-                    <div className="grid gap-3">
+                    <div className="grid gap-2 sm:gap-3">
                       {authOptions.map((option) => (
                         <Link
                           key={option.title}
                           href={authModalMode === 'signin' ? option.signinHref : option.signupHref}
-                          className="group block rounded-3xl bg-white/5 p-5 transition hover:bg-white/10"
+                          className="group block rounded-3xl bg-white/5 p-3 sm:p-5 transition hover:bg-white/10"
                           onClick={onClose}
                         >
-                          <div className="flex items-center justify-between gap-4">
-                            <div>
-                              <p className="text-lg font-semibold text-white">{option.title}</p>
-                              <p className="text-sm text-gray-400">{option.subtitle}</p>
+                          <div className="flex items-center justify-between gap-2 sm:gap-4">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-base sm:text-lg font-semibold text-white truncate">{option.title}</p>
+                              <p className="text-xs sm:text-sm text-gray-400 truncate">{option.subtitle}</p>
                             </div>
-                            <div className="rounded-full bg-purple-500 px-3 py-2 text-xs font-semibold text-white uppercase hover:bg-purple-400 transition-colors">
+                            <div className="flex-shrink-0 rounded-full bg-purple-500 px-2 sm:px-3 py-1 sm:py-2 text-xs font-semibold text-white uppercase hover:bg-purple-400 transition-colors whitespace-nowrap">
                               {authModalMode === 'signin' ? 'Sign In' : 'Sign Up'}
                             </div>
                           </div>
-                          <p className="mt-3 text-sm text-gray-400">{option.description}</p>
+                          <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-gray-400 line-clamp-2">{option.description}</p>
                         </Link>
                       ))}
                     </div>
@@ -437,7 +437,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white/5">
                     <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
                     <p className="text-xs text-gray-400">
-                      Fwaya v1.5.3 • Developed by BymaxZM
+                      Fwaya v1.5.3 • Developed by Bymax Zambia
                     </p>
                   </div>
                 </div>
