@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import { FaTimes } from 'react-icons/fa';
-import { RiWhatsappLine, RiFacebookLine, RiMailLine, RiShareLine } from 'react-icons/ri';
+import { AiFillInstagram, AiFillTikTok, AiFillX } from 'react-icons/ai';
+import { RiWhatsappLine, RiFacebookLine, RiMailLine, RiFileCopyLine } from 'react-icons/ri';
 
 interface ShareModalProps {
   open: boolean;
@@ -40,20 +41,6 @@ export default function ShareModal({
   const subject = `Listen to ${title}${artist ? ` by ${artist}` : ''} on Fwaya`;
   const coverImage = coverUrl || '/default-cover.jpg';
 
-  const handleNativeShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({ url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        alert('Link copied to clipboard!');
-      }
-      onShare?.();
-    } catch (error) {
-      console.error('Native share failed', error);
-    }
-  };
-
   const handleWhatsApp = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(payload)}`, '_blank');
     onShare?.();
@@ -66,6 +53,21 @@ export default function ShareModal({
 
   const handleEmail = () => {
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(payload)}`);
+    onShare?.();
+  };
+
+  const handleInstagram = () => {
+    window.open(`https://www.instagram.com/?url=${encodeURIComponent(url)}`, '_blank');
+    onShare?.();
+  };
+
+  const handleTikTok = () => {
+    window.open(`https://www.tiktok.com/search?q=${encodeURIComponent(`${title} ${artist || ''}`)}`, '_blank');
+    onShare?.();
+  };
+
+  const handleX = () => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(payload)}`, '_blank');
     onShare?.();
   };
 
@@ -85,20 +87,19 @@ export default function ShareModal({
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <h3 className="text-xl font-bold text-white">Share Track</h3>
-            <p className="text-sm text-gray-400 mt-1">Send a preview with cover art, track details, and an instant play link.</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
             <FaTimes size={20} />
           </button>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[140px_1fr] mb-4 items-start">
-          <div className="overflow-hidden rounded-3xl bg-white/5 h-36 w-full">
+        <div className="grid gap-4 lg:grid-cols-[110px_1fr] mb-4 items-start">
+          <div className="overflow-hidden rounded-3xl bg-white/5 h-28 w-full">
             <Image
               src={coverImage}
               alt={title}
-              width={320}
-              height={320}
+              width={280}
+              height={280}
               className="h-full w-full object-cover"
             />
           </div>
@@ -155,36 +156,39 @@ export default function ShareModal({
             <RiMailLine size={22} />
           </button>
           <button
-            onClick={handleNativeShare}
+            onClick={handleCopyLink}
             className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
-            aria-label="Share using device share"
+            aria-label="Copy link"
           >
-            <RiShareLine size={22} />
+            <RiFileCopyLine size={22} />
+          </button>
+          <button
+            onClick={handleInstagram}
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
+            aria-label="Share on Instagram"
+          >
+            <AiFillInstagram size={22} />
+          </button>
+          <button
+            onClick={handleTikTok}
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
+            aria-label="Share on TikTok"
+          >
+            <AiFillTikTok size={22} />
+          </button>
+          <button
+            onClick={handleX}
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-white transition hover:border-purple-500 hover:text-purple-300"
+            aria-label="Share on X"
+          >
+            <AiFillX size={22} />
           </button>
           <button
             onClick={handleCopyLink}
-            className="col-span-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:border-purple-500 hover:text-purple-300"
+            className="col-span-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:border-purple-500 hover:text-purple-300"
           >
             Copy link
           </button>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-sm text-gray-400">Share link</p>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={url}
-              readOnly
-              className="flex-1 bg-white/5 text-white rounded-2xl px-3 py-2 border border-white/10"
-            />
-            <button
-              onClick={handleCopyLink}
-              className="rounded-2xl bg-purple-600 px-4 py-2 text-white hover:bg-purple-500 transition"
-            >
-              Copy
-            </button>
-          </div>
         </div>
       </div>
     </div>
