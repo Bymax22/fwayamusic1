@@ -16,7 +16,6 @@ import {
   FaReply,
   FaEllipsisV,
   FaUser,
-  FaTimes,
   FaMusic,
   FaClock,
   FaFire,
@@ -24,8 +23,8 @@ import {
   FaEye,
   FaCheckCircle
 } from 'react-icons/fa';
-import { RiWhatsappLine, RiFacebookLine, RiInstagramLine, RiTwitterLine, RiTiktokLine, RiMailLine } from 'react-icons/ri';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import ShareModal from '@/components/ShareModal';
 import { useAuth } from '@/context/AuthContext';
 import { formatDuration } from '@/lib/utils';
 
@@ -248,162 +247,12 @@ export default function TrackPage() {
 
   const getTrackShareUrl = () => `${window.location.origin}/track/${track?.id}`;
 
-  const buildTrackShareText = (item: MediaItem) => {
-    return getTrackShareUrl();
-  };
+  const shareUrl = track ? getTrackShareUrl() : '';
+  const shareText = track ? `Listen to ${track.title} by ${track.artist} on Fwaya.\n${shareUrl}` : undefined;
+  const coverUrl = track ? track.coverArt || (track as any).artCoverUrl || (track as any).thumbnailUrl || (track as any).coverUrl || '/default-cover.jpg' : '/default-cover.jpg';
 
   const handleShare = () => {
     setShowShareModal(true);
-  };
-
-  const handleShareViaWhatsApp = () => {
-    if (!track) return;
-    const text = buildTrackShareText(track);
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-  };
-
-  const handleShareViaFacebook = () => {
-    if (!track) return;
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getTrackShareUrl())}`, '_blank');
-  };
-
-  const handleShareViaEmail = () => {
-    if (!track) return;
-    const subject = `Listen to ${track.title} on Fwaya`;
-    const body = buildTrackShareText(track);
-    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
-  };
-
-  const handleQuickShare = async () => {
-    if (!track) return;
-    const url = getTrackShareUrl();
-    const text = buildTrackShareText(track);
-    if (navigator.share) {
-      // share only the URL to avoid some apps duplicating text+url
-      await navigator.share({ url });
-    } else {
-      navigator.clipboard.writeText(url);
-      alert('Link copied to clipboard!');
-    }
-  };
-
-  const renderShareModal = () => {
-    if (!track || !showShareModal) return null;
-
-    const shareUrl = getTrackShareUrl();
-    const coverUrl = track.coverArt || (track as any).artCoverUrl || (track as any).thumbnailUrl || (track as any).coverUrl || '/default-cover.jpg';
-
-    return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div className="bg-black rounded-2xl p-4 max-w-md w-full ring-1 ring-white/10 max-h-[90vh] overflow-y-auto">
-          <div className="flex items-start justify-between gap-4 mb-3">
-            <div>
-              <h3 className="text-xl font-bold text-white">Share Track</h3>
-            </div>
-            <button onClick={() => setShowShareModal(false)} className="text-gray-400 hover:text-white">
-              <FaTimes size={20} />
-            </button>
-          </div>
-
-          <div className="grid gap-4 grid-cols-[120px_1fr] mb-4 items-start">
-            <div className="overflow-hidden rounded-2xl bg-white/5 w-30 h-30">
-              <Image src={coverUrl} alt={track.title} width={160} height={160} className="object-cover w-40 h-40 rounded-lg" />
-            </div>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm text-gray-400">Track</p>
-                <p className="text-lg font-semibold text-white">{track.title}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Artist</p>
-                <p className="text-white">{track.artist}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-sm text-gray-300">
-                <div>
-                  <p className="text-gray-500">Genre</p>
-                  <p>{track.genre || 'Unknown'}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Duration</p>
-                  <p>{track.duration ? `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}` : '—'}</p>
-                </div>
-              </div>
-              {track.description && (
-                <p className="text-sm text-gray-300">{track.description}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 mb-4">
-            <button onClick={handleShareViaWhatsApp} className="p-2 rounded-full hover:bg-white/5" aria-label="Share on WhatsApp">
-              <RiWhatsappLine className="text-purple-600" size={22} />
-            </button>
-            <button onClick={handleShareViaFacebook} className="p-2 rounded-full hover:bg-white/5" aria-label="Share on Facebook">
-              <RiFacebookLine className="text-purple-600" size={22} />
-            </button>
-            <button
-              onClick={() => {
-                const url = getTrackShareUrl();
-                if (navigator.share) {
-                  navigator.share({ url });
-                } else {
-                  navigator.clipboard.writeText(url);
-                  alert('Link copied to clipboard!');
-                }
-              }}
-              className="p-2 rounded-full hover:bg-white/5"
-              aria-label="Share on Instagram"
-            >
-              <RiInstagramLine className="text-purple-600" size={22} />
-            </button>
-            <button onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(getTrackShareUrl())}`, '_blank')} className="p-2 rounded-full hover:bg-white/5" aria-label="Share on X">
-              <RiTwitterLine className="text-purple-600" size={22} />
-            </button>
-            <button
-              onClick={() => {
-                const url = getTrackShareUrl();
-                if (navigator.share) {
-                  navigator.share({ url });
-                } else {
-                  navigator.clipboard.writeText(url);
-                  alert('Link copied to clipboard!');
-                }
-              }}
-              className="p-2 rounded-full hover:bg-white/5"
-              aria-label="Share on TikTok"
-            >
-              <RiTiktokLine className="text-purple-600" size={22} />
-            </button>
-            <button onClick={handleShareViaEmail} className="p-2 rounded-full hover:bg-white/5" aria-label="Share via Email">
-              <RiMailLine className="text-purple-600" size={22} />
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm text-gray-400 mb-2">Share link</p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={shareUrl}
-                  readOnly
-                  className="flex-1 bg-white/5 text-white rounded-2xl px-3 py-2 border border-white/10"
-                />
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(shareUrl);
-                    alert('Link copied to clipboard!');
-                  }}
-                  className="rounded-2xl bg-white/10 px-4 py-2 text-white hover:bg-white/15 transition"
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   const handlePostComment = async () => {
@@ -850,7 +699,18 @@ export default function TrackPage() {
           </aside>
         </div>
       </div>
-      {renderShareModal()}
+      <ShareModal
+        open={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={track?.title ?? ''}
+        artist={track?.artist}
+        coverUrl={coverUrl}
+        url={shareUrl}
+        description={track?.description ?? undefined}
+        genre={track?.genre ?? undefined}
+        duration={track?.duration ? `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}` : undefined}
+        shareText={shareText}
+      />
     </div>
   );
 }

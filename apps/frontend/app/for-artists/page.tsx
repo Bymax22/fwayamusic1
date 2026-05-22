@@ -15,6 +15,7 @@ import RoleGuard from '@/components/RoleGuard';
 import { DashboardCard } from '@/components/DashboardCard';
 import DashboardHeader from '@/components/DashboardHeader';
 import MobilePlayer from '@/components/MobilePlayer';
+import ShareModal from '@/components/ShareModal';
 
 
 
@@ -158,8 +159,8 @@ export default function ForArtistsPage() {
   const [editingMedia, setEditingMedia] = useState<Media | null>(null);
   const [selectedMediaForAnalytics, setSelectedMediaForAnalytics] = useState<Media | null>(null);
   const [selectedMediaForShare, setSelectedMediaForShare] = useState<Media | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [isEditLoading, setIsEditLoading] = useState(false);
-  const [shareLink, setShareLink] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const formatZMW = (amount: number) =>
@@ -604,7 +605,7 @@ export default function ForArtistsPage() {
     }
   };
 
-  const getTrackShareUrl = (media: Media) => `${typeof window !== 'undefined' ? window.location.origin : ''}/track/${media.id}`;
+  const getTrackShareUrl = (media: Media) => `${window.location.origin}/track/${media.id}`;
 
   const buildTrackShareText = (media: Media) => {
     const durationText = media.duration ? `${Math.floor(media.duration / 60)}:${String(media.duration % 60).padStart(2, '0')}` : 'Unknown duration';
@@ -622,55 +623,15 @@ export default function ForArtistsPage() {
 
   const handleShareTrack = async (media: Media) => {
     try {
-      const trackUrl = getTrackShareUrl(media);
       setSelectedMediaForShare(media);
-      setShareLink(trackUrl);
+      setShowShareModal(true);
     } catch (error) {
       console.error('Error sharing track:', error);
     }
   };
 
-  const handleShareViaWhatsApp = () => {
-    if (!selectedMediaForShare) return;
-    const text = buildTrackShareText(selectedMediaForShare);
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-  };
-
-  const handleShareViaFacebook = () => {
-    if (!selectedMediaForShare || !shareLink) return;
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`, '_blank');
-  };
-
-  const handleShareViaEmail = () => {
-    if (!selectedMediaForShare || !shareLink) return;
-    const subject = `Listen to ${selectedMediaForShare.title} on Fwaya`;
-    const body = buildTrackShareText(selectedMediaForShare);
-    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
-  };
-
-  const handleQuickShare = async () => {
-    if (!selectedMediaForShare || !shareLink) return;
-    const text = buildTrackShareText(selectedMediaForShare);
-    if (navigator.share) {
-      await navigator.share({
-        title: selectedMediaForShare.title,
-        text,
-        url: shareLink,
-      });
-    } else {
-      navigator.clipboard.writeText(shareLink);
-      alert('Link copied to clipboard!');
-    }
-  };
-
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      alert('Link copied to clipboard!');
-    } catch (error) {
-      console.error('Error copying to clipboard:', error);
-    }
-  };
+  const shareUrl = selectedMediaForShare ? getTrackShareUrl(selectedMediaForShare) : '';
+  const shareText = selectedMediaForShare ? buildTrackShareText(selectedMediaForShare) : undefined;
 
   const renderEditModal = () => {
     if (!editingMedia) return null;
@@ -800,125 +761,6 @@ export default function ForArtistsPage() {
               Close
             </button>
           </div>
-        </motion.div>
-      </div>
-    );
-  };
-
-  const renderShareModal = () => {
-    if (!selectedMediaForShare || !shareLink) return null;
-
-    const coverUrl = selectedMediaForShare.artCoverUrl || selectedMediaForShare.thumbnailUrl || '/default-cover.jpg';
-    const durationText = selectedMediaForShare.duration ? `${Math.floor(selectedMediaForShare.duration / 60)}:${String(selectedMediaForShare.duration % 60).padStart(2, '0')}` : 'Unknown';
-
-    return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <motion.div 
-          className="bg-black rounded-2xl p-6 max-w-2xl w-full ring-1 ring-white/10 overflow-hidden"
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-        >
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div>
-              <h3 className="text-xl font-bold text-white">Share Track</h3>
-              <p className="text-sm text-gray-400 mt-1">Send a rich preview with cover art, track details, and instant play link.</p>
-            </div>
-            <button onClick={() => setSelectedMediaForShare(null)} className="text-gray-400 hover:text-white">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-[150px_1fr] mb-4">
-            <div className="overflow-hidden rounded-3xl bg-white/5">
-              <Image
-                src={coverUrl}
-                alt={selectedMediaForShare.title}
-                width={320}
-                height={320}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm text-gray-400">Title</p>
-                <p className="text-white font-semibold">{selectedMediaForShare.title}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Genre</p>
-                <p className="text-white">{selectedMediaForShare.genre || 'Unknown'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400">Duration</p>
-                <p className="text-white">{durationText}</p>
-              </div>
-              {selectedMediaForShare.description && (
-                <p className="text-sm text-gray-300">{selectedMediaForShare.description}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-4">
-            <button
-              onClick={handleQuickShare}
-              className="rounded-2xl bg-purple-600 px-4 py-3 text-white hover:bg-purple-500 transition"
-            >
-              Quick Share
-            </button>
-            <button
-              onClick={handleShareViaWhatsApp}
-              className="rounded-2xl bg-green-600 px-4 py-3 text-white hover:bg-green-500 transition"
-            >
-              WhatsApp
-            </button>
-            <button
-              onClick={handleShareViaFacebook}
-              className="rounded-2xl bg-blue-600 px-4 py-3 text-white hover:bg-blue-500 transition"
-            >
-              Facebook
-            </button>
-            <button
-              onClick={handleShareViaEmail}
-              className="rounded-2xl bg-gray-700 px-4 py-3 text-white hover:bg-gray-600 transition"
-            >
-              Email
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            <div>
-              <p className="text-gray-400 text-sm mb-2">Share link</p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={shareLink}
-                  readOnly
-                  className="flex-1 bg-white/5 text-white rounded-2xl px-3 py-2 border border-white/10"
-                />
-                <button
-                  onClick={() => copyToClipboard(shareLink)}
-                  className="rounded-2xl bg-white/10 px-4 py-2 text-white hover:bg-white/15 transition"
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
-
-            <a
-              href={shareLink}
-              target="_blank"
-              rel="noreferrer"
-              className="block rounded-2xl bg-white/5 px-4 py-3 text-center text-white hover:bg-white/10 transition"
-            >
-              Play Now
-            </a>
-          </div>
-
-          <button
-            onClick={() => setSelectedMediaForShare(null)}
-            className="mt-4 w-full px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/15 transition"
-          >
-            Close
-          </button>
         </motion.div>
       </div>
     );
@@ -1829,7 +1671,17 @@ export default function ForArtistsPage() {
         )}
         {renderEditModal()}
         {renderAnalyticsModal()}
-        {renderShareModal()}
+        <ShareModal
+          open={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          title={selectedMediaForShare?.title ?? ''}
+          coverUrl={selectedMediaForShare?.artCoverUrl || selectedMediaForShare?.thumbnailUrl || '/default-cover.jpg'}
+          url={shareUrl}
+          description={selectedMediaForShare?.description ?? undefined}
+          genre={selectedMediaForShare?.genre ?? undefined}
+          duration={selectedMediaForShare?.duration ? `${Math.floor(selectedMediaForShare.duration / 60)}:${String(selectedMediaForShare.duration % 60).padStart(2, '0')}` : undefined}
+          shareText={shareText}
+        />
         <audio ref={audioRef} className="hidden" />
       </div>
     </div>
