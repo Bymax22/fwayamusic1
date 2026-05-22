@@ -1357,6 +1357,12 @@ export default function GuestWelcome() {
       </div>
       </div>
 
+      <div className="border-t border-white/10 bg-black/40 py-4 px-5 text-center lg:px-10">
+        <Link href="/privacy" className="text-sm text-gray-400 hover:text-white underline">
+          Privacy Policy
+        </Link>
+      </div>
+
       {/* Mobile Menu */}
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
     </>
