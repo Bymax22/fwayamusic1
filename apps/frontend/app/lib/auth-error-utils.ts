@@ -18,12 +18,13 @@ const roleSignInPaths: Record<string, string> = {
   PRODUCER: '/auth/producer/signin',
 };
 
-const sanitizeErrorText = (message: string) =>
+const sanitizeErrorText = (message: string) => {
   return message
     .replace(/^Firebase:\s*/i, '')
     .replace(/\s*\([^)]*auth\/[^)]+\)\.?$/i, '')
     .replace(/\s*\([^)]*\)$/, '')
     .trim();
+};
 
 export const getFriendlyFirebaseError = (error: Error) => {
   const firebaseError = error as { code?: string; message?: string };
