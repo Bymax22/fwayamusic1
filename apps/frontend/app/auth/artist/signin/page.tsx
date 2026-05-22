@@ -121,12 +121,12 @@ export default function ArtistSignIn() {
     <>
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl"
-        >
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-black rounded-3xl p-8 w-full max-w-md shadow-2xl"
+          >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-purple-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaMusic className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Artist Portal</h1>
@@ -141,13 +141,13 @@ export default function ArtistSignIn() {
               <label className="block text-sm font-medium text-white mb-2">
                 Email Address
               </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                placeholder="your@email.com"
-              />
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="your@email.com"
+                />
               {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
@@ -160,7 +160,7 @@ export default function ArtistSignIn() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent pr-12"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
                   placeholder="••••••••"
                 />
                 <button
@@ -193,7 +193,7 @@ export default function ArtistSignIn() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>

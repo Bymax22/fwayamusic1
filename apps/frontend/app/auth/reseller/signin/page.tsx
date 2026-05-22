@@ -104,14 +104,14 @@ export default function ResellerSignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f2e3d] to-[#051420] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-green-500/30 shadow-2xl"
+        className="bg-black rounded-3xl p-8 w-full max-w-md shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-purple-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaStore className="w-8 h-8 text-white" />
           </div>
 
@@ -130,7 +130,7 @@ export default function ResellerSignIn() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-green-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="your@email.com"
               />
               {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -145,7 +145,7 @@ export default function ResellerSignIn() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-green-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
                   placeholder="••••••••"
                 />
                 <button
@@ -178,7 +178,7 @@ export default function ResellerSignIn() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
@@ -267,7 +267,7 @@ export default function ResellerSignIn() {
               </div>
             </div>
 
-            <div className="text-center mt-8 pt-6 border-t border-green-500/20">
+            <div className="text-center mt-8 pt-6">
               <p className="text-gray-300">
                 Don&lsquo;t have a reseller account?{' '}
                 <Link href="/auth/reseller/signup" className="text-white hover:underline font-semibold">
@@ -275,22 +275,21 @@ export default function ResellerSignIn() {
                 </Link>
               </p>
               <div className="mt-4 flex gap-4 justify-center text-sm">
-                <Link href="/auth/user/signin" className="text-blue-600 hover:underline">
+                <Link href="/auth/user/signin" className="text-white/80 hover:underline">
                   Listener Sign In
                 </Link>
-                <Link href="/auth/artist/signin" className="text-purple-600 hover:underline">
+                <Link href="/auth/artist/signin" className="text-white/80 hover:underline">
                   Artist Sign In
                 </Link>
               </div>
             </div>
           </>
         )}
-
         {/* Business Benefits Section */}
         {step === 'credentials' && (
-          <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-4">
-            <h3 className="font-semibold text-green-800 mb-2">Reseller Benefits</h3>
-            <ul className="text-green-700 text-sm space-y-1">
+          <div className="mt-8 bg-purple-900/40 rounded-xl p-4">
+            <h3 className="font-semibold text-purple-200 mb-2">Reseller Benefits</h3>
+            <ul className="text-purple-100 text-sm space-y-1">
               <li>• Earn commissions on music sales</li>
               <li>• Access exclusive reseller tools</li>
               <li>• Track your sales performance</li>

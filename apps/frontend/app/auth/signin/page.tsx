@@ -76,11 +76,11 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1f29] via-[#0a3747] to-[#0a1f29] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-[#0a1f29]/80 rounded-2xl p-8 w-full max-w-md border border-white/20 shadow-2xl"
+        className="bg-black rounded-3xl p-8 w-full max-w-md shadow-2xl"
       >
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
@@ -98,7 +98,7 @@ export default function SignIn() {
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+              className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="your@email.com"
             />
             {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -109,11 +109,11 @@ export default function SignIn() {
               Password
             </label>
             <div className="relative">
-              <input
+                <input
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent pr-12"
+                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
                 placeholder="••••••••"
               />
               <button
@@ -132,13 +132,13 @@ export default function SignIn() {
               <input
                 type="checkbox"
                 id="remember"
-                className="w-4 h-4 text-[#e51f48] bg-[#0a3747] border-[#0a4a5f] rounded focus:ring-[#e51f48] focus:ring-2"
+                className="w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
               />
               <label htmlFor="remember" className="ml-2 text-sm text-gray-300">
                 Remember me
               </label>
             </div>
-            <a href="/auth/forgot-password" className="text-sm text-[#e51f48] hover:underline">
+            <a href="/auth/forgot-password" className="text-sm text-purple-400 hover:underline">
               Forgot password?
             </a>
           </div>
@@ -146,7 +146,7 @@ export default function SignIn() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="w-full px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
@@ -156,21 +156,21 @@ export default function SignIn() {
           )}
         </form>
 
-        <div className="mt-8 pt-6 border-t border-white/20">
+        <div className="mt-8 pt-6">
           <div className="text-center mb-4">
             <span className="text-gray-400 text-sm">Or continue with</span>
           </div>
           <div className="flex gap-4">
             <button
               onClick={() => handleSocialSignIn('google')}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 backdrop-blur-md bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors font-medium border border-white/20"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#18191a] transition-colors font-medium"
             >
               <FaGoogle className="w-5 h-5" />
               Google
             </button>
             <button
               onClick={() => handleSocialSignIn('facebook')}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 backdrop-blur-md bg-blue-600/80 text-white rounded-xl hover:bg-blue-600/90 transition-colors font-medium border border-blue-500/50"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#18191a] transition-colors font-medium"
             >
               <FaFacebook className="w-5 h-5" />
               Facebook
@@ -178,10 +178,10 @@ export default function SignIn() {
           </div>
         </div>
 
-        <div className="text-center mt-8 pt-6 border-t border-[#0a3747]">
+        <div className="text-center mt-8 pt-6">
           <p className="text-gray-400">
             Don&lsquo;t have an account?{' '}
-            <a href="/auth/signup" className="text-[#e51f48] hover:underline font-semibold">
+            <a href="/auth/signup" className="text-purple-400 hover:underline font-semibold">
               Sign Up
             </a>
           </p>

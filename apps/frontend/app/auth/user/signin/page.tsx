@@ -66,34 +66,17 @@ export default function UserSignIn() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-white/5 rounded-2xl p-8 w-full max-w-md border border-white/10 shadow-2xl"
+        className="bg-black rounded-3xl p-8 w-full max-w-md shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-purple-700 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaUser className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-gray-300">Sign in to your music listener account</p>
+          <p className="text-gray-400">Sign in to your music listener account</p>
         </div>
 
         <AuthErrorBanner error={authError} />
-
-        <div className="mb-6">
-          <button
-            type="button"
-            onClick={() => handleSocialSignIn('google')}
-            disabled={loading || socialLoading}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[#4285F4] text-white font-semibold hover:bg-[#357ae8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FaGoogle className="w-5 h-5" />
-            Sign in with Google
-          </button>
-          <div className="flex items-center gap-3 mt-4 text-xs text-gray-400">
-            <span className="h-px flex-1 bg-white/10" />
-            <span>or sign in with your email</span>
-            <span className="h-px flex-1 bg-white/10" />
-          </div>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -104,7 +87,7 @@ export default function UserSignIn() {
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+              className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="your@email.com"
             />
             {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -115,13 +98,13 @@ export default function UserSignIn() {
               Password
             </label>
             <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent pr-12"
-                placeholder="••••••••"
-              />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
+                  placeholder="••••••••"
+                />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -138,7 +121,7 @@ export default function UserSignIn() {
               <input
                 type="checkbox"
                 id="remember"
-                className="w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
+                className="w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
               />
               <label htmlFor="remember" className="ml-2 text-sm text-white">
                 Remember me
@@ -152,7 +135,7 @@ export default function UserSignIn() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="w-full px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
@@ -162,21 +145,21 @@ export default function UserSignIn() {
           )}
         </form>
 
-        <div className="mt-8 pt-6 border-t border-white/10">
+        <div className="mt-8 pt-6">
           <div className="text-center mb-4">
             <span className="text-gray-400 text-sm">Or continue with</span>
           </div>
           <div className="flex gap-4">
             <button
               onClick={() => handleSocialSignIn('google')}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 backdrop-blur-md bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors font-medium border border-white/20"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#18191a] transition-colors font-medium"
             >
               <FaGoogle className="w-5 h-5" />
               Google
             </button>
             <button
               onClick={() => handleSocialSignIn('facebook')}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 backdrop-blur-md bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors font-medium border border-white/20"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#18191a] transition-colors font-medium"
             >
               <FaFacebook className="w-5 h-5" />
               Facebook
