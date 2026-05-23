@@ -269,7 +269,7 @@ export default function SignUp() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-black w-full max-w-3xl rounded-3xl p-8 pb-10"
+        className="relative bg-black w-full max-w-3xl rounded-3xl p-8 pb-48 sm:pb-10"
       >
         <div className="flex items-center justify-between mb-6">
           <button
@@ -496,7 +496,7 @@ export default function SignUp() {
               Additional Information
             </h2>
 
-            <div className="bg-[#1f1f1f] border border-white/10 rounded-3xl p-5 space-y-5">
+            <div className="space-y-5">
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-purple-300">Contact</p>
@@ -649,7 +649,7 @@ export default function SignUp() {
               Terms & Consent
             </h2>
 
-            <div className="bg-[#1f1f1f] p-6 space-y-4 rounded-3xl">
+            <div className="p-6 space-y-4">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
