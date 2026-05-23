@@ -5,11 +5,15 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { AvailabilityInput } from '@/components/AvailabilityInput';
+import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { AuthErrorInfo, parseAuthError } from '@/lib/auth-error-utils';
 import { Music2, Eye, EyeOff, Check, ArrowLeft, Camera } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 type SignupStep = 'basic' | 'producer' | 'consent' | 'verification';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export default function ProducerSignUp() {
   const { signUp, loading, sendOTP, verificationError, clearVerificationError } = useAuth();
@@ -36,6 +40,7 @@ export default function ProducerSignUp() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -180,7 +185,7 @@ export default function ProducerSignUp() {
     const checkValue = field === 'username' ? value.trim().toLowerCase() : value.trim();
     try {
       console.log('[Producer] checkAvailability ->', field, checkValue);
-      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(checkValue)}`);
+      const res = await fetch(`${API_URL}/api/v1/auth/check-availability?field=${field}&value=${encodeURIComponent(checkValue)}`);
       if (!res.ok) {
         if (field === 'email') setEmailStatus('unknown');
         else setUsernameStatus('unknown');
@@ -257,6 +262,8 @@ export default function ProducerSignUp() {
       return;
     }
 
+    setAuthError(null);
+
     try {
       console.log('Starting producer signup...');
       const userData = await signUp({
@@ -271,14 +278,14 @@ export default function ProducerSignUp() {
         console.log('Producer signup successful, moving to OTP verification step');
         setStep('verification');
       } else {
-        setErrors({ submit: `User role was not set to PRODUCER. Got: ${userData?.role || 'undefined'}` });
+        const parsedError = parseAuthError(new Error(`User role was not set to PRODUCER. Got: ${userData?.role || 'undefined'}`));
+        setAuthError(parsedError);
+        setErrors({ submit: parsedError.message });
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: 'An unexpected error occurred.' });
-      }
+      const parsedError = parseAuthError(error);
+      setAuthError(parsedError);
+      setErrors({ submit: parsedError.message });
     }
   };
 
@@ -296,6 +303,8 @@ export default function ProducerSignUp() {
           <h1 className="text-3xl font-bold text-white mb-2">Join as Producer</h1>
           <p className="text-gray-300">Create your producer account and share your beats with the world</p>
         </div>
+
+        <AuthErrorBanner error={authError} />
 
         {/* Progress Bar */}
         <div className="mb-8">

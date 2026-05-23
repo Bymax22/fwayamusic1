@@ -10,6 +10,7 @@ import { PhoneInput } from '@/components/PhoneInput';
 import { AuthErrorInfo, parseAuthError } from '@/lib/auth-error-utils';
 import AuthErrorBanner from '@/components/AuthErrorBanner';
 import { FaUser, FaEye, FaEyeSlash, FaCamera, FaGoogle, FaTimes } from 'react-icons/fa';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -106,10 +107,12 @@ export default function UserSignUp() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
   const checkAvailability = async (field: 'username'|'email', value: string) => {
     if (!value) return;
     try {
-      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
+      const res = await fetch(`${API_URL}/api/v1/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
       if (!res.ok) {
         if (field === 'username') setUsernameStatus('unknown');
         else setEmailStatus('unknown');
@@ -166,6 +169,7 @@ export default function UserSignUp() {
     if (emailStatus === 'taken') newErrors.email = 'Email is already in use';
     if (!formData.acceptedTerms) newErrors.acceptedTerms = 'You must accept the terms and conditions';
     if (!formData.acceptedPrivacy) newErrors.acceptedPrivacy = 'You must accept the privacy policy';
+    if (!formData.country) newErrors.country = 'Country is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -307,18 +311,14 @@ export default function UserSignUp() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-white mb-1">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={formData.phoneNumber}
-                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="+260 96 123 4567"
-              />
-            </div>
+            <PhoneInput
+              label="Phone Number"
+              value={formData.phoneNumber}
+              countryCode={formData.country}
+              onPhoneChange={(phoneNumber) => setFormData({ ...formData, phoneNumber })}
+              onCountryChange={(countryCode) => setFormData({ ...formData, country: countryCode })}
+              error={errors.phoneNumber}
+            />
 
             <div>
               <label className="block text-sm font-medium text-white mb-1">
@@ -328,7 +328,7 @@ export default function UserSignUp() {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-3 py-2 rounded-3xl bg-[#101010] ring-1 ring-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-3xl bg-[#101010] ring-1 ring-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -371,18 +371,12 @@ export default function UserSignUp() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-white mb-1">
-                Country
-              </label>
-              <input
-                type="text"
-                value={formData.country}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="e.g., Zambia, USA, UK"
-              />
-            </div>
+            <CountrySelect
+              label="Country"
+              value={formData.country}
+              onChange={(countryCode) => setFormData({ ...formData, country: countryCode })}
+              error={errors.country}
+            />
 
             <div>
               <label className="block text-sm font-medium text-white mb-1">
@@ -392,7 +386,7 @@ export default function UserSignUp() {
                 type="text"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-3xl bg-[#0f1112] ring-1 ring-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="Street address"
               />
             </div>
@@ -467,20 +461,23 @@ export default function UserSignUp() {
 
         </form>
 
-        <div className="text-center mt-6 pt-4">
+        <div className="text-center mt-6 pt-4 border-t border-white/10">
           <p className="text-gray-300">
             Already have an account?{' '}
-            <a href="/auth/user/signin" className="text-purple-400 hover:text-purple-300 hover:underline font-semibold">
+            <Link href="/auth/user/signin" className="text-purple-400 hover:text-purple-300 hover:underline font-semibold">
               Sign In
-            </a>
+            </Link>
           </p>
-          <div className="mt-4 flex gap-4 justify-center">
-            <a href="/auth/artist/signup" className="text-sm text-white/80 hover:text-white hover:underline">
+          <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm text-white/80">
+            <Link href="/auth/artist/signup" className="hover:text-white hover:underline">
               Artist Sign Up
-            </a>
-            <a href="/auth/reseller/signup" className="text-sm text-white/80 hover:text-white hover:underline">
+            </Link>
+            <Link href="/auth/producer/signup" className="hover:text-white hover:underline">
+              Producer Sign Up
+            </Link>
+            <Link href="/auth/reseller/signup" className="hover:text-white hover:underline">
               Reseller Sign Up
-            </a>
+            </Link>
           </div>
         </div>
       </motion.div>

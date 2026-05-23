@@ -5,11 +5,15 @@ import { useState, useRef, ChangeEvent } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { AvailabilityInput } from '@/components/AvailabilityInput';
+import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { AuthErrorInfo, parseAuthError } from '@/lib/auth-error-utils';
 import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaCamera } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 
 type SignupStep = 'basic' | 'artist' | 'consent' | 'verification';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export default function ArtistSignUp() {
   const { signUp, loading, sendOTP, verificationError, clearVerificationError } = useAuth();
@@ -35,6 +39,7 @@ export default function ArtistSignUp() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -156,7 +161,7 @@ export default function ArtistSignUp() {
     const checkValue = field === 'username' ? value.trim().toLowerCase() : value.trim();
     try {
       console.log('[Artist] checkAvailability ->', field, checkValue);
-      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(checkValue)}`);
+      const res = await fetch(`${API_URL}/api/v1/auth/check-availability?field=${field}&value=${encodeURIComponent(checkValue)}`);
       if (!res.ok) {
         if (field === 'email') setEmailStatus('unknown');
         else setUsernameStatus('unknown');
@@ -224,6 +229,8 @@ export default function ArtistSignUp() {
       return;
     }
 
+    setAuthError(null);
+
     try {
       const userData = await signUp({
         ...formData,
@@ -233,14 +240,14 @@ export default function ArtistSignUp() {
       if (userData && userData.role === 'ARTIST') {
         setStep('verification');
       } else {
-        setErrors({ submit: `User role was not set to ARTIST. Got: ${userData?.role || 'undefined'}` });
+        const parsedError = parseAuthError(new Error(`User role was not set to ARTIST. Got: ${userData?.role || 'undefined'}`));
+        setAuthError(parsedError);
+        setErrors({ submit: parsedError.message });
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: 'An unexpected error occurred.' });
-      }
+      const parsedError = parseAuthError(error);
+      setAuthError(parsedError);
+      setErrors({ submit: parsedError.message });
     }
   };
 
@@ -258,6 +265,8 @@ export default function ArtistSignUp() {
           <h1 className="text-3xl font-bold text-white mb-1">Join as Artist</h1>
           <p className="text-gray-400">Create your artist account and start sharing your music.</p>
         </div>
+
+        <AuthErrorBanner error={authError} />
 
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -286,6 +295,12 @@ export default function ArtistSignUp() {
           {step === 'basic' && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h2 className="text-xl font-semibold text-white text-center mb-4">Account Information</h2>
+
+              {errors.submit && (
+                <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                  {errors.submit}
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <AvailabilityInput
@@ -361,6 +376,12 @@ export default function ArtistSignUp() {
           {step === 'artist' && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h2 className="text-xl font-semibold text-white text-center mb-4">Artist Profile</h2>
+
+              {errors.submit && (
+                <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                  {errors.submit}
+                </div>
+              )}
 
               <div className="rounded-[24px] border border-white/10 bg-[#0f1112] p-6 space-y-4">
                 <div className="flex items-center gap-4">
@@ -452,7 +473,7 @@ export default function ArtistSignUp() {
 
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             <Link href="/auth/user/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Listener Sign Up</Link>
-            <Link href="/auth/artist/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Artist Sign Up</Link>
+            <Link href="/auth/producer/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Producer Sign Up</Link>
             <Link href="/auth/reseller/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Reseller Sign Up</Link>
           </div>
         </div>
