@@ -729,22 +729,22 @@ export default function ProducerSignUp() {
               Sign In
             </Link>
           </p>
-          <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <div className="mt-4 flex justify-center gap-3 flex-nowrap overflow-x-auto">
             <Link
               href="/auth/user/signup"
-              className="rounded-full bg-[#1f1f1f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2c2c2c]"
+              className="min-w-[120px] px-4 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
             >
               Listener Sign Up
             </Link>
             <Link
               href="/auth/artist/signup"
-              className="rounded-full bg-[#1f1f1f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2c2c2c]"
+              className="min-w-[120px] px-4 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
             >
               Artist Sign Up
             </Link>
             <Link
               href="/auth/reseller/signup"
-              className="rounded-full bg-[#1f1f1f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2c2c2c]"
+              className="min-w-[120px] px-4 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
             >
               Reseller Sign Up
             </Link>
