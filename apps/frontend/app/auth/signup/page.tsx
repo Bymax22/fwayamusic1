@@ -265,11 +265,11 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 pb-48">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 pb-48 sm:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-[#0d0d0d] w-full max-w-3xl rounded-[32px] p-8 pb-10 shadow-[0_25px_70px_rgba(0,0,0,0.55)] border border-white/10"
+        className="relative bg-black w-full max-w-3xl rounded-3xl p-8 pb-10"
       >
         <div className="flex items-center justify-between mb-6">
           <button
@@ -290,7 +290,7 @@ export default function SignUp() {
           </button>
         </div>
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Join Fwaya</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Join Fwaya</h1>
           <p className="text-gray-400">Create your account and start your musical journey</p>
         </div>
 
