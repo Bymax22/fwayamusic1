@@ -38,6 +38,10 @@ export default function ProducerSignUp() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
+  const [usernameChecking, setUsernameChecking] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const producerGenres = [
@@ -164,6 +168,51 @@ export default function ProducerSignUp() {
     }
   };
 
+  const checkAvailability = async (type: 'email' | 'username', value: string) => {
+    if (!value) return;
+    try {
+      if (type === 'email') {
+        setEmailChecking(true);
+        setEmailAvailable(null);
+      } else {
+        setUsernameChecking(true);
+        setUsernameAvailable(null);
+      }
+
+      const res = await fetch(`/api/auth/check-availability?type=${type}&value=${encodeURIComponent(value)}`);
+      const data = await res.json();
+      const available = !!data?.available;
+
+      if (type === 'email') {
+        setEmailAvailable(available);
+        setEmailChecking(false);
+        setErrors(prev => {
+          const copy = { ...prev };
+          if (!available) copy.email = 'Email is already taken';
+          else delete copy.email;
+          return copy;
+        });
+      } else {
+        setUsernameAvailable(available);
+        setUsernameChecking(false);
+        setErrors(prev => {
+          const copy = { ...prev };
+          if (!available) copy.username = 'Username is already taken';
+          else delete copy.username;
+          return copy;
+        });
+      }
+    } catch (err) {
+      if (type === 'email') {
+        setEmailChecking(false);
+        setErrors(prev => ({ ...prev, email: 'Availability check failed' }));
+      } else {
+        setUsernameChecking(false);
+        setErrors(prev => ({ ...prev, username: 'Availability check failed' }));
+      }
+    }
+  };
+
   const handleGenreChange = (genre: string) => {
     setFormData(prev => ({
       ...prev,
@@ -174,6 +223,14 @@ export default function ProducerSignUp() {
   };
 
   const handleNext = () => {
+    if (step === 'basic') {
+      // Ensure in-field availability checks have passed
+      if (emailAvailable !== true || usernameAvailable !== true) {
+        setErrors(prev => ({ ...prev, submit: 'Please verify email and username availability before continuing.' }));
+        return;
+      }
+    }
+
     if (validateStep(step)) {
       if (step === 'basic') setStep('producer');
       else if (step === 'producer') setStep('consent');
@@ -281,31 +338,51 @@ export default function ProducerSignUp() {
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+                <div>
                 <label className="block text-sm font-medium text-white mb-2">
                   Email Address *
                 </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="your@email.com"
-                />
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailAvailable(null); }}
+                    onBlur={() => checkAvailability('email', formData.email)}
+                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+                    placeholder="your@email.com"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {emailChecking ? (
+                      <div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-transparent animate-spin" />
+                    ) : emailAvailable ? (
+                      <Check className="w-4 h-4 text-green-400" />
+                    ) : null}
+                  </div>
+                </div>
                 {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
               </div>
 
-              <div>
+                <div>
                 <label className="block text-sm font-medium text-white mb-2">
                   Username *
                 </label>
-                <input
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="username"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => { setFormData({ ...formData, username: e.target.value }); setUsernameAvailable(null); }}
+                    onBlur={() => checkAvailability('username', formData.username)}
+                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+                    placeholder="username"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {usernameChecking ? (
+                      <div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-transparent animate-spin" />
+                    ) : usernameAvailable ? (
+                      <Check className="w-4 h-4 text-green-400" />
+                    ) : null}
+                  </div>
+                </div>
                 {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
               </div>
             </div>
