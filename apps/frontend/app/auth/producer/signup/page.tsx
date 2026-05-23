@@ -220,10 +220,10 @@ export default function ProducerSignUp() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
+        className="bg-black rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
             <Music2 className="w-8 h-8 text-purple-400" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Producer</h1>
