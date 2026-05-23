@@ -5,6 +5,7 @@ import { useState, useRef, ChangeEvent } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { AvailabilityInput } from '@/components/AvailabilityInput';
 import { AuthErrorInfo, parseAuthError } from '@/lib/auth-error-utils';
 import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaCamera } from 'react-icons/fa';
 import Link from 'next/link';
@@ -45,7 +46,12 @@ export default function ArtistSignUp() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<'unknown' | 'checking' | 'available' | 'taken'>('unknown');
+  const [usernameStatus, setUsernameStatus] = useState<'unknown' | 'checking' | 'available' | 'taken'>('unknown');
+  const emailTimerRef = useRef<number | null>(null);
+  const usernameTimerRef = useRef<number | null>(null);
+  
+  // removed combined availabilityLoading/combined check - using field-level checks below
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleResendVerificationEmail = async () => {
@@ -60,30 +66,43 @@ export default function ArtistSignUp() {
     }
   };
 
-  const checkAvailability = async () => {
-    const params = new URLSearchParams();
-    if (formData.email) params.set('email', formData.email.trim());
-    if (formData.username) params.set('username', formData.username.trim());
-
-    if (!params.toString()) {
-      return { emailTaken: false, usernameTaken: false };
-    }
-
-    setAvailabilityLoading(true);
+  const checkAvailability = async (field: 'email' | 'username', value: string) => {
+    if (!value) return;
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/check-availability?${params.toString()}`
-      );
-
-      if (!response.ok) {
-        const body = await response.text();
-        throw new Error(body || 'Unable to verify username and email availability');
+      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
+      if (!res.ok) {
+        if (field === 'email') setEmailStatus('unknown');
+        else setUsernameStatus('unknown');
+        return;
       }
-
-      return (await response.json()) as { emailTaken: boolean; usernameTaken: boolean };
-    } finally {
-      setAvailabilityLoading(false);
+      const json = await res.json();
+      const available = Boolean(json.available);
+      if (field === 'email') setEmailStatus(available ? 'available' : 'taken');
+      else setUsernameStatus(available ? 'available' : 'taken');
+    } catch (error) {
+      if (field === 'email') setEmailStatus('unknown');
+      else setUsernameStatus('unknown');
     }
+  };
+
+  const debouncedCheckEmail = (value: string) => {
+    if (!value) {
+      setEmailStatus('unknown');
+      return;
+    }
+    setEmailStatus('checking');
+    if (emailTimerRef.current) window.clearTimeout(emailTimerRef.current);
+    emailTimerRef.current = window.setTimeout(() => checkAvailability('email', value), 400);
+  };
+
+  const debouncedCheckUsername = (value: string) => {
+    if (!value) {
+      setUsernameStatus('unknown');
+      return;
+    }
+    setUsernameStatus('checking');
+    if (usernameTimerRef.current) window.clearTimeout(usernameTimerRef.current);
+    usernameTimerRef.current = window.setTimeout(() => checkAvailability('username', value), 400);
   };
 
   const validateStep = (currentStep: SignupStep): boolean => {
@@ -183,30 +202,16 @@ export default function ArtistSignUp() {
     if (step === 'basic') {
       if (!validateStep(step)) return;
 
-      try {
-        const availability = await checkAvailability();
-        const availabilityErrors: Record<string, string> = {};
-
-        if (availability.emailTaken) {
-          availabilityErrors.email = 'This email is already in use. Please use a different email.';
-        }
-        if (availability.usernameTaken) {
-          availabilityErrors.username = 'This username is already taken. Please choose another one.';
-        }
-
-        if (availability.emailTaken || availability.usernameTaken) {
-          setErrors(availabilityErrors);
-          return;
-        }
-
-        setStep('artist');
-      } catch (error: unknown) {
-        setErrors({
-          ...errors,
-          submit: error instanceof Error ? error.message : 'Unable to verify username and email availability.',
-        });
+      if (emailStatus === 'checking' || usernameStatus === 'checking') {
+        setErrors(prev => ({ ...prev, submit: 'Please wait for email and username availability checks to complete.' }));
+        return;
+      }
+      if (emailStatus !== 'available' || usernameStatus !== 'available') {
+        setErrors(prev => ({ ...prev, submit: 'Please choose an available email and username before continuing.' }));
+        return;
       }
 
+      setStep('artist');
       return;
     }
 
@@ -354,27 +359,29 @@ export default function ArtistSignUp() {
 
                           <div className="mt-6 grid gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-300 mb-2">Email address *</label>
-                              <input
-                                type="email"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                              <AvailabilityInput
+                                label="Email address *"
                                 placeholder="your@email.com"
-                                className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                                value={formData.email}
+                                onChange={(value) => setFormData({ ...formData, email: value })}
+                                field="email"
+                                status={emailStatus}
+                                onCheckAvailability={(field, value) => { if (field === 'email') debouncedCheckEmail(value); }}
+                                error={errors.email}
                               />
-                              {errors.email && <p className="mt-2 text-sm text-red-400">{errors.email}</p>}
                             </div>
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-300 mb-2">Username *</label>
-                              <input
-                                type="text"
-                                value={formData.username}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                              <AvailabilityInput
+                                label="Username *"
                                 placeholder="artistname"
-                                className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                                value={formData.username}
+                                onChange={(value) => setFormData({ ...formData, username: value })}
+                                field="username"
+                                status={usernameStatus}
+                                onCheckAvailability={(field, value) => { if (field === 'username') debouncedCheckUsername(value); }}
+                                error={errors.username}
                               />
-                              {errors.username && <p className="mt-2 text-sm text-red-400">{errors.username}</p>}
                             </div>
 
                             <div>
