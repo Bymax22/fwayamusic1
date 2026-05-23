@@ -349,7 +349,9 @@ export default function ProducerSignUp() {
               onChange={(value) => setFormData({ ...formData, email: value })}
               field="email"
               status={emailStatus}
-              onCheckAvailability={debouncedCheckEmail}
+              onCheckAvailability={(field, value) => {
+                if (field === 'email') debouncedCheckEmail(value);
+              }}
               error={errors.email}
             />
 
@@ -360,7 +362,9 @@ export default function ProducerSignUp() {
                   onChange={(value) => setFormData({ ...formData, username: value })}
                   field="username"
                   status={usernameStatus}
-                  onCheckAvailability={debouncedCheckUsername}
+                  onCheckAvailability={(field, value) => {
+                    if (field === 'username') debouncedCheckUsername(value);
+                  }}
                   error={errors.username}
                 />
             </div>
@@ -729,22 +733,22 @@ export default function ProducerSignUp() {
               Sign In
             </Link>
           </p>
-          <div className="mt-4 flex justify-center gap-3 flex-nowrap overflow-x-auto">
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
             <Link
               href="/auth/user/signup"
-              className="min-w-[120px] px-4 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
+              className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
             >
               Listener Sign Up
             </Link>
             <Link
               href="/auth/artist/signup"
-              className="min-w-[120px] px-4 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
+              className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
             >
               Artist Sign Up
             </Link>
             <Link
               href="/auth/reseller/signup"
-              className="min-w-[120px] px-4 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
+              className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
             >
               Reseller Sign Up
             </Link>
