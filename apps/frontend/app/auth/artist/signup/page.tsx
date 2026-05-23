@@ -330,6 +330,8 @@ export default function ArtistSignUp() {
                 <label className="block text-sm font-medium text-gray-300 mb-2">Display name</label>
                 <input
                   type="text"
+                  autoComplete="nickname"
+                  inputMode="text"
                   value={formData.displayName}
                   onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                   placeholder="Your artist name"

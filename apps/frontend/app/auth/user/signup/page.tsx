@@ -189,11 +189,11 @@ export default function UserSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 pt-4 pb-24 sm:pb-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-[#0f1112] w-full max-w-md rounded-3xl p-6 shadow-2xl"
+        className="bg-black rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
       >
         <button
           type="button"

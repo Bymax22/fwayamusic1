@@ -390,6 +390,8 @@ export default function ProducerSignUp() {
               </label>
               <input
                 type="text"
+                autoComplete="nickname"
+                inputMode="text"
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                 className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
