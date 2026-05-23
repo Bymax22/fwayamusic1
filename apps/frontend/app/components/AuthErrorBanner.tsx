@@ -26,7 +26,7 @@ export default function AuthErrorBanner({ error }: Props) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.98 }}
           transition={{ duration: 0.28, ease: 'easeOut' }}
-          className="fixed left-1/2 top-6 z-50 w-[min(640px,90%)] -translate-x-1/2 rounded-2xl bg-purple-900/95 p-3 shadow-2xl"
+          className="fixed left-1/2 top-6 z-50 w-[min(640px,96%)] -translate-x-1/2 rounded-none bg-purple-900/95 p-3 shadow-2xl sm:w-[min(640px,90%)]"
         >
           <div className="flex items-start gap-3">
             <div className="flex-1">

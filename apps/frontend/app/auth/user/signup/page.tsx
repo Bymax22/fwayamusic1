@@ -420,14 +420,12 @@ export default function UserSignUp() {
           <button
             type="submit"
             disabled={loading || uploading}
-            className="w-full px-4 py-3 bg-[#e51f48] text-white rounded-lg hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow-lg"
+            className="w-full px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow-lg"
           >
             {loading ? 'Creating Account...' : uploading ? 'Uploading Avatar...' : 'Create Account'}
           </button>
 
-          {errors.submit && (
-            <p className="text-red-400 text-sm text-center">{errors.submit}</p>
-          )}
+
         </form>
 
         <div className="text-center mt-6 pt-4 border-t border-white/10">

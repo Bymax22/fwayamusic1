@@ -151,9 +151,7 @@ export default function SignIn() {
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
 
-          {errors.submit && (
-            <p className="text-red-400 text-sm text-center">{errors.submit}</p>
-          )}
+          
         </form>
 
         <div className="mt-8 pt-6">

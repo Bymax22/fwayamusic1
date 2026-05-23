@@ -1,9 +1,12 @@
 "use client";
+
+import AuthErrorBanner from '@/components/AuthErrorBanner';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { ReCAPTCHA } from '@/components/ReCAPTCHA';
+import { AuthErrorInfo } from '@/lib/auth-error-utils';
 import { 
   FaUser, 
   FaMusic, 
@@ -32,6 +35,8 @@ export default function SignUp() {
     displayName: '',
     role: 'USER' as SignupRole,
     phoneNumber: '',
+    country: 'ZM',
+    countryCode: '+260',
     dateOfBirth: '',
     artistName: '',
     stageName: '',
@@ -48,6 +53,13 @@ export default function SignUp() {
   const [recaptchaToken, setRecaptchaToken] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [resendLoading, setResendLoading] = useState(false);
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
+
+  // availability states
+  const [usernameStatus, setUsernameStatus] = useState<'unknown'|'checking'|'available'|'taken'>('unknown');
+  const [emailStatus, setEmailStatus] = useState<'unknown'|'checking'|'available'|'taken'>('unknown');
+  const usernameTimerRef = useRef<number | null>(null);
+  const emailTimerRef = useRef<number | null>(null);
 
   const handleResendVerificationEmail = async () => {
     clearVerificationError();
@@ -60,6 +72,41 @@ export default function SignUp() {
       setResendLoading(false);
     }
   };
+
+  // Availability checks (debounced)
+  const checkAvailability = async (field: 'username'|'email', value: string) => {
+    if (!value) return;
+    try {
+      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
+      if (!res.ok) {
+        // treat non-200 as unknown
+        if (field === 'username') setUsernameStatus('unknown');
+        else setEmailStatus('unknown');
+        return;
+      }
+      const json = await res.json();
+      const available = Boolean(json.available);
+      if (field === 'username') setUsernameStatus(available ? 'available' : 'taken');
+      else setEmailStatus(available ? 'available' : 'taken');
+    } catch (e) {
+      if (field === 'username') setUsernameStatus('unknown');
+      else setEmailStatus('unknown');
+    }
+  };
+
+  // watch username
+  const debouncedCheckUsername = (value: string) => {
+    setUsernameStatus('checking');
+    if (usernameTimerRef.current) window.clearTimeout(usernameTimerRef.current);
+    usernameTimerRef.current = window.setTimeout(() => checkAvailability('username', value), 650);
+  };
+
+  const debouncedCheckEmail = (value: string) => {
+    setEmailStatus('checking');
+    if (emailTimerRef.current) window.clearTimeout(emailTimerRef.current);
+    emailTimerRef.current = window.setTimeout(() => checkAvailability('email', value), 650);
+  };
+
 
   const roles = [
     {
@@ -106,6 +153,10 @@ export default function SignUp() {
       
       if (!formData.username) newErrors.username = 'Username is required';
       else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) newErrors.username = 'Username can only contain letters, numbers, and underscores';
+      else if (usernameStatus === 'taken') newErrors.username = 'Username is already taken';
+      else if (usernameStatus === 'checking') newErrors.username = 'Checking username availability — please wait';
+      if (emailStatus === 'taken') newErrors.email = 'Email is already in use';
+      else if (emailStatus === 'checking') newErrors.email = 'Checking email availability — please wait';
     }
 
     if (currentStep === 'kyc') {
@@ -233,33 +284,39 @@ export default function SignUp() {
           <p className="text-gray-400">Create your account and start your musical journey</p>
         </div>
 
+        <AuthErrorBanner error={authError} />
+
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            {['role', 'details', 'kyc', 'consent', 'verification'].map((s, index) => (
-              <div key={s} className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    step === s
-                      ? 'bg-[#e51f48] text-white'
-                      : index < ['role', 'details', 'kyc', 'consent', 'verification'].indexOf(step)
-                      ? 'bg-green-500 text-white'
-                      : 'bg-[#0a3747] text-gray-400'
-                  }`}
-                >
-                  {index < ['role', 'details', 'kyc', 'consent', 'verification'].indexOf(step) ? (
-                    <FaCheck className="w-4 h-4" />
-                  ) : (
-                    index + 1
-                  )}
+            {['role', 'details', 'kyc', 'consent', 'verification'].map((s, index, arr) => {
+              const currentIndex = arr.indexOf(step);
+              const isClickable = index <= currentIndex;
+              return (
+                <div key={s} className={`flex flex-col items-center ${isClickable ? 'cursor-pointer' : ''}`} onClick={() => isClickable && setStep(s as SignupStep)}>
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                      step === s
+                        ? 'bg-purple-500 text-white'
+                        : index < currentIndex
+                        ? 'bg-green-500 text-white'
+                        : 'bg-[#0a3747] text-gray-400'
+                    }`}
+                  >
+                    {index < currentIndex ? (
+                      <FaCheck className="w-4 h-4" />
+                    ) : (
+                      index + 1
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-400 mt-1 capitalize">{s}</span>
                 </div>
-                <span className="text-xs text-gray-400 mt-1 capitalize">{s}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="w-full bg-[#0a3747] rounded-full h-2">
             <div
-              className="bg-[#e51f48] h-2 rounded-full transition-all duration-300"
+              className="bg-purple-500 h-2 rounded-full transition-all duration-300"
               style={{
                 width: `${(['role', 'details', 'kyc', 'consent', 'verification'].indexOf(step) + 1) * 20}%`,
               }}
@@ -286,12 +343,12 @@ export default function SignUp() {
                     onClick={() => setFormData({ ...formData, role: role.id as SignupRole })}
                     className={`p-6 rounded-xl border-2 transition-all ${
                       formData.role === role.id
-                        ? `border-[#e51f48] bg-gradient-to-br ${role.color}`
-                        : 'border-[#0a3747] bg-[#0a3747] hover:border-[#e51f48]'
+                        ? `border-purple-500 bg-gradient-to-br ${role.color}`
+                        : 'border-[#0a3747] bg-[#0a3747] hover:border-purple-500'
                     }`}
                   >
                     <Icon className={`w-8 h-8 mb-3 ${
-                      formData.role === role.id ? 'text-white' : 'text-[#e51f48]'
+                      formData.role === role.id ? 'text-white' : 'text-purple-400'
                     }`} />
                     <h3 className="font-semibold text-white mb-2">{role.title}</h3>
                     <p className="text-sm text-gray-300">{role.description}</p>
@@ -302,7 +359,7 @@ export default function SignUp() {
             <div className="flex justify-end">
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] transition-colors font-semibold"
+                className="px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -329,11 +386,14 @@ export default function SignUp() {
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => { setFormData({ ...formData, email: e.target.value }); debouncedCheckEmail(e.target.value); }}
                   className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                   placeholder="your@email.com"
                 />
                 {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+                {emailStatus === 'checking' && <p className="text-xs text-gray-300 mt-1">Checking availability</p>}
+                {emailStatus === 'available' && <p className="text-xs text-green-400 mt-1">Email available</p>}
+                {emailStatus === 'taken' && <p className="text-xs text-red-400 mt-1">Email already in use</p>}
               </div>
 
               <div>
@@ -343,11 +403,14 @@ export default function SignUp() {
                 <input
                   type="text"
                   value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  onChange={(e) => { setFormData({ ...formData, username: e.target.value }); debouncedCheckUsername(e.target.value); }}
                   className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                   placeholder="username"
                 />
                 {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
+                {usernameStatus === 'checking' && <p className="text-xs text-gray-300 mt-1">Checking availability</p>}
+                {usernameStatus === 'available' && <p className="text-xs text-green-400 mt-1">Username available</p>}
+                {usernameStatus === 'taken' && <p className="text-xs text-red-400 mt-1">Username already taken</p>}
               </div>
             </div>
 
@@ -436,13 +499,25 @@ export default function SignUp() {
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Phone Number
                 </label>
-                <input
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                  placeholder="+260 96 123 4567"
-                />
+                <div className="flex gap-2">
+                  <select
+                    value={formData.countryCode}
+                    onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
+                    className="px-3 py-3 bg-[#0f1112] rounded-xl text-white"
+                  >
+                    <option value="+260">ZM +260</option>
+                    <option value="+1">US +1</option>
+                    <option value="+44">UK +44</option>
+                    <option value="+27">ZA +27</option>
+                  </select>
+                  <input
+                    type="tel"
+                    value={formData.phoneNumber}
+                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                    className="flex-1 px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="96 123 4567"
+                  />
+                </div>
                 {errors.phoneNumber && <p className="text-red-400 text-sm mt-1">{errors.phoneNumber}</p>}
               </div>
 
@@ -662,15 +737,11 @@ export default function SignUp() {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                className="px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
             </div>
-
-            {errors.submit && (
-              <p className="text-red-400 text-sm text-center">{errors.submit}</p>
-            )}
           </motion.div>
         )}
 
