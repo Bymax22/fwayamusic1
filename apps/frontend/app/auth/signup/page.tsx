@@ -265,11 +265,11 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 pb-28">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 pb-48">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-[#111111] w-full max-w-3xl rounded-[32px] p-8 pb-10 shadow-[0_25px_70px_rgba(0,0,0,0.55)]"
+        className="relative bg-[#0d0d0d] w-full max-w-3xl rounded-[32px] p-8 pb-10 shadow-[0_25px_70px_rgba(0,0,0,0.55)] border border-white/10"
       >
         <div className="flex items-center justify-between mb-6">
           <button
@@ -284,7 +284,7 @@ export default function SignUp() {
           <button
             type="button"
             onClick={() => router.push('/')}
-            className="rounded-full bg-white/5 text-gray-200 hover:bg-white/10 p-2 transition-colors"
+            className="rounded-full bg-[#1f1f1f] text-white/90 ring-1 ring-white/10 hover:bg-[#2a2a2a] p-2 transition-colors shadow-sm"
           >
             <FaTimes className="w-5 h-5" />
           </button>
@@ -309,8 +309,8 @@ export default function SignUp() {
                       step === s
                         ? 'bg-purple-600 text-white'
                         : index < currentIndex
-                        ? 'bg-[#101010] text-white'
-                        : 'bg-[#101010] text-gray-400'
+                        ? 'bg-[#1f1f1f] text-white'
+                        : 'bg-[#1f1f1f] text-gray-400'
                     }`}
                   >
                     {index < currentIndex ? (
@@ -353,8 +353,8 @@ export default function SignUp() {
                     onClick={() => setFormData({ ...formData, role: role.id as SignupRole })}
                     className={`p-6 rounded-3xl transition-all ${
                       formData.role === role.id
-                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
-                        : 'bg-[#101010] text-gray-300 hover:bg-[#1f1f1f]'
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20 border border-purple-500/30'
+                        : 'bg-[#1f1f1f] text-gray-300 hover:bg-[#252525] border border-white/10'
                     }`}
                   >
                     <Icon className="w-8 h-8 mb-3" />
@@ -429,7 +429,7 @@ export default function SignUp() {
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                 placeholder="Your display name"
-                className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
 
@@ -442,7 +442,7 @@ export default function SignUp() {
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-10"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-10"
                   />
                   <button
                     type="button"
@@ -462,7 +462,7 @@ export default function SignUp() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
               </div>
@@ -471,7 +471,7 @@ export default function SignUp() {
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#1f1f1f] text-gray-200 hover:bg-[#272727] transition-colors"
               >
                 Back
               </button>
@@ -496,7 +496,7 @@ export default function SignUp() {
               Additional Information
             </h2>
 
-            <div className="bg-[#101010] border border-white/10 rounded-3xl p-5 space-y-5">
+            <div className="bg-[#1f1f1f] border border-white/10 rounded-3xl p-5 space-y-5">
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-purple-300">Contact</p>
@@ -530,7 +530,7 @@ export default function SignUp() {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
               {errors.dateOfBirth && <p className="text-red-500 text-xs mt-1">{errors.dateOfBirth}</p>}
             </div>
@@ -545,7 +545,7 @@ export default function SignUp() {
                       value={formData.artistName}
                       onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
                       placeholder="Your official artist name"
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                     {errors.artistName && <p className="text-red-500 text-xs mt-1">{errors.artistName}</p>}
                   </div>
@@ -557,7 +557,7 @@ export default function SignUp() {
                       value={formData.stageName}
                       onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
                       placeholder="Your performance name"
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                     {errors.stageName && <p className="text-red-500 text-xs mt-1">{errors.stageName}</p>}
                   </div>
@@ -571,7 +571,7 @@ export default function SignUp() {
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       placeholder="Tell us about yourself and your music..."
                       rows={3}
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                   </div>
 
@@ -582,7 +582,7 @@ export default function SignUp() {
                       value={formData.website}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                       placeholder="https://yourwebsite.com"
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -598,7 +598,7 @@ export default function SignUp() {
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                     placeholder="Your business name"
-                    className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                   {errors.businessName && <p className="text-red-500 text-xs mt-1">{errors.businessName}</p>}
                 </div>
@@ -608,7 +608,7 @@ export default function SignUp() {
                   <select
                     value={formData.businessType}
                     onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="">Select business type</option>
                     <option value="INDIVIDUAL">Individual</option>
@@ -624,7 +624,7 @@ export default function SignUp() {
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#1f1f1f] text-gray-200 hover:bg-[#272727] transition-colors"
               >
                 Back
               </button>
@@ -649,14 +649,14 @@ export default function SignUp() {
               Terms & Consent
             </h2>
 
-            <div className="bg-[#101010] p-6 space-y-4 rounded-3xl">
+            <div className="bg-[#1f1f1f] p-6 space-y-4 rounded-3xl">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#1f1f1f] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="terms" className="text-gray-300 text-sm">
                   I agree to the <a href="/terms" className="text-purple-500 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple-500 hover:underline">Privacy Policy</a>
@@ -670,7 +670,7 @@ export default function SignUp() {
                   id="privacy"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#1f1f1f] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="privacy" className="text-gray-300 text-sm">
                   I acknowledge that I have read and understood how my personal data will be processed
@@ -684,7 +684,7 @@ export default function SignUp() {
                   id="marketing"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#1f1f1f] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="marketing" className="text-gray-300 text-sm">
                   I agree to receive marketing emails and promotional offers
@@ -697,7 +697,7 @@ export default function SignUp() {
                   id="dataSharing"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#1f1f1f] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="dataSharing" className="text-gray-300 text-sm">
                   I consent to my data being shared with trusted partners for service improvement
@@ -717,7 +717,7 @@ export default function SignUp() {
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#1f1f1f] text-gray-200 hover:bg-[#272727] transition-colors"
               >
                 Back
               </button>

@@ -62,14 +62,14 @@ export function PhoneInput({
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="w-full px-3 py-2.5 bg-[#101010] text-white text-sm flex items-center justify-center gap-1 rounded-3xl ring-1 ring-white/10 hover:ring-purple-500 focus:outline-none transition-all"
+            className="w-full px-3 py-2.5 bg-[#1f1f1f] text-white text-sm flex items-center justify-center gap-1 rounded-3xl ring-1 ring-white/10 hover:ring-purple-500 focus:outline-none transition-all"
           >
             <span className="text-lg">{selectedCountry.flag}</span>
             <FaChevronDown className="text-xs" />
           </button>
 
           {isOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-[#101010] ring-1 ring-purple-500/30 z-50 max-h-64 overflow-hidden flex flex-col w-48 rounded-3xl">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1f1f] ring-1 ring-purple-500/30 z-50 max-h-64 overflow-hidden flex flex-col w-48 rounded-3xl">
               <div className="p-2">
                 <input
                   ref={inputRef}
@@ -113,7 +113,7 @@ export function PhoneInput({
               const phoneNumber = e.target.value.replace(/\D/g, '');
               onPhoneChange(phoneNumber);
             }}
-            className={`w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none transition-colors ring-1 ${
+            className={`w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none transition-colors ring-1 ${
               error
                 ? 'ring-red-500 focus:ring-red-500'
                 : 'ring-white/10 focus:ring-purple-500'

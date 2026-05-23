@@ -77,7 +77,7 @@ export function AvailabilityInput({
           onChange={handleChange}
           onBlur={handleBlur}
           disabled={disabled}
-          className={`w-full px-4 py-3 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none transition-colors ring-1 ${
+          className={`w-full px-4 py-3 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none transition-colors ring-1 ${
             disabled
               ? 'cursor-not-allowed opacity-70 bg-[#0b0b0b] ring-white/10'
               : error || status === 'taken'

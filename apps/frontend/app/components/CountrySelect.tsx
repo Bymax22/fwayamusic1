@@ -50,7 +50,7 @@ export function CountrySelect({ label, value, onChange, error }: CountrySelectPr
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-4 py-2.5 bg-[#101010] text-white text-left flex items-center justify-between rounded-3xl ring-1 ring-white/10 hover:ring-purple-500 focus:outline-none transition-all"
+          className="w-full px-4 py-2.5 bg-[#1f1f1f] text-white text-left flex items-center justify-between rounded-3xl ring-1 ring-white/10 hover:ring-purple-500 focus:outline-none transition-all"
         >
           <span className="flex items-center gap-2">
             {selectedCountry ? (
@@ -68,7 +68,7 @@ export function CountrySelect({ label, value, onChange, error }: CountrySelectPr
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-[#101010] ring-1 ring-purple-500/30 z-50 max-h-96 overflow-hidden flex flex-col rounded-3xl">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1f1f] ring-1 ring-purple-500/30 z-50 max-h-96 overflow-hidden flex flex-col rounded-3xl">
             <div className="p-2">
               <input
                 ref={inputRef}
