@@ -1,18 +1,26 @@
 // app/auth/artist/signup/page.tsx
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, ChangeEvent } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaArrowLeft, FaCamera } from 'react-icons/fa';
+import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { AuthErrorInfo, parseAuthError } from '@/lib/auth-error-utils';
+import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaCamera } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 
 type SignupStep = 'basic' | 'artist' | 'consent' | 'verification';
 
+type AvailabilityResponse = {
+  emailTaken: boolean;
+  usernameTaken: boolean;
+};
+
 export default function ArtistSignUp() {
   const { signUp, loading, sendOTP, verificationError, clearVerificationError } = useAuth();
   const [step, setStep] = useState<SignupStep>('basic');
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -135,7 +143,7 @@ export default function ArtistSignUp() {
     }
   };
 
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -244,458 +252,423 @@ export default function ArtistSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
-      >
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaMusic className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Join as Artist</h1>
-          <p className="text-gray-300">Create your artist account and share your music with the world</p>
-        </div>
+    <div className="min-h-screen bg-black text-white">
+      <div className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-purple-700/20 to-transparent blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-4 py-10 lg:px-8 lg:py-14">
+          <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] items-start">
+            <section className="space-y-8">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.28em] text-purple-300 shadow-sm shadow-purple-500/10">
+                Artist Signup
+              </div>
 
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            {['basic', 'artist', 'consent', 'verification'].map((s, index) => (
-              <div key={s} className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    step === s
-                      ? 'bg-purple-600 text-white'
-                      : index < ['basic', 'artist', 'consent', 'verification'].indexOf(step)
-                      ? 'bg-[#121517] text-white'
-                      : 'bg-[#121517] text-gray-400'
-                  }`}
-                >
-                  {index < ['basic', 'artist', 'consent', 'verification'].indexOf(step) ? (
-                    <FaCheck className="w-4 h-4" />
-                  ) : (
-                    index + 1
-                  )}
+              <div className="space-y-6">
+                <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Build your artist presence on Fwaya.</h1>
+                <p className="max-w-2xl text-gray-400 text-lg leading-8">
+                  Upload your profile, verify your email, and setup your artist brand with a modern, purple-forward experience that matches Fwaya’s library and search styling.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.15)]">
+                  <p className="text-xs uppercase tracking-[0.3em] text-purple-300">Start strong</p>
+                  <h2 className="mt-3 text-xl font-semibold">Artist-first onboarding</h2>
+                  <p className="mt-3 text-sm text-gray-400">One flow for your profile picture, artist identity, and verification steps.</p>
                 </div>
-                <span className="text-xs text-gray-500 mt-1 capitalize">
-                  {s === 'basic' && 'Account'}
-                  {s === 'artist' && 'Artist Info'}
-                  {s === 'consent' && 'Terms'}
-                  {s === 'verification' && 'Verify'}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="w-full bg-[#121517] rounded-full h-2">
-            <div
-              className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-              style={{
-                width: `${(['basic', 'artist', 'consent', 'verification'].indexOf(step) + 1) * 25}%`,
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Step 1: Basic Information */}
-        {step === 'basic' && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-4"
-          >
-            <h2 className="text-xl font-semibold text-white text-center mb-6">
-              Account Information
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="your@email.com"
-                />
-                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Username *
-                </label>
-                <input
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="username"
-                />
-                {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Display Name
-              </label>
-              <input
-                type="text"
-                value={formData.displayName}
-                onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Your display name"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Password *
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-                {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Confirm Password *
-                </label>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="••••••••"
-                />
-                {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
-              </div>
-            </div>
-
-            <div className="flex justify-between pt-4">
-              <Link
-                href="/auth/artist/signin"
-                className="flex items-center gap-2 px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517] transition-colors"
-              >
-                <FaArrowLeft className="w-4 h-4" />
-                Back to Sign In
-              </Link>
-              <button
-                onClick={handleNext}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-colors font-semibold"
-              >
-                Continue
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Step 2: Artist Information */}
-        {step === 'artist' && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-4"
-          >
-            <h2 className="text-xl font-semibold text-white text-center mb-6">
-              Artist Profile
-            </h2>
-
-            {/* Avatar Upload */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-3">
-                Profile Picture
-              </label>
-              <div className="flex items-center gap-4">
-                <div className="relative w-24 h-24 rounded-full bg-[#0f1112] border border-[#121517] flex items-center justify-center overflow-hidden flex-shrink-0">
-                  {avatarPreview ? (
-                    <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
-                  ) : (
-                    <FaMusic className="text-3xl text-gray-400" />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarChange}
-                    disabled={uploading}
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-[#ff4d6d] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <FaCamera className="text-sm" />
-                    {uploading ? 'Uploading...' : 'Upload Picture'}
-                  </button>
-                  <p className="text-xs text-gray-400 mt-2">JPG, PNG or GIF (Max 5MB)</p>
+                <div className="rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.15)]">
+                  <p className="text-xs uppercase tracking-[0.3em] text-purple-300">Verified trust</p>
+                  <h2 className="mt-3 text-xl font-semibold">Secure email verification</h2>
+                  <p className="mt-3 text-sm text-gray-400">Maintain the same working verification flow while freshening the presentation.</p>
                 </div>
               </div>
-              {errors.avatar && <p className="text-red-400 text-sm mt-2">{errors.avatar}</p>}
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Artist Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.artistName}
-                  onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Your official artist name"
-                />
-                {errors.artistName && <p className="text-red-400 text-sm mt-1">{errors.artistName}</p>}
+              <div className="rounded-[28px] border border-white/10 bg-white/5 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.15)]">
+                <p className="text-xs uppercase tracking-[0.3em] text-purple-300">What to expect</p>
+                <ul className="mt-4 space-y-3 text-sm text-gray-400">
+                  <li>• Avatar upload with Cloudinary support</li>
+                  <li>• Artist name, stage name, and bio setup</li>
+                  <li>• Mobile friendly stepper with clear progress</li>
+                  <li>• Email verification and resend support</li>
+                </ul>
               </div>
+            </section>
 
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Stage Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.stageName}
-                  onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Your performance name"
-                />
-                {errors.stageName && <p className="text-red-400 text-sm mt-1">{errors.stageName}</p>}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="+260 96 123 4567"
-                />
-                {errors.phoneNumber && <p className="text-red-400 text-sm mt-1">{errors.phoneNumber}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Date of Birth *
-                </label>
-                <input
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                {errors.dateOfBirth && <p className="text-red-400 text-sm mt-1">{errors.dateOfBirth}</p>}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Bio
-              </label>
-              <textarea
-                value={formData.bio}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Tell us about your music and artistic journey..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Website
-              </label>
-              <input
-                type="url"
-                value={formData.website}
-                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="https://yourwebsite.com"
-              />
-            </div>
-
-            <div className="flex justify-between pt-4">
-              <button
-                onClick={handleBack}
-                className="px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517] transition-colors"
-              >
-                Back
-              </button>
-              <button
-                onClick={handleNext}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-[#ff4d6d] transition-colors font-semibold"
-              >
-                Continue
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Step 3: Consent */}
-        {step === 'consent' && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
-          >
-            <h2 className="text-xl font-semibold text-white text-center mb-6">
-              Terms & Agreements
-            </h2>
-
-            <div className="bg-[#121517] rounded-xl p-6 space-y-4">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="terms-artist"
-                  checked={formData.acceptedTerms}
-                  onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
-                />
-                <label htmlFor="terms-artist" className="text-white text-sm">
-                  I agree to the <a href="/terms" className="text-purple-400 hover:text-purple-300 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple-400 hover:text-purple-300 hover:underline">Privacy Policy</a> *
-                </label>
-              </div>
-              {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
-
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="privacy-artist"
-                  checked={formData.acceptedPrivacy}
-                  onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
-                />
-                <label htmlFor="privacy-artist" className="text-white text-sm">
-                  I acknowledge that I have read and understood how my personal data will be processed *
-                </label>
-              </div>
-              {errors.acceptedPrivacy && <p className="text-red-400 text-sm">{errors.acceptedPrivacy}</p>}
-
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="marketing-artist"
-                  checked={formData.marketingEmails}
-                  onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
-                />
-                <label htmlFor="marketing-artist" className="text-white text-sm">
-                  I agree to receive marketing emails and promotional offers
-                </label>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="dataSharing-artist"
-                  checked={formData.dataSharing}
-                  onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
-                />
-                <label htmlFor="dataSharing-artist" className="text-white text-sm">
-                  I consent to my data being shared with trusted partners for service improvement
-                </label>
-              </div>
-            </div>
-
-            <button
-              onClick={() => handleSubmit()}
-              disabled={loading || !formData.acceptedTerms || !formData.acceptedPrivacy}
-              className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[#09090b] shadow-[0_40px_120px_rgba(0,0,0,0.55)]"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
+              <div className="pointer-events-none absolute -right-20 top-10 h-52 w-52 rounded-full bg-purple-500/10 blur-3xl" />
+              <div className="relative px-6 py-8 sm:px-8 sm:py-10">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="max-w-xl">
+                    <p className="text-sm uppercase tracking-[0.3em] text-purple-300">Artist Registration</p>
+                    <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">One signup flow for your creative brand.</h2>
+                    <p className="mt-3 text-sm text-gray-400 sm:text-base">
+                      Keep the working signup and upload logic while giving artists a premium, modern onboarding experience.
+                    </p>
+                  </div>
+                  <div className="rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300">
+                    Step {['basic', 'artist', 'consent', 'verification'].indexOf(step) + 1} of 4
+                  </div>
+                </div>
 
-            {errors.submit && (
-              <p className="text-red-400 text-sm text-center">{errors.submit}</p>
-            )}
-          </motion.div>
-        )}
+                <div className="mt-8 grid gap-4 sm:grid-cols-[1fr_0.95fr]">
+                  <div className="space-y-4">
+                    {['Account', 'Artist Info', 'Terms', 'Verify'].map((label, index) => {
+                      const active = index === ['basic', 'artist', 'consent', 'verification'].indexOf(step);
+                      const completed = index < ['basic', 'artist', 'consent', 'verification'].indexOf(step);
+                      return (
+                        <div
+                          key={label}
+                          className={`flex items-center gap-3 rounded-3xl border px-4 py-4 transition ${
+                            active
+                              ? 'border-purple-500/40 bg-purple-500/10 text-white'
+                              : completed
+                              ? 'border-white/10 bg-white/5 text-gray-300'
+                              : 'border-white/10 bg-[#080809] text-gray-400'
+                          }`}
+                        >
+                          <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${active ? 'bg-purple-500 text-black' : 'bg-white/10 text-gray-300'}`}>
+                            {completed ? <FaCheck className="h-4 w-4" /> : index + 1}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold">{label}</p>
+                            <p className="text-xs text-gray-400">
+                              {index === 0 ? 'Email + username' : index === 1 ? 'Profile details' : index === 2 ? 'Consent' : 'Verification'}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
 
-        {/* Step 4: Verification */}
-        {step === 'verification' && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-4 text-center"
-          >
-            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FaCheck className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-white">Check Your Email</h3>
-            {verificationError && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-3 text-left">
-                <p className="text-red-200 text-sm font-semibold">Verification email failed to send.</p>
-                <p className="text-red-100 text-xs break-words">{verificationError}</p>
+                  <div className="space-y-6">
+                    <AuthErrorBanner error={authError} />
+
+                    {step === 'basic' && (
+                      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                        <div className="rounded-[28px] border border-white/10 bg-[#0f1112] p-6 shadow-sm">
+                          <h3 className="text-xl font-semibold text-white">Account basics</h3>
+                          <p className="mt-2 text-sm text-gray-400">Start with your email, username and secure password.</p>
+
+                          <div className="mt-6 grid gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">Email address *</label>
+                              <input
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                placeholder="your@email.com"
+                                className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                              />
+                              {errors.email && <p className="mt-2 text-sm text-red-400">{errors.email}</p>}
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">Username *</label>
+                              <input
+                                type="text"
+                                value={formData.username}
+                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                placeholder="artistname"
+                                className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                              />
+                              {errors.username && <p className="mt-2 text-sm text-red-400">{errors.username}</p>}
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">Display name</label>
+                              <input
+                                type="text"
+                                value={formData.displayName}
+                                onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+                                placeholder="Your artist name"
+                                className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                              />
+                            </div>
+
+                            <div className="grid gap-4 sm:grid-cols-2">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">Password *</label>
+                                <div className="relative">
+                                  <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    placeholder="••••••••"
+                                    className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 pr-12 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                  >
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">Confirm password *</label>
+                                <input
+                                  type={showPassword ? 'text' : 'password'}
+                                  value={formData.confirmPassword}
+                                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                  placeholder="••••••••"
+                                  className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <Link href="/auth/artist/signin" className="text-sm text-gray-400 hover:text-white">
+                            Back to Sign In
+                          </Link>
+                          <button
+                            onClick={handleNext}
+                            className="inline-flex items-center justify-center rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-purple-500/20 transition hover:bg-purple-500"
+                          >
+                            Continue
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {step === 'artist' && (
+                      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                        <div className="rounded-[28px] border border-white/10 bg-[#0f1112] p-6 shadow-sm">
+                          <h3 className="text-xl font-semibold text-white">Artist profile</h3>
+                          <p className="mt-2 text-sm text-gray-400">Upload your avatar and share the details fans need to know.</p>
+
+                          <div className="mt-6 space-y-6">
+                            <div className="rounded-[24px] border border-white/10 bg-[#09090c] p-4">
+                              <label className="block text-sm font-medium text-gray-300">Profile Picture</label>
+                              <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+                                <div className="relative h-24 w-24 overflow-hidden rounded-full bg-[#121217] border border-white/10">
+                                  {avatarPreview ? (
+                                    <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
+                                  ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-gray-500">
+                                      <FaMusic className="h-8 w-8" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    disabled={uploading}
+                                    className="hidden"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={uploading}
+                                    className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-3 text-sm font-semibold text-black transition hover:bg-purple-500 disabled:opacity-60 disabled:cursor-not-allowed"
+                                  >
+                                    <FaCamera className="h-4 w-4" />
+                                    {uploading ? 'Uploading...' : 'Upload avatar'}
+                                  </button>
+                                  <p className="mt-3 text-xs text-gray-500">JPG, PNG, GIF • max 5MB</p>
+                                </div>
+                              </div>
+                              {errors.avatar && <p className="mt-3 text-sm text-red-400">{errors.avatar}</p>}
+                            </div>
+
+                            <div className="grid gap-4 sm:grid-cols-2">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">Artist name *</label>
+                                <input
+                                  type="text"
+                                  value={formData.artistName}
+                                  onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
+                                  placeholder="Your official artist name"
+                                  className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                                />
+                                {errors.artistName && <p className="mt-2 text-sm text-red-400">{errors.artistName}</p>}
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">Stage name *</label>
+                                <input
+                                  type="text"
+                                  value={formData.stageName}
+                                  onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
+                                  placeholder="Your performance name"
+                                  className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                                />
+                                {errors.stageName && <p className="mt-2 text-sm text-red-400">{errors.stageName}</p>}
+                              </div>
+                            </div>
+
+                            <div className="grid gap-4 sm:grid-cols-2">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">Phone number *</label>
+                                <input
+                                  type="tel"
+                                  value={formData.phoneNumber}
+                                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                                  placeholder="+260 96 123 4567"
+                                  className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                                />
+                                {errors.phoneNumber && <p className="mt-2 text-sm text-red-400">{errors.phoneNumber}</p>}
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">Date of birth *</label>
+                                <input
+                                  type="date"
+                                  value={formData.dateOfBirth}
+                                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                                  className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                                />
+                                {errors.dateOfBirth && <p className="mt-2 text-sm text-red-400">{errors.dateOfBirth}</p>}
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+                              <textarea
+                                value={formData.bio}
+                                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                                rows={3}
+                                placeholder="Tell us about your music and artistic journey..."
+                                className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">Website</label>
+                              <input
+                                type="url"
+                                value={formData.website}
+                                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                                placeholder="https://yourwebsite.com"
+                                className="w-full rounded-[24px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <button
+                            onClick={handleBack}
+                            className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm text-gray-300 transition hover:bg-white/10"
+                          >
+                            Back
+                          </button>
+                          <button
+                            onClick={handleNext}
+                            className="inline-flex items-center justify-center rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-purple-500/20 transition hover:bg-purple-500"
+                          >
+                            Continue
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {step === 'consent' && (
+                      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                        <div className="rounded-[28px] border border-white/10 bg-[#0f1112] p-6 shadow-sm">
+                          <h3 className="text-xl font-semibold text-white">Permissions & consent</h3>
+                          <p className="mt-2 text-sm text-gray-400">Review the terms that allow Fwaya to help you upload music safely.</p>
+
+                          <div className="mt-6 space-y-4">
+                            {[
+                              {
+                                id: 'terms-artist',
+                                label: 'I agree to the Terms of Service and Privacy Policy *',
+                                value: formData.acceptedTerms,
+                                onChange: (checked: boolean) => setFormData({ ...formData, acceptedTerms: checked }),
+                              },
+                              {
+                                id: 'privacy-artist',
+                                label: 'I acknowledge how my personal data will be processed *',
+                                value: formData.acceptedPrivacy,
+                                onChange: (checked: boolean) => setFormData({ ...formData, acceptedPrivacy: checked }),
+                              },
+                              {
+                                id: 'marketing-artist',
+                                label: 'I agree to receive marketing emails and promotional offers',
+                                value: formData.marketingEmails,
+                                onChange: (checked: boolean) => setFormData({ ...formData, marketingEmails: checked }),
+                              },
+                              {
+                                id: 'dataSharing-artist',
+                                label: 'I consent to my data being shared with trusted partners for service improvement',
+                                value: formData.dataSharing,
+                                onChange: (checked: boolean) => setFormData({ ...formData, dataSharing: checked }),
+                              },
+                            ].map((item) => (
+                              <label key={item.id} className="flex cursor-pointer items-start gap-3 rounded-3xl border border-white/10 bg-[#09090c] p-4">
+                                <input
+                                  type="checkbox"
+                                  checked={item.value}
+                                  onChange={(e) => item.onChange(e.target.checked)}
+                                  className="mt-1 h-4 w-4 rounded border-white/20 bg-[#0f1112] text-purple-500 focus:ring-purple-500"
+                                />
+                                <span className="text-sm text-gray-300">{item.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={handleSubmit}
+                          disabled={loading || !formData.acceptedTerms || !formData.acceptedPrivacy}
+                          className="w-full rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-purple-500/20 transition hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {loading ? 'Creating Account...' : 'Create Account'}
+                        </button>
+                        {errors.submit && <p className="text-center text-sm text-red-400">{errors.submit}</p>}
+                      </motion.div>
+                    )}
+
+                    {step === 'verification' && (
+                      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 text-center">
+                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-500/20 text-green-300">
+                          <FaCheck className="h-6 w-6" />
+                        </div>
+                        <h3 className="text-2xl font-semibold">Verify your email</h3>
+                        {verificationError && (
+                          <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-4 text-left text-sm text-red-100">
+                            <p className="font-semibold">Verification email failed to send.</p>
+                            <p className="mt-2 text-xs text-red-200 break-words">{verificationError}</p>
+                          </div>
+                        )}
+                        <p className="text-sm text-gray-400">
+                          We’ve sent a verification link to <strong className="text-white">{formData.email}</strong>.
+                        </p>
+                        <p className="text-sm text-gray-500">Click that link to activate your artist account.</p>
+                        <button
+                          type="button"
+                          onClick={handleResendVerificationEmail}
+                          disabled={resendLoading}
+                          className="mx-auto rounded-full bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-50"
+                        >
+                          {resendLoading ? 'Resending…' : 'Resend verification email'}
+                        </button>
+                        <div className="rounded-3xl border border-white/10 bg-white/5 p-4 text-xs text-gray-400">
+                          After verification, you can continue to complete your KYC and start uploading music.
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
               </div>
-            )}
-            <p className="text-sm text-gray-300">We&apos;ve sent a verification link to <strong>{formData.email}</strong></p>
-            <p className="text-sm text-gray-400">Click the link in your email to verify your account and get started.</p>
-            <button
-              type="button"
-              onClick={handleResendVerificationEmail}
-              disabled={resendLoading}
-              className="mt-4 px-5 py-2 bg-[#121517] rounded-xl text-white hover:bg-[#1f1f1f] transition-colors disabled:opacity-50"
-            >
-              {resendLoading ? 'Resending…' : 'Resend verification email'}
-            </button>
-            <div className="bg-[#121517] border border-[#121517] rounded-lg p-3 mt-4">
-              <p className="text-gray-400 text-xs">
-                <strong>Note:</strong> After email verification, you&apos;ll need to complete KYC document verification to upload music.
-              </p>
-            </div>
-          </motion.div>
-        )}
 
-        {/* Navigation Links */}
-        <div className="text-center mt-8 pt-6 border-t border-white/10">
-          <p className="text-gray-300">
-            Already have an artist account?{' '}
-            <Link href="/auth/artist/signin" className="text-[#e51f48] hover:text-[#ff4d6d] hover:underline font-semibold">
-              Sign In
-            </Link>
-          </p>
-          <div className="mt-4 flex gap-4 justify-center">
-            <Link href="/auth/user/signup" className="text-sm text-blue-600 hover:underline">
-              Listener Sign Up
-            </Link>
-            <Link href="/auth/reseller/signup" className="text-sm text-green-600 hover:underline">
-              Reseller Sign Up
-            </Link>
+              <div className="mt-8 border-t border-white/10 pt-6 text-center text-sm text-gray-400">
+                Already have an artist account?{' '}
+                <Link href="/auth/artist/signin" className="font-semibold text-white hover:text-purple-300">
+                  Sign In
+                </Link>
+              </div>
+            </motion.div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
-
-
-
-

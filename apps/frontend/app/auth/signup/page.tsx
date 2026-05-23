@@ -265,11 +265,11 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 pb-48 sm:pb-0">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 pb-40">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-black w-full max-w-3xl rounded-3xl p-8 pb-48 sm:pb-10"
+        className="relative bg-[#0d0d0d] w-full max-w-3xl rounded-[32px] p-8 pb-10 shadow-[0_25px_70px_rgba(0,0,0,0.55)] border border-white/10"
       >
         <div className="flex items-center justify-between mb-6">
           <button
@@ -290,7 +290,7 @@ export default function SignUp() {
           </button>
         </div>
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Join Fwaya</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Join Fwaya</h1>
           <p className="text-gray-400">Create your account and start your musical journey</p>
         </div>
 
@@ -471,7 +471,7 @@ export default function SignUp() {
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#1f1f1f] text-gray-200 hover:bg-[#272727] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
               >
                 Back
               </button>
@@ -496,7 +496,7 @@ export default function SignUp() {
               Additional Information
             </h2>
 
-            <div className="space-y-5">
+            <div className="bg-[#1f1f1f] border border-white/10 rounded-3xl p-5 space-y-5">
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-purple-300">Contact</p>
@@ -624,7 +624,7 @@ export default function SignUp() {
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#1f1f1f] text-gray-200 hover:bg-[#272727] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
               >
                 Back
               </button>
@@ -649,14 +649,14 @@ export default function SignUp() {
               Terms & Consent
             </h2>
 
-            <div className="p-6 space-y-4">
+            <div className="bg-[#1f1f1f] p-6 space-y-4 rounded-3xl">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#1f1f1f] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="terms" className="text-gray-300 text-sm">
                   I agree to the <a href="/terms" className="text-purple-500 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple-500 hover:underline">Privacy Policy</a>
@@ -670,7 +670,7 @@ export default function SignUp() {
                   id="privacy"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#1f1f1f] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="privacy" className="text-gray-300 text-sm">
                   I acknowledge that I have read and understood how my personal data will be processed
@@ -684,7 +684,7 @@ export default function SignUp() {
                   id="marketing"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#1f1f1f] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="marketing" className="text-gray-300 text-sm">
                   I agree to receive marketing emails and promotional offers
@@ -697,7 +697,7 @@ export default function SignUp() {
                   id="dataSharing"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#1f1f1f] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="dataSharing" className="text-gray-300 text-sm">
                   I consent to my data being shared with trusted partners for service improvement
