@@ -189,12 +189,12 @@ export default function UserSignUp() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-[#111111] w-full max-w-md rounded-[32px] p-6 shadow-[0_25px_50px_rgba(0,0,0,0.55)]"
+        className="relative bg-[#0f1112] w-full max-w-md rounded-3xl p-6 shadow-2xl"
       >
         <button
           type="button"
           onClick={() => router.push('/')}
-          className="absolute right-4 top-4 rounded-full bg-white/5 text-white hover:bg-white/10 p-2 transition-colors"
+          className="absolute right-4 top-4 rounded-full bg-[#0f1112] text-white hover:bg-[#1f1f1f] p-2 transition-colors"
         >
           <FaTimes className="w-4 h-4" />
         </button>
@@ -262,7 +262,7 @@ export default function UserSignUp() {
               type="text"
               value={formData.displayName}
               onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+              className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="Your display name"
             />
           </div>
@@ -299,7 +299,7 @@ export default function UserSignUp() {
                 type={showPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="••••••••"
               />
               {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
@@ -315,7 +315,7 @@ export default function UserSignUp() {
                 type="tel"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="+260 96 123 4567"
               />
             </div>
@@ -339,7 +339,7 @@ export default function UserSignUp() {
               Profile Picture
             </label>
             <div className="flex items-center gap-4">
-              <div className="relative w-24 h-24 rounded-full bg-white/10 border-2 border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div className="relative w-24 h-24 rounded-full bg-[#0f1112] flex items-center justify-center overflow-hidden flex-shrink-0">
                 {avatarPreview ? (
                   <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
                 ) : (
@@ -379,7 +379,7 @@ export default function UserSignUp() {
                 type="text"
                 value={formData.country}
                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="e.g., Zambia, USA, UK"
               />
             </div>
@@ -392,7 +392,7 @@ export default function UserSignUp() {
                 type="text"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="Street address"
               />
             </div>
@@ -406,7 +406,7 @@ export default function UserSignUp() {
                 id="terms"
                 checked={formData.acceptedTerms}
                 onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                className="mt-1 w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
+                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
               />
               <label htmlFor="terms" className="text-sm text-gray-300">
                 I agree to the <a href="/terms" className="text-white/80 hover:text-white hover:underline">Terms of Service</a> and <a href="/privacy" className="text-white/80 hover:text-white hover:underline">Privacy Policy</a> *
@@ -420,7 +420,7 @@ export default function UserSignUp() {
                 id="privacy"
                 checked={formData.acceptedPrivacy}
                 onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                className="mt-1 w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
+                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
               />
               <label htmlFor="privacy" className="text-sm text-gray-300">
                 I acknowledge that I have read and understood how my personal data will be processed *
@@ -434,7 +434,7 @@ export default function UserSignUp() {
                 id="marketing"
                 checked={formData.marketingEmails}
                 onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                className="mt-1 w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
+                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
               />
               <label htmlFor="marketing" className="text-sm text-gray-300">
                 I agree to receive marketing emails and promotional offers
@@ -447,7 +447,7 @@ export default function UserSignUp() {
                 id="dataSharing"
                 checked={formData.dataSharing}
                 onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                className="mt-1 w-4 h-4 text-[#e51f48] bg-white/5 border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
+                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
               />
               <label htmlFor="dataSharing" className="text-sm text-gray-300">
                 I consent to my data being shared with trusted partners for service improvement
@@ -467,10 +467,10 @@ export default function UserSignUp() {
 
         </form>
 
-        <div className="text-center mt-6 pt-4 border-t border-white/10">
+        <div className="text-center mt-6 pt-4">
           <p className="text-gray-300">
             Already have an account?{' '}
-            <a href="/auth/user/signin" className="text-[#e51f48] hover:text-[#ff4d6d] hover:underline font-semibold">
+            <a href="/auth/user/signin" className="text-purple-400 hover:text-purple-300 hover:underline font-semibold">
               Sign In
             </a>
           </p>

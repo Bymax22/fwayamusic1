@@ -49,8 +49,8 @@ function VerifyEmailContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] flex items-center justify-center p-4">
-      <div className="bg-white/5 border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
         {getStatusIcon()}
 
         <h1 className={`text-2xl font-bold mb-4 ${getStatusColor()}`}>
@@ -90,8 +90,8 @@ function VerifyEmailContent() {
 export default function VerifyEmail() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] flex items-center justify-center p-4">
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
           <FaSpinner className="w-16 h-16 text-blue-500 animate-spin mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-4 text-blue-400">
             Loading...

@@ -27,7 +27,11 @@ export function AvailabilityInput({
   error,
 }: AvailabilityInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
+    const nextValue = e.target.value;
+    onChange(nextValue);
+    if (nextValue && (field === 'email' || field === 'username')) {
+      onCheckAvailability(field, nextValue);
+    }
   };
 
   const handleBlur = () => {

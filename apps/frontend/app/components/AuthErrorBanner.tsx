@@ -26,15 +26,15 @@ export default function AuthErrorBanner({ error }: Props) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.98 }}
           transition={{ duration: 0.28, ease: 'easeOut' }}
-          className="fixed top-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 rounded-3xl bg-red-600 px-4 py-3 sm:px-5 sm:py-4 shadow-2xl"
+          className="fixed top-4 inset-x-4 z-50 max-w-lg mx-auto rounded-none bg-purple-600 px-4 py-2.5 sm:px-5 sm:py-3 shadow-2xl"
         >
           <div className="flex items-start gap-3">
             <div className="flex-1">
-              <div className="text-xs font-semibold uppercase tracking-wide text-red-100">Error</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-purple-100">Error</div>
               <div className="mt-1 text-sm text-white leading-5">{error.message}</div>
               {error.redirectTo && error.redirectLabel ? (
                 <div className="mt-3">
-                  <Link href={error.redirectTo} className="inline-flex items-center gap-2 bg-red-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-800">
+                  <Link href={error.redirectTo} className="inline-flex items-center gap-2 rounded-md bg-purple-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-purple-800">
                     {error.redirectLabel}
                   </Link>
                 </div>
@@ -45,7 +45,7 @@ export default function AuthErrorBanner({ error }: Props) {
               <button
                 aria-label="Close alert"
                 onClick={() => setVisible(false)}
-                className="inline-flex h-6 w-6 items-center justify-center text-white hover:text-red-100 text-xl"
+                className="inline-flex h-6 w-6 items-center justify-center text-white hover:text-white text-base"
               >
                 ×
               </button>

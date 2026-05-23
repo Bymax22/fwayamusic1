@@ -220,10 +220,10 @@ export default function ProducerSignUp() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/5 border border-white/10 rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
+        className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
             <Music2 className="w-8 h-8 text-purple-400" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Producer</h1>
@@ -240,8 +240,8 @@ export default function ProducerSignUp() {
                     step === s
                       ? 'bg-purple-600 text-white'
                       : index < ['basic', 'producer', 'consent', 'verification'].indexOf(step)
-                      ? 'bg-white/10 text-white'
-                      : 'bg-white/10 text-gray-400'
+                      ? 'bg-[#121517] text-white'
+                      : 'bg-[#121517] text-gray-400'
                   }`}
                 >
                   {index < ['basic', 'producer', 'consent', 'verification'].indexOf(step) ? (
@@ -259,7 +259,7 @@ export default function ProducerSignUp() {
               </div>
             ))}
           </div>
-          <div className="w-full bg-white/10 rounded-full h-2">
+          <div className="w-full bg-[#121517] rounded-full h-2">
             <div
               className="bg-purple-600 h-2 rounded-full transition-all duration-300"
               style={{
@@ -289,7 +289,7 @@ export default function ProducerSignUp() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="your@email.com"
                 />
                 {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -303,7 +303,7 @@ export default function ProducerSignUp() {
                   type="text"
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="username"
                 />
                 {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
@@ -318,7 +318,7 @@ export default function ProducerSignUp() {
                 type="text"
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="Your display name"
               />
             </div>
@@ -333,7 +333,7 @@ export default function ProducerSignUp() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
                     placeholder="••••••••"
                   />
                   <button
@@ -355,7 +355,7 @@ export default function ProducerSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="••••••••"
                 />
                 {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
@@ -365,7 +365,7 @@ export default function ProducerSignUp() {
             <div className="flex justify-between pt-4">
               <Link
                 href="/auth/producer/signin"
-                className="flex items-center gap-2 px-6 py-3 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517] transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Sign In
@@ -397,7 +397,7 @@ export default function ProducerSignUp() {
                 Profile Picture
               </label>
               <div className="flex items-center gap-4">
-                <div className="relative w-24 h-24 rounded-full bg-white/10 border-2 border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                <div className="relative w-24 h-24 rounded-full bg-[#0f1112] border border-[#121517] flex items-center justify-center overflow-hidden flex-shrink-0">
                   {avatarPreview ? (
                     <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
                   ) : (
@@ -437,7 +437,7 @@ export default function ProducerSignUp() {
                   type="text"
                   value={formData.producerName}
                   onChange={(e) => setFormData({ ...formData, producerName: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Your official producer name"
                 />
                 {errors.producerName && <p className="text-red-400 text-sm mt-1">{errors.producerName}</p>}
@@ -451,7 +451,7 @@ export default function ProducerSignUp() {
                   type="text"
                   value={formData.stageName}
                   onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Your production stage name"
                 />
                 {errors.stageName && <p className="text-red-400 text-sm mt-1">{errors.stageName}</p>}
@@ -467,7 +467,7 @@ export default function ProducerSignUp() {
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="+260 96 123 4567"
                 />
                 {errors.phoneNumber && <p className="text-red-400 text-sm mt-1">{errors.phoneNumber}</p>}
@@ -481,7 +481,7 @@ export default function ProducerSignUp() {
                   type="date"
                   value={formData.dateOfBirth}
                   onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.dateOfBirth && <p className="text-red-400 text-sm mt-1">{errors.dateOfBirth}</p>}
               </div>
@@ -495,7 +495,7 @@ export default function ProducerSignUp() {
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="Tell us about your production style and background..."
               />
             </div>
@@ -508,7 +508,7 @@ export default function ProducerSignUp() {
                 type="url"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="https://yourwebsite.com"
               />
             </div>
@@ -519,7 +519,7 @@ export default function ProducerSignUp() {
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {producerGenres.map(genre => (
-                  <label key={genre} className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition">
+                  <label key={genre} className="flex items-center gap-2 px-3 py-2 bg-[#0f1112] rounded-lg border border-[#121517] hover:bg-[#121517] cursor-pointer transition">
                     <input
                       type="checkbox"
                       checked={formData.genres.includes(genre)}
@@ -536,7 +536,7 @@ export default function ProducerSignUp() {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+                className="px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517] transition-colors"
               >
                 Back
               </button>
@@ -561,14 +561,14 @@ export default function ProducerSignUp() {
               Terms & Agreements
             </h2>
 
-            <div className="bg-white/5 rounded-xl p-6 space-y-4">
+            <div className="bg-[#121517] rounded-xl p-6 space-y-4">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms-producer"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-white/10 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
                 />
                 <label htmlFor="terms-producer" className="text-white text-sm">
                   I agree to the <a href="/terms" className="text-purple-400 hover:text-purple-300 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple-400 hover:text-purple-300 hover:underline">Privacy Policy</a> *
@@ -654,12 +654,12 @@ export default function ProducerSignUp() {
               type="button"
               onClick={handleResendVerificationEmail}
               disabled={resendLoading}
-              className="mt-4 px-5 py-2 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors disabled:opacity-50"
+              className="mt-4 px-5 py-2 bg-[#121517] rounded-xl text-white hover:bg-[#1f1f1f] transition-colors disabled:opacity-50"
             >
               {resendLoading ? 'Resending…' : 'Resend verification email'}
             </button>
-            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mt-4">
-              <p className="text-yellow-400 text-xs">
+            <div className="bg-[#121517] border border-[#121517] rounded-lg p-3 mt-4">
+              <p className="text-gray-400 text-xs">
                 <strong>Note:</strong> After email verification, you&apos;ll need to complete KYC document verification to upload beats.
               </p>
             </div>
@@ -681,7 +681,7 @@ export default function ProducerSignUp() {
             <Link href="/auth/artist/signup" className="text-sm text-purple-400 hover:underline">
               Artist Sign Up
             </Link>
-            <Link href="/auth/reseller/signup" className="text-sm text-green-400 hover:underline">
+            <Link href="/auth/reseller/signup" className="text-sm text-purple-400 hover:underline">
               Reseller Sign Up
             </Link>
           </div>

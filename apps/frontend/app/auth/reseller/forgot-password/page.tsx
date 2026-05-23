@@ -39,14 +39,14 @@ export default function ResellerForgotPassword() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-green-500/30 shadow-2xl"
+          className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-md shadow-2xl"
         >
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
               <FaCheck className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-4">Check Your Email</h1>
@@ -59,13 +59,13 @@ export default function ResellerForgotPassword() {
             <div className="space-y-3">
               <Link
                 href="/auth/reseller/signin"
-                className="w-full block px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-colors font-semibold text-center"
+                className="w-full block px-4 py-2 w-full block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors font-semibold text-center"
               >
                 Back to Reseller Sign In
               </Link>
               <button
                 onClick={() => setIsSubmitted(false)}
-                className="w-full px-4 py-2 border border-green-500/40 text-white rounded-lg hover:bg-[#0a3747] transition-colors"
+                className="w-full px-4 py-2 bg-[#0f1112] text-white rounded-lg hover:bg-[#121517] transition-colors"
               >
                 Try Another Email
               </button>
@@ -77,14 +77,14 @@ export default function ResellerForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-[#0a1f29]/40 rounded-2xl p-8 w-full max-w-md border border-green-500/30 shadow-2xl"
+        className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-md shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
             <FaStore className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Reset Your Password</h1>
@@ -100,7 +100,7 @@ export default function ResellerForgotPassword() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-[#0a3747] border border-green-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="your@email.com"
             />
             {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -109,7 +109,7 @@ export default function ResellerForgotPassword() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
           >
             {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
           </button>

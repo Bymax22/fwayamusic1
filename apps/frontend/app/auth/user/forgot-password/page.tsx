@@ -43,10 +43,10 @@ export default function UserForgotPassword() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="backdrop-blur-md bg-white/5 rounded-2xl p-8 w-full max-w-md border border-white/10 shadow-2xl"
+          className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-md shadow-2xl"
         >
           <div className="text-center">
-            <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
               <FaCheck className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-4">Check Your Email</h1>
@@ -59,13 +59,13 @@ export default function UserForgotPassword() {
             <div className="space-y-3">
               <Link
                 href="/auth/user/signin"
-                className="w-full block px-4 py-2 bg-[#e51f48] text-white rounded-lg hover:bg-[#ff4d6d] transition-colors font-semibold text-center"
+                className="w-full block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors font-semibold text-center"
               >
                 Back to Sign In
               </Link>
               <button
                 onClick={() => setIsSubmitted(false)}
-                className="w-full px-4 py-2 border border-white/10 text-white rounded-lg hover:bg-white/10 transition-colors"
+                className="w-full px-4 py-2 bg-[#0f1112] text-white rounded-lg hover:bg-[#1f1f1f] transition-colors"
               >
                 Try Another Email
               </button>
@@ -81,10 +81,10 @@ export default function UserForgotPassword() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="backdrop-blur-md bg-white/5 rounded-2xl p-8 w-full max-w-md border border-white/10 shadow-2xl"
+        className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-md shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
             <FaUser className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Reset Your Password</h1>
@@ -100,7 +100,7 @@ export default function UserForgotPassword() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+              className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="your@email.com"
             />
             {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
@@ -109,7 +109,7 @@ export default function UserForgotPassword() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
           >
             {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
           </button>
@@ -119,10 +119,10 @@ export default function UserForgotPassword() {
           )}
         </form>
 
-        <div className="text-center mt-8 pt-6 border-t border-white/10">
+        <div className="text-center mt-8 pt-6">
           <Link
             href="/auth/user/signin"
-            className="inline-flex items-center gap-2 text-white hover:underline font-semibold"
+            className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 hover:underline font-semibold"
           >
             <FaArrowLeft className="w-4 h-4" />
             Back to Sign In
