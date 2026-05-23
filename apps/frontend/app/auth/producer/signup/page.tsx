@@ -4,6 +4,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { AvailabilityInput } from '@/components/AvailabilityInput';
 import { Music2, Eye, EyeOff, Check, ArrowLeft, Camera } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -38,10 +39,10 @@ export default function ProducerSignUp() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  const [emailChecking, setEmailChecking] = useState(false);
-  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
-  const [usernameChecking, setUsernameChecking] = useState(false);
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [emailStatus, setEmailStatus] = useState<'unknown' | 'checking' | 'available' | 'taken'>('unknown');
+  const [usernameStatus, setUsernameStatus] = useState<'unknown' | 'checking' | 'available' | 'taken'>('unknown');
+  const emailTimerRef = useRef<number | null>(null);
+  const usernameTimerRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const producerGenres = [
@@ -80,6 +81,9 @@ export default function ProducerSignUp() {
     if (currentStep === 'basic') {
       if (!formData.email) newErrors.email = 'Email is required';
       else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+      else if (emailStatus === 'taken') newErrors.email = 'Email is already in use';
+      else if (emailStatus === 'checking') newErrors.email = 'Checking email availability — please wait';
+      else if (emailStatus !== 'available') newErrors.email = 'Please use an available email address';
       
       if (!formData.password) newErrors.password = 'Password is required';
       else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
@@ -87,9 +91,9 @@ export default function ProducerSignUp() {
       if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
       
       if (!formData.username) newErrors.username = 'Username is required';
-    }
-
-    if (currentStep === 'producer') {
+      else if (usernameStatus === 'taken') newErrors.username = 'Username is already taken';
+      else if (usernameStatus === 'checking') newErrors.username = 'Checking username availability — please wait';
+      else if (usernameStatus !== 'available') newErrors.username = 'Please choose an available username';
       if (!formData.producerName) newErrors.producerName = 'Producer name is required';
       if (!formData.stageName) newErrors.stageName = 'Stage/Artist name is required';
       if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
@@ -168,49 +172,46 @@ export default function ProducerSignUp() {
     }
   };
 
-  const checkAvailability = async (type: 'email' | 'username', value: string) => {
+  const checkAvailability = async (field: 'email' | 'username', value: string) => {
     if (!value) return;
     try {
-      if (type === 'email') {
-        setEmailChecking(true);
-        setEmailAvailable(null);
-      } else {
-        setUsernameChecking(true);
-        setUsernameAvailable(null);
+      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
+      if (!res.ok) {
+        if (field === 'email') setEmailStatus('unknown');
+        else setUsernameStatus('unknown');
+        return;
       }
-
-      const res = await fetch(`/api/auth/check-availability?type=${type}&value=${encodeURIComponent(value)}`);
-      const data = await res.json();
-      const available = !!data?.available;
-
-      if (type === 'email') {
-        setEmailAvailable(available);
-        setEmailChecking(false);
-        setErrors(prev => {
-          const copy = { ...prev };
-          if (!available) copy.email = 'Email is already taken';
-          else delete copy.email;
-          return copy;
-        });
+      const json = await res.json();
+      const available = Boolean(json.available);
+      if (field === 'email') {
+        setEmailStatus(available ? 'available' : 'taken');
       } else {
-        setUsernameAvailable(available);
-        setUsernameChecking(false);
-        setErrors(prev => {
-          const copy = { ...prev };
-          if (!available) copy.username = 'Username is already taken';
-          else delete copy.username;
-          return copy;
-        });
+        setUsernameStatus(available ? 'available' : 'taken');
       }
-    } catch (err) {
-      if (type === 'email') {
-        setEmailChecking(false);
-        setErrors(prev => ({ ...prev, email: 'Availability check failed' }));
-      } else {
-        setUsernameChecking(false);
-        setErrors(prev => ({ ...prev, username: 'Availability check failed' }));
-      }
+    } catch (error) {
+      if (field === 'email') setEmailStatus('unknown');
+      else setUsernameStatus('unknown');
     }
+  };
+
+  const debouncedCheckEmail = (value: string) => {
+    if (!value) {
+      setEmailStatus('unknown');
+      return;
+    }
+    setEmailStatus('checking');
+    if (emailTimerRef.current) window.clearTimeout(emailTimerRef.current);
+    emailTimerRef.current = window.setTimeout(() => checkAvailability('email', value), 400);
+  };
+
+  const debouncedCheckUsername = (value: string) => {
+    if (!value) {
+      setUsernameStatus('unknown');
+      return;
+    }
+    setUsernameStatus('checking');
+    if (usernameTimerRef.current) window.clearTimeout(usernameTimerRef.current);
+    usernameTimerRef.current = window.setTimeout(() => checkAvailability('username', value), 400);
   };
 
   const handleGenreChange = (genre: string) => {
@@ -224,9 +225,12 @@ export default function ProducerSignUp() {
 
   const handleNext = () => {
     if (step === 'basic') {
-      // Ensure in-field availability checks have passed
-      if (emailAvailable !== true || usernameAvailable !== true) {
-        setErrors(prev => ({ ...prev, submit: 'Please verify email and username availability before continuing.' }));
+      if (emailStatus === 'checking' || usernameStatus === 'checking') {
+        setErrors(prev => ({ ...prev, submit: 'Please wait for email and username availability checks to complete.' }));
+        return;
+      }
+      if (emailStatus !== 'available' || usernameStatus !== 'available') {
+        setErrors(prev => ({ ...prev, submit: 'Please choose an available email and username before continuing.' }));
         return;
       }
     }
@@ -338,53 +342,27 @@ export default function ProducerSignUp() {
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailAvailable(null); }}
-                    onBlur={() => checkAvailability('email', formData.email)}
-                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
-                    placeholder="your@email.com"
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {emailChecking ? (
-                      <div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-transparent animate-spin" />
-                    ) : emailAvailable ? (
-                      <Check className="w-4 h-4 text-green-400" />
-                    ) : null}
-                  </div>
-                </div>
-                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
-              </div>
+                <AvailabilityInput
+              label="Email Address *"
+              placeholder="your@email.com"
+              value={formData.email}
+              onChange={(value) => setFormData({ ...formData, email: value })}
+              field="email"
+              status={emailStatus}
+              onCheckAvailability={debouncedCheckEmail}
+              error={errors.email}
+            />
 
-                <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Username *
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => { setFormData({ ...formData, username: e.target.value }); setUsernameAvailable(null); }}
-                    onBlur={() => checkAvailability('username', formData.username)}
-                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
-                    placeholder="username"
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {usernameChecking ? (
-                      <div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-transparent animate-spin" />
-                    ) : usernameAvailable ? (
-                      <Check className="w-4 h-4 text-green-400" />
-                    ) : null}
-                  </div>
-                </div>
-                {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
-              </div>
+                <AvailabilityInput
+                  label="Username *"
+                  placeholder="username"
+                  value={formData.username}
+                  onChange={(value) => setFormData({ ...formData, username: value })}
+                  field="username"
+                  status={usernameStatus}
+                  onCheckAvailability={debouncedCheckUsername}
+                  error={errors.username}
+                />
             </div>
 
             <div>
@@ -751,14 +729,23 @@ export default function ProducerSignUp() {
               Sign In
             </Link>
           </p>
-          <div className="mt-4 flex gap-4 justify-center">
-            <Link href="/auth/user/signup" className="text-sm text-blue-400 hover:underline">
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/auth/user/signup"
+              className="rounded-full bg-[#1f1f1f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2c2c2c]"
+            >
               Listener Sign Up
             </Link>
-            <Link href="/auth/artist/signup" className="text-sm text-purple-400 hover:underline">
+            <Link
+              href="/auth/artist/signup"
+              className="rounded-full bg-[#1f1f1f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2c2c2c]"
+            >
               Artist Sign Up
             </Link>
-            <Link href="/auth/reseller/signup" className="text-sm text-purple-400 hover:underline">
+            <Link
+              href="/auth/reseller/signup"
+              className="rounded-full bg-[#1f1f1f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2c2c2c]"
+            >
               Reseller Sign Up
             </Link>
           </div>
