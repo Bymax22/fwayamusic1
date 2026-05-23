@@ -52,6 +52,7 @@ export function AvailabilityInput({
   };
 
   const statusColor = {
+    unknown: 'text-gray-400',
     checking: 'text-gray-400',
     available: 'text-green-500',
     taken: 'text-red-500',
