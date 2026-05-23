@@ -150,14 +150,17 @@ export default function ArtistSignUp() {
 
   const checkAvailability = async (field: 'email' | 'username', value: string) => {
     if (!value) return;
+    const checkValue = field === 'username' ? value.trim().toLowerCase() : value.trim();
     try {
-      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
+      console.log('[Artist] checkAvailability ->', field, checkValue);
+      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(checkValue)}`);
       if (!res.ok) {
         if (field === 'email') setEmailStatus('unknown');
         else setUsernameStatus('unknown');
         return;
       }
       const json = await res.json();
+      console.log('[Artist] availability response', field, json);
       const available = Boolean(json.available);
       if (field === 'email') {
         setEmailStatus(available ? 'available' : 'taken');
@@ -312,7 +315,7 @@ export default function ArtistSignUp() {
                   value={formData.displayName}
                   onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                   placeholder="Your artist name"
-                  className="w-full rounded-[12px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
 
@@ -325,7 +328,7 @@ export default function ArtistSignUp() {
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       placeholder="••••••••"
-                      className="w-full rounded-[12px] border border-white/10 bg-[#0b0c0f] px-4 py-3 pr-12 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                      className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
                       {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -340,7 +343,7 @@ export default function ArtistSignUp() {
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full rounded-[12px] border border-white/10 bg-[#0b0c0f] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
               </div>
@@ -441,7 +444,15 @@ export default function ArtistSignUp() {
 
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-400">Already have an artist account? <Link href="/auth/artist/signin" className="font-semibold text-white hover:text-purple-300">Sign In</Link></div>
+        <div className="mt-6 pt-6 border-t border-white/10">
+          <div className="text-center text-sm text-gray-400">Already have an artist account? <Link href="/auth/artist/signin" className="font-semibold text-white hover:text-purple-300">Sign In</Link></div>
+
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Link href="/auth/user/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Listener Sign Up</Link>
+            <Link href="/auth/artist/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Artist Sign Up</Link>
+            <Link href="/auth/reseller/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Reseller Sign Up</Link>
+          </div>
+        </div>
       </motion.div>
     </div>
   );

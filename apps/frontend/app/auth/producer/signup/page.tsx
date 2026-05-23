@@ -174,14 +174,17 @@ export default function ProducerSignUp() {
 
   const checkAvailability = async (field: 'email' | 'username', value: string) => {
     if (!value) return;
+    const checkValue = field === 'username' ? value.trim().toLowerCase() : value.trim();
     try {
-      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
+      console.log('[Producer] checkAvailability ->', field, checkValue);
+      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(checkValue)}`);
       if (!res.ok) {
         if (field === 'email') setEmailStatus('unknown');
         else setUsernameStatus('unknown');
         return;
       }
       const json = await res.json();
+      console.log('[Producer] availability response', field, json);
       const available = Boolean(json.available);
       if (field === 'email') {
         setEmailStatus(available ? 'available' : 'taken');

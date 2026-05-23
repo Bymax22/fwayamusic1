@@ -77,14 +77,14 @@ export function AvailabilityInput({
           onChange={handleChange}
           onBlur={handleBlur}
           disabled={disabled}
-          className={`w-full px-4 py-3 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none transition-colors ring-1 ${
+          className={`w-full px-4 py-3 rounded-xl bg-[#0f1112] text-white placeholder-gray-500 focus:outline-none transition-colors ${
             disabled
-              ? 'cursor-not-allowed opacity-70 bg-[#0b0b0b] ring-white/10'
+              ? 'cursor-not-allowed opacity-70 bg-[#0b0b0b]'
               : error || status === 'taken'
-              ? 'ring-red-500 focus:ring-red-500'
+              ? 'focus:ring-2 focus:ring-red-500'
               : status === 'available'
-              ? 'ring-emerald-500 focus:ring-emerald-500'
-              : 'ring-white/10 focus:ring-purple-500'
+              ? 'focus:ring-2 focus:ring-emerald-500'
+              : 'focus:ring-2 focus:ring-purple-500'
           }`}
         />
         {status !== 'unknown' && (
