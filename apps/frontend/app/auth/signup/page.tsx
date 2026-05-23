@@ -1,17 +1,19 @@
 "use client";
 
 import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { AvailabilityInput } from '@/components/AvailabilityInput';
+import { CountrySelect } from '@/components/CountrySelect';
+import { PhoneInput } from '@/components/PhoneInput';
 import { useRouter } from 'next/navigation';
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { ReCAPTCHA } from '@/components/ReCAPTCHA';
-import { AuthErrorInfo } from '@/lib/auth-error-utils';
+import { AuthErrorInfo, parseAuthError } from '@/lib/auth-error-utils';
 import { 
   FaUser, 
   FaMusic, 
   FaStore, 
-  
   FaCheck, 
   FaEye, 
   FaEyeSlash,
@@ -36,7 +38,6 @@ export default function SignUp() {
     role: 'USER' as SignupRole,
     phoneNumber: '',
     country: 'ZM',
-    countryCode: '+260',
     dateOfBirth: '',
     artistName: '',
     stageName: '',
@@ -73,13 +74,11 @@ export default function SignUp() {
     }
   };
 
-  // Availability checks (debounced)
   const checkAvailability = async (field: 'username'|'email', value: string) => {
     if (!value) return;
     try {
       const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
       if (!res.ok) {
-        // treat non-200 as unknown
         if (field === 'username') setUsernameStatus('unknown');
         else setEmailStatus('unknown');
         return;
@@ -94,7 +93,6 @@ export default function SignUp() {
     }
   };
 
-  // watch username
   const debouncedCheckUsername = (value: string) => {
     setUsernameStatus('checking');
     if (usernameTimerRef.current) window.clearTimeout(usernameTimerRef.current);
@@ -107,35 +105,30 @@ export default function SignUp() {
     emailTimerRef.current = window.setTimeout(() => checkAvailability('email', value), 650);
   };
 
-
   const roles = [
     {
       id: 'USER',
       title: 'Music Lover',
       description: 'Stream and discover music, create playlists, follow artists',
       icon: FaUser,
-      color: 'from-blue-500 to-cyan-500'
     },
     {
       id: 'ARTIST',
       title: 'Artist/Creator',
       description: 'Upload your music, grow your audience, earn from your creations',
       icon: FaMusic,
-      color: 'from-purple-500 to-pink-500'
     },
     {
       id: 'RESELLER',
       title: 'Reseller',
       description: 'Sell music and earn commissions, build your customer base',
       icon: FaStore,
-      color: 'from-green-500 to-emerald-500'
     },
     {
       id: 'PRODUCER',
       title: 'Producer',
       description: 'Create beats, upload productions, and manage sales on the platform',
       icon: FaMusic,
-      color: 'from-indigo-500 to-violet-500'
     }
   ];
 
@@ -171,6 +164,7 @@ export default function SignUp() {
       }
       
       if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
+      if (!formData.country) newErrors.country = 'Country is required';
       if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
     }
 
@@ -213,7 +207,6 @@ export default function SignUp() {
         ...formData,
         recaptchaToken,
       });
-      // Redirect based on user role
       switch (userData.role) {
         case 'USER':
           router.push('/dashboard');
@@ -232,11 +225,8 @@ export default function SignUp() {
       }
       setStep('verification');
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: 'An unexpected error occurred.' });
-      }
+      const parsedError = parseAuthError(error);
+      setAuthError(parsedError);
     }
   };
 
@@ -263,24 +253,28 @@ export default function SignUp() {
         : await signInWithFacebook(formData.role);
 
       router.push(getRedirectPath(currentUser.role));
-    } catch (error: unknown) { // <-- use unknown
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: 'An unexpected error occurred.' });
-      }
+    } catch (error: unknown) {
+      const parsedError = parseAuthError(error);
+      setAuthError(parsedError);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1f29] via-[#0a3747] to-[#0a1f29] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#0a1f29] rounded-2xl p-8 w-full max-w-2xl border border-[#0a3747] shadow-xl"
+        className="relative bg-[#111111] w-full max-w-2xl rounded-[32px] p-8 shadow-[0_25px_70px_rgba(0,0,0,0.55)]"
       >
+        <button
+          type="button"
+          onClick={() => router.push('/')}
+          className="absolute right-4 top-4 rounded-full bg-white/5 text-gray-200 hover:bg-white/10 p-2 transition-colors"
+        >
+          ×
+        </button>
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Join Fwaya</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Join Fwaya</h1>
           <p className="text-gray-400">Create your account and start your musical journey</p>
         </div>
 
@@ -288,19 +282,19 @@ export default function SignUp() {
 
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-4">
             {['role', 'details', 'kyc', 'consent', 'verification'].map((s, index, arr) => {
               const currentIndex = arr.indexOf(step);
               const isClickable = index <= currentIndex;
               return (
                 <div key={s} className={`flex flex-col items-center ${isClickable ? 'cursor-pointer' : ''}`} onClick={() => isClickable && setStep(s as SignupStep)}>
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                    className={`w-8 h-8 flex items-center justify-center text-sm font-semibold ${
                       step === s
-                        ? 'bg-purple-500 text-white'
+                        ? 'bg-purple-600 text-white'
                         : index < currentIndex
-                        ? 'bg-green-500 text-white'
-                        : 'bg-[#0a3747] text-gray-400'
+                        ? 'bg-[#101010] text-white'
+                        : 'bg-[#101010] text-gray-400'
                     }`}
                   >
                     {index < currentIndex ? (
@@ -309,14 +303,14 @@ export default function SignUp() {
                       index + 1
                     )}
                   </div>
-                  <span className="text-xs text-gray-400 mt-1 capitalize">{s}</span>
+                  <span className="text-xs text-gray-400 mt-2 capitalize">{s}</span>
                 </div>
               );
             })}
           </div>
-          <div className="w-full bg-[#0a3747] rounded-full h-2">
+          <div className="w-full bg-[#1f1f1f] h-1 rounded-full">
             <div
-              className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+              className="bg-purple-600 h-1 rounded-full transition-all duration-300"
               style={{
                 width: `${(['role', 'details', 'kyc', 'consent', 'verification'].indexOf(step) + 1) * 20}%`,
               }}
@@ -331,27 +325,25 @@ export default function SignUp() {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-6"
           >
-            <h2 className="text-xl font-semibold text-white text-center mb-6">
+            <h2 className="text-2xl font-semibold text-white text-center mb-8">
               Choose Your Role
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {roles.map((role) => {
                 const Icon = role.icon;
                 return (
                   <button
                     key={role.id}
                     onClick={() => setFormData({ ...formData, role: role.id as SignupRole })}
-                    className={`p-6 rounded-xl border-2 transition-all ${
+                    className={`p-6 rounded-3xl transition-all ${
                       formData.role === role.id
-                        ? `border-purple-500 bg-gradient-to-br ${role.color}`
-                        : 'border-[#0a3747] bg-[#0a3747] hover:border-purple-500'
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
+                        : 'bg-[#101010] text-gray-300 hover:bg-[#1f1f1f]'
                     }`}
                   >
-                    <Icon className={`w-8 h-8 mb-3 ${
-                      formData.role === role.id ? 'text-white' : 'text-purple-400'
-                    }`} />
-                    <h3 className="font-semibold text-white mb-2">{role.title}</h3>
-                    <p className="text-sm text-gray-300">{role.description}</p>
+                    <Icon className="w-8 h-8 mb-3" />
+                    <h3 className="font-semibold mb-2 text-lg">{role.title}</h3>
+                    <p className="text-sm">{role.description}</p>
                   </button>
                 );
               })}
@@ -359,7 +351,7 @@ export default function SignUp() {
             <div className="flex justify-end">
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 transition-colors font-semibold"
+                className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -374,71 +366,57 @@ export default function SignUp() {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
           >
-            <h2 className="text-xl font-semibold text-white text-center mb-6">
+            <h2 className="text-2xl font-semibold text-white text-center mb-8">
               Account Details
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => { setFormData({ ...formData, email: e.target.value }); debouncedCheckEmail(e.target.value); }}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                  placeholder="your@email.com"
-                />
-                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
-                {emailStatus === 'checking' && <p className="text-xs text-gray-300 mt-1">Checking availability</p>}
-                {emailStatus === 'available' && <p className="text-xs text-green-400 mt-1">Email available</p>}
-                {emailStatus === 'taken' && <p className="text-xs text-red-400 mt-1">Email already in use</p>}
-              </div>
+            <AvailabilityInput
+              label="Email Address"
+              placeholder="your@email.com"
+              value={formData.email}
+              onChange={(email) => setFormData({ ...formData, email })}
+              field="email"
+              status={emailStatus}
+              onCheckAvailability={(field, value) => {
+                if (field === 'email') debouncedCheckEmail(value);
+              }}
+              error={errors.email}
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => { setFormData({ ...formData, username: e.target.value }); debouncedCheckUsername(e.target.value); }}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                  placeholder="username"
-                />
-                {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
-                {usernameStatus === 'checking' && <p className="text-xs text-gray-300 mt-1">Checking availability</p>}
-                {usernameStatus === 'available' && <p className="text-xs text-green-400 mt-1">Username available</p>}
-                {usernameStatus === 'taken' && <p className="text-xs text-red-400 mt-1">Username already taken</p>}
-              </div>
-            </div>
+            <AvailabilityInput
+              label="Username"
+              placeholder="username"
+              value={formData.username}
+              onChange={(username) => setFormData({ ...formData, username })}
+              field="username"
+              status={usernameStatus}
+              onCheckAvailability={(field, value) => {
+                if (field === 'username') debouncedCheckUsername(value);
+              }}
+              error={errors.username}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Display Name
-              </label>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-300 mb-2">Display Name</label>
               <input
                 type="text"
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                 placeholder="Your display name"
+                className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Password
-                </label>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent pr-12"
                     placeholder="••••••••"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-10"
                   />
                   <button
                     type="button"
@@ -448,34 +426,32 @@ export default function SignUp() {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
-                {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Confirm Password
-                </label>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                   placeholder="••••••••"
+                  className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
-                {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
               </div>
             </div>
 
-            <div className="flex justify-between pt-4">
+            <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 border border-gray-600 text-gray-300 rounded-xl hover:bg-[#0a3747] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] transition-colors font-semibold"
+                className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -490,137 +466,111 @@ export default function SignUp() {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
           >
-            <h2 className="text-xl font-semibold text-white text-center mb-6">
+            <h2 className="text-2xl font-semibold text-white text-center mb-8">
               Additional Information
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Phone Number
-                </label>
-                <div className="flex gap-2">
-                  <select
-                    value={formData.countryCode}
-                    onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
-                    className="px-3 py-3 bg-[#0f1112] rounded-xl text-white"
-                  >
-                    <option value="+260">ZM +260</option>
-                    <option value="+1">US +1</option>
-                    <option value="+44">UK +44</option>
-                    <option value="+27">ZA +27</option>
-                  </select>
-                  <input
-                    type="tel"
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                    className="flex-1 px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="96 123 4567"
-                  />
-                </div>
-                {errors.phoneNumber && <p className="text-red-400 text-sm mt-1">{errors.phoneNumber}</p>}
-              </div>
+            <PhoneInput
+              label="Phone Number"
+              value={formData.phoneNumber}
+              countryCode={formData.country}
+              onPhoneChange={(phone) => setFormData({ ...formData, phoneNumber: phone })}
+              onCountryChange={(country) => setFormData({ ...formData, country })}
+              error={errors.phoneNumber}
+            />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Date of Birth
-                </label>
-                <input
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                />
-                {errors.dateOfBirth && <p className="text-red-400 text-sm mt-1">{errors.dateOfBirth}</p>}
-              </div>
+            <CountrySelect
+              label="Country"
+              value={formData.country}
+              onChange={(country) => setFormData({ ...formData, country })}
+              error={errors.country}
+            />
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-300 mb-2">Date of Birth</label>
+              <input
+                type="date"
+                value={formData.dateOfBirth}
+                onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+              {errors.dateOfBirth && <p className="text-red-500 text-xs mt-1">{errors.dateOfBirth}</p>}
             </div>
 
             {formData.role === 'ARTIST' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Artist Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.artistName}
-                    onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                    placeholder="Your official artist name"
-                  />
-                  {errors.artistName && <p className="text-red-400 text-sm mt-1">{errors.artistName}</p>}
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Artist Name</label>
+                    <input
+                      type="text"
+                      value={formData.artistName}
+                      onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
+                      placeholder="Your official artist name"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    {errors.artistName && <p className="text-red-500 text-xs mt-1">{errors.artistName}</p>}
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Stage Name</label>
+                    <input
+                      type="text"
+                      value={formData.stageName}
+                      onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
+                      placeholder="Your performance name"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    {errors.stageName && <p className="text-red-500 text-xs mt-1">{errors.stageName}</p>}
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Stage Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.stageName}
-                    onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                    placeholder="Your performance name"
-                  />
-                  {errors.stageName && <p className="text-red-400 text-sm mt-1">{errors.stageName}</p>}
-                </div>
-              </div>
-            )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Bio (Optional)</label>
+                    <textarea
+                      value={formData.bio}
+                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                      placeholder="Tell us about yourself and your music..."
+                      rows={3}
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
 
-            {formData.role === 'ARTIST' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Bio (Optional)
-                  </label>
-                  <textarea
-                    value={formData.bio}
-                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                    placeholder="Tell us about yourself and your music..."
-                    rows={3}
-                  />
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Website (Optional)</label>
+                    <input
+                      type="url"
+                      value={formData.website}
+                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                      placeholder="https://yourwebsite.com"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Website (Optional)
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                    placeholder="https://yourwebsite.com"
-                  />
-                </div>
-              </div>
+              </>
             )}
 
             {formData.role === 'RESELLER' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Business Name
-                  </label>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Business Name</label>
                   <input
                     type="text"
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
                     placeholder="Your business name"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
-                  {errors.businessName && <p className="text-red-400 text-sm mt-1">{errors.businessName}</p>}
+                  {errors.businessName && <p className="text-red-500 text-xs mt-1">{errors.businessName}</p>}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Business Type
-                  </label>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Business Type</label>
                   <select
                     value={formData.businessType}
                     onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a4a5f] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="">Select business type</option>
                     <option value="INDIVIDUAL">Individual</option>
@@ -628,21 +578,21 @@ export default function SignUp() {
                     <option value="PARTNERSHIP">Partnership</option>
                     <option value="NON_PROFIT">Non-Profit</option>
                   </select>
-                  {errors.businessType && <p className="text-red-400 text-sm mt-1">{errors.businessType}</p>}
+                  {errors.businessType && <p className="text-red-500 text-xs mt-1">{errors.businessType}</p>}
                 </div>
               </div>
             )}
 
-            <div className="flex justify-between pt-4">
+            <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 border border-gray-600 text-gray-300 rounded-xl hover:bg-[#0a3747] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] transition-colors font-semibold"
+                className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -657,24 +607,24 @@ export default function SignUp() {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-6"
           >
-            <h2 className="text-xl font-semibold text-white text-center mb-6">
+            <h2 className="text-2xl font-semibold text-white text-center mb-8">
               Terms & Consent
             </h2>
 
-            <div className="bg-[#0a3747] rounded-xl p-6 space-y-4">
+            <div className="bg-[#101010] p-6 space-y-4 rounded-3xl">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-[#e51f48] bg-[#0a1f29] border-[#0a4a5f] rounded focus:ring-[#e51f48] focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="terms" className="text-gray-300 text-sm">
-                  I agree to the <a href="/terms" className="text-[#e51f48] hover:underline">Terms of Service</a> and <a href="/privacy" className="text-[#e51f48] hover:underline">Privacy Policy</a>
+                  I agree to the <a href="/terms" className="text-purple-500 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple-500 hover:underline">Privacy Policy</a>
                 </label>
               </div>
-              {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
+              {errors.acceptedTerms && <p className="text-red-500 text-xs">{errors.acceptedTerms}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -682,13 +632,13 @@ export default function SignUp() {
                   id="privacy"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-[#e51f48] bg-[#0a1f29] border-[#0a4a5f] rounded focus:ring-[#e51f48] focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="privacy" className="text-gray-300 text-sm">
                   I acknowledge that I have read and understood how my personal data will be processed
                 </label>
               </div>
-              {errors.acceptedPrivacy && <p className="text-red-400 text-sm">{errors.acceptedPrivacy}</p>}
+              {errors.acceptedPrivacy && <p className="text-red-500 text-xs">{errors.acceptedPrivacy}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -696,7 +646,7 @@ export default function SignUp() {
                   id="marketing"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-[#e51f48] bg-[#0a1f29] border-[#0a4a5f] rounded focus:ring-[#e51f48] focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="marketing" className="text-gray-300 text-sm">
                   I agree to receive marketing emails and promotional offers
@@ -709,7 +659,7 @@ export default function SignUp() {
                   id="dataSharing"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-[#e51f48] bg-[#0a1f29] border-[#0a4a5f] rounded focus:ring-[#e51f48] focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
                 />
                 <label htmlFor="dataSharing" className="text-gray-300 text-sm">
                   I consent to my data being shared with trusted partners for service improvement
@@ -717,7 +667,6 @@ export default function SignUp() {
               </div>
             </div>
 
-            {/* reCAPTCHA */}
             <div className="flex justify-center">
               <ReCAPTCHA
                 onVerify={setRecaptchaToken}
@@ -725,19 +674,19 @@ export default function SignUp() {
                 onError={() => setErrors({ ...errors, recaptcha: 'reCAPTCHA error occurred' })}
               />
             </div>
-            {errors.recaptcha && <p className="text-red-400 text-sm text-center">{errors.recaptcha}</p>}
+            {errors.recaptcha && <p className="text-red-500 text-xs text-center">{errors.recaptcha}</p>}
 
-            <div className="flex justify-between pt-4">
+            <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 border border-gray-600 text-gray-300 rounded-xl hover:bg-[#0a3747] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
@@ -752,7 +701,7 @@ export default function SignUp() {
             animate={{ opacity: 1, x: 0 }}
             className="text-center space-y-6"
           >
-            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+            <div className="w-20 h-20 bg-green-600 flex items-center justify-center mx-auto">
               <FaCheck className="w-10 h-10 text-white" />
             </div>
             
@@ -761,7 +710,7 @@ export default function SignUp() {
                 Check Your Email!
               </h2>
               {verificationError && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-3 text-left">
+                <div className="bg-red-500/10 rounded-3xl p-3 mb-3 text-left">
                   <p className="text-red-200 text-sm font-semibold">Verification email failed to send.</p>
                   <p className="text-red-100 text-xs break-words">{verificationError}</p>
                 </div>
@@ -776,13 +725,13 @@ export default function SignUp() {
                 type="button"
                 onClick={handleResendVerificationEmail}
                 disabled={resendLoading}
-                className="mt-4 px-5 py-2 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-colors disabled:opacity-50"
+                className="mt-4 px-5 py-2 bg-[#1f1f1f] text-white hover:bg-[#2a2a2a] transition-colors disabled:opacity-50"
               >
                 {resendLoading ? 'Resending…' : 'Resend verification email'}
               </button>
             </div>
 
-            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
+            <div className="bg-yellow-600/10 rounded-3xl p-4">
               <p className="text-yellow-400 text-sm">
                 <strong>Note for Artists & Resellers:</strong> After email verification, you&lsquo;ll need to complete KYC document verification to access all platform features.
               </p>
@@ -790,52 +739,13 @@ export default function SignUp() {
 
             <button
               onClick={() => window.location.href = '/auth/signin'}
-              className="px-6 py-3 bg-[#e51f48] text-white rounded-xl hover:bg-[#ff4d6d] transition-colors font-semibold"
+              className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-colors font-semibold"
             >
               Go to Sign In
             </button>
           </motion.div>
         )}
-
-        {/* Social Sign In */}
-        {step === 'role' && (
-          <div className="mt-8 pt-8 border-t border-[#0a3747]">
-            <div className="text-center mb-4">
-              <span className="text-gray-400 text-sm">Or continue with</span>
-            </div>
-            <div className="flex gap-4">
-              <button
-                onClick={() => handleSocialSignIn('google')}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-800 rounded-xl hover:bg-gray-100 transition-colors font-medium"
-              >
-                <FaGoogle className="w-5 h-5" />
-                Google
-              </button>
-              <button
-                onClick={() => handleSocialSignIn('facebook')}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
-              >
-                <FaFacebook className="w-5 h-5" />
-                Facebook
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Sign In Link */}
-        <div className="text-center mt-8 pt-6 border-t border-[#0a3747]">
-          <p className="text-gray-400">
-            Already have an account?{' '}
-            <a href="/auth/signin" className="text-[#e51f48] hover:underline font-semibold">
-              Sign In
-            </a>
-          </p>
-        </div>
       </motion.div>
     </div>
   );
 }
-
-
-
-

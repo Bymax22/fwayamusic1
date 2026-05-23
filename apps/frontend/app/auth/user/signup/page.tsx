@@ -4,7 +4,12 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { FaUser, FaEye, FaEyeSlash, FaCamera, FaGoogle } from 'react-icons/fa';
+import { AvailabilityInput } from '@/components/AvailabilityInput';
+import { CountrySelect } from '@/components/CountrySelect';
+import { PhoneInput } from '@/components/PhoneInput';
+import { AuthErrorInfo, parseAuthError } from '@/lib/auth-error-utils';
+import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { FaUser, FaEye, FaEyeSlash, FaCamera, FaGoogle, FaTimes } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -20,7 +25,7 @@ export default function UserSignUp() {
     displayName: '',
     phoneNumber: '',
     dateOfBirth: '',
-    country: '',
+    country: 'ZM',
     address: '',
     avatarUrl: '',
     acceptedTerms: false,
@@ -31,6 +36,11 @@ export default function UserSignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
+  const [usernameStatus, setUsernameStatus] = useState<'unknown'|'checking'|'available'|'taken'>('unknown');
+  const [emailStatus, setEmailStatus] = useState<'unknown'|'checking'|'available'|'taken'>('unknown');
+  const usernameTimerRef = useRef<number | null>(null);
+  const emailTimerRef = useRef<number | null>(null);
   const uploadAvatarToCloudinary = async (file: File): Promise<string> => {
     const cloudinaryFormData = new FormData();
     cloudinaryFormData.append('file', file);
@@ -96,19 +106,48 @@ export default function UserSignUp() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const checkAvailability = async (field: 'username'|'email', value: string) => {
+    if (!value) return;
+    try {
+      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
+      if (!res.ok) {
+        if (field === 'username') setUsernameStatus('unknown');
+        else setEmailStatus('unknown');
+        return;
+      }
+      const json = await res.json();
+      const available = Boolean(json.available);
+      if (field === 'username') setUsernameStatus(available ? 'available' : 'taken');
+      else setEmailStatus(available ? 'available' : 'taken');
+    } catch (e) {
+      if (field === 'username') setUsernameStatus('unknown');
+      else setEmailStatus('unknown');
+    }
+  };
+
+  const debouncedCheckUsername = (value: string) => {
+    setUsernameStatus('checking');
+    if (usernameTimerRef.current) window.clearTimeout(usernameTimerRef.current);
+    usernameTimerRef.current = window.setTimeout(() => checkAvailability('username', value), 650);
+  };
+
+  const debouncedCheckEmail = (value: string) => {
+    setEmailStatus('checking');
+    if (emailTimerRef.current) window.clearTimeout(emailTimerRef.current);
+    emailTimerRef.current = window.setTimeout(() => checkAvailability('email', value), 650);
+  };
+
   const handleGoogleSignUp = async () => {
     setSocialLoading(true);
     setErrors({});
+    setAuthError(null);
 
     try {
       await signInWithGoogle('USER');
       router.push('/dashboard');
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: 'An unexpected error occurred.' });
-      }
+      const parsedError = parseAuthError(error);
+      setAuthError(parsedError);
     } finally {
       setSocialLoading(false);
     }
@@ -117,18 +156,14 @@ export default function UserSignUp() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.debug('User signup form submitted:', {
-      email: formData.email,
-      username: formData.username,
-      avatarUrl: formData.avatarUrl,
-    });
-
     const newErrors: Record<string, string> = {};
     if (!formData.email) newErrors.email = 'Email is required';
     if (!formData.password) newErrors.password = 'Password is required';
     if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     if (!formData.username) newErrors.username = 'Username is required';
+    if (usernameStatus === 'taken') newErrors.username = 'Username is already taken';
+    if (emailStatus === 'taken') newErrors.email = 'Email is already in use';
     if (!formData.acceptedTerms) newErrors.acceptedTerms = 'You must accept the terms and conditions';
     if (!formData.acceptedPrivacy) newErrors.acceptedPrivacy = 'You must accept the privacy policy';
 
@@ -144,11 +179,8 @@ export default function UserSignUp() {
       });
       router.push('/dashboard');
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setErrors({ submit: error.message });
-      } else {
-        setErrors({ submit: 'An unexpected error occurred.' });
-      }
+      const parsedError = parseAuthError(error);
+      setAuthError(parsedError);
     }
   };
 
@@ -157,62 +189,69 @@ export default function UserSignUp() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/5 rounded-2xl p-8 w-full max-w-md border border-white/10 shadow-2xl"
+        className="relative bg-[#111111] w-full max-w-md rounded-[32px] p-6 shadow-[0_25px_50px_rgba(0,0,0,0.55)]"
       >
+        <button
+          type="button"
+          onClick={() => router.push('/')}
+          className="absolute right-4 top-4 rounded-full bg-white/5 text-white hover:bg-white/10 p-2 transition-colors"
+        >
+          <FaTimes className="w-4 h-4" />
+        </button>
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#0d0d0d] rounded-full flex items-center justify-center mx-auto mb-4">
             <FaUser className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Listener</h1>
-          <p className="text-gray-300">Create your music listener account</p>
+          <p className="text-gray-400">Create your music listener account</p>
         </div>
+
+        <AuthErrorBanner error={authError} />
 
         <div className="mb-6">
           <button
             type="button"
             onClick={handleGoogleSignUp}
             disabled={loading || socialLoading}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[#4285F4] text-white font-semibold hover:bg-[#357ae8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FaGoogle className="w-5 h-5" />
             Continue with Google
           </button>
           <div className="flex items-center gap-3 mt-4 text-xs text-gray-400">
-            <span className="h-px flex-1 bg-white/10" />
+            <span className="h-px flex-1 bg-[#1f1f1f]" />
             <span>or continue with your email</span>
-            <span className="h-px flex-1 bg-white/10" />
+            <span className="h-px flex-1 bg-[#1f1f1f]" />
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-white mb-1">
-                Email Address *
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                placeholder="your@email.com"
-              />
-              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
-            </div>
+            <AvailabilityInput
+              label="Email Address"
+              placeholder="your@email.com"
+              value={formData.email}
+              onChange={(email) => setFormData({ ...formData, email })}
+              field="email"
+              status={emailStatus}
+              onCheckAvailability={(field, value) => {
+                if (field === 'email') debouncedCheckEmail(value);
+              }}
+              error={errors.email}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-white mb-1">
-                Username *
-              </label>
-              <input
-                type="text"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
-                placeholder="username"
-              />
-              {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
-            </div>
+            <AvailabilityInput
+              label="Username"
+              placeholder="username"
+              value={formData.username}
+              onChange={(username) => setFormData({ ...formData, username })}
+              field="username"
+              status={usernameStatus}
+              onCheckAvailability={(field, value) => {
+                if (field === 'username') debouncedCheckUsername(value);
+              }}
+              error={errors.username}
+            />
           </div>
 
           <div>
@@ -238,7 +277,7 @@ export default function UserSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent pr-10"
+                  className="w-full px-3 py-2 rounded-3xl bg-[#101010] ring-1 ring-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-10"
                   placeholder="••••••••"
                 />
                 <button
@@ -289,7 +328,7 @@ export default function UserSignUp() {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                className="w-full px-3 py-2 rounded-3xl bg-[#101010] ring-1 ring-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -360,7 +399,7 @@ export default function UserSignUp() {
           </div>
 
           {/* Consent Section */}
-          <div className="bg-white/10 rounded-lg p-4 space-y-3 border border-white/10">
+          <div className="bg-[#0e0e0e] rounded-3xl p-4 space-y-3">
             <div className="flex items-start gap-3">
               <input
                 type="checkbox"
