@@ -29,8 +29,8 @@ export class AuthController {
   }
 
   @Get('check-availability')
-  async checkAvailability(@Query('email') email?: string, @Query('username') username?: string) {
-    return this.authService.checkAvailability(email, username);
+  async checkAvailability(@Query('field') field?: string, @Query('value') value?: string) {
+    return this.authService.checkAvailability(field, value);
   }
 
   @Post('social-login')

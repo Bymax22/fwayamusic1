@@ -75,6 +75,9 @@ export default function ArtistSignUp() {
       else if (usernameStatus === 'taken') newErrors.username = 'Username is already taken';
       else if (usernameStatus === 'checking') newErrors.username = 'Checking username availability — please wait';
       else if (usernameStatus !== 'available') newErrors.username = 'Please choose an available username';
+    }
+
+    if (currentStep === 'artist') {
       if (!formData.artistName) newErrors.artistName = 'Artist name is required';
       if (!formData.stageName) newErrors.stageName = 'Stage/Artist name is required';
       if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';

@@ -150,23 +150,25 @@ export class AuthService {
     }
   }
 
-  async checkAvailability(email?: string, username?: string) {
-    const result = {
-      emailTaken: false,
-      usernameTaken: false,
-    };
-
-    if (email) {
-      const existingByEmail = await this.prisma.user.findUnique({ where: { email } });
-      result.emailTaken = Boolean(existingByEmail);
+  async checkAvailability(field?: string, value?: string) {
+    if (!field || !value) {
+      return { available: true };
     }
 
-    if (username) {
-      const existingByUsername = await this.prisma.user.findUnique({ where: { username } });
-      result.usernameTaken = Boolean(existingByUsername);
+    try {
+      if (field === 'email') {
+        const existing = await this.prisma.user.findUnique({ where: { email: value } });
+        return { available: !existing };
+      } else if (field === 'username') {
+        const existing = await this.prisma.user.findUnique({ where: { username: value } });
+        return { available: !existing };
+      }
+    } catch (error) {
+      console.error('Check availability error:', error);
+      return { available: true };
     }
 
-    return result;
+    return { available: true };
   }
 
   /**
