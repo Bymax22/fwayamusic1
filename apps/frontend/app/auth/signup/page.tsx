@@ -17,6 +17,8 @@ import {
   FaCheck, 
   FaEye, 
   FaEyeSlash,
+  FaChevronLeft,
+  FaTimes,
   FaGoogle,
   FaFacebook
 } from 'react-icons/fa';
@@ -148,8 +150,10 @@ export default function SignUp() {
       else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) newErrors.username = 'Username can only contain letters, numbers, and underscores';
       else if (usernameStatus === 'taken') newErrors.username = 'Username is already taken';
       else if (usernameStatus === 'checking') newErrors.username = 'Checking username availability — please wait';
+      else if (usernameStatus !== 'available') newErrors.username = 'Please choose an available username';
       if (emailStatus === 'taken') newErrors.email = 'Email is already in use';
       else if (emailStatus === 'checking') newErrors.email = 'Checking email availability — please wait';
+      else if (emailStatus !== 'available') newErrors.email = 'Please use an available email address';
     }
 
     if (currentStep === 'kyc') {
@@ -194,6 +198,7 @@ export default function SignUp() {
     if (step === 'details') setStep('role');
     else if (step === 'kyc') setStep('details');
     else if (step === 'consent') setStep('kyc');
+    else if (step === 'verification') setStep('consent');
   };
 
   const handleSubmit = async () => {
@@ -260,19 +265,30 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 pb-28">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-[#111111] w-full max-w-2xl rounded-[32px] p-8 shadow-[0_25px_70px_rgba(0,0,0,0.55)]"
+        className="relative bg-[#111111] w-full max-w-3xl rounded-[32px] p-8 pb-10 shadow-[0_25px_70px_rgba(0,0,0,0.55)]"
       >
-        <button
-          type="button"
-          onClick={() => router.push('/')}
-          className="absolute right-4 top-4 rounded-full bg-white/5 text-gray-200 hover:bg-white/10 p-2 transition-colors"
-        >
-          ×
-        </button>
+        <div className="flex items-center justify-between mb-6">
+          <button
+            type="button"
+            onClick={handleBack}
+            disabled={step === 'role'}
+            className="flex items-center gap-2 text-gray-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <FaChevronLeft className="w-5 h-5" />
+            <span className="hidden sm:inline text-sm">Back</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            className="rounded-full bg-white/5 text-gray-200 hover:bg-white/10 p-2 transition-colors"
+          >
+            <FaTimes className="w-5 h-5" />
+          </button>
+        </div>
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Join Fwaya</h1>
           <p className="text-gray-400">Create your account and start your musical journey</p>
@@ -390,11 +406,21 @@ export default function SignUp() {
               onChange={(username) => setFormData({ ...formData, username })}
               field="username"
               status={usernameStatus}
+              disabled={formData.email !== '' && emailStatus !== 'available'}
               onCheckAvailability={(field, value) => {
                 if (field === 'username') debouncedCheckUsername(value);
               }}
               error={errors.username}
             />
+            {formData.email && emailStatus !== 'available' && (
+              <p className={`text-xs mt-1 ${emailStatus === 'taken' ? 'text-red-500' : 'text-gray-400'}`}>
+                {emailStatus === 'taken'
+                  ? 'This email is already in use. Please choose a different address.'
+                  : emailStatus === 'checking'
+                  ? 'Checking email availability before you can choose a username...'
+                  : 'Confirm your email availability to continue.'}
+              </p>
+            )}
 
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-2">Display Name</label>
@@ -470,21 +496,33 @@ export default function SignUp() {
               Additional Information
             </h2>
 
-            <PhoneInput
-              label="Phone Number"
-              value={formData.phoneNumber}
-              countryCode={formData.country}
-              onPhoneChange={(phone) => setFormData({ ...formData, phoneNumber: phone })}
-              onCountryChange={(country) => setFormData({ ...formData, country })}
-              error={errors.phoneNumber}
-            />
+            <div className="bg-[#101010] border border-white/10 rounded-3xl p-5 space-y-5">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.24em] text-purple-300">Contact</p>
+                  <h3 className="text-lg font-semibold text-white">Country & phone</h3>
+                </div>
+                <p className="text-xs text-gray-400">Dropdown selection on mobile and desktop</p>
+              </div>
 
-            <CountrySelect
-              label="Country"
-              value={formData.country}
-              onChange={(country) => setFormData({ ...formData, country })}
-              error={errors.country}
-            />
+              <div className="grid grid-cols-1 gap-4">
+                <PhoneInput
+                  label="Phone Number"
+                  value={formData.phoneNumber}
+                  countryCode={formData.country}
+                  onPhoneChange={(phone) => setFormData({ ...formData, phoneNumber: phone })}
+                  onCountryChange={(country) => setFormData({ ...formData, country })}
+                  error={errors.phoneNumber}
+                />
+
+                <CountrySelect
+                  label="Country"
+                  value={formData.country}
+                  onChange={(country) => setFormData({ ...formData, country })}
+                  error={errors.country}
+                />
+              </div>
+            </div>
 
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-2">Date of Birth</label>

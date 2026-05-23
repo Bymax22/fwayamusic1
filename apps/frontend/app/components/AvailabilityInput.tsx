@@ -12,6 +12,7 @@ interface AvailabilityInputProps {
   status: 'unknown' | 'checking' | 'available' | 'taken';
   onCheckAvailability: (field: 'email' | 'username', value: string) => void;
   onBlur?: () => void;
+  disabled?: boolean;
   error?: string;
 }
 
@@ -24,6 +25,7 @@ export function AvailabilityInput({
   status,
   onCheckAvailability,
   onBlur,
+  disabled,
   error,
 }: AvailabilityInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,8 +76,11 @@ export function AvailabilityInput({
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
+          disabled={disabled}
           className={`w-full px-4 py-3 rounded-3xl bg-[#101010] text-white placeholder-gray-500 focus:outline-none transition-colors ring-1 ${
-            error || status === 'taken'
+            disabled
+              ? 'cursor-not-allowed opacity-70 bg-[#0b0b0b] ring-white/10'
+              : error || status === 'taken'
               ? 'ring-red-500 focus:ring-red-500'
               : status === 'available'
               ? 'ring-emerald-500 focus:ring-emerald-500'

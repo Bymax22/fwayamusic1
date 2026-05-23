@@ -26,12 +26,12 @@ export default function AuthErrorBanner({ error }: Props) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.98 }}
           transition={{ duration: 0.28, ease: 'easeOut' }}
-          className="fixed top-4 inset-x-4 z-50 max-w-lg mx-auto rounded-none bg-purple-600 px-4 py-2.5 sm:px-5 sm:py-3 shadow-2xl"
+          className="fixed top-4 inset-x-4 z-50 max-w-lg mx-auto rounded-3xl bg-purple-600/95 border border-white/10 px-4 py-2 sm:px-5 sm:py-2 shadow-2xl backdrop-blur-sm"
         >
           <div className="flex items-start gap-3">
             <div className="flex-1">
-              <div className="text-xs font-semibold uppercase tracking-wide text-purple-100">Error</div>
-              <div className="mt-1 text-sm text-white leading-5">{error.message}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.3em] text-purple-100">Error</div>
+              <div className="mt-1 text-sm sm:text-sm text-white leading-5">{error.message}</div>
               {error.redirectTo && error.redirectLabel ? (
                 <div className="mt-3">
                   <Link href={error.redirectTo} className="inline-flex items-center gap-2 rounded-md bg-purple-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-purple-800">
