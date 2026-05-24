@@ -30,6 +30,7 @@ type SignupStep = 'role' | 'details' | 'kyc' | 'consent' | 'verification';
 export default function SignUp() {
   const { signUp, signInWithGoogle, signInWithFacebook, sendOTP, verificationError, clearVerificationError, loading } = useAuth();
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
   const [step, setStep] = useState<SignupStep>('role');
   const [formData, setFormData] = useState({
     email: '',
@@ -80,7 +81,8 @@ export default function SignUp() {
   const checkAvailability = async (field: 'username'|'email', value: string) => {
     if (!value) return;
     try {
-      const res = await fetch(`${API_URL}/api/v1/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
+      const baseUrl = API_URL || '';
+      const res = await fetch(`${baseUrl}/api/v1/auth/check-availability?field=${field}&value=${encodeURIComponent(value)}`);
       if (!res.ok) {
         if (field === 'username') setUsernameStatus('unknown');
         else setEmailStatus('unknown');
