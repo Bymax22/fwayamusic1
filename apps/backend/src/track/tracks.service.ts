@@ -17,7 +17,7 @@ export class TracksService {
       where,
       include: {
         album: true,
-        collaborations: {
+        collaborators: {
           include: {
             producer: {
               select: {
@@ -27,10 +27,6 @@ export class TracksService {
               },
             },
           },
-        },
-        analytics: {
-          orderBy: { date: 'desc' },
-          take: 30,
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -52,15 +48,9 @@ export class TracksService {
             avatarUrl: true,
           },
         },
-        producer: {
-          select: {
-            id: true,
-            displayName: true,
-            username: true,
-          },
-        },
+        // top-level producer relation removed; use collaborators to access producers
         album: true,
-        collaborations: {
+        collaborators: {
           include: {
             producer: {
               select: {
@@ -72,9 +62,6 @@ export class TracksService {
           },
         },
         contentModerations: true,
-        analytics: {
-          orderBy: { date: 'desc' },
-        },
       },
     });
 
@@ -104,7 +91,7 @@ export class TracksService {
       data: updateData,
       include: {
         album: true,
-        collaborations: true,
+        collaborators: true,
       },
     });
 
@@ -270,11 +257,6 @@ export class TracksService {
       throw new ForbiddenException('You can only view analytics for your own tracks');
     }
 
-    const analytics = await this.prisma.trackAnalytics.findMany({
-      where: { mediaId: trackId },
-      orderBy: { date: 'desc' },
-    });
-
     const totalStats = {
       totalPlays: track.playCount,
       totalDownloads: track.downloadCount,
@@ -291,7 +273,7 @@ export class TracksService {
         accessType: track.accessType,
       },
       totalStats,
-      dailyAnalytics: analytics,
+      dailyAnalytics: [],
     };
   }
 

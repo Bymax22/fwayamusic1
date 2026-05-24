@@ -38,7 +38,7 @@ export class ArtistDashboardController {
         where: { userId: user.id, deletedAt: null },
       }),
       this.prisma.album.count({
-        where: { artistId: user.id, deletedAt: null },
+        where: { userId: user.id },
       }),
       this.prisma.follower.count({
         where: { followingId: user.id },
@@ -195,7 +195,7 @@ export class ArtistDashboardController {
   @ApiBearerAuth()
   async getPendingModeration(@Request() req: any) {
     const moderations = await this.prisma.contentModeration.findMany({
-      where: { creatorId: req.user.id },
+      where: { contentCreatorId: req.user.id },
       include: {
         media: {
           select: {
@@ -242,7 +242,7 @@ export class ArtistDashboardController {
           },
         },
       },
-      orderBy: { requestedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
 
     return collaborations;
@@ -268,8 +268,8 @@ export class ArtistDashboardController {
     return this.prisma.producerCollaboration.update({
       where: { id: parseInt(id) },
       data: {
-        status: 'APPROVED',
-        respondedAt: new Date(),
+        isConfirmed: true,
+        confirmedAt: new Date(),
       },
     });
   }
@@ -293,8 +293,8 @@ export class ArtistDashboardController {
     return this.prisma.producerCollaboration.update({
       where: { id: parseInt(id) },
       data: {
-        status: 'REJECTED',
-        respondedAt: new Date(),
+        isConfirmed: false,
+        confirmedAt: new Date(),
       },
     });
   }

@@ -21,10 +21,30 @@ export class AlbumsService {
       cloudinaryId?: string;
     },
   ) {
+    const {
+      title,
+      description,
+      genre,
+      tags,
+      releaseDate,
+      recordLabel,
+      copyrightYear,
+      coverImageUrl,
+      cloudinaryId,
+    } = data;
+
     const album = await this.prisma.album.create({
       data: {
-        ...data,
-        artistId,
+        title,
+        description,
+        genre,
+        tags,
+        releaseDate,
+        recordLabel,
+        copyrightYear,
+        coverUrl: coverImageUrl,
+        cloudinaryPublicId: cloudinaryId,
+        userId: artistId,
         contentStatus: ContentStatus.DRAFT,
       },
       include: {
@@ -39,9 +59,9 @@ export class AlbumsService {
 
   // Get all albums for an artist
   async getArtistAlbums(artistId: number, includeDeleted = false) {
-    const where: any = { artistId };
+    const where: any = { userId: artistId };
     if (!includeDeleted) {
-      where.deletedAt = null;
+      // albums table does not track deletedAt; filter media instead when needed
     }
 
     const albums = await this.prisma.album.findMany({
@@ -51,7 +71,7 @@ export class AlbumsService {
           where: { deletedAt: null },
           orderBy: { createdAt: 'asc' },
         },
-        artist: {
+        user: {
           select: {
             id: true,
             displayName: true,
@@ -75,13 +95,13 @@ export class AlbumsService {
           where: { deletedAt: null },
           orderBy: { createdAt: 'asc' },
         },
-        artist: {
+        user: {
           select: {
             id: true,
             displayName: true,
             username: true,
             avatarUrl: true,
-            verified: true,
+            verifiedArtist: true,
           },
         },
       },
@@ -109,12 +129,23 @@ export class AlbumsService {
     }
 
     // Check authorization
-    if (album.artistId !== userId) {
+    if (album.userId !== userId) {
       throw new ForbiddenException('You can only edit your own albums');
     }
 
     // Don't allow status changes through normal update
-    const { contentStatus, ...updateData } = data;
+    const {
+      contentStatus,
+      coverImageUrl,
+      cloudinaryId,
+      ...rest
+    } = data;
+
+    const updateData: any = {
+      ...rest,
+      ...(coverImageUrl !== undefined ? { coverUrl: coverImageUrl } : {}),
+      ...(cloudinaryId !== undefined ? { cloudinaryPublicId: cloudinaryId } : {}),
+    };
 
     const updated = await this.prisma.album.update({
       where: { id: albumId },
@@ -133,13 +164,18 @@ export class AlbumsService {
   async publishAlbum(albumId: number, userId: number) {
     const album = await this.prisma.album.findUnique({
       where: { id: albumId },
+      include: {
+        media: {
+          where: { deletedAt: null },
+        },
+      },
     });
 
     if (!album) {
       throw new NotFoundException('Album not found');
     }
 
-    if (album.artistId !== userId) {
+    if (album.userId !== userId) {
       throw new ForbiddenException('You can only publish your own albums');
     }
 
@@ -151,7 +187,7 @@ export class AlbumsService {
       where: { id: albumId },
       data: {
         contentStatus: ContentStatus.PUBLISHED,
-        isVisible: true,
+        isPublic: true,
       },
     });
 
@@ -168,7 +204,7 @@ export class AlbumsService {
       throw new NotFoundException('Album not found');
     }
 
-    if (album.artistId !== userId) {
+    if (album.userId !== userId) {
       throw new ForbiddenException('You can only submit your own albums');
     }
 
@@ -190,7 +226,7 @@ export class AlbumsService {
       throw new NotFoundException('Album not found');
     }
 
-    if (album.artistId !== userId) {
+    if (album.userId !== userId) {
       throw new ForbiddenException('You can only archive your own albums');
     }
 
@@ -198,7 +234,7 @@ export class AlbumsService {
       where: { id: albumId },
       data: {
         contentStatus: ContentStatus.ARCHIVED,
-        isVisible: false,
+        isPublic: false,
       },
     });
 
@@ -219,7 +255,7 @@ export class AlbumsService {
       throw new NotFoundException('Album not found');
     }
 
-    if (album.artistId !== userId) {
+    if (album.userId !== userId) {
       throw new ForbiddenException('You can only delete your own albums');
     }
 
@@ -227,10 +263,8 @@ export class AlbumsService {
     await this.prisma.album.update({
       where: { id: albumId },
       data: {
-        deletedAt: new Date(),
-        deletionReason: reason,
         contentStatus: ContentStatus.DELETED,
-        isVisible: false,
+        isPublic: false,
       },
     });
 
@@ -262,15 +296,15 @@ export class AlbumsService {
       throw new NotFoundException('Album not found');
     }
 
-    if (album.artistId !== userId) {
+    if (album.userId !== userId) {
       throw new ForbiddenException('You can only update your own album cover');
     }
 
     const updated = await this.prisma.album.update({
       where: { id: albumId },
       data: {
-        coverImageUrl,
-        cloudinaryId,
+        coverUrl: coverImageUrl,
+        cloudinaryPublicId: cloudinaryId,
       },
     });
 
@@ -320,7 +354,7 @@ export class AlbumsService {
       throw new NotFoundException('Album not found');
     }
 
-    if (album.artistId !== userId) {
+    if (album.userId !== userId) {
       throw new ForbiddenException('You can only add tracks to your own albums');
     }
 
@@ -350,7 +384,7 @@ export class AlbumsService {
       throw new NotFoundException('Album not found');
     }
 
-    if (album.artistId !== userId) {
+    if (album.userId !== userId) {
       throw new ForbiddenException('You can only modify your own albums');
     }
 
