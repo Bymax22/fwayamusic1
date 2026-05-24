@@ -2,6 +2,7 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Music2, BarChart2, Users, Download, Settings, 
   PlusCircle, Edit3, Trash2, DollarSign, 
@@ -73,7 +74,17 @@ interface SoundResource {
 }
 
 export default function ProducerPage() {
-  const { user } = useAuth();
+  const { user, getToken } = useAuth();
+  const router = useRouter();
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '') || '';
+
+  const getAuthHeaders = async (): Promise<Record<string, string>> => {
+    const token = await getToken();
+    const headers: Record<string, string> = {};
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return headers;
+  };
+
   const [activeTab, setActiveTab] = useState<'dashboard' | 'beats' | 'packs' | 'analytics' | 'resources'>('dashboard');
   const [stats, setStats] = useState<ProducerStats | null>(null);
   const [beats, setBeats] = useState<Beat[]>([]);
@@ -136,32 +147,29 @@ export default function ProducerPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!user?.id) return;
       try {
         setIsLoading(true);
-        // Fetch producer stats
-        const statsResponse = await fetch('/api/v1/producer/stats');
+        const headers = await getAuthHeaders();
+
+        // Producer stats and content should use the authenticated producer APIs
+        const statsResponse = await fetch(`${backendUrl || ''}/api/v1/beats/producer/${user.id}/stats`, {
+          headers,
+        });
         if (statsResponse.ok) {
           setStats(await statsResponse.json());
         }
 
-        // Fetch producer beats
-        const beatsResponse = await fetch('/api/v1/beats');
+        const beatsResponse = await fetch(`${backendUrl || ''}/api/v1/beats/producer/${user.id}/beats`, {
+          headers,
+        });
         if (beatsResponse.ok) {
-          const beatsData = await beatsResponse.json();
-          setBeats(Array.isArray(beatsData) ? beatsData : beatsData.data || []);
+          setBeats(await beatsResponse.json());
         }
 
-        // Fetch beat packs
-        const packsResponse = await fetch('/api/v1/producer/beat-packs');
-        if (packsResponse.ok) {
-          setBeatPacks(await packsResponse.json());
-        }
-
-        // Fetch sound resources
-        const resourcesResponse = await fetch('/api/v1/producer/sound-resources');
-        if (resourcesResponse.ok) {
-          setSoundResources(await resourcesResponse.json());
-        }
+        // Beat packs and resources are not available yet, leave as empty arrays for now
+        setBeatPacks([]);
+        setSoundResources([]);
       } catch (error) {
         console.error('Error fetching producer data:', error);
       } finally {
@@ -170,7 +178,7 @@ export default function ProducerPage() {
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -217,36 +225,44 @@ export default function ProducerPage() {
       formData.append('genre', newBeat.genre);
       formData.append('bpm', newBeat.bpm);
       formData.append('key', newBeat.key);
-      formData.append('price', newBeat.price);
+      if (newBeat.price) {
+        formData.append('price', newBeat.price);
+      }
       formData.append('accessType', newBeat.accessType);
       formData.append('file', newBeat.file);
       if (newBeat.coverFile) {
         formData.append('coverFile', newBeat.coverFile);
       }
 
-      const response = await fetch('/api/v1/beats', {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${backendUrl || ''}/api/v1/beats`, {
         method: 'POST',
+        headers,
         body: formData,
       });
 
-      if (response.ok) {
-        const uploadedBeat = await response.json();
-        setBeats([uploadedBeat, ...beats]);
-        setShowUploadModal(false);
-        setNewBeat({
-          title: '',
-          description: '',
-          genre: '',
-          bpm: '',
-          key: '',
-          price: '',
-          accessType: 'FREE',
-          file: null,
-          coverFile: null,
-          coverPreview: null,
-        });
-        alert('Beat uploaded successfully!');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Upload failed');
       }
+
+      const uploadedBeat = await response.json();
+      setBeats([uploadedBeat, ...beats]);
+      setShowUploadModal(false);
+      setNewBeat({
+        title: '',
+        description: '',
+        genre: '',
+        bpm: '',
+        key: '',
+        price: '',
+        accessType: 'FREE',
+        file: null,
+        coverFile: null,
+        coverPreview: null,
+      });
+      setUploadProgress(100);
+      alert('Beat uploaded successfully!');
     } catch (error) {
       console.error('Upload error:', error);
       alert('Failed to upload beat');
@@ -258,14 +274,20 @@ export default function ProducerPage() {
   const handleDeleteBeat = async (beatId: number) => {
     if (window.confirm('Are you sure you want to delete this beat?')) {
       try {
-        const response = await fetch(`/api/v1/beats/${beatId}`, {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${backendUrl || ''}/api/v1/beats/${beatId}`, {
           method: 'DELETE',
+          headers,
         });
 
         if (response.ok) {
           setBeats(beats.filter(b => b.id !== beatId));
           alert('Beat deleted successfully');
+          return;
         }
+
+        const errorText = await response.text();
+        throw new Error(errorText || 'Delete failed');
       } catch (error) {
         console.error('Delete error:', error);
         alert('Failed to delete beat');
@@ -299,10 +321,15 @@ export default function ProducerPage() {
     alert('Share link copied to clipboard!');
   };
 
+  const handleComingSoon = (feature: string) => {
+    alert(`${feature} is coming soon. Stay tuned!`);
+  };
+
   return (
     <RoleGuard allowedRoles={["PRODUCER"]}>
       <div className="min-h-screen bg-black text-white">
         <div className="relative overflow-hidden">
+          <DashboardHeader />
           <div className="relative p-6 max-w-7xl mx-auto pb-32">
             {/* Header */}
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
@@ -317,13 +344,22 @@ export default function ProducerPage() {
                   Manage your beat library, track sales, and grow your fanbase
                 </p>
               </div>
-              <button
-                onClick={() => setShowUploadModal(true)}
-                className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-500"
-              >
-                <PlusCircle className="w-5 h-5" />
-                Upload Beat
-              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => router.push('/settings')}
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition hover:bg-slate-800"
+                >
+                  <Settings className="w-5 h-5" />
+                  Settings
+                </button>
+                <button
+                  onClick={() => setShowUploadModal(true)}
+                  className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-500"
+                >
+                  <PlusCircle className="w-5 h-5" />
+                  Upload Beat
+                </button>
+              </div>
             </div>
 
             {/* Tab Navigation */}
@@ -485,7 +521,7 @@ export default function ProducerPage() {
                               Share
                             </button>
                             <button
-                              onClick={() => setEditingBeat(beat)}
+                              onClick={() => handleComingSoon('Beat editing')}
                               className="flex-1 px-3 py-2 text-sm rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 transition flex items-center justify-center gap-1"
                             >
                               <Edit3 className="w-4 h-4" />
@@ -511,7 +547,10 @@ export default function ProducerPage() {
               <div className="grid gap-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold text-white">Beat Packs</h2>
-                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition">
+                  <button
+                    onClick={() => handleComingSoon('Beat pack creation')}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition"
+                  >
                     <PlusCircle className="w-4 h-4" />
                     Create Pack
                   </button>
@@ -555,7 +594,10 @@ export default function ProducerPage() {
               <div className="grid gap-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold text-white">Sound Resources</h2>
-                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition">
+                  <button
+                    onClick={() => handleComingSoon('Resource upload')}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition"
+                  >
                     <PlusCircle className="w-4 h-4" />
                     Add Resource
                   </button>
