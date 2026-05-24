@@ -1,13 +1,14 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
-import { Prisma, MediaType, MediaAccessType } from '@prisma/client';
+import { Prisma, MediaType, MediaAccessType, UserRole } from '@prisma/client';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class MediaService {
   private readonly logger = new Logger(MediaService.name);
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(private readonly prisma: PrismaService, private readonly notificationService: NotificationService) {
     try {
       cloudinary.config({
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -104,6 +105,14 @@ export class MediaService {
         }
       }
 
+      if (createMediaDto.accessType === 'PREMIUM') {
+        const uploader = await this.prisma.user.findUnique({ where: { id: userId } });
+        const allowedRoles: UserRole[] = [UserRole.ARTIST, UserRole.PRODUCER];
+        if (!uploader || !uploader.isPremium || !uploader.premiumUntil || uploader.premiumUntil < new Date() || !allowedRoles.includes(uploader.role)) {
+          throw new ForbiddenException('Only active premium artists and producers can upload premium content');
+        }
+      }
+
       const mediaData = {
         url: uploadResult.secure_url,
         cloudinaryPublicId: uploadResult.public_id,
@@ -143,6 +152,7 @@ export class MediaService {
         }
       });
 
+      await this.notifyFollowersOfUpload(media);
       this.logger.log(`Media created successfully: ${media.id}`);
       return media;
     } catch (error) {
@@ -157,6 +167,14 @@ export class MediaService {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
       const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';
+
+      if (metadata.isPremium) {
+        const uploader = await this.prisma.user.findUnique({ where: { id: userId } });
+        const allowedRoles: UserRole[] = [UserRole.ARTIST, UserRole.PRODUCER];
+        if (!uploader || !uploader.isPremium || !uploader.premiumUntil || uploader.premiumUntil < new Date() || !allowedRoles.includes(uploader.role)) {
+          throw new ForbiddenException('Only active premium artists and producers can upload premium content');
+        }
+      }
 
       const mediaData = {
         url: metadata.url,
@@ -193,6 +211,7 @@ export class MediaService {
         }
       });
 
+      await this.notifyFollowersOfUpload(media);
       this.logger.log(`Media created from metadata: ${media.id}`);
       return media;
     } catch (error) {
@@ -200,6 +219,31 @@ export class MediaService {
       this.logger.error(`Media metadata creation failed: ${errorMsg}`, error);
       throw new InternalServerErrorException(`Failed to create media from metadata: ${errorMsg}`);
     }
+  }
+
+  private async notifyFollowersOfUpload(media: any) {
+    const followers = await this.prisma.follower.findMany({
+      where: { followingId: media.user.id },
+      select: { followerId: true },
+    });
+
+    if (followers.length === 0) {
+      return;
+    }
+
+    const uploaderName = media.user.displayName || media.user.username || 'A creator';
+    const notifications = followers.map((follower) => ({
+      userId: follower.followerId,
+      title: 'New upload available',
+      message: `${uploaderName} has uploaded a new track: ${media.title}. Check it out now.`,
+      type: 'FOLLOWER_UPLOAD',
+      metadata: {
+        mediaId: media.id,
+        uploaderId: media.user.id,
+      },
+    }));
+
+    await this.notificationService.createMany(notifications);
   }
 
   private determineMediaType(resourceType: string): MediaType {

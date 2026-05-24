@@ -15,6 +15,9 @@ import { FollowerModule } from './follower/follower.module';
 import {PlaylistModule} from './playlist/playlist.module';
 import {ArtistsModule} from './artists/artists.module';
 import {UserModule} from './user/user.module';
+import { NotificationModule } from './notification/notification.module';
+import { SubscriptionModule } from './subscription/subscription.module';
+import { KycModule } from './kyc/kyc.module';
 
 const logger = new Logger('AppModule');
 
@@ -36,6 +39,9 @@ const logger = new Logger('AppModule');
     PlaylistModule,
     ArtistsModule,
     UserModule,
+    NotificationModule,
+    SubscriptionModule,
+    KycModule,
   ],
   controllers: [AppController],
   providers: [AppService,

@@ -59,7 +59,7 @@ export default function ArtistForgotPassword() {
             <div className="space-y-3">
               <Link
                 href="/auth/artist/signin"
-                className="w-full block px-4 py-2 w-full block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors font-semibold text-center"
+                className="w-full block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors font-semibold text-center"
               >
                 Back to Artist Sign In
               </Link>

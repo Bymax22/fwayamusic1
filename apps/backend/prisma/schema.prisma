@@ -7,12 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==================== ENUMS ====================
+// ==================== COMPREHENSIVE ENUMS FOR WORLD-CLASS STREAMING ====================
+
 enum MediaType {
   AUDIO
   VIDEO
   PODCAST
   LIVE_STREAM
+  ALBUM
+  COLLECTION
+  PLAYLIST
+}
+
+enum VideoQuality {
+  MOBILE      // 360p - 500 kbps
+  SD          // 480p - 1.5 Mbps
+  HD          // 720p - 3 Mbps
+  FULL_HD     // 1080p - 6 Mbps
+  QUAD_HD     // 1440p - 12 Mbps
+  ULTRA_HD    // 2160p (4K) - 20 Mbps
+  ULTRA_HD_8K // 4320p (8K) - 40 Mbps
+}
+
+enum VideoCodec {
+  H264
+  H265_HEVC
+  VP9
+  AV1
+}
+
+enum AudioCodec {
+  AAC
+  MP3
+  OPUS
+  FLAC
+  ALAC
+  VORBIS
 }
 
 enum PlaylistType {
@@ -20,36 +50,50 @@ enum PlaylistType {
   USER
   SMART
   RADIO
+  COLLABORATIVE
+  ALGORITHM_GENERATED
+  TRENDING
+  CURATED
 }
 
 enum UserRole {
   USER
   ARTIST
-  RESELLER
-  PRODUCER
   ADMIN
   MODERATOR
+  RESELLER
+  PRODUCER
+  CONTENT_MANAGER
+  ANALYTICS_VIEWER
 }
 
 enum TransactionStatus {
   PENDING
+  PROCESSING
   COMPLETED
   FAILED
   REFUNDED
   PARTIALLY_REFUNDED
+  DISPUTED
+  CANCELLED
 }
 
 enum MediaAccessType {
   FREE
   PREMIUM
   PAY_PER_VIEW
+  SUBSCRIPTION
+  TIME_LIMITED
+  EXCLUSIVE
 }
 
 enum PaymentMethod {
   MOBILE_MONEY
   BANK_TRANSFER
   CREDIT_CARD
+  DEBIT_CARD
   CRYPTO
+  WALLET
   OTHER
 }
 
@@ -62,6 +106,8 @@ enum PaymentProvider {
   PAYSTACK
   MPESA
   BANK
+  COINBASE
+  CRYPTO_GATEWAY
   OTHER
 }
 
@@ -85,6 +131,28 @@ enum Currency {
   INR
   BRL
   MXN
+  BWP
+  RWF
+  ETB
+  MUR
+  SCR
+}
+
+enum SubscriptionPlan {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+  SUSPENDED
+  PENDING
 }
 
 enum CommissionStatus {
@@ -92,12 +160,16 @@ enum CommissionStatus {
   PAID
   FAILED
   HOLD
+  DISPUTED
+  REFUNDED
 }
 
 enum ResellerLinkStatus {
   ACTIVE
   INACTIVE
   SUSPENDED
+  EXPIRED
+  ARCHIVED
 }
 
 enum DeviceRestrictionLevel {
@@ -105,12 +177,14 @@ enum DeviceRestrictionLevel {
   BASIC
   STRICT
   ENCRYPTED
+  ULTRA_SECURE
 }
 
 enum DownloadAccessType {
   OFFLINE
   ONLINE
   STREAMING
+  BOTH
 }
 
 enum UserStatus {
@@ -119,6 +193,8 @@ enum UserStatus {
   SUSPENDED
   VERIFIED
   REJECTED
+  DELETED_PENDING
+  DELETED_COMPLETED
 }
 
 enum KYCStatus {
@@ -127,6 +203,7 @@ enum KYCStatus {
   APPROVED
   REJECTED
   ADDITIONAL_INFO_NEEDED
+  EXPIRED
 }
 
 enum DocumentType {
@@ -137,726 +214,1245 @@ enum DocumentType {
   TAX_CERTIFICATE
   UTILITY_BILL
   BANK_STATEMENT
+  PROOF_OF_ADDRESS
 }
 
 enum VerificationMethod {
   EMAIL
   PHONE
+  SMS
   DOCUMENT
   BIOMETRIC
+  TWO_FACTOR_AUTH
 }
 
-// ==================== MODELS ====================
+enum ContentStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+  DELETED
+  SCHEDULED
+  PRIVATE
+}
+
+enum DeletionReason {
+  USER_REQUEST
+  DUPLICATE
+  COPYRIGHT_VIOLATION
+  POLICY_VIOLATION
+  ACCOUNT_DELETION
+  ADMIN_REMOVAL
+  EXPIRED
+  OTHER
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
+  UNDER_REVIEW
+  APPEALED
+}
+
+enum LiveStreamStatus {
+  SCHEDULED
+  LIVE
+  PAUSED
+  ENDED
+  CANCELLED
+  PROCESSING
+  ARCHIVED
+}
+
+enum RecommendationType {
+  TRENDING
+  PERSONALIZED
+  COLLABORATIVE
+  CONTENT_BASED
+  SOCIAL
+  TRENDING_LOCAL
+  TRENDING_GLOBAL
+  SIMILAR_ARTIST
+}
+
+enum StreamingQualityPreset {
+  ADAPTIVE
+  MOBILE_FIRST
+  BALANCED
+  HIGH_QUALITY
+  DATA_SAVER
+}
+
+enum NotificationType {
+  NEW_RELEASE
+  FOLLOW
+  LIKE
+  COMMENT
+  SHARE
+  PURCHASE
+  DOWNLOAD_COMPLETE
+  STREAM_MILESTONE
+  SYSTEM
+  PROMOTION
+  LIVE_STREAM_START
+  COLLABORATION_REQUEST
+}
+
+enum AudioFeatureCategory {
+  ENERGETIC
+  ACOUSTIC
+  DANCEABLE
+  MELANCHOLIC
+  UPLIFTING
+  DARK
+  RELAXED
+  AGGRESSIVE
+  INSTRUMENTAL
+  VOCAL_HEAVY
+}
+
+enum CollaborationType {
+  PRODUCER
+  FEATURE_ARTIST
+  SONGWRITER
+  ENGINEER
+  MIXER
+  MASTERING
+  BAND_MEMBER
+  GUEST_ARTIST
+}
+
+enum RatingValue {
+  ONE
+  TWO
+  THREE
+  FOUR
+  FIVE
+}
+
+// ==================== CORE MODELS ====================
 
 model User {
-  id            Int       @id @default(autoincrement())
-  email         String    @unique
-  username      String    @unique
-  passwordHash  String    @map("password_hash")
-  displayName   String?   @map("display_name")
-  avatarUrl     String?   @map("avatar_url")
-  isSocialAuth  Boolean   @default(false) @map("is_social_auth")
-  provider      String?
-  socialId      String?   @map("social_id")
-  lastLoginAt   DateTime? @map("last_login_at")
-  role          UserRole  @default(USER)
-  isPremium     Boolean   @default(false) @map("is_premium")
-  premiumUntil  DateTime? @map("premium_until")
-  walletBalance Float     @default(0) @map("wallet_balance")
-  totalEarnings Float     @default(0) @map("total_earnings")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  // Payment & Reseller Fields
-  isReseller      Boolean @default(false) @map("is_reseller")
-  resellerCode    String? @unique @map("reseller_code")
-  commissionRate  Float?  @default(0.2) @map("commission_rate")
-  totalCommission Float   @default(0) @map("total_commission")
-  paidCommission  Float   @default(0) @map("paid_commission")
-
-  // Payment Accounts
-  paymentAccounts PaymentAccount[]
-  country         String?          @default("US")
-  defaultCurrency Currency         @default(USD)
-
-  // KYC & Verification Fields
-  status          UserStatus @default(PENDING) @map("status")
-  phoneNumber     String?    @map("phone_number")
-  dateOfBirth     DateTime?  @map("date_of_birth")
-  address         Json?      @map("address")
-  taxId           String?    @map("tax_id")
-  isEmailVerified Boolean    @default(false) @map("is_email_verified")
-  isPhoneVerified Boolean    @default(false) @map("is_phone_verified")
-
-  // Artist-specific fields
-  artistName  String? @map("artist_name")
-  stageName   String? @map("stage_name")
-  bio         String? @map("bio")
-  website     String? @map("website")
-  socialLinks Json?   @map("social_links")
-
-  // Reseller-specific fields
-  businessName String? @map("business_name")
-  businessType String? @map("business_type")
-
-  // Relations for float account system
-  queuedPayouts QueuedPayout[]
-
-  // Other relations...
-  taxNumber    String? @map("tax_number")
-
-  // Consent fields
-  acceptedTerms   Boolean   @default(false) @map("accepted_terms")
-  acceptedPrivacy Boolean   @default(false) @map("accepted_privacy")
-  marketingEmails Boolean   @default(false) @map("marketing_emails")
-  dataSharing     Boolean   @default(false) @map("data_sharing")
-  consentDate     DateTime? @map("consent_date")
-
-  // KYC Relations
-  kycSubmissions    KYCDocument[]
-  verifications     Verification[]
-  reviewedDocuments KYCDocument[]  @relation("DocumentReviewer")
-  auditLogs         AuditLog[]
-
-  // Relations
-  media          Media[]
-  playlists      Playlist[]
-  interactions   MediaInteraction[]
-  nowPlaying     NowPlaying?
-  devices        UserDevice[]
-  sessions       Session[]
-  followers      Follower[]         @relation("following")
-  following      Follower[]         @relation("followers")
-  downloads      Download[]
-  transactions   Transaction[]
-  commissions    Commission[]
-  resellerLinks  ResellerLink[]
-  notifications  Notification[]
-  libraries      Library[]
-  mediaComments  MediaComment[]
-  payoutRequests PayoutRequest[]
-  deviceLicenses DeviceLicense[]
-
-  newsLikes     NewsLike[]
-  newsShares    NewsShare[]
-  newsComments  NewsComment[]
-  newsBookmarks NewsBookmark[]
-  newsViews     NewsView[]
-  newsReports   NewsReport[]
-  newsReactions NewsReaction[]
-  News          News[]
+  id                      Int              @id @default(autoincrement())
+  email                   String           @unique
+  username                String           @unique
+  passwordHash            String           @map("password_hash")
+  displayName             String?          @map("display_name")
+  avatarUrl               String?          @map("avatar_url")
+  cloudinaryPublicId      String?          @map("cloudinary_public_id")
+  coverImageUrl           String?          @map("cover_image_url")
+  coverCloudinaryId       String?          @map("cover_cloudinary_id")
+  bio                     String?
+  
+  // Authentication & Security
+  isSocialAuth            Boolean          @default(false) @map("is_social_auth")
+  provider                String?
+  socialId                String?          @map("social_id")
+  lastLoginAt             DateTime?        @map("last_login_at")
+  lastLoginIp             String?          @map("last_login_ip")
+  twoFactorEnabled        Boolean          @default(false) @map("two_factor_enabled")
+  twoFactorSecret         String?          @map("two_factor_secret")
+  passwordChangedAt       DateTime?        @map("password_changed_at")
+  lastPasswordReset       DateTime?        @map("last_password_reset")
+  
+  // Account Status & Verification
+  role                    UserRole         @default(USER)
+  status                  UserStatus       @default(PENDING) @map("status")
+  isEmailVerified         Boolean          @default(false) @map("is_email_verified")
+  isPhoneVerified         Boolean          @default(false) @map("is_phone_verified")
+  isAccountVerified       Boolean          @default(false) @map("is_account_verified")
+  acceptedTerms           Boolean          @default(false) @map("accepted_terms")
+  acceptedPrivacy         Boolean          @default(false) @map("accepted_privacy")
+  acceptedCookies         Boolean          @default(false) @map("accepted_cookies")
+  consentDate             DateTime?        @map("consent_date")
+  
+  // Subscription & Premium
+  isPremium               Boolean          @default(false) @map("is_premium")
+  premiumUntil            DateTime?        @map("premium_until")
+  subscriptionPlan        SubscriptionPlan? @map("subscription_plan")
+  autoRenewSubscription   Boolean          @default(true) @map("auto_renew_subscription")
+  freeTrialUsed           Boolean          @default(false) @map("free_trial_used")
+  freeTrialExpiresAt      DateTime?        @map("free_trial_expires_at")
+  
+  // Personal Information
+  phoneNumber             String?          @map("phone_number")
+  dateOfBirth             DateTime?        @map("date_of_birth")
+  gender                  String?
+  country                 String?          @default("US")
+  address                 Json?
+  timezone                String?          @default("UTC")
+  language                String?          @default("en")
+  
+  // Artist Profile
+  isArtist                Boolean          @default(false) @map("is_artist")
+  artistName              String?          @map("artist_name")
+  stageName               String?          @map("stage_name")
+  website                 String?
+  socialLinks             Json?            @map("social_links")
+  artistBio               String?          @map("artist_bio")
+  verifiedArtist          Boolean          @default(false) @map("verified_artist")
+  verifiedArtistAt        DateTime?        @map("verified_artist_at")
+  totalFollowers          Int              @default(0) @map("total_followers")
+  totalFollowing          Int              @default(0) @map("total_following")
+  
+  // Producer Profile
+  isProducer              Boolean          @default(false) @map("is_producer")
+  producerName            String?          @map("producer_name")
+  producerBio             String?          @map("producer_bio")
+  producerWebsite         String?          @map("producer_website")
+  verifiedProducer        Boolean          @default(false) @map("verified_producer")
+  producerFollowers       Int              @default(0) @map("producer_followers")
+  
+  // Business Information
+  isReseller              Boolean          @default(false) @map("is_reseller")
+  businessName            String?          @map("business_name")
+  businessType            String?          @map("business_type")
+  taxId                   String?          @map("tax_id")
+  taxNumber               String?          @map("tax_number")
+  businessRegistration    String?          @map("business_registration")
+  businessLicense         String?          @map("business_license")
+  businessVerified        Boolean          @default(false) @map("business_verified")
+  
+  // Financial Data
+  walletBalance           Float            @default(0) @map("wallet_balance")
+  totalEarnings           Float            @default(0) @map("total_earnings")
+  totalSpent              Float            @default(0) @map("total_spent")
+  totalStreams            Int              @default(0) @map("total_streams")
+  monthlySpend            Float            @default(0) @map("monthly_spend")
+  monthlyEarnings         Float            @default(0) @map("monthly_earnings")
+  
+  // Commission & Reseller
+  commissionRate          Float?           @default(0.2) @map("commission_rate")
+  totalCommission         Float            @default(0) @map("total_commission")
+  paidCommission          Float            @default(0) @map("paid_commission")
+  resellerCode            String?          @unique @map("reseller_code")
+  resellerEarnings        Float            @default(0) @map("reseller_earnings")
+  referralCode            String?          @unique @map("referral_code")
+  
+  // Payment & Currency
+  defaultCurrency         Currency         @default(USD) @map("default_currency")
+  paymentAccounts         PaymentAccount[]
+  
+  // Preferences
+  marketingEmails         Boolean          @default(false) @map("marketing_emails")
+  dataSharing             Boolean          @default(false) @map("data_sharing")
+  notificationSettings    Json?            @map("notification_settings")
+  streamingQualityPref    StreamingQualityPreset @default(ADAPTIVE) @map("streaming_quality_pref")
+  autoDownloadQuality     VideoQuality?    @map("auto_download_quality")
+  allowExplicit           Boolean          @default(true) @map("allow_explicit")
+  
+  // Deletion & Account Management
+  deletionRequestedAt     DateTime?        @map("deletion_requested_at")
+  deletionReason          String?          @map("deletion_reason")
+  deletionDetails         Json?            @map("deletion_details")
+  accountDeactivatedAt    DateTime?        @map("account_deactivated_at")
+  
+  // Timestamps
+  createdAt               DateTime         @default(now()) @map("created_at")
+  updatedAt               DateTime         @updatedAt @map("updated_at")
+  
+  // Relations - Media
+  media                   Media[]
+  albums                  Album[]
+  playlists               Playlist[]
+  
+  // Relations - Social
+  followers               Follower[]       @relation("followers")
+  following               Follower[]       @relation("following")
+  
+  // Relations - Interactions
+  interactions            MediaInteraction[]
+  nowPlaying              NowPlaying?
+  watchHistory            WatchHistory[]
+  savedForLater           SavedForLater[]
+  ratings                 MediaRating[]
+  
+  // Relations - Streaming
+  devices                 UserDevice[]
+  sessions                Session[]
+  downloads               Download[]
+  
+  // Relations - Commerce
+  transactions            Transaction[]
+  commissions             Commission[]
+  resellerLinks           ResellerLink[]
+  subscriptions           Subscription[]
+  payoutRequests          PayoutRequest[]
+  
+  // Relations - Content
+  mediaComments           MediaComment[]
+  libraries               Library[]
+  deviceLicenses          DeviceLicense[]
+  
+  // Relations - News & Updates
+  newsLikes               NewsLike[]
+  newsShares              NewsShare[]
+  newsComments            NewsComment[]
+  newsBookmarks           NewsBookmark[]
+  newsViews               NewsView[]
+  newsReports             NewsReport[]
+  newsReactions           NewsReaction[]
+  news                    News[]
+  
+  // Relations - KYC & Verification
+  kycSubmissions          KYCDocument[]
+  verifications           Verification[]
+  reviewedDocuments       KYCDocument[]   @relation("DocumentReviewer")
+  auditLogs               AuditLog[]
+  
+  // Relations - Analytics & Recommendations
+  recommendations         UserRecommendation[]
+  searchHistory           SearchHistory[]
+  
+  // Relations - Management & Moderation
+  queuedPayouts           QueuedPayout[]
+  notifications           Notification[]
+  contentModerations      ContentModeration[] @relation("ModerationReviewer")
+  userContentModerations  ContentModeration[] @relation("ContentCreator")
+  
+  // Relations - Collaboration & Live
+  liveStreams             LiveStream[]
+  liveViewers             LiveStreamViewer[]
+  collaborations          ProducerCollaboration[] @relation("CollaboratingArtist")
+  collaborationRequests   ProducerCollaboration[] @relation("AssignedProducer")
 
   @@index([email])
   @@index([username])
+  @@index([isArtist])
+  @@index([isProducer])
   @@index([isReseller])
   @@index([resellerCode])
+  @@index([status])
+  @@index([isPremium])
+  @@index([verifiedArtist])
+  @@index([createdAt])
   @@map("users")
 }
 
+// ==================== MEDIA & VIDEO MODELS ====================
+
 model Media {
-  id                 Int             @id @default(autoincrement())
-  url                String          @unique
-  artCoverUrl        String?         @map("art_cover_url")
-  thumbnailUrl       String?         @map("thumbnail_url")
-  format             String?
-  duration           Int? // in seconds
-  title              String
-  description        String?
-  genre              String?
-  tags               String[]
-  type               MediaType
-  accessType         MediaAccessType @default(FREE) @map("access_type")
-  price              Float?          @default(0)
-  isExplicit         Boolean         @default(false) @map("is_explicit")
-  playCount          Int             @default(0) @map("play_count")
-  downloadCount      Int             @default(0) @map("download_count")
-  shareCount         Int             @default(0) @map("share_count")
-  lastPlayedAt       DateTime?       @map("last_played_at")
-  createdAt          DateTime        @default(now()) @map("created_at")
-  updatedAt          DateTime        @updatedAt @map("updated_at")
-  userId             Int?            @map("user_id")
-  cloudinaryPublicId String?         @map("cloudinary_public_id")
-
-  // Reseller & Commission Fields
-  allowReselling         Boolean @default(true) @map("allow_reselling")
-  resellerCommissionRate Float?  @map("reseller_commission_rate")
-  artistCommissionRate   Float   @default(0.5) @map("artist_commission_rate")
-  platformCommissionRate Float   @default(0.3) @map("platform_commission_rate")
-
-  // Digital Rights Management
-  isDRMProtected Boolean @default(false) @map("is_drm_protected")
-  encryptionKey  String? @map("encryption_key")
-  maxDevices     Int     @default(1) @map("max_devices")
-
-  // Audio Features
-  bpm          Int?
-  key          String?
-  energy       Float?
-  danceability Float?
-  valence      Float?
-  acousticness Float?
-
+  id                      Int                @id @default(autoincrement())
+  title                   String
+  description             String?
+  url                     String             @unique
+  type                    MediaType          @default(AUDIO)
+  
+  // Video/Audio Properties
+  duration                Int?               // in seconds
+  format                  String?
+  fileSize                BigInt?            @map("file_size")
+  bitrate                 Int?               // in kbps
+  sampleRate              Int?               @map("sample_rate")
+  
+  // Video Specific
+  width                   Int?
+  height                  Int?
+  videoCodec              VideoCodec?        @map("video_codec")
+  videoQualityVariants    VideoVariant[]
+  frameRate               Float?             @map("frame_rate")
+  
+  // Audio Specific
+  audioCodec              AudioCodec?        @map("audio_codec")
+  audioChannels           Int?               @map("audio_channels")
+  
+  // Artwork & Thumbnails
+  artCoverUrl             String?            @map("art_cover_url")
+  cloudinaryPublicId      String?            @map("cloudinary_public_id")
+  thumbnailUrl            String?            @map("thumbnail_url")
+  thumbnailCloudinaryId   String?            @map("thumbnail_cloudinary_id")
+  
+  // Classification
+  genre                   String?
+  tags                    String[]
+  mood                    String?
+  language                String?
+  isExplicit              Boolean            @default(false) @map("is_explicit")
+  contentStatus           ContentStatus      @default(DRAFT) @map("content_status")
+  
+  // Access Control
+  accessType              MediaAccessType    @default(FREE) @map("access_type")
+  price                   Float?             @default(0)
+  
+  // Audio Features & Metadata
+  bpm                     Int?
+  key                     String?
+  energy                  Float?             // 0-1
+  danceability            Float?             // 0-1
+  valence                 Float?             // 0-1
+  acousticness            Float?             // 0-1
+  audioFeatureCategory    AudioFeatureCategory? @map("audio_feature_category")
+  isrc                    String?            @map("isrc")
+  
+  // Metadata
+  releaseDate             DateTime?          @map("release_date")
+  lyricist                String?
+  composer                String?
+  copyrightYear           Int?               @map("copyright_year")
+  copyrightOwner          String?            @map("copyright_owner")
+  rights                  Json?
+  
+  // Ownership & Permissions
+  userId                  Int?               @map("user_id")
+  allowReselling          Boolean            @default(true) @map("allow_reselling")
+  allowCommercialUse      Boolean            @default(true) @map("allow_commercial_use")
+  allowDerivatives        Boolean            @default(true) @map("allow_derivatives")
+  
+  // DRM & Licensing
+  isDRMProtected          Boolean            @default(false) @map("is_drm_protected")
+  encryptionKey           String?            @map("encryption_key")
+  maxDevices              Int                @default(1) @map("max_devices")
+  licenseType             String?            @map("license_type")
+  
+  // Commission Rates
+  artistCommissionRate    Float              @default(0.5) @map("artist_commission_rate")
+  platformCommissionRate  Float              @default(0.3) @map("platform_commission_rate")
+  resellerCommissionRate  Float?             @map("reseller_commission_rate")
+  
+  // Analytics
+  playCount               Int                @default(0) @map("play_count")
+  downloadCount           Int                @default(0) @map("download_count")
+  shareCount              Int                @default(0) @map("share_count")
+  likeCount               Int                @default(0) @map("like_count")
+  lastPlayedAt            DateTime?          @map("last_played_at")
+  totalStreamingTime      BigInt             @default(0) @map("total_streaming_time")
+  
+  // Versioning & Deletion
+  version                 Int                @default(1)
+  originalMediaId         Int?               @map("original_media_id")
+  deletedAt               DateTime?          @map("deleted_at")
+  deletionReason          DeletionReason?    @map("deletion_reason")
+  deletionDetails         Json?              @map("deletion_details")
+  
+  // Timestamps
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
   // Relations
-  commissions     Commission[]
-  libraryItems    LibraryItem[]
-  user            User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  interactions    MediaInteraction[]
-  comments        MediaComment[]
-  categories      MediaCategory[]
-  playlistEntries PlaylistEntry[]
-  nowPlaying      NowPlaying[]
-  downloads       Download[]
-  transactions    Transaction[]
-  resellerLinks   ResellerLink[]
-  deviceLicenses  DeviceLicense[]
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  album                   Album?             @relation(fields: [albumId], references: [id])
+  albumId                 Int?               @map("album_id")
+  
+  categories              MediaCategory[]
+  comments                MediaComment[]
+  interactions            MediaInteraction[]
+  nowPlaying              NowPlaying[]
+  playlistEntries         PlaylistEntry[]
+  resellerLinks           ResellerLink[]
+  transactions            Transaction[]
+  downloads               Download[]
+  commissions             Commission[]
+  deviceLicenses          DeviceLicense[]
+  watchHistory            WatchHistory[]
+  ratings                 MediaRating[]
+  savedForLater           SavedForLater[]
+  libraryItems            LibraryItem[]
+  contentModerations      ContentModeration[]
+  recommendations         UserRecommendation[]
+  versionedMedia          Media[]            @relation("MediaVersions")
+  originalMedia           Media?             @relation("MediaVersions", fields: [originalMediaId], references: [id])
+  collaborators           ProducerCollaboration[]
+  liveStreamSessions      LiveStreamSession[]
 
   @@index([userId])
   @@index([accessType])
   @@index([allowReselling])
+  @@index([contentStatus])
+  @@index([type])
+  @@index([deletedAt])
+  @@index([createdAt])
+  @@index([genre])
+  @@index([playCount])
   @@map("media")
 }
 
+model VideoVariant {
+  id                      Int                @id @default(autoincrement())
+  mediaId                 Int                @map("media_id")
+  quality                 VideoQuality
+  url                     String
+  fileSize                BigInt             @map("file_size")
+  bitrate                 Int                // in kbps
+  width                   Int
+  height                  Int
+  codec                   VideoCodec
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, quality])
+  @@map("video_variants")
+}
+
+model Album {
+  id                      Int                @id @default(autoincrement())
+  title                   String
+  description             String?
+  userId                  Int                @map("user_id")
+  coverUrl                String?            @map("cover_url")
+  cloudinaryPublicId      String?            @map("cloudinary_public_id")
+  releaseDate             DateTime?          @map("release_date")
+  type                    String?            // STUDIO, LIVE, COMPILATION, etc.
+  recordLabel             String?            @map("record_label")
+  credits                 Json?
+  
+  contentStatus           ContentStatus      @default(DRAFT) @map("content_status")
+  isPublic                Boolean            @default(false) @map("is_public")
+  
+  playCount               Int                @default(0) @map("play_count")
+  downloadCount           Int                @default(0) @map("download_count")
+  
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media                   Media[]
+
+  @@index([userId])
+  @@index([releaseDate])
+  @@map("albums")
+}
+
+model MediaRating {
+  id                      Int                @id @default(autoincrement())
+  mediaId                 Int                @map("media_id")
+  userId                  Int                @map("user_id")
+  rating                  RatingValue
+  comment                 String?
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, userId])
+  @@map("media_ratings")
+}
+
+model WatchHistory {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  mediaId                 Int                @map("media_id")
+  watchedAt               DateTime           @default(now()) @map("watched_at")
+  watchDuration           Int?               @map("watch_duration")
+  completionPercent       Float?             @map("completion_percent")
+  quality                 VideoQuality?      // quality watched at
+  deviceType              String?            @map("device_type")
+  isOfflineWatch          Boolean            @default(false) @map("is_offline_watch")
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
+  @@index([userId, watchedAt])
+  @@index([mediaId])
+  @@map("watch_history")
+}
+
+model SavedForLater {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  mediaId                 Int                @map("media_id")
+  savedAt                 DateTime           @default(now()) @map("saved_at")
+  priority                Int                @default(0)
+  notes                   String?
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
+  @@map("saved_for_later")
+}
+
+model MediaCategory {
+  mediaId                 Int                @map("media_id")
+  categoryId              Int                @map("category_id")
+  assignedAt              DateTime           @default(now()) @map("assigned_at")
+  
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  category                Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([mediaId, categoryId])
+  @@map("media_categories")
+}
+
+model Category {
+  id                      Int                @id @default(autoincrement())
+  name                    String             @unique
+  description             String?
+  slug                    String             @unique
+  imageUrl                String?            @map("image_url")
+  order                   Int                @default(0)
+  isActive                Boolean            @default(true) @map("is_active")
+  
+  media                   MediaCategory[]
+
+  @@map("categories")
+}
+
 model MediaComment {
-  id         Int      @id @default(autoincrement())
-  mediaId    Int      @map("media_id")
-  userId     Int      @map("user_id")
-  parentId   Int?     @map("parent_id")
-  content    String
-  likes      Int      @default(0)
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id                      Int                @id @default(autoincrement())
+  mediaId                 Int                @map("media_id")
+  userId                  Int                @map("user_id")
+  parentId                Int?               @map("parent_id")
+  content                 String
+  likes                   Int                @default(0)
+  isPinned                Boolean            @default(false) @map("is_pinned")
+  isEdited                Boolean            @default(false) @map("is_edited")
+  editedAt                DateTime?          @map("edited_at")
+  deletedAt               DateTime?          @map("deleted_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent                  MediaComment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  replies                 MediaComment[]     @relation("CommentReplies")
 
-  media Media @relation(fields: [mediaId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
-  parent MediaComment? @relation("CommentReplies", fields: [parentId], references: [id])
-  replies MediaComment[] @relation("CommentReplies")
-
+  @@index([mediaId])
+  @@index([userId])
+  @@index([parentId])
   @@map("media_comments")
 }
 
+model MediaInteraction {
+  id                      Int                @id @default(autoincrement())
+  mediaId                 Int                @map("media_id")
+  userId                  Int?               @map("user_id")
+  liked                   Boolean?           @default(false)
+  saved                   Boolean?           @default(false)
+  played                  Boolean?           @default(false)
+  position                Int?               // for resuming playback
+  lastPlayedPosition      Int?               @map("last_played_position")
+  interactedAt            DateTime?          @default(now()) @map("interacted_at")
+  
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, userId])
+  @@index([userId])
+  @@map("media_interactions")
+}
+
+// ==================== PLAYLIST & ORGANIZATION ====================
+
+model Playlist {
+  id                      Int                @id @default(autoincrement())
+  name                    String
+  description             String?
+  coverUrl                String?            @map("cover_url")
+  isPublic                Boolean            @default(false) @map("is_public")
+  isCollaborative         Boolean            @default(false) @map("is_collaborative")
+  type                    PlaylistType       @default(USER)
+  rules                   Json?              // For smart playlists
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  userId                  Int                @map("user_id")
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries                 PlaylistEntry[]
+
+  @@index([userId])
+  @@index([isPublic])
+  @@map("playlists")
+}
+
+model PlaylistEntry {
+  id                      Int                @id @default(autoincrement())
+  playlistId              Int                @map("playlist_id")
+  mediaId                 Int                @map("media_id")
+  position                Int
+  addedAt                 DateTime           @default(now()) @map("added_at")
+  addedBy                 Int?               @map("added_by")
+  
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  playlist                Playlist           @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, mediaId])
+  @@map("playlist_entries")
+}
+
+model NowPlaying {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @unique @map("user_id")
+  mediaId                 Int                @map("media_id")
+  position                Int                @default(0)
+  isPlaying               Boolean            @default(false) @map("is_playing")
+  deviceId                String?            @map("device_id")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@map("now_playing")
+}
+
+// ==================== USER ACTIVITY & PREFERENCES ====================
+
+model SearchHistory {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  query                   String
+  results                 Int?               // number of results returned
+  clickedResultId         Int?               @map("clicked_result_id")
+  searchedAt              DateTime           @default(now()) @map("searched_at")
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, searchedAt])
+  @@map("search_history")
+}
+
+model UserRecommendation {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  mediaId                 Int                @map("media_id")
+  type                    RecommendationType
+  score                   Float?             // confidence score
+  reason                  String?            // why this was recommended
+  displayedAt             DateTime?          @map("displayed_at")
+  clickedAt               DateTime?          @map("clicked_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([mediaId])
+  @@map("user_recommendations")
+}
+
+model UserDevice {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int?               @map("user_id")
+  deviceId                String             @map("device_id")
+  deviceName              String             @map("device_name")
+  deviceType              String?            @map("device_type")
+  os                      String?
+  osVersion               String?            @map("os_version")
+  appVersion              String?            @map("app_version")
+  lastActiveAt            DateTime?          @map("last_active_at")
+  fingerprint             String?            @unique
+  ipAddress               String?            @map("ip_address")
+  browserAgent            String?            @map("browser_agent")
+  isCurrentDevice         Boolean            @default(false) @map("is_current_device")
+  isTrusted               Boolean            @default(false) @map("is_trusted")
+  
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenses                DeviceLicense[]
+
+  @@unique([userId, deviceId])
+  @@index([userId])
+  @@map("user_devices")
+}
+
+model Session {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int?               @map("user_id")
+  token                   String             @unique
+  refreshToken            String?            @unique @map("refresh_token")
+  ipAddress               String?            @map("ip_address")
+  userAgent               String?            @map("user_agent")
+  expiresAt               DateTime           @map("expires_at")
+  refreshExpiresAt        DateTime?          @map("refresh_expires_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  revokedAt               DateTime?          @map("revoked_at")
+  
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+model Follower {
+  id                      Int                @id @default(autoincrement())
+  followerId              Int                @map("follower_id")
+  followingId             Int?               @map("following_id")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  follower                User               @relation("followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following               User?              @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("followers")
+}
+
+// ==================== DOWNLOADS & OFFLINE ====================
+
+model Download {
+  id                      Int                @id @default(autoincrement())
+  mediaId                 Int                @map("media_id")
+  userId                  Int?               @map("user_id")
+  deviceId                String?            @map("device_id")
+  downloadedAt            DateTime           @default(now()) @map("downloaded_at")
+  expiresAt               DateTime?          @map("expires_at")
+  accessType              DownloadAccessType @default(OFFLINE) @map("access_type")
+  quality                 VideoQuality?
+  isDRMProtected          Boolean            @default(false) @map("is_drm_protected")
+  licenseKey              String?            @unique @map("license_key")
+  fileSize                BigInt?            @map("file_size")
+  downloadProgress        Float?             @map("download_progress")
+  extraData               Json?              @map("extra_data")
+  
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([deviceId])
+  @@map("downloads")
+}
+
+// ==================== TRANSACTIONS & PAYMENTS ====================
+
+model Transaction {
+  id                      Int                @id @default(autoincrement())
+  amount                  Float
+  currency                Currency           @default(USD)
+  originalAmount          Float?             @map("original_amount")
+  originalCurrency        Currency?          @map("original_currency")
+  exchangeRate            Float?             @map("exchange_rate")
+  status                  TransactionStatus  @default(PENDING)
+  
+  userId                  Int?               @map("user_id")
+  mediaId                 Int?               @map("media_id")
+  reference               String             @unique
+  paymentMethod           PaymentMethod      @map("payment_method")
+  paymentProvider         PaymentProvider    @map("payment_provider")
+  providerReference       String?            @map("provider_reference")
+  
+  metadata                Json?
+  receipt                 String?
+  receiptUrl              String?            @map("receipt_url")
+  
+  isResellerSale          Boolean            @default(false) @map("is_reseller_sale")
+  resellerLinkId          Int?               @map("reseller_link_id")
+  
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  processedAt             DateTime?          @map("processed_at")
+  
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  media                   Media?             @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  resellerLink            ResellerLink?      @relation(fields: [resellerLinkId], references: [id], onDelete: SetNull)
+  
+  commissions             Commission[]
+  payoutTransactions      PayoutTransaction[]
+  queuedPayouts           QueuedPayout[]
+  libraryItems            LibraryItem[]
+  deviceLicenses          DeviceLicense[]
+
+  @@index([userId, status])
+  @@index([paymentProvider, providerReference])
+  @@index([resellerLinkId])
+  @@index([createdAt])
+  @@map("transactions")
+}
+
+model Commission {
+  id                      Int                @id @default(autoincrement())
+  amount                  Float
+  currency                Currency           @default(USD)
+  status                  CommissionStatus   @default(PENDING)
+  resellerId              Int                @map("reseller_id")
+  transactionId           Int                @map("transaction_id")
+  mediaId                 Int                @map("media_id")
+  commissionRate          Float              @map("commission_rate")
+  isPaid                  Boolean            @default(false) @map("is_paid")
+  paidAt                  DateTime?          @map("paid_at")
+  payoutTransactionId     Int?               @map("payout_transaction_id")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  reseller                User               @relation(fields: [resellerId], references: [id], onDelete: Cascade)
+  transaction             Transaction        @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  payoutTransaction       PayoutTransaction? @relation(fields: [payoutTransactionId], references: [id])
+
+  @@index([resellerId, status])
+  @@index([transactionId])
+  @@index([status])
+  @@map("commissions")
+}
+
+model ResellerLink {
+  id                      Int                @id @default(autoincrement())
+  code                    String             @unique
+  resellerId              Int                @map("reseller_id")
+  mediaId                 Int                @map("media_id")
+  clickCount              Int                @default(0) @map("click_count")
+  conversionCount         Int                @default(0) @map("conversion_count")
+  earnings                Float              @default(0)
+  status                  ResellerLinkStatus @default(ACTIVE)
+  customCommissionRate    Float?             @map("custom_commission_rate")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  expiresAt               DateTime?          @map("expires_at")
+  
+  reseller                User               @relation(fields: [resellerId], references: [id], onDelete: Cascade)
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  transactions            Transaction[]
+
+  @@unique([resellerId, mediaId])
+  @@index([code])
+  @@index([status])
+  @@map("reseller_links")
+}
+
+model Library {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int?               @map("user_id")
+  name                    String
+  description             String?
+  isPrivate               Boolean            @default(true) @map("is_private")
+  order                   Int                @default(0)
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items                   LibraryItem[]
+
+  @@index([userId])
+  @@map("libraries")
+}
+
+model LibraryItem {
+  id                      Int                @id @default(autoincrement())
+  libraryId               Int                @map("library_id")
+  mediaId                 Int                @map("media_id")
+  addedAt                 DateTime           @default(now()) @map("added_at")
+  purchasedAt             DateTime?          @map("purchased_at")
+  transactionId           Int?               @map("transaction_id")
+  
+  library                 Library            @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  transaction             Transaction?       @relation(fields: [transactionId], references: [id])
+
+  @@unique([libraryId, mediaId])
+  @@map("library_items")
+}
+
+model DeviceLicense {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  deviceId                Int                @map("device_id")
+  mediaId                 Int                @map("media_id")
+  transactionId           Int?               @map("transaction_id")
+  licenseKey              String             @unique @map("license_key")
+  restrictionLevel        DeviceRestrictionLevel @default(STRICT) @map("restriction_level")
+  expiresAt               DateTime?          @map("expires_at")
+  isActive                Boolean            @default(true) @map("is_active")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  device                  UserDevice         @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  transaction             Transaction?       @relation(fields: [transactionId], references: [id])
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceId, mediaId])
+  @@index([licenseKey])
+  @@index([expiresAt])
+  @@map("device_licenses")
+}
+
+// ==================== PAYMENTS & PAYOUTS ====================
+
+model PaymentAccount {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  provider                PaymentProvider
+  accountType             PaymentMethod      @map("account_type")
+  accountNumber           String             @map("account_number")
+  accountName             String?            @map("account_name")
+  accountHolder           String?            @map("account_holder")
+  country                 String?
+  currency                Currency           @default(USD)
+  isVerified              Boolean            @default(false) @map("is_verified")
+  isDefault               Boolean            @default(false) @map("is_default")
+  verifiedAt              DateTime?          @map("verified_at")
+  metadata                Json?
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payoutRequests          PayoutRequest[]
+  payoutTransactions      PayoutTransaction[]
+
+  @@unique([userId, provider, accountNumber])
+  @@index([userId, isDefault])
+  @@index([isVerified])
+  @@map("payment_accounts")
+}
+
+model PayoutTransaction {
+  id                      Int                @id @default(autoincrement())
+  paymentAccountId        Int                @map("payment_account_id")
+  transactionId           Int?               @map("transaction_id")
+  amount                  Float
+  currency                Currency           @default(USD)
+  status                  TransactionStatus
+  reference               String             @unique
+  providerReference       String?            @map("provider_reference")
+  fees                    Float              @default(0)
+  metadata                Json?
+  processedAt             DateTime?          @map("processed_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  paymentAccount          PaymentAccount     @relation(fields: [paymentAccountId], references: [id], onDelete: Cascade)
+  transaction             Transaction?       @relation(fields: [transactionId], references: [id])
+  commissions             Commission[]
+
+  @@index([paymentAccountId, status])
+  @@index([status])
+  @@map("payout_transactions")
+}
+
+model PayoutRequest {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  amount                  Float
+  currency                Currency           @default(USD)
+  status                  TransactionStatus
+  paymentAccountId        Int?               @map("payment_account_id")
+  reason                  String?
+  metadata                Json?
+  processedAt             DateTime?          @map("processed_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  paymentAccount          PaymentAccount?    @relation(fields: [paymentAccountId], references: [id], onDelete: SetNull)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([status])
+  @@map("payout_requests")
+}
+
+model QueuedPayout {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  transactionId           Int                @map("transaction_id")
+  amount                  Float
+  currency                Currency
+  type                    String
+  status                  String
+  reason                  String
+  retryCount              Int                @default(0) @map("retry_count")
+  maxRetries              Int                @default(3) @map("max_retries")
+  lastError               String?            @map("last_error")
+  processedAt             DateTime?          @map("processed_at")
+  nextRetryAt             DateTime?          @map("next_retry_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  transaction             Transaction        @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([userId, status])
+  @@index([nextRetryAt])
+  @@map("queued_payouts")
+}
+
+// ==================== SUBSCRIPTIONS ====================
+
+model Subscription {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  plan                    SubscriptionPlan
+  status                  SubscriptionStatus @default(ACTIVE)
+  price                   Float
+  currency                Currency           @default(USD)
+  provider                PaymentProvider?
+  providerSubscriptionId  String?            @map("provider_subscription_id")
+  autoRenew               Boolean            @default(false) @map("auto_renew")
+  startedAt               DateTime           @default(now()) @map("started_at")
+  expiresAt               DateTime           @map("expires_at")
+  canceledAt              DateTime?          @map("canceled_at")
+  metadata                Json?
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([expiresAt])
+  @@map("subscriptions")
+}
+
+// ==================== NOTIFICATIONS ====================
+
+model Notification {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int?               @map("user_id")
+  type                    NotificationType
+  title                   String
+  message                 String
+  data                    Json?
+  isRead                  Boolean            @default(false) @map("is_read")
+  readAt                  DateTime?          @map("read_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+// ==================== NEWS & UPDATES ====================
+
 model News {
-  id          Int      @id @default(autoincrement())
-  title       String
-  slug        String   @unique
-  summary     String?
-  content     String
-  imageUrl    String?
-  authorId    Int?
-  publishedAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isPublished Boolean  @default(true)
-  tags        String[]
-  metadata    Json?
-  author      User?    @relation(fields: [authorId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  title                   String
+  slug                    String             @unique
+  summary                 String?
+  content                 String
+  imageUrl                String?            @map("image_url")
+  cloudinaryPublicId      String?            @map("cloudinary_public_id")
+  authorId                Int?               @map("author_id")
+  publishedAt             DateTime           @default(now()) @map("published_at")
+  updatedAt               DateTime           @updatedAt
+  scheduledAt             DateTime?          @map("scheduled_at")
+  isPublished             Boolean            @default(true) @map("is_published")
+  isFeatured              Boolean            @default(false) @map("is_featured")
+  tags                    String[]
+  metadata                Json?
+  
+  author                  User?              @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  
+  bookmarks               NewsBookmark[]
+  comments                NewsComment[]
+  likes                   NewsLike[]
+  reactions               NewsReaction[]
+  reports                 NewsReport[]
+  shares                  NewsShare[]
+  views                   NewsView[]
 
-  //back-relations:
-  likes     NewsLike[]
-  shares    NewsShare[]
-  comments  NewsComment[]
-  bookmarks NewsBookmark[]
-  views     NewsView[]
-  reports   NewsReport[]
-  reactions NewsReaction[]
-
+  @@index([authorId])
+  @@index([publishedAt])
+  @@index([isPublished])
   @@map("news")
 }
 
 model NewsLike {
-  id        Int      @id @default(autoincrement())
-  newsId    Int
-  userId    Int
-  createdAt DateTime @default(now())
-
-  news News @relation(fields: [newsId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  newsId                  Int                @map("news_id")
+  userId                  Int                @map("user_id")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  news                    News               @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([newsId, userId])
   @@map("news_likes")
 }
 
 model NewsShare {
-  id       Int      @id @default(autoincrement())
-  newsId   Int
-  userId   Int
-  sharedAt DateTime @default(now())
-
-  news News @relation(fields: [newsId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  newsId                  Int                @map("news_id")
+  userId                  Int                @map("user_id")
+  sharedAt                DateTime           @default(now()) @map("shared_at")
+  
+  news                    News               @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("news_shares")
 }
 
 model NewsComment {
-  id        Int      @id @default(autoincrement())
-  newsId    Int
-  userId    Int
-  content   String
-  createdAt DateTime @default(now())
-
-  news News @relation(fields: [newsId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  newsId                  Int                @map("news_id")
+  userId                  Int                @map("user_id")
+  content                 String
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  news                    News               @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("news_comments")
 }
 
 model NewsBookmark {
-  id        Int      @id @default(autoincrement())
-  newsId    Int
-  userId    Int
-  createdAt DateTime @default(now())
-
-  news News @relation(fields: [newsId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  newsId                  Int                @map("news_id")
+  userId                  Int                @map("user_id")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  news                    News               @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([newsId, userId])
   @@map("news_bookmarks")
 }
 
 model NewsView {
-  id        Int      @id @default(autoincrement())
-  newsId    Int
-  userId    Int?
-  viewedAt  DateTime @default(now())
-  ipAddress String?
-
-  news News  @relation(fields: [newsId], references: [id])
-  user User? @relation(fields: [userId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  newsId                  Int                @map("news_id")
+  userId                  Int?               @map("user_id")
+  viewedAt                DateTime           @default(now()) @map("viewed_at")
+  ipAddress               String?            @map("ip_address")
+  
+  news                    News               @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("news_views")
 }
 
 model NewsReport {
-  id         Int      @id @default(autoincrement())
-  newsId     Int
-  userId     Int
-  reason     String
-  details    String?
-  reportedAt DateTime @default(now())
-
-  news News @relation(fields: [newsId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  newsId                  Int                @map("news_id")
+  userId                  Int                @map("user_id")
+  reason                  String
+  details                 String?
+  reportedAt              DateTime           @default(now()) @map("reported_at")
+  
+  news                    News               @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("news_reports")
 }
 
 model NewsReaction {
-  id        Int      @id @default(autoincrement())
-  newsId    Int
-  userId    Int
-  type      String // e.g. "like", "love", "angry", "sad", "wow"
-  reactedAt DateTime @default(now())
-
-  news News @relation(fields: [newsId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  newsId                  Int                @map("news_id")
+  userId                  Int                @map("user_id")
+  type                    String             // like, love, angry, sad, wow
+  reactedAt               DateTime           @default(now()) @map("reacted_at")
+  
+  news                    News               @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([newsId, userId, type])
   @@map("news_reactions")
 }
 
-model Category {
-  id          Int             @id @default(autoincrement())
-  name        String          @unique
-  description String?
-  slug        String          @unique
-  media       MediaCategory[]
-
-  @@map("categories")
-}
-
-model MediaCategory {
-  mediaId    Int      @map("media_id")
-  categoryId Int      @map("category_id")
-  assignedAt DateTime @default(now()) @map("assigned_at")
-
-  media    Media    @relation(fields: [mediaId], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
-
-  @@id([mediaId, categoryId])
-  @@map("media_categories")
-}
-
-model Playlist {
-  id          Int          @id @default(autoincrement())
-  name        String
-  description String?
-  coverUrl    String?      @map("cover_url")
-  isPublic    Boolean      @default(false) @map("is_public")
-  type        PlaylistType
-  rules       Json? // For smart playlists
-  createdAt   DateTime     @default(now()) @map("created_at")
-  updatedAt   DateTime     @updatedAt @map("updated_at")
-  userId      Int          @map("user_id")
-
-  // Relations
-  user    User            @relation(fields: [userId], references: [id])
-  entries PlaylistEntry[]
-
-  @@map("playlists")
-}
-
-model PlaylistEntry {
-  id         Int      @id @default(autoincrement())
-  playlistId Int      @map("playlist_id")
-  mediaId    Int      @map("media_id")
-  position   Int
-  addedAt    DateTime @default(now()) @map("added_at")
-  addedBy    Int?     @map("added_by")
-
-  playlist Playlist @relation(fields: [playlistId], references: [id])
-  media    Media    @relation(fields: [mediaId], references: [id])
-
-  @@map("playlist_entries")
-}
-
-model NowPlaying {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique @map("user_id")
-  mediaId   Int      @map("media_id")
-  position  Int      @default(0)
-  isPlaying Boolean  @default(false) @map("is_playing")
-  deviceId  String?  @map("device_id")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user  User  @relation(fields: [userId], references: [id])
-  media Media @relation(fields: [mediaId], references: [id])
-
-  @@map("now_playing")
-}
-
-model MediaInteraction {
-  id           Int       @id @default(autoincrement())
-  mediaId      Int       @map("media_id")
-  userId       Int       @map("user_id")
-  liked        Boolean?  @default(false)
-  saved        Boolean?  @default(false)
-  played       Boolean?  @default(false)
-  position     Int?
-  interactedAt DateTime? @default(now()) @map("interacted_at")
-
-  media Media @relation(fields: [mediaId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
-
-  @@unique([mediaId, userId])
-  @@map("media_interactions")
-}
-
-model UserDevice {
-  id           Int       @id @default(autoincrement())
-  userId       Int       @map("user_id")
-  deviceId     String    @map("device_id")
-  deviceName   String    @map("device_name")
-  deviceType   String?   @map("device_type")
-  os           String?
-  lastActiveAt DateTime? @map("last_active_at")
-  fingerprint  String?   @unique
-
-  user     User            @relation(fields: [userId], references: [id])
-  licenses DeviceLicense[]
-
-  @@unique([userId, deviceId])
-  @@map("user_devices")
-}
-
-model Session {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  token     String   @unique
-  ipAddress String?  @map("ip_address")
-  userAgent String?  @map("user_agent")
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@map("sessions")
-}
-
-model Follower {
-  id          Int      @id @default(autoincrement())
-  followerId  Int      @map("follower_id")
-  followingId Int      @map("following_id")
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  follower  User @relation("followers", fields: [followerId], references: [id])
-  following User @relation("following", fields: [followingId], references: [id])
-
-  @@unique([followerId, followingId])
-  @@map("followers")
-}
-
-model Download {
-  id             Int                @id @default(autoincrement())
-  mediaId        Int                @map("media_id")
-  userId         Int                @map("user_id")
-  deviceId       String?            @map("device_id")
-  downloadedAt   DateTime           @default(now()) @map("downloaded_at")
-  expiresAt      DateTime?          @map("expires_at")
-  accessType     DownloadAccessType @default(OFFLINE) @map("access_type")
-  isDRMProtected Boolean            @default(false) @map("is_drm_protected")
-  licenseKey     String?            @unique @map("license_key")
-  extraData      Json?              @map("extra_data")
-  media          Media              @relation(fields: [mediaId], references: [id])
-  user           User               @relation(fields: [userId], references: [id])
-
-  @@map("downloads")
-}
-
-model Transaction {
-  id                Int               @id @default(autoincrement())
-  amount            Float
-  currency          Currency          @default(USD)
-  originalAmount    Float?            @map("original_amount")
-  originalCurrency  Currency?         @map("original_currency")
-  exchangeRate      Float?            @map("exchange_rate")
-  status            TransactionStatus
-  userId            Int               @map("user_id")
-  mediaId           Int?              @map("media_id")
-  reference         String            @unique
-  paymentMethod     PaymentMethod     @map("payment_method")
-  paymentProvider   PaymentProvider   @map("payment_provider")
-  providerReference String?           @map("provider_reference")
-  metadata          Json?
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
-  resellerLinkId    Int?              @map("reseller_link_id")
-  isResellerSale    Boolean           @default(false) @map("is_reseller_sale")
-
-  commissions        Commission[]
-  payoutTransactions PayoutTransaction[]
-  queuedPayouts      QueuedPayout[]
-  libraryItems       LibraryItem[]
-  user               User                @relation(fields: [userId], references: [id])
-  media              Media?              @relation(fields: [mediaId], references: [id])
-  resellerLink       ResellerLink?       @relation(fields: [resellerLinkId], references: [id])
-  deviceLicenses     DeviceLicense[]
-
-  @@index([userId, status])
-  @@index([paymentProvider, providerReference])
-  @@index([resellerLinkId])
-  @@map("transactions")
-}
-
-model Commission {
-  id                  Int              @id @default(autoincrement())
-  amount              Float
-  currency            Currency         @default(USD)
-  status              CommissionStatus @default(PENDING)
-  resellerId          Int              @map("reseller_id")
-  transactionId       Int              @map("transaction_id")
-  mediaId             Int              @map("media_id")
-  commissionRate      Float            @map("commission_rate")
-  isPaid              Boolean          @default(false) @map("is_paid")
-  paidAt              DateTime?        @map("paid_at")
-  payoutTransactionId Int?             @map("payout_transaction_id")
-  createdAt           DateTime         @default(now()) @map("created_at")
-
-  reseller          User               @relation(fields: [resellerId], references: [id])
-  transaction       Transaction        @relation(fields: [transactionId], references: [id])
-  media             Media              @relation(fields: [mediaId], references: [id])
-  payoutTransaction PayoutTransaction? @relation(fields: [payoutTransactionId], references: [id])
-
-  @@index([resellerId, status])
-  @@index([transactionId])
-  @@map("commissions")
-}
-
-model ResellerLink {
-  id                   Int                @id @default(autoincrement())
-  code                 String             @unique
-  resellerId           Int                @map("reseller_id")
-  mediaId              Int                @map("media_id")
-  clickCount           Int                @default(0) @map("click_count")
-  conversionCount      Int                @default(0) @map("conversion_count")
-  status               ResellerLinkStatus @default(ACTIVE)
-  customCommissionRate Float?             @map("custom_commission_rate")
-  createdAt            DateTime           @default(now()) @map("created_at")
-  expiresAt            DateTime?          @map("expires_at")
-
-  reseller     User          @relation(fields: [resellerId], references: [id])
-  media        Media         @relation(fields: [mediaId], references: [id])
-  transactions Transaction[]
-
-  @@unique([resellerId, mediaId])
-  @@index([code])
-  @@map("reseller_links")
-}
-
-model Library {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @map("user_id")
-  name        String
-  description String?
-  isPrivate   Boolean  @default(true) @map("is_private")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  user  User          @relation(fields: [userId], references: [id])
-  items LibraryItem[]
-
-  @@map("libraries")
-}
-
-model LibraryItem {
-  id            Int       @id @default(autoincrement())
-  libraryId     Int       @map("library_id")
-  mediaId       Int       @map("media_id")
-  addedAt       DateTime  @default(now()) @map("added_at")
-  purchasedAt   DateTime? @map("purchased_at")
-  transactionId Int?      @map("transaction_id")
-
-  library     Library      @relation(fields: [libraryId], references: [id])
-  media       Media        @relation(fields: [mediaId], references: [id])
-  transaction Transaction? @relation(fields: [transactionId], references: [id])
-
-  @@unique([libraryId, mediaId])
-  @@map("library_items")
-}
-
-model Notification {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  title     String
-  message   String
-  isRead    Boolean  @default(false) @map("is_read")
-  type      String
-  metadata  Json?
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@map("notifications")
-}
-
-model PaymentAccount {
-  id            Int             @id @default(autoincrement())
-  userId        Int             @map("user_id")
-  provider      PaymentProvider
-  accountType   PaymentMethod   @map("account_type")
-  accountNumber String          @map("account_number")
-  accountName   String?         @map("account_name")
-  country       String?
-  currency      Currency        @default(USD)
-  isVerified    Boolean         @default(false) @map("is_verified")
-  isDefault     Boolean         @default(false) @map("is_default")
-  metadata      Json?
-  createdAt     DateTime        @default(now()) @map("created_at")
-  updatedAt     DateTime        @updatedAt @map("updated_at")
-
-  user               User                @relation(fields: [userId], references: [id])
-  payoutTransactions PayoutTransaction[]
-  payoutRequests     PayoutRequest[]
-
-  @@unique([userId, provider, accountNumber])
-  @@index([userId, isDefault])
-  @@map("payment_accounts")
-}
-
-model PayoutTransaction {
-  id                Int               @id @default(autoincrement())
-  paymentAccountId  Int               @map("payment_account_id")
-  transactionId     Int?              @map("transaction_id")
-  amount            Float
-  currency          Currency          @default(USD)
-  status            TransactionStatus
-  reference         String            @unique
-  providerReference String?           @map("provider_reference")
-  fees              Float             @default(0)
-  metadata          Json?
-  processedAt       DateTime?         @map("processed_at")
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
-
-  paymentAccount PaymentAccount @relation(fields: [paymentAccountId], references: [id])
-  transaction    Transaction?   @relation(fields: [transactionId], references: [id])
-  commissions    Commission[]
-
-  @@index([paymentAccountId, status])
-  @@map("payout_transactions")
-}
-
-model PayoutRequest {
-  id               Int               @id @default(autoincrement())
-  userId           Int               @map("user_id")
-  amount           Float
-  currency         Currency          @default(USD)
-  status           TransactionStatus
-  paymentAccountId Int?              @map("payment_account_id")
-  reason           String?
-  metadata         Json?
-  processedAt      DateTime?         @map("processed_at")
-  createdAt        DateTime          @default(now()) @map("created_at")
-  updatedAt        DateTime          @updatedAt @map("updated_at")
-
-  user           User            @relation(fields: [userId], references: [id])
-  paymentAccount PaymentAccount? @relation(fields: [paymentAccountId], references: [id])
-
-  @@index([userId, status])
-  @@map("payout_requests")
-}
-
-model DeviceLicense {
-  id               Int                    @id @default(autoincrement())
-  userId           Int                    @map("user_id")
-  deviceId         Int                    @map("device_id")
-  mediaId          Int                    @map("media_id")
-  transactionId    Int?                   @map("transaction_id")
-  licenseKey       String                 @unique @map("license_key")
-  restrictionLevel DeviceRestrictionLevel @default(STRICT) @map("restriction_level")
-  expiresAt        DateTime?              @map("expires_at")
-  isActive         Boolean                @default(true) @map("is_active")
-  createdAt        DateTime               @default(now()) @map("created_at")
-  updatedAt        DateTime               @updatedAt @map("updated_at")
-
-  user        User         @relation(fields: [userId], references: [id])
-  device      UserDevice   @relation(fields: [deviceId], references: [id])
-  media       Media        @relation(fields: [mediaId], references: [id])
-  transaction Transaction? @relation(fields: [transactionId], references: [id])
-
-  @@unique([userId, deviceId, mediaId])
-  @@index([licenseKey])
-  @@map("device_licenses")
-}
-
-model CurrencyExchange {
-  id           Int      @id @default(autoincrement())
-  fromCurrency Currency @map("from_currency")
-  toCurrency   Currency @map("to_currency")
-  rate         Float
-  isActive     Boolean  @default(true) @map("is_active")
-  lastUpdated  DateTime @default(now()) @map("last_updated")
-
-  @@unique([fromCurrency, toCurrency])
-  @@map("currency_exchanges")
-}
-
-model SystemSettings {
-  id          Int      @id @default(autoincrement())
-  key         String   @unique
-  value       String
-  description String?
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("system_settings")
-}
+// ==================== KYC & VERIFICATION ====================
 
 model KYCDocument {
-  id              Int          @id @default(autoincrement())
-  userId          Int          @map("user_id")
-  documentType    DocumentType @map("document_type")
-  documentNumber  String?      @map("document_number")
-  frontImageUrl   String       @map("front_image_url")
-  backImageUrl    String?      @map("back_image_url")
-  selfieImageUrl  String?      @map("selfie_image_url")
-  status          KYCStatus    @default(PENDING_REVIEW) @map("status")
-  rejectionReason String?      @map("rejection_reason")
-  reviewedBy      Int?         @map("reviewed_by")
-  reviewedAt      DateTime?    @map("reviewed_at")
-  metadata        Json?        @map("metadata")
-  createdAt       DateTime     @default(now()) @map("created_at")
-  updatedAt       DateTime     @updatedAt @map("updated_at")
-
-  user     User  @relation(fields: [userId], references: [id])
-  reviewer User? @relation("DocumentReviewer", fields: [reviewedBy], references: [id])
+  id                      Int                @id @default(autoincrement())
+  userId                  Int                @map("user_id")
+  documentType            DocumentType       @map("document_type")
+  documentNumber          String?            @map("document_number")
+  frontImageUrl           String             @map("front_image_url")
+  backImageUrl            String?            @map("back_image_url")
+  selfieImageUrl          String?            @map("selfie_image_url")
+  status                  KYCStatus          @default(PENDING_REVIEW) @map("status")
+  rejectionReason         String?            @map("rejection_reason")
+  reviewedBy              Int?               @map("reviewed_by")
+  reviewedAt              DateTime?          @map("reviewed_at")
+  metadata                Json?
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  reviewer                User?              @relation("DocumentReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
   @@index([documentType, status])
@@ -864,108 +1460,239 @@ model KYCDocument {
 }
 
 model Verification {
-  id         Int                @id @default(autoincrement())
-  userId     Int                @map("user_id")
-  method     VerificationMethod @map("method")
-  code       String?            @map("code")
-  token      String?            @map("token")
-  isVerified Boolean            @default(false) @map("is_verified")
-  expiresAt  DateTime           @map("expires_at")
-  verifiedAt DateTime?          @map("verified_at")
-  metadata   Json?              @map("metadata")
-  createdAt  DateTime           @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  userId                  Int?               @map("user_id")
+  method                  VerificationMethod @map("method")
+  code                    String?
+  token                   String?
+  isVerified              Boolean            @default(false) @map("is_verified")
+  expiresAt               DateTime           @map("expires_at")
+  verifiedAt              DateTime?          @map("verified_at")
+  metadata                Json?
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, method])
   @@index([token, expiresAt])
   @@map("verifications")
 }
 
-model AuditLog {
-  id         Int      @id @default(autoincrement())
-  userId     Int?     @map("user_id")
-  action     String   @map("action")
-  resource   String?  @map("resource")
-  resourceId Int?     @map("resource_id")
-  oldValues  Json?    @map("old_values")
-  newValues  Json?    @map("new_values")
-  ipAddress  String?  @map("ip_address")
-  userAgent  String?  @map("user_agent")
-  createdAt  DateTime @default(now()) @map("created_at")
+// ==================== AUDITING & SECURITY ====================
 
-  user User? @relation(fields: [userId], references: [id])
+model AuditLog {
+  id                      Int                @id @default(autoincrement())
+  userId                  Int?               @map("user_id")
+  action                  String
+  resource                String?
+  resourceId              Int?               @map("resource_id")
+  oldValues               Json?              @map("old_values")
+  newValues               Json?              @map("new_values")
+  ipAddress               String?            @map("ip_address")
+  userAgent               String?            @map("user_agent")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  user                    User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId, action])
   @@index([resource, resourceId])
+  @@index([createdAt])
   @@map("audit_logs")
 }
 
-// ==================== FLOAT ACCOUNT SYSTEM ====================
+model SystemAlert {
+  id                      Int                @id @default(autoincrement())
+  type                    String
+  message                 String
+  severity                String             // LOW, MEDIUM, HIGH, CRITICAL
+  resolved                Boolean            @default(false)
+  resolvedAt              DateTime?          @map("resolved_at")
+  resolvedBy              Int?               @map("resolved_by")
+  metadata                Json?
+  createdAt               DateTime           @default(now()) @map("created_at")
+
+  @@index([type, resolved])
+  @@index([severity, createdAt])
+  @@map("system_alerts")
+}
+
+model SystemSettings {
+  id                      Int                @id @default(autoincrement())
+  key                     String             @unique
+  value                   String
+  description             String?
+  category                String?
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@map("system_settings")
+}
+
+// ==================== CONTENT MODERATION ====================
+
+model ContentModeration {
+  id                      Int                @id @default(autoincrement())
+  mediaId                 Int                @map("media_id")
+  contentCreatorId        Int                @map("content_creator_id")
+  reviewerId              Int?               @map("reviewer_id")
+  status                  ModerationStatus   @default(PENDING)
+  reason                  String?
+  flags                   String[]           // list of policy violations
+  notes                   String?
+  reviewedAt              DateTime?          @map("reviewed_at")
+  appealed                Boolean            @default(false)
+  appealReason            String?            @map("appeal_reason")
+  appealedAt              DateTime?          @map("appealed_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  contentCreator          User               @relation("ContentCreator", fields: [contentCreatorId], references: [id], onDelete: Cascade)
+  reviewer                User?              @relation("ModerationReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([mediaId])
+  @@index([createdAt])
+  @@map("content_moderations")
+}
+
+// ==================== CURRENCY & FLOAT ACCOUNT ====================
+
+model CurrencyExchange {
+  id                      Int                @id @default(autoincrement())
+  fromCurrency            Currency           @map("from_currency")
+  toCurrency              Currency           @map("to_currency")
+  rate                    Float
+  isActive                Boolean            @default(true) @map("is_active")
+  lastUpdated             DateTime           @default(now()) @map("last_updated")
+
+  @@unique([fromCurrency, toCurrency])
+  @@map("currency_exchanges")
+}
 
 model FloatAccount {
-  id        Int      @id @default(autoincrement())
-  currency  Currency @unique
-  balance   Float    @default(0)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  transactions FloatTransaction[]
+  id                      Int                @id @default(autoincrement())
+  currency                Currency           @unique
+  balance                 Float              @default(0)
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  transactions            FloatTransaction[]
 
   @@map("float_accounts")
 }
 
 model FloatTransaction {
-  id          Int      @id @default(autoincrement())
-  floatAccountId Int   @map("float_account_id")
-  amount      Float    // Positive for funding, negative for deductions
-  currency    Currency
-  type        String   // FUNDING, DEDUCTION, ADJUSTMENT
-  reason      String
-  balanceAfter Float   @map("balance_after")
-  reference   String?  @unique
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  floatAccount FloatAccount @relation(fields: [floatAccountId], references: [id])
+  id                      Int                @id @default(autoincrement())
+  floatAccountId          Int                @map("float_account_id")
+  amount                  Float
+  currency                Currency
+  type                    String
+  reason                  String
+  balanceAfter            Float              @map("balance_after")
+  reference               String?            @unique
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  floatAccount            FloatAccount       @relation(fields: [floatAccountId], references: [id], onDelete: Cascade)
 
   @@index([floatAccountId, createdAt])
   @@map("float_transactions")
 }
 
-model QueuedPayout {
-  id           Int               @id @default(autoincrement())
-  userId       Int               @map("user_id")
-  transactionId Int              @map("transaction_id")
-  amount       Float
-  currency     Currency
-  type         String            // ARTIST_PAYOUT, RESELLER_PAYOUT, RETRY_PAYOUT
-  status       String            // QUEUED, PROCESSING, COMPLETED, FAILED
-  reason       String
-  retryCount   Int               @default(0) @map("retry_count")
-  lastError    String?           @map("last_error")
-  processedAt  DateTime?         @map("processed_at")
-  createdAt    DateTime          @default(now()) @map("created_at")
-  updatedAt    DateTime          @updatedAt @map("updated_at")
+// ==================== LIVE STREAMING ====================
 
-  user        User        @relation(fields: [userId], references: [id])
-  transaction Transaction @relation(fields: [transactionId], references: [id])
+model LiveStream {
+  id                      Int                @id @default(autoincrement())
+  title                   String
+  description             String?
+  userId                  Int                @map("user_id")
+  status                  LiveStreamStatus   @default(SCHEDULED)
+  startedAt               DateTime?          @map("started_at")
+  endedAt                 DateTime?          @map("ended_at")
+  scheduledFor            DateTime?          @map("scheduled_for")
+  streamUrl               String?            @map("stream_url")
+  streamKey               String?            @unique @map("stream_key")
+  thumbnailUrl            String?            @map("thumbnail_url")
+  viewerCount             Int                @default(0) @map("viewer_count")
+  peakViewerCount         Int                @default(0) @map("peak_viewer_count")
+  isPublic                Boolean            @default(true) @map("is_public")
+  isRecorded              Boolean            @default(false) @map("is_recorded")
+  recordedMediaId         Int?               @map("recorded_media_id")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+  
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions                LiveStreamSession[]
+  viewers                 LiveStreamViewer[]
 
-  @@index([status, createdAt])
   @@index([userId, status])
-  @@map("queued_payouts")
+  @@index([status])
+  @@map("live_streams")
 }
 
-model SystemAlert {
-  id        Int      @id @default(autoincrement())
-  type      String   // FLOAT_BALANCE_LOW, PAYOUT_FAILED, SETTLEMENT_DELAYED
-  message   String
-  severity  String   // LOW, MEDIUM, HIGH, CRITICAL
-  resolved  Boolean  @default(false)
-  resolvedAt DateTime? @map("resolved_at")
-  metadata  Json?
-  createdAt DateTime @default(now()) @map("created_at")
+model LiveStreamSession {
+  id                      Int                @id @default(autoincrement())
+  liveStreamId            Int                @map("live_stream_id")
+  mediaId                 Int?               @map("media_id")
+  bitrate                 Int?
+  fps                     Float?
+  resolution              String?
+  codec                   VideoCodec?
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  liveStream              LiveStream         @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
+  media                   Media?             @relation(fields: [mediaId], references: [id], onDelete: SetNull)
 
-  @@index([type, resolved])
-  @@index([severity, createdAt])
-  @@map("system_alerts")
+  @@map("live_stream_sessions")
+}
+
+model LiveStreamViewer {
+  id                      Int                @id @default(autoincrement())
+  liveStreamId            Int                @map("live_stream_id")
+  userId                  Int                @map("user_id")
+  joinedAt                DateTime           @default(now()) @map("joined_at")
+  leftAt                  DateTime?          @map("left_at")
+  watchDuration           Int?               @map("watch_duration")
+  
+  liveStream              LiveStream         @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([liveStreamId, userId])
+  @@index([liveStreamId])
+  @@map("live_stream_viewers")
+}
+
+// ==================== PRODUCER COLLABORATION ====================
+
+model ProducerCollaboration {
+  id                      Int                @id @default(autoincrement())
+  mediaId                 Int                @map("media_id")
+  producerId              Int                @map("producer_id")
+  artistId                Int                @map("artist_id")
+  type                    CollaborationType
+  roleDescription         String?            @map("role_description")
+  isConfirmed             Boolean            @default(false) @map("is_confirmed")
+  confirmedAt             DateTime?          @map("confirmed_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  
+  media                   Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  producer                User               @relation("AssignedProducer", fields: [producerId], references: [id], onDelete: Cascade)
+  artist                  User               @relation("CollaboratingArtist", fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, producerId, type])
+  @@map("producer_collaborations")
+}
+
+// ==================== SESSION MODEL (LEGACY) ====================
+
+model sessions {
+  id                      Int                @id @default(autoincrement())
+  user_id                 Int?               @map("user_id")
+  token                   String             @unique
+  ip_address              String?            @map("ip_address")
+  user_agent              String?            @map("user_agent")
+  expires_at              DateTime           @map("expires_at")
+  created_at              DateTime           @default(now()) @map("created_at")
+
+  @@map("sessions_legacy")
 }

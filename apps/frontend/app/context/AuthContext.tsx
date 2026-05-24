@@ -13,7 +13,7 @@ import {
   deleteUser,
 } from 'firebase/auth';
 import { auth, googleProvider, facebookProvider } from '@/lib/firebase-config';
-import { getRoleMismatchMessage } from '@/lib/auth-error-utils';
+import { getFriendlyFirebaseError, getRoleMismatchMessage } from '@/lib/auth-error-utils';
 
 // local UserRole type used by auth helpers/components
 type UserRole = 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER' | 'ADMIN' | 'MODERATOR';
@@ -442,12 +442,18 @@ const signUp = async (data: SignUpData): Promise<User> => {
     }
   };
 
-    const forgotPassword = async (email: string): Promise<void> => {
+  const forgotPassword = async (email: string): Promise<void> => {
     try {
+      setLoading(true);
       await sendPasswordResetEmail(auth, email);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Password reset error:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw new Error(getFriendlyFirebaseError(error));
+      }
+      throw new Error('Failed to send password reset email. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 

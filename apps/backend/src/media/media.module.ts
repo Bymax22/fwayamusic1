@@ -4,10 +4,12 @@ import { MediaController } from './media.controller';
 import { PrismaModule } from '../db/prisma.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
     PrismaModule,
+    NotificationModule,
     MulterModule.register({
       storage: memoryStorage(),
       limits: {

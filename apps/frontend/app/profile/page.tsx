@@ -1,8 +1,9 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
+import toast from 'react-hot-toast';
 import {
   Headphones,
   Heart,
@@ -14,6 +15,9 @@ import {
   Calendar,
   Mail,
   Download,
+  Upload,
+  X,
+  Loader,
 } from 'lucide-react';
 
 type ActivityType = 'played' | 'liked' | 'created';
@@ -49,7 +53,7 @@ interface UserProfile {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser, getToken } = useAuth();
 
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
@@ -72,6 +76,15 @@ export default function ProfilePage() {
     },
     recentActivity: [],
   });
+
+  const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   // Redirect unauthenticated users and populate profile when user available
   useEffect(() => {
@@ -116,6 +129,7 @@ export default function ProfilePage() {
     website: '',
   });
 
+
   useEffect(() => {
     setEditForm({
       displayName: profile.displayName,
@@ -125,9 +139,173 @@ export default function ProfilePage() {
     });
   }, [profile]);
 
-  const handleSaveProfile = () => {
-    setProfile((prev) => ({ ...prev, ...editForm }));
-    setIsEditing(false);
+  // Real-time: refresh user on mount, focus, visibility change, storage changes, and poll periodically
+  useEffect(() => {
+    let intervalId: number | undefined;
+    const doRefresh = async () => {
+      try {
+        if (user) await refreshUser();
+      } catch (e) {
+        console.error('Refresh user failed:', e);
+      }
+    };
+
+    // initial refresh
+    doRefresh();
+
+    const onFocus = () => doRefresh();
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') doRefresh();
+    };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'authToken') doRefresh();
+    };
+
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('storage', onStorage);
+
+    // poll every 15s while on the profile page
+    intervalId = window.setInterval(() => doRefresh(), 15000);
+
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('storage', onStorage);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [user, refreshUser]);
+
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    const optimisticProfile = { ...profile, ...editForm };
+    setProfile(optimisticProfile);
+
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('Not authenticated');
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editForm),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Failed to save profile');
+      }
+
+      await refreshUser();
+      toast.success('Profile saved successfully!');
+      setIsEditing(false);
+    } catch (err: unknown) {
+      console.error('Save profile error:', err);
+      const errorMsg = err instanceof Error ? err.message : 'Failed to save profile';
+      toast.error(errorMsg);
+      await refreshUser();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setAvatarPreview(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload
+    setUploadingAvatar(true);
+    const loadingToast = toast.loading('Uploading avatar...');
+
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('Not authenticated');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/avatar`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error('Failed to upload avatar');
+
+      const data = await res.json();
+      setProfile((prev) => ({ ...prev, avatar: data.avatarUrl }));
+      setAvatarPreview(null);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+      
+      toast.dismiss(loadingToast);
+      toast.success('Avatar updated!');
+      await refreshUser();
+    } catch (err) {
+      toast.dismiss(loadingToast);
+      toast.error(err instanceof Error ? err.message : 'Failed to upload avatar');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setCoverPreview(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload
+    setUploadingCover(true);
+    const loadingToast = toast.loading('Uploading cover...');
+
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('Not authenticated');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/cover`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error('Failed to upload cover');
+
+      const data = await res.json();
+      setProfile((prev) => ({ ...prev, coverImage: data.coverImageUrl }));
+      setCoverPreview(null);
+      if (coverInputRef.current) coverInputRef.current.value = '';
+      
+      toast.dismiss(loadingToast);
+      toast.success('Cover image updated!');
+      await refreshUser();
+    } catch (err) {
+      toast.dismiss(loadingToast);
+      toast.error(err instanceof Error ? err.message : 'Failed to upload cover');
+    } finally {
+      setUploadingCover(false);
+    }
   };
 
   const getActivityIcon = (type: ActivityType) => {
@@ -158,12 +336,42 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-black text-white pb-32">
+      {/* Hidden file inputs */}
+      <input
+        ref={avatarInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleAvatarChange}
+        className="hidden"
+      />
+      <input
+        ref={coverInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleCoverChange}
+        className="hidden"
+      />
+
       {/* Cover Image */}
       <div className="relative h-64 bg-gradient-to-r from-purple-600 to-purple-500">
+        <Image
+          src={coverPreview || profile.coverImage}
+          alt="Cover"
+          fill
+          className="object-cover"
+          onError={() => {
+            setProfile((prev) => ({ ...prev, coverImage: '/covers/banner1.jpg' }));
+          }}
+        />
         <div className="absolute inset-0 bg-black/20" />
         {isEditing && (
-          <button className="absolute top-4 right-4 px-4 py-2 bg-black/50 hover:bg-black/70 text-white rounded-lg transition-colors">
-            Change Cover
+          <button
+            onClick={() => coverInputRef.current?.click()}
+            disabled={uploadingCover}
+            className="absolute top-4 right-4 px-4 py-2 bg-black/50 hover:bg-black/70 text-white rounded-lg transition-colors flex items-center gap-2"
+          >
+            {uploadingCover ? <Loader className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+            {uploadingCover ? 'Uploading...' : 'Change Cover'}
           </button>
         )}
       </div>
@@ -173,10 +381,10 @@ export default function ProfilePage() {
         {/* Profile Header */}
         <div className="rounded-[2rem] bg-[#111827]/90 p-8 shadow-xl shadow-slate-900/20 mb-8">
         <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-end">
-          {/* Avatar */}
+        {/* Avatar */}
           <div className="relative">
             <Image
-              src={profile.avatar}
+              src={avatarPreview || profile.avatar}
               alt={profile.displayName}
               width={128}
               height={128}
@@ -186,8 +394,12 @@ export default function ProfilePage() {
               }}
             />
             {isEditing && (
-              <button className="absolute bottom-2 right-2 w-8 h-8 bg-[#e51f48] rounded-full flex items-center justify-center text-white">
-                <Edit3 className="w-4 h-4" />
+              <button
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="absolute bottom-2 right-2 w-8 h-8 bg-[#e51f48] hover:bg-[#ff4d6d] rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-colors"
+              >
+                {uploadingAvatar ? <Loader className="w-4 h-4 animate-spin" /> : <Edit3 className="w-4 h-4" />}
               </button>
             )}
           </div>
@@ -225,10 +437,11 @@ export default function ProfilePage() {
                   </>
                 ) : (
                   <>
-                    <button onClick={handleSaveProfile} className="px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors">
-                      Save
+                    <button onClick={handleSaveProfile} disabled={saving} className="px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
+                      {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
+                      {saving ? 'Saving...' : 'Save'}
                     </button>
-                    <button onClick={() => setIsEditing(false)} className="px-4 py-2 bg-[#0a3747] hover:bg-[#0a3747]/80 text-white rounded-xl transition-colors">
+                    <button onClick={() => { setIsEditing(false); setEditForm({ displayName: profile.displayName, bio: profile.bio, location: profile.location, website: profile.website }); }} className="px-4 py-2 bg-[#0a3747] hover:bg-[#0a3747]/80 text-white rounded-xl transition-colors">
                       Cancel
                     </button>
                   </>
