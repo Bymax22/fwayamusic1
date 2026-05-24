@@ -8,8 +8,8 @@ export class KycController {
   constructor(private readonly kycService: KycService) {}
 
   @Post()
-  async submit(@Request() req: any, @Body() body: CreateKYCDto) {
-    const userId = req.user?.id ?? body['userId'];
+  async submit(@Request() req: any, @Body() body: any) {
+    const userId = req.user?.id ?? body.userId;
     return this.kycService.submitDocument(userId, body);
   }
 

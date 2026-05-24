@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ContentStatus } from '@prisma/client';
+import { ContentStatus, DeletionReason } from '@prisma/client';
 
 @Injectable()
 export class AlbumsService {
@@ -12,7 +12,6 @@ export class AlbumsService {
     data: {
       title: string;
       description?: string;
-      genre?: string;
       tags?: string[];
       releaseDate?: Date;
       recordLabel?: string;
@@ -24,7 +23,6 @@ export class AlbumsService {
     const {
       title,
       description,
-      genre,
       tags,
       releaseDate,
       recordLabel,
@@ -37,8 +35,6 @@ export class AlbumsService {
       data: {
         title,
         description,
-        genre,
-        tags,
         releaseDate,
         recordLabel,
         copyrightYear,
@@ -245,7 +241,7 @@ export class AlbumsService {
   async deleteAlbum(
     albumId: number,
     userId: number,
-    reason: string = 'USER_REQUEST',
+    reason: DeletionReason = DeletionReason.USER_REQUEST,
   ) {
     const album = await this.prisma.album.findUnique({
       where: { id: albumId },

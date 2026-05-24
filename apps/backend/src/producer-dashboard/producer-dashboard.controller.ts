@@ -31,7 +31,12 @@ export class ProducerDashboardController {
     // Get producer stats
     const [producedTracks, collaborations, earnings] = await Promise.all([
       this.prisma.media.count({
-        where: { producerId: user.id, deletedAt: null },
+        where: {
+          deletedAt: null,
+          collaborators: {
+            some: { producerId: user.id },
+          },
+        },
       }),
       this.prisma.producerCollaboration.count({
         where: { producerId: user.id },
@@ -44,7 +49,12 @@ export class ProducerDashboardController {
 
     // Get recent production work
     const recentWork = await this.prisma.media.findMany({
-      where: { producerId: user.id, deletedAt: null },
+      where: {
+        deletedAt: null,
+        collaborators: {
+          some: { producerId: user.id },
+        },
+      },
       orderBy: { createdAt: 'desc' },
       take: 5,
       include: {
@@ -58,7 +68,7 @@ export class ProducerDashboardController {
     const pendingRequests = await this.prisma.producerCollaboration.count({
       where: {
         producerId: user.id,
-        status: 'PENDING',
+        isConfirmed: false,
       },
     });
 
@@ -83,7 +93,8 @@ export class ProducerDashboardController {
     @Query('status') status?: string,
   ) {
     const where: any = { producerId: req.user.id };
-    if (status) where.status = status;
+    if (status === 'PENDING') where.isConfirmed = false;
+    if (status === 'APPROVED') where.isConfirmed = true;
 
     const collaborations = await this.prisma.producerCollaboration.findMany({
       where,
@@ -104,7 +115,7 @@ export class ProducerDashboardController {
           },
         },
       },
-      orderBy: { requestedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
 
     return collaborations;
@@ -116,7 +127,12 @@ export class ProducerDashboardController {
   @ApiBearerAuth()
   async getProducedTracks(@Request() req: any) {
     const tracks = await this.prisma.media.findMany({
-      where: { producerId: req.user.id, deletedAt: null },
+      where: {
+        deletedAt: null,
+        collaborators: {
+          some: { producerId: req.user.id },
+        },
+      },
       include: {
         user: {
           select: {
@@ -126,7 +142,7 @@ export class ProducerDashboardController {
             avatarUrl: true,
           },
         },
-        collaborations: {
+        collaborators: {
           include: {
             artist: {
               select: {
@@ -152,28 +168,13 @@ export class ProducerDashboardController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    const where: any = {
-      collaborations: {
-        some: {
-          producerId: req.user.id,
-          isPaid: true,
-        },
-      },
-    };
-
     const start = startDate ? new Date(startDate) : undefined;
     const end = endDate ? new Date(endDate) : undefined;
-
-    if (start || end) {
-      where.createdAt = {};
-      if (start) where.createdAt.gte = start;
-      if (end) where.createdAt.lte = end;
-    }
 
     const collaborations = await this.prisma.producerCollaboration.findMany({
       where: {
         producerId: req.user.id,
-        isPaid: true,
+        isConfirmed: true,
       },
       include: {
         media: {
@@ -184,7 +185,7 @@ export class ProducerDashboardController {
       },
     });
 
-    const totalEarnings = collaborations.reduce((sum, c) => sum + (c.flatFee || 0), 0);
+    const totalEarnings = 0;
 
     return {
       collaborations,
@@ -213,8 +214,8 @@ export class ProducerDashboardController {
     return this.prisma.producerCollaboration.update({
       where: { id: parseInt(id) },
       data: {
-        status: 'APPROVED',
-        respondedAt: new Date(),
+        isConfirmed: true,
+        confirmedAt: new Date(),
       },
     });
   }
@@ -238,8 +239,8 @@ export class ProducerDashboardController {
     return this.prisma.producerCollaboration.update({
       where: { id: parseInt(id) },
       data: {
-        status: 'REJECTED',
-        respondedAt: new Date(),
+        isConfirmed: false,
+        confirmedAt: new Date(),
       },
     });
   }
@@ -250,7 +251,12 @@ export class ProducerDashboardController {
   @ApiBearerAuth()
   async getPortfolio(@Request() req: any) {
     const tracks = await this.prisma.media.findMany({
-      where: { producerId: req.user.id, deletedAt: null },
+      where: {
+        deletedAt: null,
+        collaborators: {
+          some: { producerId: req.user.id },
+        },
+      },
       select: {
         id: true,
         title: true,
@@ -301,7 +307,7 @@ export class ProducerDashboardController {
     const approvedCollaborations = await this.prisma.producerCollaboration.count({
       where: {
         producerId: req.user.id,
-        status: 'APPROVED',
+        isConfirmed: true,
       },
     });
 

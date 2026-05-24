@@ -155,7 +155,7 @@ export class UserService {
 
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { coverImageUrl, coverCloudinaryPublicId },
+      data: { coverImageUrl, cloudinaryPublicId: coverCloudinaryPublicId },
     });
 
     return this.getProfileByEmail(email);

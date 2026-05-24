@@ -3,7 +3,7 @@ import { DocumentType } from '@prisma/client';
 
 export class CreateKYCDto {
   @IsEnum(DocumentType)
-  documentType: DocumentType;
+  documentType!: DocumentType;
 
   @IsOptional()
   @IsString()
@@ -11,7 +11,7 @@ export class CreateKYCDto {
 
   @IsNotEmpty()
   @IsString()
-  frontImageUrl: string;
+  frontImageUrl!: string;
 
   @IsOptional()
   @IsString()

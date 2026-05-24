@@ -3,7 +3,7 @@ import { KYCStatus } from '@prisma/client';
 
 export class ReviewKYCDto {
   @IsEnum(KYCStatus)
-  status: KYCStatus;
+  status!: KYCStatus;
 
   @IsOptional()
   @IsString()

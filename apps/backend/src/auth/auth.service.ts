@@ -443,10 +443,15 @@ async findOrCreateUser(decodedFirebaseUser: any) {
     await this.prisma.verification.update({ where: { id: verification.id }, data: { isVerified: true, verifiedAt: new Date() } });
 
     // update the user
+    const verificationUserId = verification.userId;
+    if (!verificationUserId) {
+      return { success: false, message: 'Invalid verification user' };
+    }
+
     if (verification.method === VerificationMethod.EMAIL) {
-      await this.prisma.user.update({ where: { id: verification.userId }, data: { isEmailVerified: true } });
+      await this.prisma.user.update({ where: { id: verificationUserId }, data: { isEmailVerified: true } });
     } else {
-      await this.prisma.user.update({ where: { id: verification.userId }, data: { isPhoneVerified: true } });
+      await this.prisma.user.update({ where: { id: verificationUserId }, data: { isPhoneVerified: true } });
     }
 
     return { success: true };

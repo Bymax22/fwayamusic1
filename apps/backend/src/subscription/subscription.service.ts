@@ -190,12 +190,13 @@ export class SubscriptionService {
   async ensureActivePremiumArtistOrProducer(userId: number) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     const now = new Date();
+    const premiumRoles = [UserRole.ARTIST, UserRole.PRODUCER] as const;
     if (
       !user ||
       !user.isPremium ||
       !user.premiumUntil ||
       user.premiumUntil < now ||
-      ![UserRole.ARTIST, UserRole.PRODUCER].includes(user.role)
+      !premiumRoles.includes(user.role as typeof premiumRoles[number])
     ) {
       throw new ForbiddenException('This action requires an active premium artist or producer account.');
     }

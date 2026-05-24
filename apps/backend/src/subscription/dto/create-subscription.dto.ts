@@ -4,11 +4,11 @@ import { Currency, PaymentProvider, SubscriptionPlan } from '@prisma/client';
 export class CreateSubscriptionDto {
   @IsEnum(SubscriptionPlan)
   @IsNotEmpty()
-  plan: SubscriptionPlan;
+  plan!: SubscriptionPlan;
 
   @IsNumber()
   @IsNotEmpty()
-  amount: number;
+  amount!: number;
 
   @IsEnum(Currency)
   @IsOptional()

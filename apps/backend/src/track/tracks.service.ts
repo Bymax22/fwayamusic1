@@ -119,7 +119,8 @@ export class TracksService {
 
     if (accessType === MediaAccessType.PREMIUM) {
       const user = await this.prisma.user.findUnique({ where: { id: userId } });
-      if (!user || !user.isPremium || !user.premiumUntil || user.premiumUntil < new Date() || ![UserRole.ARTIST, UserRole.PRODUCER].includes(user.role)) {
+      const allowedRoles = [UserRole.ARTIST, UserRole.PRODUCER] as const;
+      if (!user || !user.isPremium || !user.premiumUntil || user.premiumUntil < new Date() || !allowedRoles.includes(user.role as typeof allowedRoles[number])) {
         throw new ForbiddenException('Only active premium artists and producers can set premium pricing for tracks');
       }
     }
