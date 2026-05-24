@@ -82,6 +82,7 @@ interface SignUpData {
   businessType?: string;
   acceptedTerms: boolean;
   acceptedPrivacy: boolean;
+  acceptedCookies: boolean;
   marketingEmails: boolean;
   dataSharing: boolean;
   recaptchaToken?: string; // Made optional - can be empty for USER role temporarily
@@ -509,6 +510,7 @@ const signInWithFacebook = async (role?: UserRole) => {
         displayName: firebaseUser.displayName,
         avatarUrl: firebaseUser.photoURL,
         provider: firebaseUser.providerData[0]?.providerId,
+        socialId: firebaseUser.providerData[0]?.uid,
         role,
       }),
     });

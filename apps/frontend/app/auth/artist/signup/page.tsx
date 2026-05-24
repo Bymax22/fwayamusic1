@@ -33,6 +33,7 @@ export default function ArtistSignUp() {
     avatarUrl: '',
     acceptedTerms: false,
     acceptedPrivacy: false,
+    acceptedCookies: false,
     marketingEmails: false,
     dataSharing: false,
     avatarFile: null as File | null,
@@ -450,8 +451,13 @@ export default function ArtistSignUp() {
                   <input type="checkbox" id="privacy-artist" checked={formData.acceptedPrivacy} onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })} className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2" />
                   <label htmlFor="privacy-artist" className="text-white text-sm">I acknowledge how my personal data will be processed *</label>
                 </div>
-
-                <button onClick={handleSubmit} disabled={loading || !formData.acceptedTerms || !formData.acceptedPrivacy} className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500">{loading ? 'Creating Account...' : 'Create Account'}</button>
+                {errors.acceptedPrivacy && <p className="text-red-400 text-sm mt-2">{errors.acceptedPrivacy}</p>}
+                <div className="flex items-start gap-3 mt-3">
+                  <input type="checkbox" id="cookies-artist" checked={formData.acceptedCookies} onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })} className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2" />
+                  <label htmlFor="cookies-artist" className="text-white text-sm">I agree to the use of cookies for analytics and personalization.</label>
+                </div>
+                {errors.acceptedCookies && <p className="text-red-400 text-sm mt-2">{errors.acceptedCookies}</p>}
+                <button onClick={handleSubmit} disabled={loading || !formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedCookies} className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500">{loading ? 'Creating Account...' : 'Create Account'}</button>
                 {errors.submit && <p className="text-sm text-red-400 text-center">{errors.submit}</p>}
               </div>
             </motion.div>

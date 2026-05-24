@@ -33,6 +33,7 @@ export default function ProducerSignUp() {
     avatarUrl: '',
     acceptedTerms: false,
     acceptedPrivacy: false,
+    acceptedCookies: false,
     marketingEmails: false,
     dataSharing: false,
     avatarFile: null as File | null,
@@ -112,6 +113,7 @@ export default function ProducerSignUp() {
     if (currentStep === 'consent') {
       if (!formData.acceptedTerms) newErrors.acceptedTerms = 'You must accept the terms and conditions';
       if (!formData.acceptedPrivacy) newErrors.acceptedPrivacy = 'You must accept the privacy policy';
+      if (!formData.acceptedCookies) newErrors.acceptedCookies = 'You must accept the cookies policy';
     }
 
     setErrors(newErrors);
@@ -665,6 +667,20 @@ export default function ProducerSignUp() {
                 </label>
               </div>
               {errors.acceptedPrivacy && <p className="text-red-400 text-sm">{errors.acceptedPrivacy}</p>}
+
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="cookies-producer"
+                  checked={formData.acceptedCookies}
+                  onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })}
+                  className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-white/10 rounded focus:ring-purple-500 focus:ring-2"
+                />
+                <label htmlFor="cookies-producer" className="text-white text-sm">
+                  I agree to the use of cookies for analytics and personalization.
+                </label>
+              </div>
+              {errors.acceptedCookies && <p className="text-red-400 text-sm">{errors.acceptedCookies}</p>}
 
               <div className="flex items-start gap-3">
                 <input

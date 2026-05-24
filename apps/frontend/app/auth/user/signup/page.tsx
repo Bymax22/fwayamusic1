@@ -31,6 +31,7 @@ export default function UserSignUp() {
     avatarUrl: '',
     acceptedTerms: false,
     acceptedPrivacy: false,
+    acceptedCookies: false,
     marketingEmails: false,
     dataSharing: false,
   });
@@ -169,6 +170,7 @@ export default function UserSignUp() {
     if (emailStatus === 'taken') newErrors.email = 'Email is already in use';
     if (!formData.acceptedTerms) newErrors.acceptedTerms = 'You must accept the terms and conditions';
     if (!formData.acceptedPrivacy) newErrors.acceptedPrivacy = 'You must accept the privacy policy';
+    if (!formData.acceptedCookies) newErrors.acceptedCookies = 'You must accept the cookies policy';
     if (!formData.country) newErrors.country = 'Country is required';
 
     if (Object.keys(newErrors).length > 0) {
@@ -421,6 +423,20 @@ export default function UserSignUp() {
               </label>
             </div>
             {errors.acceptedPrivacy && <p className="text-red-400 text-sm">{errors.acceptedPrivacy}</p>}
+
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="cookies"
+                checked={formData.acceptedCookies}
+                onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })}
+                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
+              />
+              <label htmlFor="cookies" className="text-sm text-gray-300">
+                I agree to the use of cookies for analytics and personalization.
+              </label>
+            </div>
+            {errors.acceptedCookies && <p className="text-red-400 text-sm">{errors.acceptedCookies}</p>}
 
             <div className="flex items-start gap-3">
               <input

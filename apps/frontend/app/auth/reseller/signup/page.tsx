@@ -29,6 +29,7 @@ export default function ResellerSignUp() {
     avatarUrl: '',
     acceptedTerms: false,
     acceptedPrivacy: false,
+    acceptedCookies: false,
     marketingEmails: false,
     dataSharing: false,
     avatarFile: null as File | null,
@@ -85,6 +86,7 @@ export default function ResellerSignUp() {
     if (currentStep === 'consent') {
       if (!formData.acceptedTerms) newErrors.acceptedTerms = 'You must accept the terms and conditions';
       if (!formData.acceptedPrivacy) newErrors.acceptedPrivacy = 'You must accept the privacy policy';
+      if (!formData.acceptedCookies) newErrors.acceptedCookies = 'You must accept the cookies policy';
     }
 
     setErrors(newErrors);
@@ -508,6 +510,20 @@ export default function ResellerSignUp() {
                 </label>
               </div>
               {errors.acceptedPrivacy && <p className="text-red-400 text-sm">{errors.acceptedPrivacy}</p>}
+
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="cookies-reseller"
+                  checked={formData.acceptedCookies}
+                  onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })}
+                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0f1112] border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
+                />
+                <label htmlFor="cookies-reseller" className="text-white text-sm">
+                  I agree to the use of cookies for analytics and personalization.
+                </label>
+              </div>
+              {errors.acceptedCookies && <p className="text-red-400 text-sm">{errors.acceptedCookies}</p>}
 
               <div className="flex items-start gap-3">
                 <input
