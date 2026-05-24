@@ -13,7 +13,7 @@ import {
   deleteUser,
 } from 'firebase/auth';
 import { auth, googleProvider, facebookProvider } from '@/lib/firebase-config';
-import { getFriendlyFirebaseError, getRoleMismatchMessage } from '@/lib/auth-error-utils';
+import { getFriendlyFirebaseError, getRoleMismatchMessage, AuthErrorInfo } from '@/lib/auth-error-utils';
 
 // local UserRole type used by auth helpers/components
 type UserRole = 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER' | 'ADMIN' | 'MODERATOR';
@@ -66,6 +66,9 @@ interface AuthContextType {
   sendOTP: (method: 'email' | 'phone' | 'link', identifier: string) => Promise<void>;
   verificationError: string | null;
   clearVerificationError: () => void;
+  authError: AuthErrorInfo | null;
+  setAuthError: (e: AuthErrorInfo | null) => void;
+  clearAuthError: () => void;
 }
 
 interface SignUpData {
@@ -138,8 +141,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<AuthErrorInfo | null>(null);
 
   const clearVerificationError = () => setVerificationError(null);
+  const clearAuthError = () => setAuthError(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
@@ -578,6 +583,9 @@ const logout = async () => {
     sendOTP,
     verificationError,
     clearVerificationError,
+    authError,
+    setAuthError,
+    clearAuthError,
   };
 
   return (

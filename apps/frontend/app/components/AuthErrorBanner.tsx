@@ -34,7 +34,7 @@ export default function AuthErrorBanner({ error }: Props) {
               <div className="mt-1 text-xs sm:text-sm text-white leading-5">{error.message}</div>
               {error.redirectTo && error.redirectLabel ? (
                 <div className="mt-3">
-                  <Link href={error.redirectTo} className="inline-flex items-center gap-2 rounded-md bg-purple-700 px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-semibold text-white hover:bg-purple-800">
+                  <Link href={error.redirectTo} className="inline-flex items-center gap-2 rounded-md bg-black px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-semibold text-white hover:bg-purple-800">
                     {error.redirectLabel}
                   </Link>
                 </div>

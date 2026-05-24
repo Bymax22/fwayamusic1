@@ -10,10 +10,11 @@ import NowPlayingPanel from "../components/NowPlayingPanel";
 import BottomNav from "../components/BottomNav";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
+import AuthErrorBanner from "../components/AuthErrorBanner";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, authError, clearAuthError, verificationError } = useAuth();
   const { currentTrack, isPlaying, togglePlay, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute } = useAudioPlayer();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -21,6 +22,11 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
 
   return (
     <div className="w-full text-white bg-transparent lg:pt-14">
+      {/* Global auth error banner (shows verification and other auth errors) */}
+      {(() => {
+        const bannerError = authError ?? (verificationError ? { message: verificationError } : null);
+        return <AuthErrorBanner error={bannerError} />;
+      })()}
       <Navbar currentTrack={currentTrack} />
 
       {/* =======================
