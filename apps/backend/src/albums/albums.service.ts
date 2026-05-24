@@ -26,7 +26,6 @@ export class AlbumsService {
       tags,
       releaseDate,
       recordLabel,
-      copyrightYear,
       coverImageUrl,
       cloudinaryId,
     } = data;
@@ -37,7 +36,6 @@ export class AlbumsService {
         description,
         releaseDate,
         recordLabel,
-        copyrightYear,
         coverUrl: coverImageUrl,
         cloudinaryPublicId: cloudinaryId,
         userId: artistId,

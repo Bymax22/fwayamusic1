@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
-import { Prisma, MediaType, MediaAccessType, UserRole } from '@prisma/client';
+import { MediaType, MediaAccessType, NotificationType, UserRole } from '@prisma/client';
 import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
@@ -232,11 +232,11 @@ export class MediaService {
     }
 
     const uploaderName = media.user.displayName || media.user.username || 'A creator';
-    const notifications = followers.map((follower) => ({
+    const notifications: Array<{ userId: number; title: string; message: string; type: NotificationType; metadata: any }> = followers.map((follower) => ({
       userId: follower.followerId,
       title: 'New upload available',
       message: `${uploaderName} has uploaded a new track: ${media.title}. Check it out now.`,
-      type: 'FOLLOWER_UPLOAD',
+      type: NotificationType.NEW_RELEASE,
       metadata: {
         mediaId: media.id,
         uploaderId: media.user.id,

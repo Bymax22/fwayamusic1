@@ -301,7 +301,12 @@ export class ProducerDashboardController {
     });
 
     const producedTracks = await this.prisma.media.count({
-      where: { producerId: req.user.id, deletedAt: null },
+      where: {
+        deletedAt: null,
+        collaborators: {
+          some: { producerId: req.user.id },
+        },
+      },
     });
 
     const approvedCollaborations = await this.prisma.producerCollaboration.count({

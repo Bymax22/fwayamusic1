@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
-import { Currency, PaymentProvider, SubscriptionPlan, SubscriptionStatus, UserRole } from '@prisma/client';
+import { Currency, NotificationType, PaymentProvider, SubscriptionPlan, SubscriptionStatus, UserRole } from '@prisma/client';
 import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
@@ -92,7 +92,7 @@ export class SubscriptionService {
       userId,
       'Subscription Activated',
       `Your ${plan.toLowerCase()} subscription is active until ${expiresAt.toDateString()}. Premium features are now available.`,
-      'SUBSCRIPTION',
+      NotificationType.SYSTEM,
       {
         plan,
         expiresAt: expiresAt.toISOString(),
@@ -136,11 +136,11 @@ export class SubscriptionService {
       }),
     ]);
 
-    const notifications = userIds.map((userId) => ({
+    const notifications: Array<{ userId: number; title: string; message: string; type: NotificationType; metadata: any }> = userIds.map((userId) => ({
       userId,
       title: 'Subscription Expired',
       message: 'Your premium subscription has expired. Your account has been reverted to the standard plan.',
-      type: 'SUBSCRIPTION_EXPIRED',
+      type: NotificationType.SYSTEM,
       metadata: { expiredAt: now.toISOString() },
     }));
 
@@ -177,7 +177,7 @@ export class SubscriptionService {
         userId,
         'Subscription Expired',
         'Your premium plan has expired and your account has been downgraded to the regular plan.',
-        'SUBSCRIPTION_EXPIRED',
+        NotificationType.SYSTEM,
         { expiredAt: now.toISOString() },
       );
 

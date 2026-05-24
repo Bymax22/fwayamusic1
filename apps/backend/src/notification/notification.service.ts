@@ -13,7 +13,7 @@ export class NotificationService {
         title,
         message,
         type,
-        metadata: metadata || {},
+        data: metadata || {},
       },
     });
   }
@@ -29,7 +29,7 @@ export class NotificationService {
         title: notification.title,
         message: notification.message,
         type: notification.type,
-        metadata: notification.metadata || {},
+        data: notification.metadata || {},
       })),
       skipDuplicates: true,
     });

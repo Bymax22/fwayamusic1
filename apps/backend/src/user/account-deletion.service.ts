@@ -69,7 +69,7 @@ export class AccountDeletionService {
         followers: user.followers?.length || 0,
         following: user.following?.length || 0,
       },
-      transactions: {
+      transactionSummary: {
         totalTransactions: user.transactions?.length || 0,
         totalEarnings: user.totalEarnings,
         walletBalance: user.walletBalance,
