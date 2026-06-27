@@ -13,6 +13,7 @@ import {
   QueueListIcon,
   XMarkIcon,
   ArrowPathIcon,
+  VideoCameraIcon,
 } from "@heroicons/react/24/solid";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 
@@ -23,7 +24,10 @@ type TrackType = {
   album?: string;
   imageUrl?: string;
   audioUrl?: string;
+  videoUrl?: string;
+  url?: string;
   duration?: number;
+  type?: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM';
   accessType?: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
   price?: number;
   currency?: string;
@@ -71,6 +75,7 @@ export default function MobilePlayer({
   const [isLiked, setIsLiked] = useState(false);
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
+  const isVideo = track.type === 'VIDEO' || Boolean((track.videoUrl || track.url || track.audioUrl)?.match(/\.(mp4|mov|m4v|webm|avi|mkv)(\?.*)?$/i));
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!progressBarRef.current || !onSeek) return;
@@ -261,13 +266,18 @@ export default function MobilePlayer({
                   <div className="animate-spin rounded-full h-2 w-2 border-b-2 border-white"></div>
                 </div>
               )}
+              {isVideo && (
+                <div className="absolute top-1 left-1 rounded-full bg-black/70 p-1">
+                  <VideoCameraIcon className="w-3 h-3 text-white" />
+                </div>
+              )}
             </div>
 
             {/* Track Info with Scrolling Title */}
             <div className="flex-1 min-w-0 relative z-10">
               <ScrollingTitle title={track.title || "Unknown Title"} isPlaying={isPlaying} />
               <p className="text-white/70 text-xs truncate">
-                {track.artist || "Unknown Artist"}
+                {isVideo ? 'Video • ' : ''}{track.artist || 'Unknown Artist'}
               </p>
             </div>
 

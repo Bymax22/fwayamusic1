@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -142,6 +143,8 @@ model User {
   recommendations        UserRecommendation[]
   verifications          Verification[]
   watchHistory           WatchHistory[]
+  beatPacks              BeatPack[]          @relation("BeatPacks")
+  resources              Resource[]          @relation("Resources")
 
   @@index([email])
   @@index([username])
@@ -243,6 +246,7 @@ model Media {
   collaborators          ProducerCollaboration[]
   resellerLinks          ResellerLink[]
   savedForLater          SavedForLater[]
+  beatPackBeats         BeatPackBeat[]        @relation("BeatPackBeats")
   transactions           Transaction[]
   recommendations        UserRecommendation[]
   videoQualityVariants   VideoVariant[]
@@ -1188,6 +1192,68 @@ model ProducerCollaboration {
   @@map("producer_collaborations")
 }
 
+model BeatPack {
+  id              Int               @id @default(autoincrement())
+  title           String
+  description     String?           @default("")
+  genre           String?
+  userId          Int               @map("user_id")
+  coverUrl        String?           @map("cover_url")
+  price           Float             @default(0)
+  accessType      MediaAccessType   @default(FREE) @map("access_type")
+  playCount       Int               @default(0) @map("play_count")
+  downloadCount   Int               @default(0) @map("download_count")
+  likeCount       Int               @default(0) @map("like_count")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  user            User              @relation("BeatPacks", fields: [userId], references: [id], onDelete: Cascade)
+  beatPackBeats   BeatPackBeat[]
+
+  @@index([userId])
+  @@index([accessType])
+  @@index([createdAt])
+  @@map("beat_packs")
+}
+
+model BeatPackBeat {
+  id        Int      @id @default(autoincrement())
+  packId    Int      @map("pack_id")
+  beatId    Int      @map("beat_id")
+  order     Int      @default(0)
+  addedAt   DateTime @default(now()) @map("added_at")
+  pack      BeatPack @relation(fields: [packId], references: [id], onDelete: Cascade)
+  beat      Media    @relation("BeatPackBeats", fields: [beatId], references: [id], onDelete: Cascade)
+
+  @@unique([packId, beatId])
+  @@index([packId])
+  @@map("beat_pack_beats")
+}
+
+model Resource {
+  id              Int             @id @default(autoincrement())
+  title           String
+  description     String?         @default("")
+  resourceType    ResourceType
+  genre           String?
+  userId          Int             @map("user_id")
+  fileUrl         String?         @map("file_url")
+  thumbnailUrl    String?         @map("thumbnail_url")
+  price           Float           @default(0)
+  accessType      MediaAccessType @default(FREE) @map("access_type")
+  playCount       Int             @default(0) @map("play_count")
+  downloadCount   Int             @default(0) @map("download_count")
+  likeCount       Int             @default(0) @map("like_count")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  user            User            @relation("Resources", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([resourceType])
+  @@index([accessType])
+  @@index([createdAt])
+  @@map("resources")
+}
+
 model sessions {
   id         Int      @id @default(autoincrement())
   user_id    Int?     @map("user_id")
@@ -1515,6 +1581,14 @@ enum CollaborationType {
   MASTERING
   BAND_MEMBER
   GUEST_ARTIST
+}
+
+enum ResourceType {
+  SAMPLE
+  LOOP
+  TEMPLATE
+  PRESET
+  SOUND
 }
 
 enum RatingValue {

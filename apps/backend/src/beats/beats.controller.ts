@@ -87,16 +87,18 @@ export class BeatsController {
 
   @Put(':id')
   @UseGuards(FirebaseAuthGuard)
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'coverFile', maxCount: 1 }]))
   async updateBeat(
     @Request() req: any,
     @Param('id') id: number,
-    @Body() updateData: any
+    @Body() updateData: any,
+    @UploadedFiles() files?: { coverFile?: Express.Multer.File[] }
   ) {
     if (!req.user || req.user.role !== 'PRODUCER') {
       throw new HttpException('Only producers can update beats', HttpStatus.FORBIDDEN);
     }
 
-    return this.beatsService.updateBeat(req.user.id, Number(id), updateData);
+    return this.beatsService.updateBeat(req.user.id, Number(id), updateData, files?.coverFile?.[0]);
   }
 
   @Delete(':id')
@@ -110,6 +112,38 @@ export class BeatsController {
     }
 
     return this.beatsService.deleteBeat(req.user.id, Number(id));
+  }
+
+  @Get(':id/analytics')
+  @UseGuards(FirebaseAuthGuard)
+  async getBeatAnalytics(
+    @Request() req: any,
+    @Param('id') id: number
+  ) {
+    if (!req.user) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.beatsService.getBeatAnalytics(req.user.id, Number(id));
+  }
+
+  @Get(':id/detailed')
+  async getBeatDetailed(@Param('id') id: number) {
+    return this.beatsService.getBeatDetailed(Number(id));
+  }
+
+  @Put(':id/access-type')
+  @UseGuards(FirebaseAuthGuard)
+  async toggleAccessType(
+    @Request() req: any,
+    @Param('id') id: number,
+    @Body() body: { accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW' }
+  ) {
+    if (!req.user || req.user.role !== 'PRODUCER') {
+      throw new HttpException('Only producers can update beats', HttpStatus.FORBIDDEN);
+    }
+
+    return this.beatsService.toggleAccessType(req.user.id, Number(id), body.accessType);
   }
 
   // Producer-specific endpoints

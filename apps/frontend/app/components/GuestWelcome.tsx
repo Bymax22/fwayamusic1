@@ -35,6 +35,8 @@ export default function GuestWelcome() {
   const [featuredArtists, setFeaturedArtists] = useState([]);
   const [trendingNow, setTrendingNow] = useState([]);
   const [topCharts, setTopCharts] = useState([]);
+  const [musicVideos, setMusicVideos] = useState([]);
+  const [otherVideos, setOtherVideos] = useState([]);
   const [playlists, setPlaylists] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -105,6 +107,24 @@ export default function GuestWelcome() {
           setFeaturedAlbums(processedAlbums);
         }
 
+        if (homepageData.musicVideos && Array.isArray(homepageData.musicVideos)) {
+          const processedVideos = homepageData.musicVideos.map((video: any) => ({
+            ...video,
+            url: video.url ? resolveMediaUrl(video.url) : video.url,
+            coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt
+          }));
+          setMusicVideos(processedVideos);
+        }
+
+        if (homepageData.otherVideos && Array.isArray(homepageData.otherVideos)) {
+          const processedVideos = homepageData.otherVideos.map((video: any) => ({
+            ...video,
+            url: video.url ? resolveMediaUrl(video.url) : video.url,
+            coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt
+          }));
+          setOtherVideos(processedVideos);
+        }
+
         // Fetch featured artists
         const artistsResponse = await fetch(`${API_BASE}/api/v1/artists`);
         if (!artistsResponse.ok) throw new Error('Failed to fetch artists');
@@ -164,6 +184,14 @@ export default function GuestWelcome() {
       secondaryButton: "Download"
     }
   ];
+
+  const featuredProducers = featuredArtists.filter((artist: any) => {
+    const role = artist.role?.toString().toUpperCase();
+    return role === "PRODUCER";
+  });
+
+  const musicVideoCards = musicVideos.slice(0, 6);
+  const otherVideoCards = otherVideos.slice(0, 6);
 
   // Auto-rotate hero images with sliding animation
   React.useEffect(() => {
@@ -295,6 +323,7 @@ export default function GuestWelcome() {
         <div className="flex gap-2 mt-2 overflow-x-auto pb-2 scrollbar-hide">
           {[
             { name: "For You", key: "for-you" },
+            { name: "Videos", key: "videos" },
             { name: "New Releases", key: "new-releases" },
             { name: "Playlists", key: "playlists" },
             { name: "Trending", key: "trending" },
@@ -356,6 +385,37 @@ export default function GuestWelcome() {
                     <div className="px-1">
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Music Videos (mobile) */}
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Music Videos</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {musicVideoCards.map((item: any, i: number) => (
+                  <div key={i} className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5">
+                    <div className="relative aspect-[9/16]">
+                      <div
+                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                        style={{
+                          backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <FaPlay className="text-white text-xl" />
+                      </div>
+                    </div>
+                    <div className="p-2">
+                      <p className="text-xs font-semibold truncate text-white">{item.title}</p>
+                      <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Producer'}</p>
                     </div>
                   </div>
                 ))}
@@ -880,6 +940,70 @@ export default function GuestWelcome() {
           </>
         )}
 
+        {activeTab === 'videos' && (
+          <>
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Music Videos</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {musicVideoCards.map((item: any, i: number) => (
+                  <div key={i} className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5">
+                    <div className="relative aspect-[9/16]">
+                      <div
+                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                        style={{
+                          backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <FaPlay className="text-white text-xl" />
+                      </div>
+                    </div>
+                    <div className="p-2">
+                      <p className="text-xs font-semibold truncate text-white">{item.title}</p>
+                      <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Producer'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Other Videos</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {otherVideoCards.map((item: any, i: number) => (
+                  <div key={i} className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5">
+                    <div className="relative aspect-[9/16]">
+                      <div
+                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                        style={{
+                          backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <FaPlay className="text-white text-xl" />
+                      </div>
+                    </div>
+                    <div className="p-2">
+                      <p className="text-xs font-semibold truncate text-white">{item.title}</p>
+                      <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Artist'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
         {activeTab === 'podcasts' && (
           <>
             {/* Featured Artists (as Podcasts placeholder) */}
@@ -1103,6 +1227,79 @@ export default function GuestWelcome() {
             </div>
           </div>
 
+          {/* ===== PRODUCERS & BEAT MAKERS ===== */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">
+                Producers & Beat Makers
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-6 gap-3">
+              {featuredProducers.slice(0, 6).map((artist: any, i: number) => (
+                <Link
+                  key={i}
+                  href={`/artists/${artist.id || artist._id}`}
+                  className="text-center cursor-pointer hover:bg-transparent rounded-xl p-3 transition-colors"
+                >
+                  <div
+                    className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mx-auto mb-2"
+                    style={{
+                      backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  ></div>
+
+                  <p className="text-sm font-semibold truncate mb-1">
+                    {artist.displayName || artist.username || artist.artistName || 'Unknown Producer'}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {artist.followers ? `${artist.followers.length} followers` : '0 followers'}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* ===== MUSIC VIDEOS ===== */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">
+                Music Videos
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-6 gap-3">
+              {musicVideoCards.map((video: any, i: number) => (
+                <div key={i} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group">
+                  <div className="relative aspect-[9/16]">
+                    <div
+                      className={`absolute inset-0 ${video.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                      style={{
+                        backgroundImage: video.artCoverUrl ? `url(${video.artCoverUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <FaPlay className="text-white text-xl" />
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-[#080a13]">
+                    <p className="text-xs font-medium truncate text-white">
+                      {video.title}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {video.user?.displayName || video.user?.username || 'Unknown Producer'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* ===== FEATURED ARTISTS ===== */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
@@ -1225,6 +1422,44 @@ export default function GuestWelcome() {
             </div>
           </div>
 
+          {/* ===== OTHER VIDEOS ===== */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">
+                Other Videos
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-6 gap-3">
+              {otherVideoCards.map((video: any, i: number) => (
+                <div key={i} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group">
+                  <div className="relative aspect-[9/16]">
+                    <div
+                      className={`absolute inset-0 ${video.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                      style={{
+                        backgroundImage: video.artCoverUrl ? `url(${video.artCoverUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <FaPlay className="text-white text-xl" />
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-[#080a13]">
+                    <p className="text-xs font-medium truncate text-white">
+                      {video.title}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {video.user?.displayName || video.user?.username || 'Unknown Artist'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* ===== TOP CHARTS + GENRES ===== */}
           <div className="flex gap-8">
 
@@ -1296,6 +1531,42 @@ export default function GuestWelcome() {
                   </button>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* ===== BEATS & INSTRUMENTS ===== */}
+          <div className="mt-8 mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-lg">
+                Beats & Instruments
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-6 gap-3">
+              {featuredAlbums.slice(0, 6).map((beat: any, i: number) => (
+                <div
+                  key={i}
+                  className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                >
+                  <div
+                    className={`aspect-[4/5] ${beat.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} group-hover:scale-105 transition-transform`}
+                    style={{
+                      backgroundImage: beat.artCoverUrl ? `url(${beat.artCoverUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+
+                  <div className="p-3 bg-[#080a13]">
+                    <p className="text-xs font-medium truncate text-white">
+                      {beat.title}
+                    </p>
+                    <p className="text-xs text-gray-400 truncate">
+                      {beat.user?.displayName || beat.user?.username || 'Unknown Producer'}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

@@ -505,11 +505,49 @@ async getHomepageSections() {
     topCharts = topCharts.concat(latest);
   }
 
+  // Music videos from DB
+  let musicVideos = await this.prisma.media.findMany({
+    where: { type: MediaType.VIDEO },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true
+        }
+      }
+    },
+    orderBy: { createdAt: "desc" },
+    take: 6,
+  });
+  musicVideos = musicVideos.filter(m => m.userId !== null);
+
+  // Other videos from DB
+  let otherVideos = await this.prisma.media.findMany({
+    where: { type: MediaType.VIDEO },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true
+        }
+      }
+    },
+    orderBy: { playCount: "desc" },
+    take: 6,
+  });
+  otherVideos = otherVideos.filter(m => m.userId !== null);
+
   return {
     featuredSongs,
     trendingSongs,
     beats,
     topCharts,
+    musicVideos,
+    otherVideos,
   };
 }
 }

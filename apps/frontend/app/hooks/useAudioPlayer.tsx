@@ -8,9 +8,11 @@ interface Track {
   artist: string;
   imageUrl?: string;
   audioUrl?: string;
+  videoUrl?: string;
   url?: string; // For backward compatibility
   coverArt?: string;
   duration?: number;
+  type?: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM';
   isDRMProtected?: boolean;
   accessType?: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
   price?: number;
@@ -52,86 +54,101 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [audioQuality, setAudioQuality] = useState<AudioQuality>('high');
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  const isVideoUrl = (url?: string) => Boolean(url && /\.(mp4|mov|m4v|webm|avi|mkv)(\?.*)?$/i.test(url));
+  const isVideoTrack = (track?: Track | null) => track?.type === 'VIDEO' || isVideoUrl(track?.videoUrl || track?.audioUrl || track?.url);
+
+  const getActiveMedia = (track?: Track | null) => {
+    if (isVideoTrack(track)) {
+      if (!videoRef.current) {
+        videoRef.current = document.createElement('video');
+      }
+      return videoRef.current;
+    }
+
     if (!audioRef.current) {
       audioRef.current = new Audio();
     }
+    return audioRef.current;
+  };
 
-    const audio = audioRef.current;
-    console.log('GlobalPlayer: Created new audio element');
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const audio = audioRef.current || new Audio();
+    audioRef.current = audio;
+    const video = videoRef.current || document.createElement('video');
+    videoRef.current = video;
 
     const updateDuration = () => {
-      const duration = audio.duration || 0;
-      console.log('GlobalPlayer: Duration loaded:', duration);
+      const activeMedia = isVideoTrack(currentTrack) ? video : audio;
+      const duration = activeMedia.duration || 0;
       setDuration(duration);
     };
 
     const updateTime = () => {
-      setCurrentTime(audio.currentTime);
+      const activeMedia = isVideoTrack(currentTrack) ? video : audio;
+      setCurrentTime(activeMedia.currentTime);
     };
 
     const handleEnded = () => {
-      console.log('GlobalPlayer: Track ended');
       setIsPlaying(false);
       setCurrentTime(0);
     };
 
     const handleLoadStart = () => {
-      console.log('GlobalPlayer: Load started');
       setIsLoading(true);
     };
 
     const handleCanPlay = () => {
-      console.log('GlobalPlayer: Can play now');
       setIsLoading(false);
     };
 
     const handleError = (e: Event) => {
-      console.error('GlobalPlayer: Audio error:', e);
+      console.error('GlobalPlayer: Media error:', e);
       setIsLoading(false);
       setIsPlaying(false);
     };
 
     const handlePlaying = () => {
-      console.log('GlobalPlayer: Audio started playing');
       setIsPlaying(true);
       setIsLoading(false);
     };
 
     const handlePause = () => {
-      console.log('GlobalPlayer: Audio paused');
       setIsPlaying(false);
     };
 
-    audio.addEventListener('loadedmetadata', updateDuration);
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('loadstart', handleLoadStart);
-    audio.addEventListener('canplay', handleCanPlay);
-    audio.addEventListener('error', handleError);
-    audio.addEventListener('playing', handlePlaying);
-    audio.addEventListener('pause', handlePause);
-
-    audio.volume = volume;
-    audio.muted = isMuted;
-    audio.preload = 'auto';
-    audio.crossOrigin = 'anonymous';
+    [audio, video].forEach((media) => {
+      media.addEventListener('loadedmetadata', updateDuration);
+      media.addEventListener('timeupdate', updateTime);
+      media.addEventListener('ended', handleEnded);
+      media.addEventListener('loadstart', handleLoadStart);
+      media.addEventListener('canplay', handleCanPlay);
+      media.addEventListener('error', handleError);
+      media.addEventListener('playing', handlePlaying);
+      media.addEventListener('pause', handlePause);
+      media.volume = isMuted ? 0 : volume;
+      media.muted = isMuted;
+      media.preload = 'auto';
+      media.crossOrigin = 'anonymous';
+    });
 
     return () => {
-      console.log('GlobalPlayer: Cleaning up audio element');
-      audio.removeEventListener('loadedmetadata', updateDuration);
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('loadstart', handleLoadStart);
-      audio.removeEventListener('canplay', handleCanPlay);
-      audio.removeEventListener('error', handleError);
-      audio.removeEventListener('playing', handlePlaying);
-      audio.removeEventListener('pause', handlePause);
-      audio.pause();
+      [audio, video].forEach((media) => {
+        media.removeEventListener('loadedmetadata', updateDuration);
+        media.removeEventListener('timeupdate', updateTime);
+        media.removeEventListener('ended', handleEnded);
+        media.removeEventListener('loadstart', handleLoadStart);
+        media.removeEventListener('canplay', handleCanPlay);
+        media.removeEventListener('error', handleError);
+        media.removeEventListener('playing', handlePlaying);
+        media.removeEventListener('pause', handlePause);
+        media.pause();
+      });
     };
-  }, []);
+  }, [currentTrack, isMuted, volume]);
 
   const applyAudioQualityToUrl = (rawUrl: string) => {
     if (!rawUrl) return rawUrl;
@@ -177,40 +194,31 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-    }
-
-    const audio = audioRef.current;
-    const audioUrl = currentTrack?.audioUrl || currentTrack?.url;
-    if (!audioUrl) {
-      console.error('GlobalPlayer: No audio URL available in current track');
+    const media = getActiveMedia(currentTrack);
+    const mediaUrl = currentTrack?.type === 'VIDEO' ? (currentTrack?.videoUrl || currentTrack?.audioUrl || currentTrack?.url) : (currentTrack?.audioUrl || currentTrack?.url);
+    if (!mediaUrl) {
+      console.error('GlobalPlayer: No media URL available in current track');
       return;
     }
 
-    const normalizedUrl = applyAudioQualityToUrl(audioUrl);
-    if (!audio.src || audio.src !== normalizedUrl) {
-      console.log('GlobalPlayer: Loading current track source before toggling playback');
-      audio.src = normalizedUrl;
-      audio.preload = 'auto';
-      audio.crossOrigin = 'anonymous';
-      audio.muted = isMuted;
-      audio.volume = isMuted ? 0 : volume;
-      audio.load();
+    const normalizedUrl = applyAudioQualityToUrl(mediaUrl);
+    if (!media.src || media.src !== normalizedUrl) {
+      media.src = normalizedUrl;
+      media.preload = 'auto';
+      media.crossOrigin = 'anonymous';
+      media.muted = isMuted;
+      media.volume = isMuted ? 0 : volume;
+      media.load();
       setCurrentTime(0);
       setDuration(0);
     }
 
     if (isPlaying) {
-      console.log('GlobalPlayer: Pausing playback');
-      audio.pause();
+      media.pause();
       setIsPlaying(false);
     } else {
-      console.log('GlobalPlayer: Starting/resuming playback');
       setIsLoading(true);
-
-      audio.play().then(() => {
-        console.log('GlobalPlayer: Playback started successfully');
+      media.play().then(() => {
         setIsPlaying(true);
         setIsLoading(false);
       }).catch((err) => {
@@ -227,13 +235,6 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-    }
-
-    const audio = audioRef.current;
-
-    // Accept incoming partial/extended objects; coerce to Partial<Track> for safe merging
     const incoming = track as Partial<Track> & Record<string, unknown>;
     const newTrack = {
       id: incoming.id as string | number,
@@ -241,40 +242,41 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       artist: incoming.artist || '',
       imageUrl: (incoming.imageUrl as string) || (incoming.coverArt as string) || undefined,
       audioUrl: (incoming.audioUrl as string) || (incoming.url as string) || undefined,
+      videoUrl: incoming.videoUrl as string | undefined,
       duration: incoming.duration as number | undefined,
+      type: (incoming.type as Track['type']) || (isVideoUrl(incoming.videoUrl as string | undefined) ? 'VIDEO' : 'AUDIO'),
       isDRMProtected: incoming.isDRMProtected as boolean | undefined,
       accessType: (incoming.accessType as Track['accessType']) ?? 'FREE',
       price: incoming.price as number | undefined,
       currency: (incoming.currency as string) ?? 'ZMW'
     };
 
-    console.log('GlobalPlayer: playTrack called with:', newTrack);
-
-    if (!newTrack.audioUrl) {
-      console.error('GlobalPlayer: No audio URL provided in track:', newTrack);
+    const mediaUrl = newTrack.type === 'VIDEO' ? (newTrack.videoUrl || newTrack.audioUrl) : newTrack.audioUrl;
+    if (!mediaUrl) {
+      console.error('GlobalPlayer: No media URL provided in track:', newTrack);
       return;
     }
 
-    setCurrentTrack(newTrack);
+    setCurrentTrack(newTrack as Track);
     setIsLoading(true);
 
-    const src = applyAudioQualityToUrl(newTrack.audioUrl.trim());
-    console.log('GlobalPlayer: Setting audio source to:', src);
+    const media = getActiveMedia(newTrack as Track);
+    const src = applyAudioQualityToUrl(mediaUrl.trim());
 
-    audio.pause();
-    audio.currentTime = 0;
-    audio.src = src;
-    audio.crossOrigin = 'anonymous';
-    audio.preload = 'auto';
-    audio.muted = isMuted;
-    audio.volume = isMuted ? 0 : volume;
-    audio.load();
+    audioRef.current?.pause();
+    videoRef.current?.pause();
+    media.currentTime = 0;
+    media.src = src;
+    media.crossOrigin = 'anonymous';
+    media.preload = 'auto';
+    media.muted = isMuted;
+    media.volume = isMuted ? 0 : volume;
+    media.load();
 
     setCurrentTime(0);
     setDuration(0);
 
-    audio.play().then(() => {
-      console.log('GlobalPlayer: Audio started playing successfully');
+    media.play().then(() => {
       setIsPlaying(true);
       setIsLoading(false);
     }).catch((err) => {
@@ -286,9 +288,9 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const seekTo = (time: number) => {
     if (typeof window === 'undefined') return;
-    const audio = audioRef.current;
-    if (audio) {
-      audio.currentTime = time;
+    const media = getActiveMedia(currentTrack);
+    if (media) {
+      media.currentTime = time;
       setCurrentTime(time);
     }
   };
@@ -300,11 +302,11 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     }
 
     setVolumeState(newVolume);
-    const audio = audioRef.current;
-    if (audio) {
-      audio.volume = isMuted ? 0 : newVolume;
-      console.log('GlobalPlayer: Volume set to:', audio.volume);
-    }
+    [audioRef.current, videoRef.current].forEach((media) => {
+      if (media) {
+        media.volume = isMuted ? 0 : newVolume;
+      }
+    });
   };
 
   const toggleMute = () => {
@@ -313,25 +315,26 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const audio = audioRef.current;
     setIsMuted((prev) => {
       const next = !prev;
-      if (audio) {
-        audio.volume = next ? 0 : volume;
-        console.log('GlobalPlayer: Mute toggled, volume now:', audio.volume);
-      }
+      [audioRef.current, videoRef.current].forEach((media) => {
+        if (media) {
+          media.volume = next ? 0 : volume;
+        }
+      });
       return next;
     });
   };
 
   const stopTrack = () => {
     if (typeof window === 'undefined') return;
-    const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-      audio.src = '';
-    }
+    [audioRef.current, videoRef.current].forEach((media) => {
+      if (media) {
+        media.pause();
+        media.currentTime = 0;
+        media.src = '';
+      }
+    });
     setIsPlaying(false);
     setIsLoading(false);
     setCurrentTrack(null);
@@ -355,10 +358,11 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   // Update audio volume when volume or mute state changes
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const audio = audioRef.current;
-    if (audio) {
-      audio.volume = isMuted ? 0 : volume;
-    }
+    [audioRef.current, videoRef.current].forEach((media) => {
+      if (media) {
+        media.volume = isMuted ? 0 : volume;
+      }
+    });
   }, [volume, isMuted]);
 
   return (

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { parseAuthError } from '@/lib/auth-error-utils';
 import RoleGuard from '@/components/RoleGuard';
 import { DashboardCard } from '@/components/DashboardCard';
 import DashboardHeader from '@/components/DashboardHeader';
@@ -74,7 +75,7 @@ interface SoundResource {
 }
 
 export default function ProducerPage() {
-  const { user, getToken } = useAuth();
+  const { user, getToken, setAuthError } = useAuth();
   const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '') || '';
 
@@ -172,6 +173,8 @@ export default function ProducerPage() {
         setSoundResources([]);
       } catch (error) {
         console.error('Error fetching producer data:', error);
+        const errorMsg = error instanceof Error ? error.message : 'Failed to load dashboard data';
+        setAuthError({ message: `Dashboard error: ${errorMsg}` });
       } finally {
         setIsLoading(false);
       }
@@ -265,7 +268,8 @@ export default function ProducerPage() {
       alert('Beat uploaded successfully!');
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Failed to upload beat');
+      const errorMsg = error instanceof Error ? error.message : 'Failed to upload beat';
+      setAuthError({ message: `Beat upload failed: ${errorMsg}` });
     } finally {
       setIsUploading(false);
     }
@@ -290,7 +294,8 @@ export default function ProducerPage() {
         throw new Error(errorText || 'Delete failed');
       } catch (error) {
         console.error('Delete error:', error);
-        alert('Failed to delete beat');
+        const errorMsg = error instanceof Error ? error.message : 'Failed to delete beat';
+        setAuthError({ message: `Beat deletion failed: ${errorMsg}` });
       }
     }
   };
@@ -330,7 +335,7 @@ export default function ProducerPage() {
       <div className="min-h-screen bg-black text-white">
         <div className="relative overflow-hidden">
           <DashboardHeader />
-          <div className="relative p-6 max-w-7xl mx-auto pb-32">
+          <div className="relative p-6 max-w-7xl mx-auto pb-40 lg:pb-16">
             {/* Header */}
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
               <div className="space-y-3">

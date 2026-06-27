@@ -1,13 +1,22 @@
 import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { ConfigService } from '@nestjs/config';
+import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
 
 @Injectable()
 export class BeatsService {
   constructor(
     private prisma: PrismaService,
     private configService: ConfigService
-  ) {}
+  ) {
+    // Configure Cloudinary
+    cloudinary.config({
+      cloud_name: this.configService.get('CLOUDINARY_CLOUD_NAME'),
+      api_key: this.configService.get('CLOUDINARY_API_KEY'),
+      api_secret: this.configService.get('CLOUDINARY_API_SECRET'),
+    });
+  }
 
   async getAllBeats(filters?: {
     genre?: string;
@@ -184,7 +193,41 @@ export class BeatsService {
     return beat;
   }
 
-  async updateBeat(userId: number, beatId: number, updateData: any) {
+  async updateBeat(userId: number, beatId: number, updateData: any, coverFile?: Express.Multer.File) {
+    // Verify ownership
+    const beat = await this.prisma.media.findUnique({
+      where: { id: beatId }
+    });
+
+    if (!beat || beat.userId !== userId) {
+      throw new ForbiddenException('You can only update your own beats');
+    }
+
+    // Handle cover art upload if provided
+    let coverUrl = beat.artCoverUrl;
+    if (coverFile) {
+      coverUrl = await this.uploadToCloudinary(coverFile);
+    }
+
+    const updated = await this.prisma.media.update({
+      where: { id: beatId },
+      data: {
+        title: updateData.title !== undefined ? updateData.title : beat.title,
+        description: updateData.description !== undefined ? updateData.description : beat.description,
+        genre: updateData.genre !== undefined ? updateData.genre : beat.genre,
+        bpm: updateData.bpm !== undefined ? updateData.bpm : beat.bpm,
+        key: updateData.key !== undefined ? updateData.key : beat.key,
+        price: updateData.price !== undefined ? updateData.price : beat.price,
+        accessType: updateData.accessType !== undefined ? updateData.accessType : beat.accessType,
+        artCoverUrl: coverUrl,
+        thumbnailUrl: coverUrl,
+      }
+    });
+
+    return updated;
+  }
+
+  async toggleAccessType(userId: number, beatId: number, newAccessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW') {
     // Verify ownership
     const beat = await this.prisma.media.findUnique({
       where: { id: beatId }
@@ -196,18 +239,85 @@ export class BeatsService {
 
     const updated = await this.prisma.media.update({
       where: { id: beatId },
-      data: {
-        title: updateData.title || beat.title,
-        description: updateData.description || beat.description,
-        genre: updateData.genre || beat.genre,
-        bpm: updateData.bpm || beat.bpm,
-        key: updateData.key || beat.key,
-        price: updateData.price !== undefined ? updateData.price : beat.price,
-        accessType: updateData.accessType || beat.accessType,
+      data: { accessType: newAccessType }
+    });
+
+    return { message: `Beat access type changed to ${newAccessType}`, beat: updated };
+  }
+
+  async getBeatAnalytics(userId: number, beatId: number) {
+    // Verify ownership
+    const beat = await this.prisma.media.findUnique({
+      where: { id: beatId },
+      include: {
+        comments: true,
+        interactions: true,
+        ratings: true,
+        user: { select: { id: true, username: true, displayName: true } }
       }
     });
 
-    return updated;
+    if (!beat || beat.userId !== userId) {
+      throw new ForbiddenException('You can only view analytics for your own beats');
+    }
+
+    // Calculate engagement metrics
+    const likeCount = beat.interactions?.filter(i => i.type === 'LIKE').length || 0;
+    const commentCount = beat.comments?.length || 0;
+    const averageRating = beat.ratings?.length > 0
+      ? beat.ratings.reduce((sum: number, r: any) => sum + r.rating, 0) / beat.ratings.length
+      : 0;
+
+    // Get follower count (users following this beat's creator)
+    const followerCount = await this.prisma.follower.count({
+      where: { followingId: userId }
+    });
+
+    // Calculate engagement rate
+    const totalEngagements = beat.playCount + beat.downloadCount + likeCount + commentCount;
+    const engagementRate = beat.playCount > 0 ? ((totalEngagements / beat.playCount) * 100).toFixed(2) : '0';
+
+    return {
+      beat: {
+        id: beat.id,
+        title: beat.title,
+        genre: beat.genre,
+        accessType: beat.accessType,
+        createdAt: beat.createdAt,
+        updatedAt: beat.updatedAt
+      },
+      analytics: {
+        playCount: beat.playCount,
+        downloadCount: beat.downloadCount,
+        shareCount: beat.shareCount,
+        likeCount,
+        commentCount,
+        followerCount,
+        averageRating: parseFloat(averageRating.toFixed(2)),
+        engagementRate: parseFloat(engagementRate)
+      },
+      monetization: {
+        price: beat.price || 0,
+        accessType: beat.accessType,
+        estimatedRevenue: (beat.downloadCount * (beat.price || 0) * beat.artistCommissionRate).toFixed(2)
+      }
+    };
+  }
+
+  async getBeatDetailed(beatId: number) {
+    return this.prisma.media.findUnique({
+      where: { id: beatId },
+      include: {
+        user: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
+        comments: {
+          include: { user: { select: { id: true, username: true, avatarUrl: true } } },
+          take: 10,
+          orderBy: { createdAt: 'desc' }
+        },
+        interactions: true,
+        ratings: true
+      }
+    });
   }
 
   async deleteBeat(userId: number, beatId: number) {
@@ -369,8 +479,26 @@ export class BeatsService {
   }
 
   private async uploadToCloudinary(file: Express.Multer.File): Promise<string> {
-    // Implement actual Cloudinary upload
-    // For now, returning a placeholder
-    return `https://res.cloudinary.com/placeholder/${file.filename}`;
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'fwaya-beats',
+          resource_type: file.mimetype.startsWith('audio') ? 'auto' : 'image',
+          public_id: `${Date.now()}_${file.originalname.split('.')[0]}`,
+          overwrite: true,
+        },
+        (error, result) => {
+          if (error) {
+            reject(new BadRequestException(`Failed to upload file: ${error.message}`));
+          } else {
+            resolve(result.secure_url);
+          }
+        }
+      );
+
+      // Create a readable stream from the buffer and pipe to Cloudinary
+      const bufferStream = Readable.from([file.buffer]);
+      bufferStream.pipe(uploadStream);
+    });
   }
 }
