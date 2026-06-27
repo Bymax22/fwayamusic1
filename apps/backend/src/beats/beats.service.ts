@@ -488,8 +488,8 @@ export class BeatsService {
           overwrite: true,
         },
         (error, result) => {
-          if (error) {
-            reject(new BadRequestException(`Failed to upload file: ${error.message}`));
+          if (error || !result?.secure_url) {
+            reject(new BadRequestException(`Failed to upload file: ${error?.message || 'No upload URL returned'}`));
           } else {
             resolve(result.secure_url);
           }
