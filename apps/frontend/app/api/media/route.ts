@@ -1,11 +1,28 @@
-
 import { NextResponse } from 'next/server';
 
+function getBackendBaseUrl() {
+  return process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+}
+
 export async function GET() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`);
-  if (!res.ok) throw new Error('Failed to fetch media');
-  const media = await res.json();
-  return NextResponse.json(media);
+  try {
+    const baseUrl = getBackendBaseUrl();
+    const res = await fetch(`${baseUrl}/api/v1/media`, {
+      headers: { Accept: 'application/json' },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => '');
+      console.error('Backend media request failed:', res.status, errorText);
+      return NextResponse.json({ data: [] }, { status: 200 });
+    }
+
+    const media = await res.json();
+    return NextResponse.json(media);
+  } catch (error) {
+    console.error('Failed to fetch media:', error);
+    return NextResponse.json({ data: [] }, { status: 200 });
+  }
 }
 
 export async function POST(request: Request) {
@@ -17,11 +34,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
+    const baseUrl = getBackendBaseUrl();
+
     // Forward the file to the backend upload-avatar endpoint
     const backendFormData = new FormData();
     backendFormData.append('file', file);
 
-    const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload-avatar`, {
+    const uploadResponse = await fetch(`${baseUrl}/api/v1/media/upload-avatar`, {
       method: 'POST',
       body: backendFormData,
     });

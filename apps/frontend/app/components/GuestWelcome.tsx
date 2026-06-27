@@ -72,7 +72,8 @@ export default function GuestWelcome() {
           const processedSongs = homepageData.featuredSongs.map((song: any) => ({
             ...song,
             url: song.url ? resolveMediaUrl(song.url) : song.url,
-            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt
+            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt,
+            artCoverUrl: song.artCoverUrl ? resolveMediaUrl(song.artCoverUrl) : (song.coverArt ? resolveMediaUrl(song.coverArt) : (song.thumbnailUrl ? resolveMediaUrl(song.thumbnailUrl) : undefined))
           }));
           setQuickPicks(processedSongs);
         }
@@ -82,7 +83,8 @@ export default function GuestWelcome() {
           const processedSongs = homepageData.trendingSongs.map((song: any) => ({
             ...song,
             url: song.url ? resolveMediaUrl(song.url) : song.url,
-            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt
+            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt,
+            artCoverUrl: song.artCoverUrl ? resolveMediaUrl(song.artCoverUrl) : (song.coverArt ? resolveMediaUrl(song.coverArt) : (song.thumbnailUrl ? resolveMediaUrl(song.thumbnailUrl) : undefined))
           }));
           setTrendingNow(processedSongs);
         }
@@ -92,7 +94,8 @@ export default function GuestWelcome() {
           const processedSongs = homepageData.topCharts.map((song: any) => ({
             ...song,
             url: song.url ? resolveMediaUrl(song.url) : song.url,
-            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt
+            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt,
+            artCoverUrl: song.artCoverUrl ? resolveMediaUrl(song.artCoverUrl) : (song.coverArt ? resolveMediaUrl(song.coverArt) : (song.thumbnailUrl ? resolveMediaUrl(song.thumbnailUrl) : undefined))
           }));
           setTopCharts(processedSongs);
         }
@@ -102,7 +105,8 @@ export default function GuestWelcome() {
           const processedAlbums = homepageData.beats.map((album: any) => ({
             ...album,
             url: album.url ? resolveMediaUrl(album.url) : album.url,
-            coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt
+            coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
+            artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
           }));
           setFeaturedAlbums(processedAlbums);
         }
@@ -111,7 +115,8 @@ export default function GuestWelcome() {
           const processedVideos = homepageData.musicVideos.map((video: any) => ({
             ...video,
             url: video.url ? resolveMediaUrl(video.url) : video.url,
-            coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt
+            coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt,
+            artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
           }));
           setMusicVideos(processedVideos);
         }
@@ -120,7 +125,8 @@ export default function GuestWelcome() {
           const processedVideos = homepageData.otherVideos.map((video: any) => ({
             ...video,
             url: video.url ? resolveMediaUrl(video.url) : video.url,
-            coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt
+            coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt,
+            artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
           }));
           setOtherVideos(processedVideos);
         }
