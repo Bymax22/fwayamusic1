@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Put, Delete, Param, Body, UseGuards, Req, UploadedFile, UseInterceptors, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BeatPackService } from './beat-pack.service';
-import { FirebaseAuthGuard } from '../auth/firebase-auth.guard';
+import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 
 @Controller('v1/beat-packs')
 export class BeatPackController {

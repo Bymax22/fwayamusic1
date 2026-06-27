@@ -106,7 +106,7 @@ export class BeatPackService {
     return { message: `Beat pack access type changed to ${newAccessType}`, pack: updated };
   }
 
-  async getBeatPackAnalytics(userId: number, packId: number) {
+  async getBeatPackAnalytics(userId: number | null, packId: number) {
     const pack = await this.prisma.beatPack.findUnique({
       where: { id: packId },
       include: {
@@ -211,8 +211,8 @@ export class BeatPackService {
           overwrite: true,
         },
         (error, result) => {
-          if (error) {
-            reject(new BadRequestException(`Failed to upload file: ${error.message}`));
+          if (error || !result?.secure_url) {
+            reject(new BadRequestException(`Failed to upload file: ${error?.message || 'No upload URL returned'}`));
           } else {
             resolve(result.secure_url);
           }

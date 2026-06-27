@@ -262,7 +262,7 @@ export class BeatsService {
     }
 
     // Calculate engagement metrics
-    const likeCount = beat.interactions?.filter(i => i.type === 'LIKE').length || 0;
+    const likeCount = beat.interactions?.filter((i: any) => i.type === 'LIKE').length || 0;
     const commentCount = beat.comments?.length || 0;
     const averageRating = beat.ratings?.length > 0
       ? beat.ratings.reduce((sum: number, r: any) => sum + r.rating, 0) / beat.ratings.length
