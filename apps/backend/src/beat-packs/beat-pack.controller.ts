@@ -3,6 +3,21 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { BeatPackService } from './beat-pack.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 
+function normalizeBeatIds(value: unknown): number[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => Number(item)).filter((item) => Number.isFinite(item));
+  }
+
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map((item) => Number(item.trim()))
+      .filter((item) => Number.isFinite(item));
+  }
+
+  return [];
+}
+
 @Controller('v1/beat-packs')
 export class BeatPackController {
   constructor(private readonly beatPackService: BeatPackService) {}
@@ -12,7 +27,11 @@ export class BeatPackController {
   @UseInterceptors(FileInterceptor('cover'))
   async create(@Req() req: any, @Body() body: any, @UploadedFile() cover?: Express.Multer.File) {
     const userId = req.user?.uid || req.user?.id;
-    return this.beatPackService.createBeatPack(userId, { ...body, coverFile: cover });
+    return this.beatPackService.createBeatPack(userId, {
+      ...body,
+      beatIds: normalizeBeatIds(body?.beatIds),
+      coverFile: cover,
+    });
   }
 
   @UseGuards(FirebaseAuthGuard)

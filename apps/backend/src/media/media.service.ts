@@ -113,6 +113,9 @@ export class MediaService {
         }
       }
 
+      const normalizedType = this.normalizeMediaType(createMediaDto.type || this.determineMediaType(uploadResult.resource_type));
+      const normalizedReleaseTags = this.buildReleaseTags(createMediaDto.releaseType, tags);
+
       const mediaData = {
         url: uploadResult.secure_url,
         cloudinaryPublicId: uploadResult.public_id,
@@ -120,12 +123,12 @@ export class MediaService {
         description: createMediaDto.description || null,
         format: uploadResult.format,
         duration: Math.floor(uploadResult.duration || 0),
-        type: createMediaDto.type || this.determineMediaType(uploadResult.resource_type),
+        type: normalizedType,
         accessType: createMediaDto.accessType || 'FREE',
         price: createMediaDto.price ? parseFloat(createMediaDto.price as any) : null,
         isExplicit: createMediaDto.isExplicit === 'true' || createMediaDto.isExplicit === true || false,
         genre: createMediaDto.genre || null,
-        tags: tags,
+        tags: normalizedReleaseTags,
         allowReselling: createMediaDto.allowReselling === 'true' || createMediaDto.allowReselling === true || true,
         artistCommissionRate: createMediaDto.artistCommissionRate ? parseFloat(createMediaDto.artistCommissionRate as any) : 0.5,
         platformCommissionRate: 0.5,
@@ -152,7 +155,15 @@ export class MediaService {
         }
       });
 
-      await this.notifyFollowersOfUpload(media);
+      try {
+        await this.notifyFollowersOfUpload(media);
+      } catch (notificationError) {
+        this.logger.error(
+          `Media created but failed to notify followers: ${notificationError instanceof Error ? notificationError.message : String(notificationError)}`,
+          notificationError instanceof Error ? notificationError.stack : undefined
+        );
+      }
+
       this.logger.log(`Media created successfully: ${media.id}`);
       return media;
     } catch (error) {
@@ -162,7 +173,7 @@ export class MediaService {
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
@@ -189,6 +200,9 @@ export class MediaService {
         }
       }
 
+      const normalizedType = this.normalizeMediaType(metadata.type);
+      const normalizedReleaseTags = this.buildReleaseTags(metadata.releaseType || metadata.type, tags);
+
       const mediaData = {
         url: metadata.url,
         cloudinaryPublicId: metadata.cloudinaryPublicId,
@@ -196,7 +210,7 @@ export class MediaService {
         description: metadata.description || null,
         format: metadata.format,
         duration: Math.floor(metadata.duration || 0),
-        type: metadata.type as MediaType,
+        type: normalizedType,
         accessType: normalizedAccessType === 'PAY_PER_VIEW'
           ? MediaAccessType.PAY_PER_VIEW
           : normalizedAccessType === 'PREMIUM'
@@ -207,7 +221,7 @@ export class MediaService {
           : null,
         isExplicit: metadata.isExplicit || false,
         genre: metadata.genre || null,
-        tags,
+        tags: normalizedReleaseTags,
         allowReselling: metadata.allowReselling !== false,
         artistCommissionRate: metadata.artistCommissionRate ? Number(metadata.artistCommissionRate) : 0.5,
         platformCommissionRate: metadata.platformCommissionRate ? Number(metadata.platformCommissionRate) : 0.5,
@@ -230,7 +244,15 @@ export class MediaService {
         }
       });
 
-      await this.notifyFollowersOfUpload(media);
+      try {
+        await this.notifyFollowersOfUpload(media);
+      } catch (notificationError) {
+        this.logger.error(
+          `Media metadata created but failed to notify followers: ${notificationError instanceof Error ? notificationError.message : String(notificationError)}`,
+          notificationError instanceof Error ? notificationError.stack : undefined
+        );
+      }
+
       this.logger.log(`Media created from metadata: ${media.id}`);
       return media;
     } catch (error) {
@@ -253,16 +275,52 @@ export class MediaService {
     const uploaderName = media.user.displayName || media.user.username || 'A creator';
     const notifications: Array<{ userId: number; title: string; message: string; type: NotificationType; metadata: any }> = followers.map((follower) => ({
       userId: follower.followerId,
-      title: 'New upload available',
-      message: `${uploaderName} has uploaded a new track: ${media.title}. Check it out now.`,
+        title: `${uploaderName} uploaded new ${media.type?.toLowerCase() || 'content'}`,
+        message: `${uploaderName} has uploaded "${media.title}". Tap to view it now.`,
       type: NotificationType.NEW_RELEASE,
       metadata: {
         mediaId: media.id,
         uploaderId: media.user.id,
+          link: `/track/${media.id}`,
+          title: media.title,
+          coverUrl: media.artCoverUrl,
       },
     }));
 
     await this.notificationService.createMany(notifications);
+  }
+
+  private normalizeMediaType(type?: string | null): MediaType {
+    switch ((type || '').toUpperCase()) {
+      case 'VIDEO':
+        return MediaType.VIDEO;
+      case 'PODCAST':
+        return MediaType.PODCAST;
+      case 'LIVE_STREAM':
+        return MediaType.LIVE_STREAM;
+      case 'ALBUM':
+      case 'EP':
+      case 'COLLECTION':
+      case 'PLAYLIST':
+        return MediaType.ALBUM;
+      default:
+        return MediaType.AUDIO;
+    }
+  }
+
+  private buildReleaseTags(releaseType?: string | null, tags: string[] = []): string[] {
+    const normalizedTags = Array.isArray(tags) ? tags.filter(Boolean) : [];
+    const normalizedReleaseType = (releaseType || '').toUpperCase();
+
+    if (normalizedReleaseType === 'EP') {
+      return [...new Set([...normalizedTags, 'ep'])];
+    }
+
+    if (normalizedReleaseType === 'ALBUM') {
+      return [...new Set([...normalizedTags, 'album'])];
+    }
+
+    return normalizedTags;
   }
 
   private determineMediaType(resourceType: string): MediaType {
@@ -391,11 +449,12 @@ async getHomepageSections() {
   // Featured Songs / New Releases
   let featuredSongs = await this.prisma.media.findMany({
     where: {
+      accessType: 'FREE',
+      type: { in: [MediaType.AUDIO, MediaType.ALBUM] },
       OR: [
         { tags: { has: "featured" } },
         { tags: { has: "new" } }
       ],
-      accessType: 'FREE'
     },
     include: {
       user: {
@@ -412,26 +471,27 @@ async getHomepageSections() {
   });
   featuredSongs = featuredSongs.filter(m => m.userId !== null);
   if (featuredSongs.length < 8) {
-    const latest = await this.prisma.media.findMany({
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            displayName: true,
-            avatarUrl: true
+      const latest = await this.prisma.media.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatarUrl: true
+            }
           }
-        }
-      },
-      orderBy: { createdAt: "desc" },
-      take: 8 - featuredSongs.length,
-      where: { id: { notIn: featuredSongs.map((m: any) => m.id) }, accessType: 'FREE' }
-    });    latest.filter(m => m.userId !== null);    featuredSongs = featuredSongs.concat(latest);
-  }
-
+        },
+        orderBy: { createdAt: "desc" },
+        take: 8 - featuredSongs.length,
+        where: { id: { notIn: featuredSongs.map((m: any) => m.id) }, accessType: 'FREE', type: { in: [MediaType.AUDIO, MediaType.ALBUM] } }
+      });
+      const filteredLatest = latest.filter((m: any) => m.userId !== null);
+      featuredSongs = featuredSongs.concat(filteredLatest);
+    }
   // Trending Songs
   let trendingSongs = await this.prisma.media.findMany({
-    where: { tags: { has: "trending" }, accessType: 'FREE' },
+    where: { tags: { has: "trending" }, accessType: 'FREE', type: { in: [MediaType.AUDIO, MediaType.ALBUM] } },
     include: {
       user: {
         select: {
@@ -460,18 +520,23 @@ async getHomepageSections() {
       },
       orderBy: { playCount: "desc" },
       take: 8 - trendingSongs.length,
-      where: { id: { notIn: trendingSongs.map((m: any) => m.id) }, accessType: 'FREE' }
-    });    mostPlayed.filter(m => m.userId !== null);    trendingSongs = trendingSongs.concat(mostPlayed);
+      where: { id: { notIn: trendingSongs.map((m: any) => m.id) }, accessType: 'FREE', type: { in: [MediaType.AUDIO, MediaType.ALBUM] } }
+    });
+    const filteredMostPlayed = mostPlayed.filter((m: any) => m.userId !== null);
+    trendingSongs = trendingSongs.concat(filteredMostPlayed);
   }
 
   // Beats and Instruments (filter by genre, not type)
   let beats = await this.prisma.media.findMany({
     where: {
+      accessType: 'FREE',
+      type: { in: [MediaType.AUDIO, MediaType.ALBUM] },
       OR: [
         { genre: { contains: "beat", mode: "insensitive" } },
-        { genre: { contains: "instrumental", mode: "insensitive" } }
-      ],
-      accessType: 'FREE'
+        { genre: { contains: "instrumental", mode: "insensitive" } },
+        { tags: { has: "album" } },
+        { tags: { has: "ep" } }
+      ]
     },
     include: {
       user: {
@@ -489,7 +554,7 @@ async getHomepageSections() {
 
   // Top Charts
   let topCharts = await this.prisma.media.findMany({
-    where: { accessType: 'FREE' },
+    where: { accessType: 'FREE', type: { in: [MediaType.AUDIO, MediaType.ALBUM] } },
     include: {
       user: {
         select: {
@@ -518,10 +583,10 @@ async getHomepageSections() {
       },
       orderBy: { createdAt: "desc" },
       take: 8 - topCharts.length,
-      where: { id: { notIn: topCharts.map((m: any) => m.id) }, accessType: 'FREE' }
+      where: { id: { notIn: topCharts.map((m: any) => m.id) }, accessType: 'FREE', type: { in: [MediaType.AUDIO, MediaType.ALBUM] } }
     });
-    latest.filter(m => m.userId !== null);
-    topCharts = topCharts.concat(latest);
+    const filteredLatest = latest.filter((m: any) => m.userId !== null);
+    topCharts = topCharts.concat(filteredLatest);
   }
 
   // Music videos from DB

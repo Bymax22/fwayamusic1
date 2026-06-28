@@ -114,7 +114,7 @@ interface Stats {
 
 interface NewMedia {
   title: string;
-  type: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM';
+  type: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM' | 'ALBUM' | 'EP';
   file: File | null;
   artCoverFile: File | null;
   artCoverPreview: string | null;
@@ -400,6 +400,9 @@ export default function ForArtistsPage() {
       const dbFormData = new FormData();
       dbFormData.append('title', newMedia.title);
       dbFormData.append('type', newMedia.type);
+      if (newMedia.type === 'ALBUM' || newMedia.type === 'EP') {
+        dbFormData.append('releaseType', newMedia.type === 'EP' ? 'EP' : 'ALBUM');
+      }
       dbFormData.append('cloudinaryPublicId', cloudinaryData.public_id);
       dbFormData.append('url', cloudinaryData.secure_url);
       dbFormData.append('duration', cloudinaryData.duration?.toString() || '0');
@@ -1458,12 +1461,14 @@ export default function ForArtistsPage() {
                       value={newMedia.type}
                       onChange={(e) => setNewMedia({
                         ...newMedia, 
-                        type: e.target.value as 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM'
+                        type: e.target.value as 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM' | 'ALBUM' | 'EP'
                       })}
                       disabled={isUploading}
                     >
                       <option value="AUDIO">Audio Track</option>
                       <option value="VIDEO">Video</option>
+                      <option value="ALBUM">Album</option>
+                      <option value="EP">EP</option>
                       <option value="PODCAST">Podcast</option>
                       <option value="LIVE_STREAM">Live Stream</option>
                     </select>
@@ -1513,7 +1518,7 @@ export default function ForArtistsPage() {
                           className="hidden"
                           id="file-upload"
                           onChange={handleFileSelect}
-                          accept="audio/*,video/*"
+                          accept={newMedia.type === 'VIDEO' ? 'video/*' : 'audio/*'}
                           disabled={isUploading}
                         />
                         <label htmlFor="file-upload" className="cursor-pointer text-white font-medium">

@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { FaBell, FaCog, FaSignOutAlt, FaShare, FaUser, FaMusic, FaHeadphones } from 'react-icons/fa';
+import { FaCog, FaSignOutAlt, FaShare, FaUser, FaMusic, FaHeadphones } from 'react-icons/fa';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import NotificationBell from './NotificationBell';
 
 interface DashboardHeaderProps {
   showLogo?: boolean;
@@ -99,11 +100,7 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
             </button>
 
             {/* Notifications Bell */}
-            <button className="relative p-2 text-white/80 hover:text-white transition-colors">
-              <FaBell className="w-5 h-5" />
-              {/* Notification dot - can be made dynamic */}
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
+            <NotificationBell />
 
             {/* User Avatar with Dropdown */}
             <div className="relative">

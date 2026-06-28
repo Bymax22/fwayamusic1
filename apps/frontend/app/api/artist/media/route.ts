@@ -121,6 +121,7 @@ export async function POST(request: NextRequest) {
       const artistCommissionRate = formData.get('artistCommissionRate');
       const platformCommissionRate = formData.get('platformCommissionRate');
       const tags = formData.get('tags');
+      const releaseType = formData.get('releaseType');
       const baseUrl = getBackendBaseUrl();
 
       const metadata = {
@@ -140,6 +141,7 @@ export async function POST(request: NextRequest) {
         artistCommissionRate: artistCommissionRate ? Number(artistCommissionRate) : undefined,
         platformCommissionRate: platformCommissionRate ? Number(platformCommissionRate) : undefined,
         tags: tags ? String(tags) : undefined,
+        releaseType: releaseType ? String(releaseType) : undefined,
         coverUrl: coverUrl ? String(coverUrl) : undefined,
       };
 

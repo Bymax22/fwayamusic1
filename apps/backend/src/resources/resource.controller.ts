@@ -1,5 +1,5 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, UseGuards, Req, UploadedFile, UseInterceptors, Query } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Post, Get, Put, Delete, Param, Body, UseGuards, Req, UploadedFiles, UseInterceptors, Query } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ResourceService } from './resource.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 
@@ -9,10 +9,15 @@ export class ResourceController {
 
   @UseGuards(FirebaseAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
-  async create(@Req() req: any, @Body() body: any, @UploadedFile() file?: Express.Multer.File) {
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'file', maxCount: 1 },
+    { name: 'thumbnailFile', maxCount: 1 },
+  ]))
+  async create(@Req() req: any, @Body() body: any, @UploadedFiles() files?: { file?: Express.Multer.File[]; thumbnailFile?: Express.Multer.File[] }) {
     const userId = req.user?.uid || req.user?.id;
-    return this.resourceService.createResource(userId, { ...body, file });
+    const file = files?.file?.[0];
+    const thumbnailFile = files?.thumbnailFile?.[0];
+    return this.resourceService.createResource(userId, { ...body, file, thumbnailFile });
   }
 
   @UseGuards(FirebaseAuthGuard)
@@ -36,10 +41,15 @@ export class ResourceController {
 
   @UseGuards(FirebaseAuthGuard)
   @Put(':id')
-  @UseInterceptors(FileInterceptor('file'))
-  async update(@Req() req: any, @Param('id') id: string, @Body() body: any, @UploadedFile() file?: Express.Multer.File) {
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'file', maxCount: 1 },
+    { name: 'thumbnailFile', maxCount: 1 },
+  ]))
+  async update(@Req() req: any, @Param('id') id: string, @Body() body: any, @UploadedFiles() files?: { file?: Express.Multer.File[]; thumbnailFile?: Express.Multer.File[] }) {
     const userId = req.user?.uid || req.user?.id;
-    return this.resourceService.updateResource(Number(userId), Number(id), body, { file });
+    const file = files?.file?.[0];
+    const thumbnailFile = files?.thumbnailFile?.[0];
+    return this.resourceService.updateResource(Number(userId), Number(id), body, { file, thumbnail: thumbnailFile });
   }
 
   @UseGuards(FirebaseAuthGuard)

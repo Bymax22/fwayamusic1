@@ -13,6 +13,12 @@ export class NotificationController {
   }
 
   @UseGuards(FirebaseAuthGuard)
+  @Get('me/unread-count')
+  async getUnreadCount(@Req() req: any) {
+    return { unreadCount: await this.notificationService.getUnreadCount(req.user.id) };
+  }
+
+  @UseGuards(FirebaseAuthGuard)
   @Patch(':id/read')
   async markAsRead(@Req() req: any, @Param('id') id: string) {
     const notificationId = Number(id);

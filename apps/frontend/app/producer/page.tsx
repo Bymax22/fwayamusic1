@@ -58,20 +58,24 @@ interface BeatPack {
   id: number;
   title: string;
   description: string;
-  beatCount: number;
+  beatCount?: number;
   price: number;
-  downloads: number;
-  sales: number;
-  createdAt: string;
+  downloads?: number;
+  sales?: number;
+  createdAt?: string;
+  coverUrl?: string | null;
+  accessType?: 'FREE' | 'PREMIUM';
 }
 
 interface SoundResource {
   id: number;
   title: string;
-  type: 'SAMPLE_PACK' | 'SOUND_KIT' | 'PRESET' | 'TUTORIAL';
+  type: string;
   description: string;
   price: number;
-  downloads: number;
+  downloads?: number;
+  thumbnailUrl?: string | null;
+  accessType?: 'FREE' | 'PREMIUM';
 }
 
 export default function ProducerPage() {
@@ -93,8 +97,12 @@ export default function ProducerPage() {
   const [soundResources, setSoundResources] = useState<SoundResource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showPackModal, setShowPackModal] = useState(false);
+  const [showResourceModal, setShowResourceModal] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [isCreatingPack, setIsCreatingPack] = useState(false);
+  const [isCreatingResource, setIsCreatingResource] = useState(false);
   const [newBeat, setNewBeat] = useState({
     title: '',
     description: '',
@@ -107,6 +115,26 @@ export default function ProducerPage() {
     coverFile: null as File | null,
     coverPreview: null as string | null,
   });
+  const [newBeatPack, setNewBeatPack] = useState({
+    title: '',
+    description: '',
+    genre: '',
+    price: '',
+    accessType: 'FREE' as 'FREE' | 'PREMIUM',
+    coverFile: null as File | null,
+    coverPreview: null as string | null,
+  });
+  const [newResource, setNewResource] = useState({
+    title: '',
+    description: '',
+    genre: '',
+    resourceType: 'SAMPLE' as 'SAMPLE' | 'LOOP' | 'TEMPLATE' | 'PRESET' | 'SOUND',
+    price: '',
+    accessType: 'FREE' as 'FREE' | 'PREMIUM',
+    file: null as File | null,
+    thumbnailFile: null as File | null,
+    thumbnailPreview: null as string | null,
+  });
   const [currentTrack, setCurrentTrack] = useState<Beat | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [editingBeat, setEditingBeat] = useState<Beat | null>(null);
@@ -115,6 +143,9 @@ export default function ProducerPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
+  const packCoverInputRef = useRef<HTMLInputElement>(null);
+  const resourceFileInputRef = useRef<HTMLInputElement>(null);
+  const resourceThumbnailInputRef = useRef<HTMLInputElement>(null);
 
   const formatZMW = (amount: number) =>
     amount.toLocaleString('en-ZM', {
@@ -168,9 +199,17 @@ export default function ProducerPage() {
           setBeats(await beatsResponse.json());
         }
 
-        // Beat packs and resources are not available yet, leave as empty arrays for now
-        setBeatPacks([]);
-        setSoundResources([]);
+        const packsResponse = await fetch(`${backendUrl || ''}/api/v1/beat-packs/producer/me`, { headers });
+        if (packsResponse.ok) {
+          const packsData = await packsResponse.json();
+          setBeatPacks(Array.isArray(packsData) ? packsData : []);
+        }
+
+        const resourcesResponse = await fetch(`${backendUrl || ''}/api/v1/resources/producer/me`, { headers });
+        if (resourcesResponse.ok) {
+          const resourcesData = await resourcesResponse.json();
+          setSoundResources(Array.isArray(resourcesData) ? resourcesData : []);
+        }
       } catch (error) {
         console.error('Error fetching producer data:', error);
         const errorMsg = error instanceof Error ? error.message : 'Failed to load dashboard data';
@@ -272,6 +311,153 @@ export default function ProducerPage() {
       setAuthError({ message: `Beat upload failed: ${errorMsg}` });
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleBeatPackFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewBeatPack((prev) => ({ ...prev, coverPreview: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+    setNewBeatPack((prev) => ({ ...prev, coverFile: file }));
+  };
+
+  const handleResourceFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setNewResource((prev) => ({ ...prev, file }));
+  };
+
+  const handleResourceThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewResource((prev) => ({ ...prev, thumbnailPreview: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+    setNewResource((prev) => ({ ...prev, thumbnailFile: file }));
+  };
+
+  const handleUploadBeatPack = async () => {
+    if (!newBeatPack.title) {
+      alert('Please enter a beat pack title');
+      return;
+    }
+
+    setIsCreatingPack(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('title', newBeatPack.title);
+      formData.append('description', newBeatPack.description);
+      formData.append('genre', newBeatPack.genre);
+      if (newBeatPack.price) formData.append('price', newBeatPack.price);
+      formData.append('accessType', newBeatPack.accessType);
+      if (newBeatPack.coverFile) formData.append('cover', newBeatPack.coverFile);
+
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${backendUrl || ''}/api/v1/beat-packs`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Beat pack upload failed');
+      }
+
+      const uploadedPack = await response.json();
+      setBeatPacks((prev) => [uploadedPack, ...prev]);
+      setShowPackModal(false);
+      setNewBeatPack({
+        title: '',
+        description: '',
+        genre: '',
+        price: '',
+        accessType: 'FREE',
+        coverFile: null,
+        coverPreview: null,
+      });
+      alert('Beat pack created successfully');
+    } catch (error) {
+      console.error('Beat pack upload error:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Failed to create beat pack';
+      setAuthError({ message: `Beat pack creation failed: ${errorMsg}` });
+    } finally {
+      setIsCreatingPack(false);
+    }
+  };
+
+  const handleUploadResource = async () => {
+    if (!newResource.title || !newResource.resourceType || !newResource.file) {
+      alert('Please enter a title, choose a resource type, and upload a file');
+      return;
+    }
+
+    setIsCreatingResource(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('title', newResource.title);
+      formData.append('description', newResource.description);
+      formData.append('genre', newResource.genre);
+      formData.append('resourceType', newResource.resourceType);
+      if (newResource.price) formData.append('price', newResource.price);
+      formData.append('accessType', newResource.accessType);
+      formData.append('file', newResource.file);
+      if (newResource.thumbnailFile) formData.append('thumbnailFile', newResource.thumbnailFile);
+
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${backendUrl || ''}/api/v1/resources`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Resource upload failed');
+      }
+
+      const uploadedResource = await response.json();
+      setSoundResources((prev) => [uploadedResource, ...prev]);
+      setShowResourceModal(false);
+      setNewResource({
+        title: '',
+        description: '',
+        genre: '',
+        resourceType: 'SAMPLE',
+        price: '',
+        accessType: 'FREE',
+        file: null,
+        thumbnailFile: null,
+        thumbnailPreview: null,
+      });
+      alert('Resource created successfully');
+    } catch (error) {
+      console.error('Resource upload error:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Failed to create resource';
+      setAuthError({ message: `Resource creation failed: ${errorMsg}` });
+    } finally {
+      setIsCreatingResource(false);
     }
   };
 
@@ -553,7 +739,7 @@ export default function ProducerPage() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold text-white">Beat Packs</h2>
                   <button
-                    onClick={() => handleComingSoon('Beat pack creation')}
+                    onClick={() => setShowPackModal(true)}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition"
                   >
                     <PlusCircle className="w-4 h-4" />
@@ -600,7 +786,7 @@ export default function ProducerPage() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold text-white">Sound Resources</h2>
                   <button
-                    onClick={() => handleComingSoon('Resource upload')}
+                    onClick={() => setShowResourceModal(true)}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition"
                   >
                     <PlusCircle className="w-4 h-4" />

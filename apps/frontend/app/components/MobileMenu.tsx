@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, Bell, Moon, Sun, ChevronRight, Crown } from "lucide-react";
+import NotificationBell from "./NotificationBell";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -326,7 +327,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     </p>
                   </div>
                   <button className="p-2 rounded-full hover:bg-purple-600/20 transition-colors">
-                    <Bell className="w-4 h-4 text-purple-400" />
+                    <NotificationBell />
                   </button>
                 </div>
               </div>

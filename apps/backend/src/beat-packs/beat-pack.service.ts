@@ -23,7 +23,7 @@ export class BeatPackService {
     genre?: string;
     price?: number;
     accessType?: 'FREE' | 'PREMIUM';
-    beatIds: number[];
+    beatIds?: number[];
     coverFile?: Express.Multer.File;
   }) {
     if (!beatPackData.title) {
@@ -34,6 +34,9 @@ export class BeatPackService {
     if (beatPackData.coverFile) {
       coverUrl = await this.uploadToCloudinary(beatPackData.coverFile);
     }
+
+    const normalizedBeatIds = (beatPackData.beatIds || [])
+      .filter((beatId): beatId is number => typeof beatId === 'number' && Number.isFinite(beatId));
 
     // Create beat pack with beats relationship
     const beatPack = await this.prisma.beatPack.create({
@@ -46,7 +49,7 @@ export class BeatPackService {
         coverUrl,
         userId,
         beatPackBeats: {
-          create: beatPackData.beatIds.map((beatId, index) => ({
+          create: normalizedBeatIds.map((beatId, index) => ({
             beatId,
             order: index
           }))

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, User, ChevronDown, Settings } from "lucide-react";
+import { User, ChevronDown, Settings } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Image from "next/image";
+import NotificationBell from "./NotificationBell";
 
 export default function Navbar({ currentTrack }: { currentTrack: any }) {
   const { user } = useAuth();
@@ -37,9 +38,7 @@ export default function Navbar({ currentTrack }: { currentTrack: any }) {
         </div>
 
         <div className="w-[340px] flex items-center h-full justify-end px-6 gap-4">
-          <button className="text-gray-400 hover:text-white transition" aria-label="Notifications">
-            <Bell size={20} />
-          </button>
+          <NotificationBell />
           <Link href="/settings" className="text-gray-400 hover:text-white transition" aria-label="Settings">
             <Settings size={20} />
           </Link>
