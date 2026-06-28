@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 
+function getBackendBaseUrl() {
+  return process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+}
+
 export async function POST(request: Request) {
   try {
     const metadata = await request.json();
     const authHeader = request.headers.get('Authorization');
+    const baseUrl = getBackendBaseUrl();
 
     if (!metadata.url || !metadata.title || !metadata.type) {
       return NextResponse.json(
@@ -14,7 +19,7 @@ export async function POST(request: Request) {
 
     // Forward to backend (include /api prefix expected by deployed backend)
     const backendResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/save-metadata`,
+      `${baseUrl}/api/v1/media/save-metadata`,
       {
         method: 'POST',
         headers: {

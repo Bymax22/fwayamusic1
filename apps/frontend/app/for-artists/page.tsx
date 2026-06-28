@@ -371,15 +371,16 @@ export default function ForArtistsPage() {
       }
 
       // Step 1: Upload media file to Cloudinary
+      const cloudinaryCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dayn5vifn';
       const cloudinaryFormData = new FormData();
       cloudinaryFormData.append('file', newMedia.file);
       cloudinaryFormData.append('upload_preset', 'bymaxdev1');
-      cloudinaryFormData.append('resource_type', 'auto');
+      cloudinaryFormData.append('resource_type', newMedia.type === 'VIDEO' ? 'video' : 'auto');
       
       setUploadProgress(30);
 
       const cloudinaryResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/auto/upload`,
+        `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/upload`,
         {
           method: 'POST',
           body: cloudinaryFormData,
@@ -407,6 +408,9 @@ export default function ForArtistsPage() {
       if (artCoverUrl) dbFormData.append('artCoverUrl', artCoverUrl);
       dbFormData.append('accessType', newMedia.accessType);
       dbFormData.append('genre', newMedia.genre.trim());
+      dbFormData.append('description', newMedia.lyrics.trim());
+      dbFormData.append('isExplicit', 'false');
+      dbFormData.append('allowReselling', 'true');
       if (newMedia.accessType !== 'FREE') dbFormData.append('price', newMedia.price.trim());
       if (newMedia.lyrics.trim()) dbFormData.append('lyrics', newMedia.lyrics.trim());
 

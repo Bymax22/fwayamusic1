@@ -162,17 +162,30 @@ export class MediaService {
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; coverUrl?: string }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
       const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';
+      const normalizedAccessType = metadata.accessType?.toUpperCase() === 'PREMIUM' || metadata.accessType?.toUpperCase() === 'PAY_PER_VIEW'
+        ? metadata.accessType.toUpperCase()
+        : (metadata.isPremium ? 'PREMIUM' : 'FREE');
 
-      if (metadata.isPremium) {
+      if (metadata.isPremium || normalizedAccessType === 'PREMIUM' || normalizedAccessType === 'PAY_PER_VIEW') {
         const uploader = await this.prisma.user.findUnique({ where: { id: userId } });
         const allowedRoles: UserRole[] = [UserRole.ARTIST, UserRole.PRODUCER];
         if (!uploader || !uploader.isPremium || !uploader.premiumUntil || uploader.premiumUntil < new Date() || !allowedRoles.includes(uploader.role)) {
           throw new ForbiddenException('Only active premium artists and producers can upload premium content');
+        }
+      }
+
+      let tags: string[] = [];
+      if (metadata.tags) {
+        try {
+          tags = typeof metadata.tags === 'string' ? JSON.parse(metadata.tags) : metadata.tags;
+        } catch (error) {
+          this.logger.warn('Failed to parse metadata tags:', error);
+          tags = [];
         }
       }
 
@@ -184,17 +197,23 @@ export class MediaService {
         format: metadata.format,
         duration: Math.floor(metadata.duration || 0),
         type: metadata.type as MediaType,
-        accessType: metadata.isPremium ? MediaAccessType.PREMIUM : MediaAccessType.FREE,
-        price: metadata.isPremium ? 2.99 : null, // Default price for premium
+        accessType: normalizedAccessType === 'PAY_PER_VIEW'
+          ? MediaAccessType.PAY_PER_VIEW
+          : normalizedAccessType === 'PREMIUM'
+            ? MediaAccessType.PREMIUM
+            : MediaAccessType.FREE,
+        price: normalizedAccessType === 'PREMIUM' || normalizedAccessType === 'PAY_PER_VIEW'
+          ? (metadata.price ? Number(metadata.price) : 2.99)
+          : null,
         isExplicit: metadata.isExplicit || false,
         genre: metadata.genre || null,
-        tags: [],
-        allowReselling: true,
-        artistCommissionRate: 0.5,
-        platformCommissionRate: 0.5,
+        tags,
+        allowReselling: metadata.allowReselling !== false,
+        artistCommissionRate: metadata.artistCommissionRate ? Number(metadata.artistCommissionRate) : 0.5,
+        platformCommissionRate: metadata.platformCommissionRate ? Number(metadata.platformCommissionRate) : 0.5,
         user: { connect: { id: userId } },
-        artCoverUrl: metadata.coverUrl || defaultCoverUrl,
-        thumbnailUrl: metadata.coverUrl || defaultCoverUrl,
+        artCoverUrl: metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
+        thumbnailUrl: metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
       };
 
       const media = await this.prisma.media.create({

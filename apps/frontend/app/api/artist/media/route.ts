@@ -5,12 +5,17 @@ export const config = {
   maxDuration: 55,
 };
 
+function getBackendBaseUrl() {
+  return process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+}
+
 export async function GET(request: NextRequest) {
   try {
     const token = request.headers.get('authorization');
+    const baseUrl = getBackendBaseUrl();
     
     // Get the current user's media from backend
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/user/me`, {
+    const res = await fetch(`${baseUrl}/api/v1/media/user/me`, {
       headers: {
         'Authorization': token || '',
       },
@@ -60,9 +65,10 @@ export async function POST(request: NextRequest) {
         console.error('[API Route] Request timeout after 50 seconds');
         controller.abort();
       }, 50000);
+      const baseUrl = getBackendBaseUrl();
 
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/upload`, {
+        const res = await fetch(`${baseUrl}/api/v1/media/upload`, {
           method: 'POST',
           headers: {
             'Authorization': token || '',
@@ -106,6 +112,16 @@ export async function POST(request: NextRequest) {
 
       // Create metadata object for database
       const coverUrl = formData.get('artCoverUrl') || formData.get('coverUrl');
+      const description = formData.get('description');
+      const genre = formData.get('genre');
+      const accessType = formData.get('accessType');
+      const price = formData.get('price');
+      const isExplicit = formData.get('isExplicit');
+      const allowReselling = formData.get('allowReselling');
+      const artistCommissionRate = formData.get('artistCommissionRate');
+      const platformCommissionRate = formData.get('platformCommissionRate');
+      const tags = formData.get('tags');
+      const baseUrl = getBackendBaseUrl();
 
       const metadata = {
         title,
@@ -115,11 +131,20 @@ export async function POST(request: NextRequest) {
         duration: duration ? parseInt(duration as string) : 0,
         format,
         resourceType,
+        description: description ? String(description) : undefined,
+        genre: genre ? String(genre) : undefined,
+        accessType: accessType ? String(accessType) : undefined,
+        price: price ? Number(price) : undefined,
+        isExplicit: isExplicit === 'true' || isExplicit === true,
+        allowReselling: allowReselling === 'true' || allowReselling === true,
+        artistCommissionRate: artistCommissionRate ? Number(artistCommissionRate) : undefined,
+        platformCommissionRate: platformCommissionRate ? Number(platformCommissionRate) : undefined,
+        tags: tags ? String(tags) : undefined,
         coverUrl: coverUrl ? String(coverUrl) : undefined,
       };
 
       // Send to backend to save metadata only (no file upload)
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/save-metadata`, {
+      const res = await fetch(`${baseUrl}/api/v1/media/save-metadata`, {
         method: 'POST',
         headers: {
           'Authorization': token || '',
