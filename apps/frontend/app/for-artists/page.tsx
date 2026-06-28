@@ -16,6 +16,7 @@ import { DashboardCard } from '@/components/DashboardCard';
 import DashboardHeader from '@/components/DashboardHeader';
 import MobilePlayer from '@/components/MobilePlayer';
 import ShareModal from '@/components/ShareModal';
+import VideoPlayer from '@/components/VideoPlayer';
 
 
 
@@ -122,7 +123,25 @@ interface NewMedia {
   price: string;
   genre: string;
   lyrics: string;
+  tags: string;
+  tracks: ReleaseTrack[];
 }
+
+interface ReleaseTrack {
+  id: string;
+  title: string;
+  file: File | null;
+  artCoverFile: File | null;
+  artCoverPreview: string | null;
+}
+
+const createEmptyTrack = (): ReleaseTrack => ({
+  id: `track-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  title: '',
+  file: null,
+  artCoverFile: null,
+  artCoverPreview: null,
+});
 
 export default function ForArtistsPage() {
   const { user } = useAuth();
@@ -146,6 +165,8 @@ export default function ForArtistsPage() {
     price: '',
     genre: '',
     lyrics: '',
+    tags: '',
+    tracks: [createEmptyTrack()],
   });
   const [currentTrack, setCurrentTrack] = useState<Media | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -157,6 +178,7 @@ export default function ForArtistsPage() {
   const [isTrackLoading, setIsTrackLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [editingMedia, setEditingMedia] = useState<Media | null>(null);
+  const [selectedVideoForPlayer, setSelectedVideoForPlayer] = useState<Media | null>(null);
   const [selectedMediaForAnalytics, setSelectedMediaForAnalytics] = useState<Media | null>(null);
   const [selectedMediaForShare, setSelectedMediaForShare] = useState<Media | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -170,6 +192,33 @@ export default function ForArtistsPage() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+
+  const getBackendBaseUrl = () => process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+
+  const uploadToCloudinary = async (file: File, resourceType: 'image' | 'video' | 'auto' = 'auto') => {
+    const cloudinaryCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dayn5vifn';
+    const endpoint = resourceType === 'image'
+      ? `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`
+      : `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/upload`;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'bymaxdev1');
+    if (resourceType !== 'image') {
+      formData.append('resource_type', resourceType === 'video' ? 'video' : 'auto');
+    }
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(resourceType === 'image' ? 'Cover art upload failed' : 'Cloudinary upload failed');
+    }
+
+    return response.json();
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -259,6 +308,13 @@ export default function ForArtistsPage() {
   };
 
   const playTrack = (track: Media) => {
+    // If it's a video, open the video player instead
+    if (track.type === 'VIDEO') {
+      setSelectedVideoForPlayer(track);
+      return;
+    }
+
+    // For audio tracks, use the regular audio player
     if (currentTrack?.id === track.id) {
       setIsPlaying((prev) => !prev);
       return;
@@ -323,13 +379,26 @@ export default function ForArtistsPage() {
   };
 
   const handleUpload = async () => {
-    if (!newMedia.file) {
-      alert('Please select a file to upload');
+    if (!newMedia.title.trim()) {
+      alert('Please enter a title');
       return;
     }
 
-    if (!newMedia.title.trim()) {
-      alert('Please enter a title');
+    const isReleaseUpload = newMedia.type === 'ALBUM' || newMedia.type === 'EP';
+    if (isReleaseUpload) {
+      const validTracks = newMedia.tracks.filter((track) => track.title.trim() && track.file);
+      if (validTracks.length === 0) {
+        alert('Please add at least one track with a title and audio file');
+        return;
+      }
+
+      const incompleteTracks = newMedia.tracks.some((track) => (track.title.trim() && !track.file) || (!track.title.trim() && track.file));
+      if (incompleteTracks) {
+        alert('Each track needs both a title and an audio file before upload');
+        return;
+      }
+    } else if (!newMedia.file) {
+      alert('Please select a file to upload');
       return;
     }
 
@@ -346,63 +415,128 @@ export default function ForArtistsPage() {
     try {
       setIsUploading(true);
       setUploadProgress(0);
+      const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
+      if (isReleaseUpload) {
+        let releaseCoverUrl: string | null = null;
+        let releaseCoverPublicId: string | null = null;
+        if (newMedia.artCoverFile) {
+          const coverData = await uploadToCloudinary(newMedia.artCoverFile, 'image');
+          releaseCoverUrl = coverData.secure_url;
+          releaseCoverPublicId = coverData.public_id;
+        }
+
+        setUploadProgress(10);
+
+        const albumResponse = await fetch(`${getBackendBaseUrl()}/api/v1/albums`, {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: newMedia.title,
+            description: newMedia.lyrics.trim() || undefined,
+            coverImageUrl: releaseCoverUrl,
+            cloudinaryId: releaseCoverPublicId,
+            type: newMedia.type,
+          }),
+        });
+
+        if (!albumResponse.ok) {
+          const errorData = await albumResponse.text();
+          throw new Error(`Failed to create release: ${albumResponse.status} - ${errorData}`);
+        }
+
+        const albumData = await albumResponse.json();
+        const uploadedTracks: Media[] = [];
+        let releaseAlbumId: number | null = albumData?.id ?? null;
+
+        for (let index = 0; index < newMedia.tracks.length; index += 1) {
+          const track = newMedia.tracks[index];
+          const trackCloudinaryData = await uploadToCloudinary(track.file as File, 'auto');
+          const dbFormData = new FormData();
+          dbFormData.append('title', track.title.trim());
+          dbFormData.append('type', 'AUDIO');
+          dbFormData.append('releaseType', newMedia.type === 'EP' ? 'EP' : 'ALBUM');
+          dbFormData.append('cloudinaryPublicId', trackCloudinaryData.public_id);
+          dbFormData.append('url', trackCloudinaryData.secure_url);
+          dbFormData.append('duration', trackCloudinaryData.duration?.toString() || '0');
+          dbFormData.append('format', trackCloudinaryData.format);
+          dbFormData.append('resourceType', trackCloudinaryData.resource_type);
+          dbFormData.append('accessType', newMedia.accessType);
+          dbFormData.append('genre', newMedia.genre.trim());
+          dbFormData.append('description', newMedia.lyrics.trim());
+          dbFormData.append('isExplicit', 'false');
+          dbFormData.append('allowReselling', 'true');
+          if (newMedia.accessType !== 'FREE') dbFormData.append('price', newMedia.price.trim());
+          if (track.artCoverFile) {
+            const trackCoverData = await uploadToCloudinary(track.artCoverFile, 'image');
+            dbFormData.append('artCoverUrl', trackCoverData.secure_url);
+          }
+          if (releaseAlbumId) {
+            dbFormData.append('albumId', releaseAlbumId.toString());
+          }
+
+          const dbResponse = await fetch('/api/artist/media', {
+            method: 'POST',
+            body: dbFormData,
+            headers,
+          });
+
+          if (!dbResponse.ok) {
+            const errorData = await dbResponse.text();
+            throw new Error(`Failed to save track metadata: ${dbResponse.status} - ${errorData}`);
+          }
+
+          const uploadedTrack = await dbResponse.json() as Media & { albumId?: number };
+          if (!releaseAlbumId && uploadedTrack.albumId) {
+            releaseAlbumId = uploadedTrack.albumId;
+          }
+
+          uploadedTracks.push(uploadedTrack);
+          setUploadProgress(15 + Math.round(((index + 1) / newMedia.tracks.length) * 80));
+        }
+
+        setMedia(prev => [...uploadedTracks, ...prev]);
+        setUploadProgress(100);
+
+        setTimeout(() => {
+          setShowUploadModal(false);
+          setNewMedia({
+            title: '',
+            type: 'AUDIO',
+            file: null,
+            artCoverFile: null,
+            artCoverPreview: null,
+            accessType: 'FREE',
+            price: '',
+            genre: '',
+            lyrics: '',
+            tags: '',
+            tracks: [createEmptyTrack()],
+          });
+          setUploadProgress(0);
+          setIsUploading(false);
+          alert('Release uploaded successfully!');
+        }, 500);
+        return;
+      }
 
       let artCoverUrl: string | null = null;
       if (newMedia.artCoverFile) {
-        const coverFormData = new FormData();
-        coverFormData.append('file', newMedia.artCoverFile);
-        coverFormData.append('upload_preset', 'bymaxdev1');
-        
-        const coverResponse = await fetch(
-          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-          {
-            method: 'POST',
-            body: coverFormData,
-          }
-        );
-
-        if (!coverResponse.ok) {
-          throw new Error('Cover art upload failed');
-        }
-
-        const coverData = await coverResponse.json();
+        const coverData = await uploadToCloudinary(newMedia.artCoverFile, 'image');
         artCoverUrl = coverData.secure_url;
         setUploadProgress(20);
       }
 
-      // Step 1: Upload media file to Cloudinary
-      const cloudinaryCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dayn5vifn';
-      const cloudinaryFormData = new FormData();
-      cloudinaryFormData.append('file', newMedia.file);
-      cloudinaryFormData.append('upload_preset', 'bymaxdev1');
-      cloudinaryFormData.append('resource_type', newMedia.type === 'VIDEO' ? 'video' : 'auto');
-      
-      setUploadProgress(30);
-
-      const cloudinaryResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/upload`,
-        {
-          method: 'POST',
-          body: cloudinaryFormData,
-        }
-      );
-
-      if (!cloudinaryResponse.ok) {
-        throw new Error('Cloudinary upload failed');
-      }
-
-      const cloudinaryData = await cloudinaryResponse.json();
+      const cloudinaryData = await uploadToCloudinary(newMedia.file as File, newMedia.type === 'VIDEO' ? 'video' : 'auto');
       setUploadProgress(65);
 
-      // Step 2: Save metadata to database via backend API
-      const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
-      
       const dbFormData = new FormData();
       dbFormData.append('title', newMedia.title);
       dbFormData.append('type', newMedia.type);
-      if (newMedia.type === 'ALBUM' || newMedia.type === 'EP') {
-        dbFormData.append('releaseType', newMedia.type === 'EP' ? 'EP' : 'ALBUM');
-      }
       dbFormData.append('cloudinaryPublicId', cloudinaryData.public_id);
       dbFormData.append('url', cloudinaryData.secure_url);
       dbFormData.append('duration', cloudinaryData.duration?.toString() || '0');
@@ -416,10 +550,12 @@ export default function ForArtistsPage() {
       dbFormData.append('allowReselling', 'true');
       if (newMedia.accessType !== 'FREE') dbFormData.append('price', newMedia.price.trim());
       if (newMedia.lyrics.trim()) dbFormData.append('lyrics', newMedia.lyrics.trim());
+      if (newMedia.tags.trim()) {
+        const tagsArray = newMedia.tags.split(',').map(tag => tag.trim().toLowerCase());
+        dbFormData.append('tags', JSON.stringify(tagsArray));
+      }
 
       setUploadProgress(80);
-
-      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
       const dbResponse = await fetch('/api/artist/media', {
         method: 'POST',
@@ -432,8 +568,7 @@ export default function ForArtistsPage() {
       if (dbResponse.ok) {
         const uploadedMedia = await dbResponse.json() as Media;
         setMedia(prev => [uploadedMedia, ...prev]);
-        
-        // Log cover art validation
+
         console.log('✅ Media Upload Successful:', {
           id: uploadedMedia.id,
           title: uploadedMedia.title,
@@ -442,9 +577,9 @@ export default function ForArtistsPage() {
           url: uploadedMedia.url,
           timestamp: new Date().toISOString(),
         });
-        
+
         setUploadProgress(100);
-        
+
         setTimeout(() => {
           setShowUploadModal(false);
           setNewMedia({
@@ -457,6 +592,8 @@ export default function ForArtistsPage() {
             price: '',
             genre: '',
             lyrics: '',
+            tags: '',
+            tracks: [createEmptyTrack()],
           });
           setUploadProgress(0);
           setIsUploading(false);
@@ -481,6 +618,27 @@ export default function ForArtistsPage() {
     }
   };
 
+  const handleTrackFileSelect = (trackId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setNewMedia(prev => ({
+      ...prev,
+      tracks: prev.tracks.map((track) => track.id === trackId ? { ...track, file } : track),
+    }));
+  };
+
+  const addTrackToRelease = () => {
+    setNewMedia(prev => ({ ...prev, tracks: [...prev.tracks, createEmptyTrack()] }));
+  };
+
+  const removeTrackFromRelease = (trackId: string) => {
+    setNewMedia(prev => ({
+      ...prev,
+      tracks: prev.tracks.filter((track) => track.id !== trackId),
+    }));
+  };
+
   const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -496,6 +654,33 @@ export default function ForArtistsPage() {
     };
     reader.readAsDataURL(file);
     setNewMedia(prev => ({ ...prev, artCoverFile: file }));
+  };
+
+  const handleTrackCoverSelect = (trackId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image for the track cover art');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewMedia(prev => ({
+        ...prev,
+        tracks: prev.tracks.map((track) => track.id === trackId ? {
+          ...track,
+          artCoverPreview: reader.result as string,
+        } : track),
+      }));
+    };
+    reader.readAsDataURL(file);
+
+    setNewMedia(prev => ({
+      ...prev,
+      tracks: prev.tracks.map((track) => track.id === trackId ? { ...track, artCoverFile: file } : track),
+    }));
   };
 
   const generateResellerLink = async (mediaId: number) => {
@@ -1486,6 +1671,103 @@ export default function ForArtistsPage() {
                     />
                   </div>
 
+                  {newMedia.type === 'VIDEO' && (
+                    <div>
+                      <label className="block text-gray-400 mb-2">Video Tags</label>
+                      <input
+                        type="text"
+                        className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="e.g., music, song, music video, comedy, tutorial (comma-separated)"
+                        value={newMedia.tags}
+                        onChange={(e) => setNewMedia({ ...newMedia, tags: e.target.value })}
+                        disabled={isUploading}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Use 'music' or 'song' for music videos, 'comedy' for comedy videos, etc.</p>
+                    </div>
+                  )}
+
+                  {['ALBUM', 'EP'].includes(newMedia.type) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-gray-400">Tracks *</label>
+                        <button
+                          type="button"
+                          onClick={addTrackToRelease}
+                          className="text-sm text-purple-400 hover:text-purple-300"
+                        >
+                          + Add track
+                        </button>
+                      </div>
+
+                      {newMedia.tracks.map((track, index) => (
+                        <div key={track.id} className="rounded-3xl border border-white/10 bg-[#08080e] p-3 space-y-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-sm text-gray-300">Track {index + 1}</span>
+                            {newMedia.tracks.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeTrackFromRelease(track.id)}
+                                className="text-xs text-red-400 hover:text-red-300"
+                              >
+                                Remove
+                              </button>
+                            )}
+                          </div>
+
+                          <input
+                            type="text"
+                            className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="Track title"
+                            value={track.title}
+                            onChange={(e) => setNewMedia(prev => ({
+                              ...prev,
+                              tracks: prev.tracks.map((item) => item.id === track.id ? { ...item, title: e.target.value } : item),
+                            }))}
+                            disabled={isUploading}
+                          />
+
+                          <div className="bg-[#08080e] rounded-3xl p-3 text-center">
+                            <input
+                              type="file"
+                              className="hidden"
+                              id={`track-file-${track.id}`}
+                              onChange={(e) => handleTrackFileSelect(track.id, e)}
+                              accept="audio/*"
+                              disabled={isUploading}
+                            />
+                            <label htmlFor={`track-file-${track.id}`} className="cursor-pointer inline-flex flex-col items-center gap-1 text-gray-400">
+                              <Upload className="w-6 h-6 text-purple-400" />
+                              <span className="text-white font-medium">{track.file ? 'Change audio file' : 'Upload audio file'}</span>
+                              <span className="text-xs">MP3, WAV, FLAC</span>
+                            </label>
+                            {track.file && (
+                              <p className="text-purple-300 text-sm mt-2">✓ {track.file.name}</p>
+                            )}
+                          </div>
+
+                          <div className="bg-[#08080e] rounded-3xl p-3 text-center">
+                            <input
+                              type="file"
+                              className="hidden"
+                              id={`track-cover-${track.id}`}
+                              onChange={(e) => handleTrackCoverSelect(track.id, e)}
+                              accept="image/*"
+                              disabled={isUploading}
+                            />
+                            <label htmlFor={`track-cover-${track.id}`} className="cursor-pointer inline-flex flex-col items-center gap-1 text-gray-400">
+                              <Upload className="w-6 h-6 text-purple-400" />
+                              <span className="text-white font-medium">{track.artCoverFile ? 'Change track cover' : 'Optional track cover'}</span>
+                              <span className="text-xs">JPG, PNG, WEBP</span>
+                            </label>
+                            {track.artCoverPreview && (
+                              <img src={track.artCoverPreview} alt="Track cover preview" className="mx-auto mt-3 h-16 w-16 rounded-2xl object-cover" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-gray-400 mb-2">Cover Art</label>
                     <div className="bg-[#08080e] rounded-3xl p-3 text-center">
@@ -1509,7 +1791,7 @@ export default function ForArtistsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-gray-400 mb-2">File * (Max 10MB)</label>
+                    <label className="block text-gray-400 mb-2">File * (Max {newMedia.type === 'VIDEO' ? '30MB' : '10MB'})</label>
                     <div className="bg-[#08080e] rounded-3xl p-4 text-center">
                       <div className="flex flex-col items-center justify-center gap-1 text-gray-400">
                         <Upload className="w-8 h-8 text-purple-400" />
@@ -1522,9 +1804,12 @@ export default function ForArtistsPage() {
                           disabled={isUploading}
                         />
                         <label htmlFor="file-upload" className="cursor-pointer text-white font-medium">
-                          Click to select file
+                          {newMedia.type === 'ALBUM' || newMedia.type === 'EP' ? 'This upload is for the release cover and metadata only' : 'Click to select file'}
                         </label>
-                        <p className="text-sm">MP3, WAV, FLAC, MP4, MOV</p>
+                        <p className="text-sm">{newMedia.type === 'ALBUM' || newMedia.type === 'EP' ? 'Each track will be uploaded separately below' : 'MP3, WAV, FLAC, MP4, MOV'}</p>
+                        {newMedia.type === 'VIDEO' && (
+                          <p className="text-xs text-yellow-400 mt-1">Note: Videos are reviewed before appearing on the platform</p>
+                        )}
                         {newMedia.file && (
                           <p className="text-purple-300 text-sm mt-2">
                             ✓ {newMedia.file.name}
@@ -1576,7 +1861,7 @@ export default function ForArtistsPage() {
                     <button
                       onClick={() => {
                         setShowUploadModal(false);
-                        setNewMedia({ title: '', type: 'AUDIO', file: null, artCoverFile: null, artCoverPreview: null, accessType: 'FREE', price: '', genre: '', lyrics: '' });
+                        setNewMedia({ title: '', type: 'AUDIO', file: null, artCoverFile: null, artCoverPreview: null, accessType: 'FREE', price: '', genre: '', lyrics: '', tags: '', tracks: [createEmptyTrack()] });
                       }}
                       className="px-4 py-2 bg-[#11131c] text-white rounded-3xl hover:bg-[#161a24] transition-colors"
                       disabled={isUploading}
@@ -1585,7 +1870,7 @@ export default function ForArtistsPage() {
                     </button>
                     <button
                       onClick={handleUpload}
-                      disabled={!newMedia.title || !newMedia.file || isUploading}
+                      disabled={!newMedia.title || (newMedia.type === 'ALBUM' || newMedia.type === 'EP' ? false : !newMedia.file) || isUploading}
                       className="px-4 py-2 bg-purple-600 disabled:bg-gray-600 text-white rounded-3xl hover:bg-purple-500 transition-colors disabled:cursor-not-allowed"
                     >
                       {isUploading ? 'Uploading...' : 'Upload'}
@@ -1678,6 +1963,15 @@ export default function ForArtistsPage() {
             onToggleMute={toggleMute}
           />
         )}
+        <VideoPlayer
+          isOpen={!!selectedVideoForPlayer}
+          onClose={() => setSelectedVideoForPlayer(null)}
+          videoUrl={selectedVideoForPlayer?.url || ''}
+          title={selectedVideoForPlayer?.title}
+          artist={user?.displayName || user?.email || 'Unknown'}
+          coverUrl={selectedVideoForPlayer?.artCoverUrl || selectedVideoForPlayer?.thumbnailUrl}
+          duration={selectedVideoForPlayer?.duration}
+        />
         {renderEditModal()}
         {renderAnalyticsModal()}
         <ShareModal

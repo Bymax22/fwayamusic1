@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
-import { MediaType, MediaAccessType, NotificationType, UserRole } from '@prisma/client';
+import { MediaType, MediaAccessType, NotificationType, UserRole, ModerationStatus } from '@prisma/client';
 import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
@@ -49,6 +49,65 @@ export class MediaService {
     }
   }
 
+  // Check video content for inappropriate material using Cloudinary's moderation API
+  async checkVideoModeration(publicId: string): Promise<{ flagged: boolean; flags: string[] }> {
+    try {
+      this.logger.log(`Starting content moderation check for: ${publicId}`);
+      
+      // Use Cloudinary's moderation API to check the video
+      const response = await (cloudinary.api as any).call("get", `/resources/video/${publicId}`, {
+        moderation_status: true,
+        tags: true,
+      });
+
+      const moderationData = response.moderation && response.moderation[response.moderation.length - 1];
+      
+      if (!moderationData) {
+        this.logger.log(`No moderation data available for ${publicId}, allowing upload`);
+        return { flagged: false, flags: [] };
+      }
+
+      const result = moderationData.result;
+      const flags: string[] = [];
+      let flagged = false;
+
+      // Check for explicit content flags
+      if (result && result.explicit_detection) {
+        if (result.explicit_detection.status === 'ok' && result.explicit_detection.confidence > 0.85) {
+          flags.push('EXPLICIT_CONTENT');
+          flagged = true;
+        }
+      }
+
+      // Check for nudity using Cloudinary's manual tagging (if available)
+      if (result && result.detection) {
+        if (result.detection === 'nudity' || result.detection === 'explicit') {
+          flags.push('NUDITY_DETECTED');
+          flagged = true;
+        }
+      }
+
+      // Additional check: if video has common adult tags, flag it
+      if (response.tags && response.tags.some((tag: string) => 
+        tag.toLowerCase().includes('adult') || 
+        tag.toLowerCase().includes('nsfw') ||
+        tag.toLowerCase().includes('18+')
+      )) {
+        flags.push('ADULT_TAGS');
+        flagged = true;
+      }
+
+      this.logger.log(`Moderation check for ${publicId}: flagged=${flagged}, flags=${flags.join(',')}`);
+      return { flagged, flags };
+    } catch (error) {
+      this.logger.warn(
+        `Could not perform moderation check for ${publicId}: ${error instanceof Error ? error.message : String(error)}`
+      );
+      // If moderation check fails, allow upload but log warning
+      return { flagged: false, flags: [] };
+    }
+  }
+
   async createMedia(file: Express.Multer.File, userId: number, createMediaDto: any) {
     try {
       this.logger.log(`Creating media for user ${userId}, file: ${file.originalname}, size: ${file.size} bytes`);
@@ -90,6 +149,17 @@ export class MediaService {
       const uploadResult = await Promise.race([uploadPromise, timeoutPromise]) as UploadApiResponse;
       const totalTime = Date.now() - startTime;
       this.logger.log(`Cloudinary upload success: ${uploadResult.public_id} (${totalTime}ms total)`);
+
+      // 1.5 Check video content moderation if video upload
+      let videoModerationFlags: string[] = [];
+      const isVideo = uploadResult.resource_type === 'video';
+      if (isVideo) {
+        const moderationResult = await this.checkVideoModeration(uploadResult.public_id);
+        videoModerationFlags = moderationResult.flags;
+        if (moderationResult.flagged) {
+          this.logger.warn(`Video ${uploadResult.public_id} flagged for moderation: ${videoModerationFlags.join(', ')}`);
+        }
+      }
 
       // 2. Create database record
       const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';
@@ -155,6 +225,20 @@ export class MediaService {
         }
       });
 
+      // If video was flagged, create a moderation record
+      if (isVideo && videoModerationFlags.length > 0) {
+        await this.prisma.contentModeration.create({
+          data: {
+            mediaId: media.id,
+            contentCreatorId: userId,
+            status: ModerationStatus.PENDING,
+            flags: videoModerationFlags,
+            reason: `Automatic flagging: ${videoModerationFlags.join(', ')}`,
+          },
+        });
+        this.logger.log(`Created moderation record for video ${media.id}`);
+      }
+
       try {
         await this.notifyFollowersOfUpload(media);
       } catch (notificationError) {
@@ -173,7 +257,7 @@ export class MediaService {
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
@@ -202,6 +286,28 @@ export class MediaService {
 
       const normalizedType = this.normalizeMediaType(metadata.type);
       const normalizedReleaseTags = this.buildReleaseTags(metadata.releaseType || metadata.type, tags);
+      const albumId = metadata.albumId ? Number(metadata.albumId) : undefined;
+
+      if (albumId) {
+        const album = await this.prisma.album.findUnique({ where: { id: albumId } });
+        if (!album) {
+          throw new InternalServerErrorException('Album release not found');
+        }
+        if (album.userId !== userId) {
+          throw new ForbiddenException('You can only add tracks to your own album');
+        }
+      }
+
+      // Check video moderation if this is a video
+      let videoModerationFlags: string[] = [];
+      const isVideo = metadata.resourceType === 'video' || normalizedType === MediaType.VIDEO;
+      if (isVideo && metadata.cloudinaryPublicId) {
+        const moderationResult = await this.checkVideoModeration(metadata.cloudinaryPublicId);
+        videoModerationFlags = moderationResult.flags;
+        if (moderationResult.flagged) {
+          this.logger.warn(`Video ${metadata.cloudinaryPublicId} flagged for moderation: ${videoModerationFlags.join(', ')}`);
+        }
+      }
 
       const mediaData = {
         url: metadata.url,
@@ -228,6 +334,7 @@ export class MediaService {
         user: { connect: { id: userId } },
         artCoverUrl: metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
         thumbnailUrl: metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
+        ...(albumId ? { album: { connect: { id: albumId } } } : {}),
       };
 
       const media = await this.prisma.media.create({
@@ -243,6 +350,20 @@ export class MediaService {
           }
         }
       });
+
+      // If video was flagged, create a moderation record
+      if (isVideo && videoModerationFlags.length > 0) {
+        await this.prisma.contentModeration.create({
+          data: {
+            mediaId: media.id,
+            contentCreatorId: userId,
+            status: ModerationStatus.PENDING,
+            flags: videoModerationFlags,
+            reason: `Automatic flagging: ${videoModerationFlags.join(', ')}`,
+          },
+        });
+        this.logger.log(`Created moderation record for video ${media.id}`);
+      }
 
       try {
         await this.notifyFollowersOfUpload(media);
@@ -589,9 +710,22 @@ async getHomepageSections() {
     topCharts = topCharts.concat(filteredLatest);
   }
 
-  // Music videos from DB
+  // Music videos from DB (only verified/published)
   let musicVideos = await this.prisma.media.findMany({
-    where: { type: MediaType.VIDEO },
+    where: { 
+      type: MediaType.VIDEO,
+      OR: [
+        { tags: { has: "music" } },
+        { tags: { has: "song" } },
+        { tags: { has: "mv" } },
+        { genre: { contains: "music", mode: "insensitive" } }
+      ],
+      contentModerations: {
+        none: {
+          status: 'PENDING'
+        }
+      }
+    },
     include: {
       user: {
         select: {
@@ -600,16 +734,31 @@ async getHomepageSections() {
           displayName: true,
           avatarUrl: true
         }
-      }
+      },
+      contentModerations: true
     },
     orderBy: { createdAt: "desc" },
     take: 6,
   });
   musicVideos = musicVideos.filter(m => m.userId !== null);
 
-  // Other videos from DB
+  // Other videos from DB - comedy, entertainment, tutorials, etc (only verified/published)
   let otherVideos = await this.prisma.media.findMany({
-    where: { type: MediaType.VIDEO },
+    where: { 
+      type: MediaType.VIDEO,
+      NOT: {
+        OR: [
+          { tags: { has: "music" } },
+          { tags: { has: "song" } },
+          { tags: { has: "mv" } },
+        ]
+      },
+      contentModerations: {
+        none: {
+          status: 'PENDING'
+        }
+      }
+    },
     include: {
       user: {
         select: {
@@ -618,7 +767,8 @@ async getHomepageSections() {
           displayName: true,
           avatarUrl: true
         }
-      }
+      },
+      contentModerations: true
     },
     orderBy: { playCount: "desc" },
     take: 6,

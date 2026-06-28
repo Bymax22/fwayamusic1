@@ -1,15 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserStatus, UserRole, KYCStatus } from '@prisma/client';
+import { UserStatus, UserRole, KYCStatus, NotificationType } from '@prisma/client';
 import { VerificationMethod } from '@prisma/client';
 import { randomBytes } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import axios from 'axios';
+import { NotificationService } from '../notification/notification.service';
 
 // Using Brevo for email delivery (OTP and magic-link)
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationService: NotificationService,
+  ) {}
+
+  private async createWelcomeNotification(userId: number) {
+    const existing = await this.prisma.notification.findFirst({
+      where: {
+        userId,
+        type: NotificationType.SYSTEM,
+        title: 'Welcome to Fwaya',
+      },
+    });
+
+    if (existing) {
+      return;
+    }
+
+    await this.notificationService.createNotification(
+      userId,
+      'Welcome to Fwaya',
+      'Your account is ready. Start exploring music, uploads, and your dashboard.',
+      NotificationType.SYSTEM,
+      { source: 'account_signup', link: '/discover' },
+    );
+  }
 
   /**
    * Register a new user
@@ -126,6 +152,8 @@ export class AuthService {
       const createdUser = await this.prisma.user.create({
         data: userData,
       });
+
+      await this.createWelcomeNotification(createdUser.id);
       
       console.log('Created user with ID:', createdUser.id, 'Role:', createdUser.role);
       return createdUser;
@@ -200,6 +228,8 @@ if (!user) {
       passwordHash: 'SOCIAL_LOGIN', // <-- Add this line
     },
   });
+
+  await this.createWelcomeNotification(user.id);
 }
 
     return user;
@@ -231,6 +261,8 @@ async findOrCreateUser(decodedFirebaseUser: any) {
         passwordHash: 'SOCIAL_LOGIN',
       },
     });
+
+    await this.createWelcomeNotification(user.id);
   }
 
   return user;

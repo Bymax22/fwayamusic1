@@ -122,6 +122,7 @@ export async function POST(request: NextRequest) {
       const platformCommissionRate = formData.get('platformCommissionRate');
       const tags = formData.get('tags');
       const releaseType = formData.get('releaseType');
+      const albumId = formData.get('albumId');
       const baseUrl = getBackendBaseUrl();
 
       const metadata = {
@@ -142,6 +143,7 @@ export async function POST(request: NextRequest) {
         platformCommissionRate: platformCommissionRate ? Number(platformCommissionRate) : undefined,
         tags: tags ? String(tags) : undefined,
         releaseType: releaseType ? String(releaseType) : undefined,
+        albumId: albumId ? Number(albumId) : undefined,
         coverUrl: coverUrl ? String(coverUrl) : undefined,
       };
 

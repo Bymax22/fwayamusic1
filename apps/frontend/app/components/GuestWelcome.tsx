@@ -22,6 +22,7 @@ import {
 import { FaRegHeart } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import MobileMenu from "./MobileMenu";
+import VideoPlayer from "./VideoPlayer";
 
 export default function GuestWelcome() {
   const [activeTab, setActiveTab] = useState<string>("for-you");
@@ -39,6 +40,7 @@ export default function GuestWelcome() {
   const [otherVideos, setOtherVideos] = useState([]);
   const [playlists, setPlaylists] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedVideoForPlayer, setSelectedVideoForPlayer] = useState<any>(null);
 
   // Animation state for Discover text
   const [isDiscoverAnimating, setIsDiscoverAnimating] = useState(false);
@@ -1278,7 +1280,11 @@ export default function GuestWelcome() {
 
             <div className="grid grid-cols-6 gap-3">
               {musicVideoCards.map((video: any, i: number) => (
-                <div key={i} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group">
+                <div 
+                  key={i} 
+                  onClick={() => setSelectedVideoForPlayer(video)}
+                  className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                >
                   <div className="relative aspect-[9/16]">
                     <div
                       className={`absolute inset-0 ${video.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
@@ -1288,7 +1294,7 @@ export default function GuestWelcome() {
                         backgroundPosition: 'center'
                       }}
                     />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/50 transition-colors">
                       <FaPlay className="text-white text-xl" />
                     </div>
                   </div>
@@ -1438,7 +1444,11 @@ export default function GuestWelcome() {
 
             <div className="grid grid-cols-6 gap-3">
               {otherVideoCards.map((video: any, i: number) => (
-                <div key={i} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group">
+                <div 
+                  key={i} 
+                  onClick={() => setSelectedVideoForPlayer(video)}
+                  className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                >
                   <div className="relative aspect-[9/16]">
                     <div
                       className={`absolute inset-0 ${video.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
@@ -1448,7 +1458,7 @@ export default function GuestWelcome() {
                         backgroundPosition: 'center'
                       }}
                     />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/50 transition-colors">
                       <FaPlay className="text-white text-xl" />
                     </div>
                   </div>
@@ -1642,6 +1652,17 @@ export default function GuestWelcome() {
 
       {/* Mobile Menu */}
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+
+      {/* Video Player Modal */}
+      <VideoPlayer
+        isOpen={!!selectedVideoForPlayer}
+        onClose={() => setSelectedVideoForPlayer(null)}
+        videoUrl={selectedVideoForPlayer?.url || ''}
+        title={selectedVideoForPlayer?.title}
+        artist={selectedVideoForPlayer?.user?.displayName || selectedVideoForPlayer?.user?.username || 'Unknown Artist'}
+        coverUrl={selectedVideoForPlayer?.artCoverUrl || selectedVideoForPlayer?.thumbnailUrl}
+        duration={selectedVideoForPlayer?.duration}
+      />
     </>
   );
 }

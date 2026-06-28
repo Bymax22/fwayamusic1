@@ -24,7 +24,7 @@ import { Request } from 'express';
 @Controller('v1/media')
 export class MediaController {
   private readonly logger = new Logger(MediaController.name);
-  private readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  private readonly MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB for videos
 
   constructor(private readonly mediaService: MediaService) {}
 
