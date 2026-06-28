@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { SerializeInterceptor } from './common/interceptors/serialize.interceptor';
 
 let app: any;
 const logger = new Logger('Bootstrap');
@@ -23,6 +24,9 @@ async function initializeApp() {
         forbidNonWhitelisted: false,
       })
     );
+
+    // Sanitize responses (BigInt -> safe JSON) globally
+    app.useGlobalInterceptors(new SerializeInterceptor());
 
     // CORS must be enabled BEFORE global prefix
     app.enableCors({

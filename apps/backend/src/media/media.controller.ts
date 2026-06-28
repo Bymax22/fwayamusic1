@@ -28,6 +28,28 @@ export class MediaController {
 
   constructor(private readonly mediaService: MediaService) {}
 
+  // Convert Prisma/BigInt values to JSON-safe values
+  private sanitizeForJson(value: any): any {
+    if (value === null || value === undefined) return value;
+    if (typeof value === 'bigint') {
+      // Convert to number when safe, otherwise to string
+      try {
+        const asNumber = Number(value);
+        if (Number.isSafeInteger(asNumber)) return asNumber;
+      } catch (_) {}
+      return value.toString();
+    }
+    if (Array.isArray(value)) return value.map((v) => this.sanitizeForJson(v));
+    if (typeof value === 'object') {
+      const out: any = {};
+      for (const k of Object.keys(value)) {
+        out[k] = this.sanitizeForJson(value[k]);
+      }
+      return out;
+    }
+    return value;
+  }
+
   @UseGuards(FirebaseAuthGuard)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -53,9 +75,9 @@ export class MediaController {
       this.logger.log(`Starting upload for user ${userId}, file: ${file.originalname}, size: ${file.size}`);
       
       const result = await this.mediaService.createMedia(file, userId, createMediaDto);
-      
+
       this.logger.log(`Upload success for user ${userId}, media ID: ${result.id}`);
-      return result;
+      return this.sanitizeForJson(result);
     } catch (error) {
       this.logger.error(`Upload error: ${error instanceof Error ? error.message : error}`, error);
       throw error;
@@ -99,10 +121,10 @@ export class MediaController {
       const userId = user.id;
       this.logger.log(`Saving metadata for user ${userId}, title: ${metadata.title}, url: ${metadata.url}, coverUrl: ${metadata.coverUrl || 'none'}`);
       
-      const result = await this.mediaService.createMediaFromMetadata(userId, metadata);
-      
-      this.logger.log(`Metadata saved successfully for user ${userId}, media ID: ${result.id}`);
-      return result;
+        const result = await this.mediaService.createMediaFromMetadata(userId, metadata);
+
+        this.logger.log(`Metadata saved successfully for user ${userId}, media ID: ${result.id}`);
+        return this.sanitizeForJson(result);
     } catch (error) {
       this.logger.error(`Error saving metadata: ${error instanceof Error ? error.message : error}`, error);
       throw error;
@@ -112,13 +134,15 @@ export class MediaController {
   // NEW: Homepage sections endpoint (must come before generic @Get())
   @Get('homepage-sections')
   async getHomepageSections() {
-    return this.mediaService.getHomepageSections();
+    const sections = await this.mediaService.getHomepageSections();
+    return this.sanitizeForJson(sections);
   }
 
   @Get()
   async getAllMedia() {
     // Return all public media (for browse page, landing page, etc)
-    return this.mediaService.getAllMedia();
+    const media = await this.mediaService.getAllMedia();
+    return this.sanitizeForJson(media);
   }
 
   @UseGuards(FirebaseAuthGuard)
@@ -129,12 +153,14 @@ export class MediaController {
       throw new BadRequestException('User authentication required');
     }
     const userId = user.id;
-    return this.mediaService.getUserMedia(userId);
+    const media = await this.mediaService.getUserMedia(userId);
+    return this.sanitizeForJson(media);
   }
 
   @Get(':id')
   async getMediaById(@Param('id') id: string) {
-    return this.mediaService.getMediaById(parseInt(id));
+    const media = await this.mediaService.getMediaById(parseInt(id));
+    return this.sanitizeForJson(media);
   }
 
   @UseGuards(FirebaseAuthGuard)
@@ -144,7 +170,8 @@ export class MediaController {
       throw new BadRequestException('User authentication required');
     }
     const userId = user.id;
-    return this.mediaService.deleteMedia(parseInt(id), userId);
+    const result = await this.mediaService.deleteMedia(parseInt(id), userId);
+    return this.sanitizeForJson(result);
   }
 
   @UseGuards(FirebaseAuthGuard)
@@ -158,6 +185,7 @@ export class MediaController {
       throw new BadRequestException('User authentication required');
     }
     const userId = user.id;
-    return this.mediaService.updateMedia(parseInt(id), userId, updates);
+    const updated = await this.mediaService.updateMedia(parseInt(id), userId, updates);
+    return this.sanitizeForJson(updated);
   }
 }
