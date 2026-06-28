@@ -1963,15 +1963,25 @@ export default function ForArtistsPage() {
             onToggleMute={toggleMute}
           />
         )}
-        <VideoPlayer
-          isOpen={!!selectedVideoForPlayer}
-          onClose={() => setSelectedVideoForPlayer(null)}
-          videoUrl={selectedVideoForPlayer?.url || ''}
-          title={selectedVideoForPlayer?.title}
-          artist={user?.displayName || user?.email || 'Unknown'}
-          coverUrl={selectedVideoForPlayer?.artCoverUrl || selectedVideoForPlayer?.thumbnailUrl}
-          duration={selectedVideoForPlayer?.duration}
-        />
+        {
+          (() => {
+            const selectedVideoCoverUrl: string | undefined =
+              selectedVideoForPlayer?.artCoverUrl ??
+              (selectedVideoForPlayer?.thumbnailUrl ?? undefined);
+
+            return (
+              <VideoPlayer
+                isOpen={!!selectedVideoForPlayer}
+                onClose={() => setSelectedVideoForPlayer(null)}
+                videoUrl={selectedVideoForPlayer?.url || ''}
+                title={selectedVideoForPlayer?.title}
+                artist={user?.displayName || user?.email || 'Unknown'}
+                coverUrl={selectedVideoCoverUrl}
+                duration={selectedVideoForPlayer?.duration}
+              />
+            );
+          })()
+        }
         {renderEditModal()}
         {renderAnalyticsModal()}
         <ShareModal

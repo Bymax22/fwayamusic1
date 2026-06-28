@@ -10,7 +10,7 @@ interface VideoPlayerProps {
   videoUrl: string;
   title?: string;
   artist?: string;
-  coverUrl?: string;
+  coverUrl?: string | null;
   duration?: number;
 }
 
@@ -150,10 +150,15 @@ export default function VideoPlayer({
               <video
                 ref={videoRef}
                 src={videoUrl}
+                poster={coverUrl}
                 className="w-full h-full object-contain bg-black"
                 onTimeUpdate={handleTimeUpdate}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
+                playsInline
+                preload="metadata"
+                webkit-playsinline="true"
+                controls
               />
 
               {/* Video Controls */}
