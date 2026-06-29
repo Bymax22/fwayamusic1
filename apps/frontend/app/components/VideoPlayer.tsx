@@ -181,7 +181,7 @@ export default function VideoPlayer({
     }
   };
 
-  const handleMediaTap = async (event?: React.MouseEvent) => {
+  const handleMediaTap = async (event?: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     event?.stopPropagation();
 
     if (isMinimized && isMobile) {
@@ -227,6 +227,7 @@ export default function VideoPlayer({
             <div
               className="relative bg-black"
               onClick={handleMediaTap}
+              onTouchStart={handleMediaTap}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             >
@@ -240,6 +241,8 @@ export default function VideoPlayer({
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
                 onEnded={() => setIsPlaying(false)}
+                autoPlay
+                muted={isMuted}
                 playsInline
                 preload="metadata"
                 webkit-playsinline="true"
