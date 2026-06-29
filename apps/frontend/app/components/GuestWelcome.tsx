@@ -1289,7 +1289,10 @@ export default function GuestWelcome() {
               {musicVideoCards.map((video: any, i: number) => (
                 <div 
                   key={i} 
+                  role="button"
+                  tabIndex={0}
                   onClick={() => openVideoPlayer(video)}
+                  onTouchStart={() => openVideoPlayer(video)}
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
                   <div className="relative aspect-[9/16]">
@@ -1453,7 +1456,10 @@ export default function GuestWelcome() {
               {otherVideoCards.map((video: any, i: number) => (
                 <div 
                   key={i} 
+                  role="button"
+                  tabIndex={0}
                   onClick={() => openVideoPlayer(video)}
+                  onTouchStart={() => openVideoPlayer(video)}
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
                   <div className="relative aspect-[9/16]">
