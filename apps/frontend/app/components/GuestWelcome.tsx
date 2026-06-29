@@ -1282,7 +1282,21 @@ export default function GuestWelcome() {
               {musicVideoCards.map((video: any, i: number) => (
                 <div 
                   key={i} 
-                  onClick={() => setSelectedVideoForPlayer(video)}
+                  onClick={async () => {
+                    try {
+                      console.debug('[GuestWelcome] opening video', video?.url);
+                      // quick HEAD check to inspect CORS and content-type
+                      const headResp = await fetch(video?.url || '', { method: 'HEAD' });
+                      console.debug('[GuestWelcome] HEAD status', headResp.status, 'headers:', {
+                        contentType: headResp.headers.get('content-type'),
+                        acceptRanges: headResp.headers.get('accept-ranges'),
+                        cors: headResp.headers.get('access-control-allow-origin')
+                      });
+                    } catch (err) {
+                      console.warn('[GuestWelcome] HEAD check failed', err);
+                    }
+                    setSelectedVideoForPlayer(video);
+                  }}
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
                   <div className="relative aspect-[9/16]">
@@ -1446,7 +1460,20 @@ export default function GuestWelcome() {
               {otherVideoCards.map((video: any, i: number) => (
                 <div 
                   key={i} 
-                  onClick={() => setSelectedVideoForPlayer(video)}
+                  onClick={async () => {
+                    try {
+                      console.debug('[GuestWelcome] opening other video', video?.url);
+                      const headResp = await fetch(video?.url || '', { method: 'HEAD' });
+                      console.debug('[GuestWelcome] HEAD status', headResp.status, 'headers:', {
+                        contentType: headResp.headers.get('content-type'),
+                        acceptRanges: headResp.headers.get('accept-ranges'),
+                        cors: headResp.headers.get('access-control-allow-origin')
+                      });
+                    } catch (err) {
+                      console.warn('[GuestWelcome] HEAD check failed', err);
+                    }
+                    setSelectedVideoForPlayer(video);
+                  }}
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
                   <div className="relative aspect-[9/16]">
