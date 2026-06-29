@@ -34,6 +34,7 @@ export default function GuestWelcome() {
   const [quickPicks, setQuickPicks] = useState([]);
   const [featuredAlbums, setFeaturedAlbums] = useState([]);
   const [featuredArtists, setFeaturedArtists] = useState([]);
+  const [beats, setBeats] = useState([]);
   const [trendingNow, setTrendingNow] = useState([]);
   const [topCharts, setTopCharts] = useState([]);
   const [musicVideos, setMusicVideos] = useState([]);
@@ -111,6 +112,7 @@ export default function GuestWelcome() {
             artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
           }));
           setFeaturedAlbums(processedAlbums);
+          setBeats(processedAlbums);
         }
 
         if (homepageData.musicVideos && Array.isArray(homepageData.musicVideos)) {
