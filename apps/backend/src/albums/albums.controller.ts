@@ -16,7 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Albums')
-@Controller('api/v1/albums')
+@Controller('v1/albums')
 export class AlbumsController {
   constructor(private albumsService: AlbumsService) {}
 

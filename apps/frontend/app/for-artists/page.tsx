@@ -1769,7 +1769,7 @@ export default function ForArtistsPage() {
                   )}
 
                   <div>
-                    <label className="block text-gray-400 mb-2">Cover Art</label>
+                    <label className="block text-gray-400 mb-2">Cover Art (Optional)</label>
                     <div className="bg-[#08080e] rounded-3xl p-3 text-center">
                       <input
                         type="file"
@@ -1782,7 +1782,7 @@ export default function ForArtistsPage() {
                       <label htmlFor="cover-upload" className="cursor-pointer inline-flex flex-col items-center gap-1 text-gray-400">
                         <Upload className="w-6 h-6 text-purple-400" />
                         <span className="text-white font-medium">Upload cover art</span>
-                        <span className="text-xs">JPG, PNG, WEBP</span>
+                        <span className="text-xs">JPG, PNG, WEBP · Optional</span>
                       </label>
                       {newMedia.artCoverPreview && (
                         <img src={newMedia.artCoverPreview} alt="Cover preview" className="mx-auto mt-3 h-20 w-20 rounded-3xl object-cover" />
@@ -1969,6 +1969,8 @@ export default function ForArtistsPage() {
               selectedVideoForPlayer?.artCoverUrl ??
               (selectedVideoForPlayer?.thumbnailUrl ?? undefined);
 
+            const relatedVideoPool = (media || []).filter((item: Media) => item.type === 'VIDEO' && item.url && item.id !== selectedVideoForPlayer?.id).slice(0, 6);
+
             return (
               <VideoPlayer
                 isOpen={!!selectedVideoForPlayer}
@@ -1978,6 +1980,8 @@ export default function ForArtistsPage() {
                 artist={user?.displayName || user?.email || 'Unknown'}
                 coverUrl={selectedVideoCoverUrl}
                 duration={selectedVideoForPlayer?.duration}
+                relatedVideos={relatedVideoPool}
+                onSelectVideo={(video) => setSelectedVideoForPlayer(video as Media)}
               />
             );
           })()

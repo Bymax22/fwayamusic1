@@ -1,8 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Volume2, VolumeX, Maximize2, Play, Pause } from 'lucide-react';
-import Image from 'next/image';
+import { X, Volume2, VolumeX, Maximize2, Play, Pause, Minimize2 } from 'lucide-react';
 
 interface VideoPlayerProps {
   isOpen: boolean;
@@ -12,6 +11,8 @@ interface VideoPlayerProps {
   artist?: string;
   coverUrl?: string | null;
   duration?: number;
+  relatedVideos?: Array<any>;
+  onSelectVideo?: (video: any) => void;
 }
 
 export default function VideoPlayer({
@@ -21,34 +22,80 @@ export default function VideoPlayer({
   title = 'Video',
   artist = 'Unknown',
   coverUrl,
-  duration
+  duration,
+  relatedVideos = [],
+  onSelectVideo,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(duration || 0);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const checkViewport = () => setIsMobile(window.innerWidth < 768);
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+
+    return () => window.removeEventListener('resize', checkViewport);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {
       setIsPlaying(false);
       setCurrentTime(0);
+      setVideoDuration(duration || 0);
+      setIsMinimized(false);
+      setShowControls(true);
+      return;
     }
-  }, [isOpen]);
 
-  const togglePlayPause = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play().catch(err => {
-          console.error('Failed to play video:', err);
-        });
+    setIsMinimized(false);
+    setShowControls(true);
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    video.load();
+    video.currentTime = 0;
+    setCurrentTime(0);
+    setVideoDuration(duration || 0);
+
+    const playVideo = async () => {
+      try {
+        await video.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error('Failed to autoplay video:', error);
+        setIsPlaying(false);
       }
-      setIsPlaying(!isPlaying);
+    };
+
+    void playVideo();
+  }, [isOpen, videoUrl, duration]);
+
+  const togglePlayPause = async () => {
+    if (!videoRef.current) return;
+
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    try {
+      await videoRef.current.play();
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('Failed to play video:', error);
     }
   };
 
@@ -70,6 +117,9 @@ export default function VideoPlayer({
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       setCurrentTime(videoRef.current.currentTime);
+      if (Number.isFinite(videoRef.current.duration)) {
+        setVideoDuration(videoRef.current.duration);
+      }
     }
   };
 
@@ -83,12 +133,10 @@ export default function VideoPlayer({
 
   const toggleFullscreen = async () => {
     if (!videoRef.current) return;
-    
+
     try {
       if (!document.fullscreenElement) {
-        await videoRef.current.requestFullscreen().catch(err => {
-          console.error('Failed to enter fullscreen:', err);
-        });
+        await videoRef.current.requestFullscreen();
         setIsFullscreen(true);
       } else {
         await document.exitFullscreen();
@@ -112,13 +160,13 @@ export default function VideoPlayer({
   };
 
   const formatTime = (seconds: number) => {
-    if (isNaN(seconds)) return '0:00';
+    if (Number.isNaN(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const videoDuration = videoRef.current?.duration || duration || 0;
+  const visibleRelatedVideos = relatedVideos.filter((video: any) => video?.url && video.url !== videoUrl).slice(0, 6);
 
   return (
     <AnimatePresence>
@@ -127,19 +175,18 @@ export default function VideoPlayer({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+          className={isMinimized && isMobile ? 'fixed bottom-4 right-4 z-[70] w-[180px] sm:w-[220px]' : 'fixed inset-0 z-[60] bg-black/95 flex items-center justify-center p-2 sm:p-4'}
+          onClick={isMinimized && isMobile ? undefined : onClose}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-4xl bg-black rounded-lg overflow-hidden"
+            className={isMinimized && isMobile ? 'w-full overflow-hidden rounded-[20px] border border-white/10 bg-black/90 shadow-2xl backdrop-blur' : 'w-full max-w-5xl overflow-hidden rounded-[24px] border border-white/10 bg-[#050509]/95 shadow-2xl'}
           >
-            {/* Video Container */}
             <div
-              className="relative bg-black aspect-video"
+              className="relative bg-black"
               onMouseMove={handleMouseMove}
               onMouseLeave={() => {
                 if (isPlaying) {
@@ -151,123 +198,144 @@ export default function VideoPlayer({
                 ref={videoRef}
                 src={videoUrl}
                 poster={coverUrl ?? undefined}
-                className="w-full h-full object-contain bg-black"
+                className={isMinimized && isMobile ? 'aspect-video w-full object-cover' : 'aspect-video w-full object-contain bg-black'}
                 onTimeUpdate={handleTimeUpdate}
+                onLoadedMetadata={handleTimeUpdate}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
                 playsInline
                 preload="metadata"
                 webkit-playsinline="true"
-                controls
               />
 
-              {/* Video Controls */}
-              <motion.div
-                animate={{ opacity: showControls ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-between pointer-events-none"
-              >
-                {/* Top Bar - Close Button */}
-                <div className="flex justify-between items-start p-4 pointer-events-auto">
-                  <div>
-                    <h3 className="text-white font-semibold text-lg truncate max-w-xs">{title}</h3>
-                    <p className="text-gray-300 text-sm">{artist}</p>
-                  </div>
+              <div className={`absolute inset-0 ${isMinimized && isMobile ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent' : 'bg-gradient-to-t from-black/90 via-black/20 to-transparent'}`} />
+
+              <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3 sm:p-4">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-white">{title}</p>
+                  <p className="truncate text-xs text-white/70">{artist}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {isMobile && !isMinimized && (
+                    <button
+                      onClick={() => setIsMinimized(true)}
+                      className="rounded-full bg-black/40 p-2 text-white transition hover:bg-white/10"
+                    >
+                      <Minimize2 className="h-4 w-4" />
+                    </button>
+                  )}
+                  {isMobile && isMinimized && (
+                    <button
+                      onClick={() => setIsMinimized(false)}
+                      className="rounded-full bg-black/40 p-2 text-white transition hover:bg-white/10"
+                    >
+                      <Maximize2 className="h-4 w-4" />
+                    </button>
+                  )}
                   <button
                     onClick={onClose}
-                    className="p-2 hover:bg-white/10 rounded-full transition"
+                    className="rounded-full bg-black/40 p-2 text-white transition hover:bg-white/10"
                   >
-                    <X className="w-6 h-6 text-white" />
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
+              </div>
 
-                {/* Center Play Button (when paused) */}
-                {!isPlaying && (
-                  <div className="flex justify-center items-center pointer-events-auto">
-                    <button
-                      onClick={togglePlayPause}
-                      className="p-4 bg-white/20 hover:bg-white/30 rounded-full transition backdrop-blur-sm"
-                    >
-                      <Play className="w-12 h-12 text-white fill-white" />
-                    </button>
-                  </div>
-                )}
+              {!isMinimized && (
+                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+                  <motion.div
+                    animate={{ opacity: showControls ? 1 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="rounded-[18px] border border-white/10 bg-black/40 p-3 backdrop-blur"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={togglePlayPause}
+                          className="rounded-full bg-white/15 p-2 text-white transition hover:bg-white/25"
+                        >
+                          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-white" />}
+                        </button>
+                        <div>
+                          <p className="text-sm font-semibold text-white">{title}</p>
+                          <p className="text-xs text-white/70">{artist}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={toggleMute} className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20">
+                          {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                        </button>
+                        <button onClick={toggleFullscreen} className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20">
+                          <Maximize2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
 
-                {/* Bottom Controls */}
-                <div className="space-y-3 pointer-events-auto">
-                  {/* Progress Bar */}
-                  <div className="px-4">
                     <input
                       type="range"
                       min="0"
                       max={videoDuration || 0}
                       value={currentTime}
                       onChange={handleSeek}
-                      className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500 hover:h-2 transition-all"
+                      className="mb-2 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/20 accent-purple-500"
                     />
-                  </div>
 
-                  {/* Time and Controls */}
-                  <div className="flex items-center justify-between px-4 pb-4">
-                    <div className="flex items-center gap-4">
-                      {/* Play/Pause */}
-                      <button
-                        onClick={togglePlayPause}
-                        className="p-2 hover:bg-white/10 rounded-full transition"
-                      >
-                        {isPlaying ? (
-                          <Pause className="w-5 h-5 text-white" />
-                        ) : (
-                          <Play className="w-5 h-5 text-white fill-white" />
-                        )}
-                      </button>
-
-                      {/* Volume Control */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={toggleMute}
-                          className="p-2 hover:bg-white/10 rounded-full transition"
-                        >
-                          {isMuted ? (
-                            <VolumeX className="w-5 h-5 text-white" />
-                          ) : (
-                            <Volume2 className="w-5 h-5 text-white" />
-                          )}
-                        </button>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.1"
-                          value={volume}
-                          onChange={handleVolumeChange}
-                          className="w-16 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                        />
-                      </div>
-
-                      {/* Time Display */}
-                      <div className="text-sm text-white/80 ml-4 w-20 text-right">
-                        {formatTime(currentTime)} / {formatTime(videoDuration)}
-                      </div>
+                    <div className="flex items-center justify-between text-[11px] text-white/70">
+                      <span>{formatTime(currentTime)}</span>
+                      <span>{formatTime(videoDuration)}</span>
                     </div>
+                  </motion.div>
+                </div>
+              )}
 
-                    {/* Fullscreen */}
-                    <button
-                      onClick={toggleFullscreen}
-                      className="p-2 hover:bg-white/10 rounded-full transition"
-                    >
-                      <Maximize2 className="w-5 h-5 text-white" />
-                    </button>
+              {isMinimized && isMobile && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <button
+                    onClick={togglePlayPause}
+                    className="rounded-full bg-white/15 p-3 text-white shadow-lg backdrop-blur"
+                  >
+                    {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 fill-white" />}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {!isMinimized && (
+              <div className="border-t border-white/10 bg-[#050509] p-3 sm:p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-white">Related videos</p>
+                    <p className="text-xs text-gray-400">Swipe or scroll to explore more</p>
                   </div>
                 </div>
-              </motion.div>
-            </div>
-
-            {/* Video Info */}
-            <div className="bg-black p-4 border-t border-white/10">
-              <h3 className="text-white font-semibold truncate">{title}</h3>
-              <p className="text-gray-400 text-sm">{artist}</p>
-            </div>
+                {visibleRelatedVideos.length > 0 ? (
+                  <div className="grid max-h-56 gap-3 overflow-y-auto pr-1 sm:grid-cols-2">
+                    {visibleRelatedVideos.map((video: any, index: number) => (
+                      <button
+                        key={video.id || `${video.url}-${index}`}
+                        onClick={() => onSelectVideo?.(video)}
+                        className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-2 text-left transition hover:bg-white/[0.06]"
+                      >
+                        <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                          {video.artCoverUrl || video.thumbnailUrl ? (
+                            <img src={video.artCoverUrl || video.thumbnailUrl} alt={video.title} className="h-full w-full object-cover" />
+                          ) : null}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-white">{video.title}</p>
+                          <p className="truncate text-xs text-gray-400">
+                            {video.user?.displayName || video.user?.username || 'Unknown artist'}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">No related videos available right now.</p>
+                )}
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}
