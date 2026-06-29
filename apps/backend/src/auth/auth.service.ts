@@ -84,6 +84,11 @@ export class AuthService {
             businessType: dto.businessType || existingUser.businessType,
             taxNumber: dto.taxNumber || existingUser.taxNumber,
             taxId: dto.taxId || existingUser.taxId,
+            // Producer-specific fields
+            isProducer: dto.role === UserRole.PRODUCER || existingUser.isProducer,
+            producerName: dto.producerName || existingUser.producerName,
+            producerBio: dto.producerBio || existingUser.producerBio,
+            producerWebsite: dto.producerWebsite || existingUser.producerWebsite,
           },
         });
         
@@ -135,6 +140,16 @@ export class AuthService {
       if (dto.website) userData.website = dto.website;
       if (dto.socialLinks) {
         userData.socialLinks = typeof dto.socialLinks === 'string' ? JSON.parse(dto.socialLinks) : dto.socialLinks;
+      }
+
+      // Producer-specific fields
+      if (dto.producerName) userData.producerName = dto.producerName;
+      if (dto.producerBio) userData.producerBio = dto.producerBio;
+      if (dto.producerWebsite) userData.producerWebsite = dto.producerWebsite;
+      if (dto.role === UserRole.PRODUCER) {
+        userData.isProducer = true;
+        // ensure role is set to PRODUCER explicitly
+        userData.role = UserRole.PRODUCER;
       }
 
       // Reseller-specific fields

@@ -324,8 +324,8 @@ const signUp = async (data: SignUpData): Promise<User> => {
       console.log('Signup response userData:', userData, 'Role:', userData?.role);
       setUser(userData);
 
-      // After backend user is created, send magic-link for ARTIST/RESELLER so Verification record exists
-      if (data.role === 'ARTIST' || data.role === 'RESELLER') {
+      // After backend user is created, send magic-link for ARTIST/RESELLER/PRODUCER so Verification record exists
+      if (data.role === 'ARTIST' || data.role === 'RESELLER' || data.role === 'PRODUCER') {
         setVerificationError(null);
         try {
           await sendOTP('link', data.email);
