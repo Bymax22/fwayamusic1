@@ -150,7 +150,7 @@ export default function VideoPlayer({
               <video
                 ref={videoRef}
                 src={videoUrl}
-                poster={coverUrl}
+                poster={coverUrl ?? undefined}
                 className="w-full h-full object-contain bg-black"
                 onTimeUpdate={handleTimeUpdate}
                 onPlay={() => setIsPlaying(true)}
