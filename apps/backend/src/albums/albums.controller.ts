@@ -14,6 +14,7 @@ import {
 import { AlbumsService } from './albums.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 
 @ApiTags('Albums')
 @Controller('v1/albums')
@@ -21,14 +22,14 @@ export class AlbumsController {
   constructor(private albumsService: AlbumsService) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(FirebaseAuthGuard)
   @ApiBearerAuth()
   async createAlbum(@Request() req: any, @Body() createAlbumDto: any) {
     return this.albumsService.createAlbum(req.user.id, createAlbumDto);
   }
 
   @Get('my-albums')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(FirebaseAuthGuard)
   @ApiBearerAuth()
   async getMyAlbums(@Request() req: any) {
     return this.albumsService.getArtistAlbums(req.user.id);

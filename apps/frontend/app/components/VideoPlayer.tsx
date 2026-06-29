@@ -49,6 +49,14 @@ export default function VideoPlayer({
   }, []);
 
   useEffect(() => {
+    return () => {
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isOpen) {
       setIsPlaying(false);
       setCurrentTime(0);
@@ -147,16 +155,47 @@ export default function VideoPlayer({
     }
   };
 
-  const handleMouseMove = () => {
+  const showControlsTemporarily = () => {
     setShowControls(true);
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
     }
-    if (isPlaying) {
-      controlsTimeoutRef.current = setTimeout(() => {
-        setShowControls(false);
-      }, 3000);
+    controlsTimeoutRef.current = window.setTimeout(() => {
+      setShowControls(false);
+    }, 2500);
+  };
+
+  const handleMouseMove = () => {
+    if (isPlaying || isMobile) {
+      showControlsTemporarily();
+    } else {
+      setShowControls(true);
     }
+  };
+
+  const handleMouseLeave = () => {
+    if (isPlaying) {
+      setShowControls(false);
+    } else {
+      setShowControls(true);
+    }
+  };
+
+  const handleMediaTap = async (event?: React.MouseEvent) => {
+    event?.stopPropagation();
+
+    if (isMinimized && isMobile) {
+      await togglePlayPause();
+      return;
+    }
+
+    if (showControls) {
+      setShowControls(false);
+    } else {
+      showControlsTemporarily();
+    }
+
+    await togglePlayPause();
   };
 
   const formatTime = (seconds: number) => {
@@ -183,16 +222,13 @@ export default function VideoPlayer({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className={isMinimized && isMobile ? 'w-full overflow-hidden rounded-[20px] border border-white/10 bg-black/90 shadow-2xl backdrop-blur' : 'w-full max-w-5xl overflow-hidden rounded-[24px] border border-white/10 bg-[#050509]/95 shadow-2xl'}
+            className={isMinimized && isMobile ? 'w-full overflow-hidden rounded-[20px] bg-black/90 shadow-2xl backdrop-blur' : 'w-full max-w-5xl overflow-hidden rounded-[24px] bg-[#050509]/95 shadow-2xl'}
           >
             <div
               className="relative bg-black"
+              onClick={handleMediaTap}
               onMouseMove={handleMouseMove}
-              onMouseLeave={() => {
-                if (isPlaying) {
-                  setShowControls(false);
-                }
-              }}
+              onMouseLeave={handleMouseLeave}
             >
               <video
                 ref={videoRef}
@@ -211,7 +247,7 @@ export default function VideoPlayer({
 
               <div className={`absolute inset-0 ${isMinimized && isMobile ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent' : 'bg-gradient-to-t from-black/90 via-black/20 to-transparent'}`} />
 
-              <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3 sm:p-4">
+              <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3 sm:p-4" onClick={(e) => e.stopPropagation()}>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-white">{title}</p>
                   <p className="truncate text-xs text-white/70">{artist}</p>
@@ -243,7 +279,7 @@ export default function VideoPlayer({
               </div>
 
               {!isMinimized && (
-                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4" onClick={(e) => e.stopPropagation()}>
                   <motion.div
                     animate={{ opacity: showControls ? 1 : 0 }}
                     transition={{ duration: 0.2 }}
@@ -302,7 +338,7 @@ export default function VideoPlayer({
             </div>
 
             {!isMinimized && (
-              <div className="border-t border-white/10 bg-[#050509] p-3 sm:p-4">
+              <div className="bg-[#050509] p-3 sm:p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white">Related videos</p>

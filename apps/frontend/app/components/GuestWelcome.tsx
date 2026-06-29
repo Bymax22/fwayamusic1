@@ -1564,7 +1564,7 @@ export default function GuestWelcome() {
             </div>
 
             <div className="grid grid-cols-6 gap-3">
-              {featuredAlbums.slice(0, 6).map((beat: any, i: number) => (
+              {beats.slice(0, 6).map((beat: any, i: number) => (
                 <div
                   key={i}
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
