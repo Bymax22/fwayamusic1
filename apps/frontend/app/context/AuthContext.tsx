@@ -146,6 +146,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const clearVerificationError = () => setVerificationError(null);
   const clearAuthError = () => setAuthError(null);
 
+  const setSessionCookie = async (token: string) => {
+    try {
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+    } catch (error) {
+      console.warn('Failed to set auth session cookie', error);
+    }
+  };
+
+  const clearSessionCookie = async () => {
+    try {
+      await fetch('/api/auth/session', { method: 'DELETE' });
+    } catch (error) {
+      console.warn('Failed to clear auth session cookie', error);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       setFirebaseUser(firebaseUser);
@@ -170,18 +190,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
          tokenLength: token.length,
          apiUrl: process.env.NEXT_PUBLIC_API_URL,
        });
-       
+
        if (typeof window !== 'undefined' && token) {
          localStorage.setItem('authToken', token);
        }
+       if (token) {
+         await setSessionCookie(token);
+       }
 
        const executeSync = async (tokenToUse: string) => {
+         const headers: Record<string, string> = { Accept: 'application/json' };
+         if (tokenToUse) {
+           headers.Authorization = `Bearer ${tokenToUse}`;
+         }
+
          const response = await fetch(`/api/auth/me`, {
            method: 'GET',
-           headers: {
-             Authorization: `Bearer ${tokenToUse}`,
-             Accept: 'application/json',
-           },
+           headers,
+           credentials: 'include',
          });
 
          console.log('Backend /auth/me response status:', response.status);
@@ -219,6 +245,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
            if (typeof window !== 'undefined' && token) {
              localStorage.setItem('authToken', token);
            }
+           if (token) {
+             await setSessionCookie(token);
+           }
            const retryResult = await executeSync(token);
            if (retryResult && 'response' in retryResult) {
              if (retryResult.response.status === 401) {
@@ -252,8 +281,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!firebaseUser) return null;
       const t = await firebaseUser.getIdToken();
-      // refresh storage
-      if (typeof window !== 'undefined' && t) localStorage.setItem('authToken', t);
+      if (typeof window !== 'undefined' && t) {
+        localStorage.setItem('authToken', t);
+      }
       return t;
     } catch (err) {
       console.error('getToken failed', err);
@@ -313,10 +343,10 @@ const signUp = async (data: SignUpData): Promise<User> => {
 
      // Create user in backend
       const token = await firebaseUser.getIdToken();
-      // Store token for middleware
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && token) {
         localStorage.setItem('authToken', token);
       }
+      await setSessionCookie(token);
       const backendResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/signup`, {
         method: 'POST',
         headers: {
@@ -457,11 +487,12 @@ const signUp = async (data: SignUpData): Promise<User> => {
   const verifyOTP = async (method: 'email' | 'phone', code: string): Promise<boolean> => {
     try {
       const token = await getToken();
+      if (token) await setSessionCookie(token);
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': token ? `Bearer ${token}` : undefined,
         },
         body: JSON.stringify({ method, code }),
       });
@@ -528,7 +559,10 @@ const signInWithFacebook = async (role?: UserRole) => {
 
   const handleSocialSignIn = async (firebaseUser: FirebaseUser, role?: UserRole) => {
     const token = await firebaseUser.getIdToken();
-    if (typeof window !== 'undefined' && token) localStorage.setItem('authToken', token);
+    if (typeof window !== 'undefined' && token) {
+      localStorage.setItem('authToken', token);
+    }
+    await setSessionCookie(token);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/social-login`, {
       method: 'POST',
       headers: {
@@ -561,10 +595,7 @@ const logout = async () => {
     // Clear user state first
     setUser(null);
     setFirebaseUser(null);
-    // Clear local storage
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('authToken');
-    }
+    await clearSessionCookie();
     // Sign out from Firebase
     await signOut(auth);
     console.log('Successfully logged out');
@@ -573,9 +604,7 @@ const logout = async () => {
     // Even if Firebase logout fails, clear local state
     setUser(null);
     setFirebaseUser(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('authToken');
-    }
+    await clearSessionCookie();
     if (error instanceof Error) {
       throw error;
     } else {

@@ -6,7 +6,14 @@ function getBackendBaseUrl() {
 
 export async function GET(request: Request) {
   try {
-    const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
+    let authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
+    if (!authHeader) {
+      const cookieToken = request.cookies.get('authToken')?.value;
+      if (cookieToken) {
+        authHeader = `Bearer ${cookieToken}`;
+      }
+    }
+
     if (!authHeader) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
