@@ -8,7 +8,8 @@ type VideoCardProps = {
   duration: number;
   views: number;
   createdAt?: string;
-  thumbnail: string;
+  thumbnail?: string;
+  videoUrl?: string;
   href?: string;
 };
 
@@ -27,6 +28,7 @@ export default function VideoCard({
   views,
   createdAt,
   thumbnail,
+  videoUrl,
   href,
 }: VideoCardProps) {
   const route = href || `/videos/${id}`;
@@ -36,12 +38,27 @@ export default function VideoCard({
       className="block w-full rounded-2xl bg-slate-950 hover:bg-slate-900 transition-colors"
       aria-label={`Open video ${title}`}
     >
-      <div className="relative overflow-hidden rounded-2xl">
-        <img
-          src={thumbnail || "/default-cover.jpg"}
-          alt={title}
-          className="h-48 w-full object-cover bg-slate-800"
-        />
+      <div className="relative overflow-hidden rounded-2xl bg-slate-800">
+        {thumbnail ? (
+          <img
+            src={thumbnail}
+            alt={title}
+            className="h-48 w-full object-cover"
+          />
+        ) : videoUrl ? (
+          <video
+            src={videoUrl}
+            className="h-48 w-full object-cover"
+            muted
+            autoPlay
+            loop
+            playsInline
+            preload="metadata"
+          />
+        ) : (
+          <div className="h-48 w-full bg-gradient-to-br from-purple-500 to-pink-500" />
+        )}
+
         <div className="absolute right-3 top-3 rounded-full bg-slate-900/90 px-2 py-1 text-[11px] font-medium text-white">
           {formatDuration(duration)}
         </div>

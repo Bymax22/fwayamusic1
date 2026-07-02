@@ -98,6 +98,7 @@ export default function VideoWatchPage() {
             views: relatedItem.views || relatedItem.playCount || 0,
             createdAt: relatedItem.createdAt || relatedItem.publishedAt || new Date().toISOString(),
             thumbnail: relatedItem.thumbnailUrl || relatedItem.artCoverUrl || relatedItem.coverArt || "/default-cover.jpg",
+            videoUrl: relatedItem.videoUrl || relatedItem.url || relatedItem.audioUrl || undefined,
           })),
         };
         setVideo(mapped);

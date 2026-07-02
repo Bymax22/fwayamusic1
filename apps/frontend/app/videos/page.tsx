@@ -48,6 +48,7 @@ export default function VideosPage() {
           views: item.views || item.playCount || 0,
           createdAt: item.createdAt || item.publishedAt || new Date().toISOString(),
           thumbnail: item.thumbnailUrl || item.artCoverUrl || item.coverArt || "/default-cover.jpg",
+          videoUrl: item.videoUrl || item.url || item.audioUrl || undefined,
         }));
 
         setVideos(mapped);
