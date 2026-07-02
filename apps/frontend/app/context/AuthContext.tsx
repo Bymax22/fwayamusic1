@@ -164,33 +164,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
  const syncUserWithBackend = async (firebaseUser: FirebaseUser): Promise<User | null> => {
      try {
-       const token = await firebaseUser.getIdToken();
+       let token = await firebaseUser.getIdToken();
        console.log('Firebase token obtained, syncing with backend:', {
          email: firebaseUser.email,
          tokenLength: token.length,
          apiUrl: process.env.NEXT_PUBLIC_API_URL,
        });
        
-       // persist short-lived token for other components if they need it
-       if (typeof window !== 'undefined' && token) localStorage.setItem('authToken', token);
-       
-       // Use frontend proxy to avoid CORS and surface upstream errors in dev
-       const response = await fetch(`/api/auth/me`, {
-         headers: {
-           'Authorization': `Bearer ${token}`,
-           'Content-Type': 'application/json',
-         },
-       });
+       if (typeof window !== 'undefined' && token) {
+         localStorage.setItem('authToken', token);
+       }
 
-       console.log('Backend /auth/me response status:', response.status);
+       const executeSync = async (tokenToUse: string) => {
+         const response = await fetch(`/api/auth/me`, {
+           method: 'GET',
+           headers: {
+             Authorization: `Bearer ${tokenToUse}`,
+             Accept: 'application/json',
+           },
+         });
 
-       if (response.ok) {
-        const userData: User = await response.json();
-        console.log('Successfully synced user with backend:', userData.email);
-        setUser(userData);
-        return userData;
-       } else {
-         // Try to get error details
+         console.log('Backend /auth/me response status:', response.status);
+
+         if (response.ok) {
+           const userData: User = await response.json();
+           console.log('Successfully synced user with backend:', userData.email);
+           setUser(userData);
+           return userData;
+         }
+
          let errorText = `HTTP ${response.status}`;
          try {
            const errorData = await response.json();
@@ -198,24 +200,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
          } catch {
            errorText = await response.text() || errorText;
          }
-         
+
          console.warn('Backend /auth/me failed:', {
            status: response.status,
            email: firebaseUser.email,
            error: errorText,
          });
-         
-         // For 401, don't automatically sign out - might be a transient issue
-         if (response.status === 401) {
-           console.warn('Unauthorized response from backend, will retry on next sync');
-           return null;
+
+         return { response, errorText } as const;
+       };
+
+       const result = await executeSync(token);
+
+       if (result && 'response' in result) {
+         if (result.response.status === 401) {
+           console.warn('Auth/me returned 401, refreshing token and retrying');
+           token = await firebaseUser.getIdToken(true);
+           if (typeof window !== 'undefined' && token) {
+             localStorage.setItem('authToken', token);
+           }
+           const retryResult = await executeSync(token);
+           if (retryResult && 'response' in retryResult) {
+             if (retryResult.response.status === 401) {
+               console.warn('Refresh retry also returned 401, signing out');
+               await signOut(auth);
+               setUser(null);
+               return null;
+             }
+             await signOut(auth);
+             setUser(null);
+             return null;
+           }
+           return retryResult;
          }
-         
-         // For other errors, sign out
+
          await signOut(auth);
          setUser(null);
-        return null;
+         return null;
        }
+
+       return result;
     } catch (error) {
       console.error('Error syncing user with backend:', error);
       return null;
