@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   FaPlay,
@@ -22,7 +23,6 @@ import {
 import { FaRegHeart } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import MobileMenu from "./MobileMenu";
-import VideoPlayer from "./VideoPlayer";
 
 export default function GuestWelcome() {
   const [activeTab, setActiveTab] = useState<string>("for-you");
@@ -41,7 +41,7 @@ export default function GuestWelcome() {
   const [otherVideos, setOtherVideos] = useState([]);
   const [playlists, setPlaylists] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedVideoForPlayer, setSelectedVideoForPlayer] = useState<any>(null);
+  const router = useRouter();
 
   // Animation state for Discover text
   const [isDiscoverAnimating, setIsDiscoverAnimating] = useState(false);
@@ -228,7 +228,8 @@ export default function GuestWelcome() {
   const relatedVideoPool = [...musicVideos, ...otherVideos].filter((video: any) => video?.url).slice(0, 10);
 
   const openVideoPlayer = (video: any) => {
-    setSelectedVideoForPlayer(video);
+    if (!video?.id) return;
+    router.push(`/videos/${video.id}?autoplay=1`);
   };
 
   // Auto-rotate hero images with sliding animation
@@ -1699,18 +1700,6 @@ export default function GuestWelcome() {
       {/* Mobile Menu */}
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
-      {/* Video Player Modal */}
-      <VideoPlayer
-        isOpen={!!selectedVideoForPlayer}
-        onClose={() => setSelectedVideoForPlayer(null)}
-        videoUrl={selectedVideoForPlayer?.url || ''}
-        title={selectedVideoForPlayer?.title}
-        artist={selectedVideoForPlayer?.user?.displayName || selectedVideoForPlayer?.user?.username || 'Unknown Artist'}
-        coverUrl={selectedVideoForPlayer?.artCoverUrl || selectedVideoForPlayer?.thumbnailUrl}
-        duration={selectedVideoForPlayer?.duration}
-        relatedVideos={relatedVideoPool.filter((video: any) => video?.url && video.url !== selectedVideoForPlayer?.url)}
-        onSelectVideo={openVideoPlayer}
-      />
     </>
   );
 }

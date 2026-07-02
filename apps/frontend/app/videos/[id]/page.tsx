@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Play, Pause, Volume2, VolumeX, Maximize2, Heart, Share2, Plus, X } from "lucide-react";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { useAuth } from "@/context/AuthContext";
 import VideoCard from "@/components/VideoCard";
 
 interface VideoDetail {
@@ -39,12 +40,18 @@ export default function VideoWatchPage() {
   const params = useParams();
   const router = useRouter();
   const { currentTrack, isPlaying, playTrack, togglePlay, toggleMute, isMuted } = useAudioPlayer();
+  const { getToken } = useAuth();
+  const searchParams = useSearchParams();
   const [video, setVideo] = useState<VideoDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showControls, setShowControls] = useState(true);
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [commentLoading, setCommentLoading] = useState(false);
 
   const videoId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const shouldAutoplay = searchParams?.get('autoplay') === '1';
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -77,6 +84,25 @@ export default function VideoWatchPage() {
           })),
         };
         setVideo(mapped);
+
+        // Fetch comments for this video
+        const commentsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${videoId}/comments`);
+        if (commentsResponse.ok) {
+          const commentsData = await commentsResponse.json();
+          setComments(commentsData);
+        }
+
+        if (shouldAutoplay && mapped.videoUrl) {
+          playTrack({
+            id: mapped.id,
+            title: mapped.title,
+            artist: mapped.artist,
+            videoUrl: mapped.videoUrl,
+            imageUrl: mapped.thumbnail,
+            type: "VIDEO",
+            duration: mapped.duration,
+          });
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unable to load video");
       } finally {
@@ -104,6 +130,41 @@ export default function VideoWatchPage() {
         type: "VIDEO",
         duration: video.duration,
       });
+    }
+  };
+
+  const handlePostComment = async () => {
+    if (!newComment.trim() || !video) return;
+
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to post a comment.');
+      return;
+    }
+
+    setCommentLoading(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${video.id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content: newComment }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to post comment');
+      }
+
+      const savedComment = await response.json();
+      setComments((prev) => [savedComment, ...prev]);
+      setNewComment('');
+    } catch (err) {
+      console.error('Failed to post comment', err);
+      alert('Unable to post comment. Please try again.');
+    } finally {
+      setCommentLoading(false);
     }
   };
 
@@ -198,6 +259,55 @@ export default function VideoWatchPage() {
                     </div>
                   </div>
                   <div className="mt-6 text-sm leading-7 text-slate-300">{video.description}</div>
+                </div>
+
+                <div className="rounded-3xl bg-slate-950 p-6">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-lg font-semibold text-white">Comments</h2>
+                        <p className="text-sm text-slate-500">{comments.length} discussion{comments.length === 1 ? '' : 's'}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        rows={4}
+                        placeholder="Write a comment..."
+                        className="w-full rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-purple-500 focus:outline-none"
+                      />
+                      <button
+                        onClick={handlePostComment}
+                        disabled={commentLoading || !newComment.trim()}
+                        className="inline-flex items-center justify-center rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {commentLoading ? 'Posting...' : 'Post comment'}
+                      </button>
+                    </div>
+
+                    <div className="space-y-4 pt-4">
+                      {comments.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900 p-4 text-sm text-slate-400">
+                          No comments yet. Be the first to share your thoughts.
+                        </div>
+                      ) : (
+                        comments.map((comment) => (
+                          <div key={comment.id} className="rounded-3xl bg-slate-900 p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-full bg-slate-800" />
+                              <div>
+                                <p className="text-sm font-semibold text-white">{comment.user?.displayName || comment.user?.username || 'Anonymous'}</p>
+                                <p className="text-xs text-slate-500">{new Date(comment.createdAt).toLocaleString()}</p>
+                              </div>
+                            </div>
+                            <p className="mt-4 text-sm leading-6 text-slate-300">{comment.content || comment.text || comment.body}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
