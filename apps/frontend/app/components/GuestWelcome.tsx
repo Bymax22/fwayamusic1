@@ -65,8 +65,8 @@ export default function GuestWelcome() {
         setIsLoading(true);
         const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-        // Fetch homepage sections (featured songs, trending, beats, top charts)
-        const homepageResponse = await fetch(`${API_BASE}/api/v1/media/homepage-sections`);
+        // Fetch homepage sections (featured songs, trending, beats, top charts) via frontend proxy
+        const homepageResponse = await fetch(`/api/media/homepage-sections`);
         if (!homepageResponse.ok) throw new Error('Failed to fetch homepage data');
         const homepageData = await homepageResponse.json();
 

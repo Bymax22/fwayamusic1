@@ -7,21 +7,25 @@ function getBackendBaseUrl() {
 export async function GET() {
   try {
     const baseUrl = getBackendBaseUrl();
+    const start = Date.now();
     const res = await fetch(`${baseUrl}/api/v1/media`, {
       headers: { Accept: 'application/json' },
     });
 
+    const upstreamMs = Date.now() - start;
+
     if (!res.ok) {
       const errorText = await res.text().catch(() => '');
       console.error('Backend media request failed:', res.status, errorText);
-      return NextResponse.json({ data: [] }, { status: 200 });
+      // Surface upstream error to make debugging easier instead of returning silent empty arrays
+      return NextResponse.json({ error: errorText || 'Upstream error' }, { status: res.status || 502, headers: { 'x-upstream-ms': String(upstreamMs) } });
     }
 
     const media = await res.json();
-    return NextResponse.json(media);
+    return NextResponse.json(media, { headers: { 'x-upstream-ms': String(upstreamMs) } });
   } catch (error) {
     console.error('Failed to fetch media:', error);
-    return NextResponse.json({ data: [] }, { status: 200 });
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
 
