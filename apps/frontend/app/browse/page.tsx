@@ -166,18 +166,31 @@ export default function Browse() {
   }, []);
 
   useEffect(() => {
-    const fetchWithFallback = async (primaryUrl: string, fallbackUrl: string, options: RequestInit = {}) => {
+    const fetchWithTimeout = async (input: RequestInfo, timeout = 4000, options: RequestInit = {}) => {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
       try {
-        const response = await fetch(primaryUrl, options);
-        if (response.ok) {
-          return response;
-        }
-        console.warn(`Primary fetch failed: ${primaryUrl}`, response.status, response.statusText);
-      } catch (fetchError) {
-        console.warn(`Primary fetch error: ${primaryUrl}`, fetchError);
+        const res = await fetch(input, { signal: controller.signal, ...options });
+        clearTimeout(id);
+        return res;
+      } catch (err) {
+        clearTimeout(id);
+        throw err;
+      }
+    };
+
+    const fetchWithFallback = async (primaryUrl: string, fallbackUrl: string, options: RequestInit = {}) => {
+      // Prefer the frontend proxy first for faster local response
+      try {
+        const proxyRes = await fetchWithTimeout(fallbackUrl, 2500, options);
+        if (proxyRes.ok) return proxyRes;
+        console.warn(`Proxy fetch failed: ${fallbackUrl}`, proxyRes.status, proxyRes.statusText);
+      } catch (proxyErr) {
+        console.warn(`Proxy fetch error: ${fallbackUrl}`, proxyErr);
       }
 
-      return fetch(fallbackUrl, options);
+      // Fall back to primary backend with a slightly longer timeout
+      return fetchWithTimeout(primaryUrl, 4000, options);
     };
 
     const fetchData = async () => {

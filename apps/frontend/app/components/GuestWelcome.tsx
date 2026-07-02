@@ -55,6 +55,20 @@ export default function GuestWelcome() {
     return url.startsWith('http://') || url.startsWith('https://') ? url : `${API_BASE}${url}`;
   };
 
+  // Helper: fetch with timeout
+  const fetchJsonWithTimeout = async (input: RequestInfo, timeout = 4000, init?: RequestInit) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+      const res = await fetch(input, { signal: controller.signal, ...init });
+      clearTimeout(id);
+      return res;
+    } catch (err) {
+      clearTimeout(id);
+      throw err;
+    }
+  };
+
   // Audio player hook
   const { playTrack, isPlaying } = useAudioPlayer();
 
@@ -66,7 +80,8 @@ export default function GuestWelcome() {
         const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
         // Fetch homepage sections (featured songs, trending, beats, top charts) via frontend proxy
-        const homepageResponse = await fetch(`/api/media/homepage-sections`);
+        // Use timeout to avoid hanging the preloader
+        const homepageResponse = await fetchJsonWithTimeout(`/api/media/homepage-sections`, 4000);
         if (!homepageResponse.ok) throw new Error('Failed to fetch homepage data');
         const homepageData = await homepageResponse.json();
 
@@ -136,7 +151,9 @@ export default function GuestWelcome() {
         }
 
         // Fetch featured artists
-        const artistsResponse = await fetch(`${API_BASE}/api/v1/artists`);
+        // Fetch featured artists with timeout and via proxy if possible
+        const artistsUrl = `/api/artists`;
+        const artistsResponse = await fetchJsonWithTimeout(artistsUrl, 3000);
         if (!artistsResponse.ok) throw new Error('Failed to fetch artists');
         const artistsData = await artistsResponse.json();
         const artistsArray = Array.isArray(artistsData) ? artistsData : artistsData.artists || [];
@@ -147,7 +164,9 @@ export default function GuestWelcome() {
         setFeaturedArtists(processedArtists);
 
         // Fetch playlists
-        const playlistsResponse = await fetch(`${API_BASE}/api/v1/playlist`);
+        // Fetch playlists with timeout
+        const playlistsUrl = `/api/playlist`;
+        const playlistsResponse = await fetchJsonWithTimeout(playlistsUrl, 3000);
         if (!playlistsResponse.ok) throw new Error('Failed to fetch playlists');
         const playlistsData = await playlistsResponse.json();
         const playlistsArray = Array.isArray(playlistsData) ? playlistsData : playlistsData.playlists || [];
