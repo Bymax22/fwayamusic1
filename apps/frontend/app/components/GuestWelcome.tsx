@@ -13,13 +13,16 @@ import {
   FaMusic,
   FaUser,
   FaCompass,
+  FaFilm,
   FaChevronLeft,
   FaChevronRight,
   FaList,
   FaMicrophone,
   FaBookOpen,
   FaHeadphones,
-  FaChevronDown
+  FaChevronDown,
+  FaCog,
+  FaSignOutAlt
 } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
@@ -47,6 +50,43 @@ export default function GuestWelcome() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
   const { user, logout } = useAuth();
+  const cacheKey = 'fwayaGuestWelcomeHomepageData';
+
+  const loadCachedHomepageData = () => {
+    if (typeof window === 'undefined') return false;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (!cached) return false;
+
+    try {
+      const data = JSON.parse(cached);
+      if (data && typeof data === 'object') {
+        setQuickPicks(data.quickPicks || []);
+        setFeaturedAlbums(data.featuredAlbums || []);
+        setFeaturedArtists(data.featuredArtists || []);
+        setFeaturedProducers(data.featuredProducers || []);
+        setBeats(data.beats || []);
+        setTrendingNow(data.trendingNow || []);
+        setTopCharts(data.topCharts || []);
+        setMusicVideos(data.musicVideos || []);
+        setOtherVideos(data.otherVideos || []);
+        setPlaylists(data.playlists || []);
+        return true;
+      }
+    } catch (error) {
+      console.warn('Failed to parse guest welcome cache:', error);
+    }
+
+    return false;
+  };
+
+  const saveCachedHomepageData = (data: any) => {
+    if (typeof window === 'undefined') return;
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify(data));
+    } catch (error) {
+      console.warn('Failed to save guest welcome cache:', error);
+    }
+  };
 
   const getDashboardPath = (role?: string) => {
     switch (role?.toUpperCase()) {
@@ -137,9 +177,9 @@ export default function GuestWelcome() {
 
   // Fetch homepage data from backend
   useEffect(() => {
-    const fetchHomepageData = async () => {
+    const fetchHomepageData = async (showLoader = true) => {
       try {
-        setIsLoading(true);
+        if (showLoader) setIsLoading(true);
         const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
         // Fetch homepage sections (featured songs, trending, beats, top charts) via frontend proxy
@@ -152,40 +192,33 @@ export default function GuestWelcome() {
         if (!homepageResponse.ok) throw new Error('Failed to fetch homepage data');
         const homepageData = await homepageResponse.json();
 
-        // Set quick picks from featured songs
-        if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {
-          const processedSongs = homepageData.featuredSongs.map((song: any) => ({
-            ...song,
-            url: song.url ? resolveMediaUrl(song.url) : song.url,
-            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt,
-            artCoverUrl: song.artCoverUrl ? resolveMediaUrl(song.artCoverUrl) : (song.coverArt ? resolveMediaUrl(song.coverArt) : (song.thumbnailUrl ? resolveMediaUrl(song.thumbnailUrl) : undefined))
-          }));
-          setQuickPicks(processedSongs);
-        }
+        const processedQuickPicks = homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)
+          ? homepageData.featuredSongs.map((song: any) => ({
+              ...song,
+              url: song.url ? resolveMediaUrl(song.url) : song.url,
+              coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt,
+              artCoverUrl: song.artCoverUrl ? resolveMediaUrl(song.artCoverUrl) : (song.coverArt ? resolveMediaUrl(song.coverArt) : (song.thumbnailUrl ? resolveMediaUrl(song.thumbnailUrl) : undefined))
+            }))
+          : [];
 
-        // Set trending songs
-        if (homepageData.trendingSongs && Array.isArray(homepageData.trendingSongs)) {
-          const processedSongs = homepageData.trendingSongs.map((song: any) => ({
-            ...song,
-            url: song.url ? resolveMediaUrl(song.url) : song.url,
-            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt,
-            artCoverUrl: song.artCoverUrl ? resolveMediaUrl(song.artCoverUrl) : (song.coverArt ? resolveMediaUrl(song.coverArt) : (song.thumbnailUrl ? resolveMediaUrl(song.thumbnailUrl) : undefined))
-          }));
-          setTrendingNow(processedSongs);
-        }
+        const processedTrendingNow = homepageData.trendingSongs && Array.isArray(homepageData.trendingSongs)
+          ? homepageData.trendingSongs.map((song: any) => ({
+              ...song,
+              url: song.url ? resolveMediaUrl(song.url) : song.url,
+              coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt,
+              artCoverUrl: song.artCoverUrl ? resolveMediaUrl(song.artCoverUrl) : (song.coverArt ? resolveMediaUrl(song.coverArt) : (song.thumbnailUrl ? resolveMediaUrl(song.thumbnailUrl) : undefined))
+            }))
+          : [];
 
-        // Set top charts
-        if (homepageData.topCharts && Array.isArray(homepageData.topCharts)) {
-          const processedSongs = homepageData.topCharts.map((song: any) => ({
-            ...song,
-            url: song.url ? resolveMediaUrl(song.url) : song.url,
-            coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt,
-            artCoverUrl: song.artCoverUrl ? resolveMediaUrl(song.artCoverUrl) : (song.coverArt ? resolveMediaUrl(song.coverArt) : (song.thumbnailUrl ? resolveMediaUrl(song.thumbnailUrl) : undefined))
-          }));
-          setTopCharts(processedSongs);
-        }
+        const processedTopCharts = homepageData.topCharts && Array.isArray(homepageData.topCharts)
+          ? homepageData.topCharts.map((song: any) => ({
+              ...song,
+              url: song.url ? resolveMediaUrl(song.url) : song.url,
+              coverArt: song.coverArt ? resolveMediaUrl(song.coverArt) : song.coverArt,
+              artCoverUrl: song.artCoverUrl ? resolveMediaUrl(song.artCoverUrl) : (song.coverArt ? resolveMediaUrl(song.coverArt) : (song.thumbnailUrl ? resolveMediaUrl(song.thumbnailUrl) : undefined))
+            }))
+          : [];
 
-        // Set featured albums from actual album media if available, otherwise fallback to any beat items marked as albums
         const albumItems: any[] = [];
         if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {
           albumItems.push(...homepageData.featuredSongs.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
@@ -197,82 +230,80 @@ export default function GuestWelcome() {
           albumItems.push(...homepageData.beats.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
         }
 
-        if (albumItems.length > 0) {
-          const processedAlbums = albumItems.map((album: any) => ({
-            ...album,
-            url: album.url ? resolveMediaUrl(album.url) : album.url,
-            coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
-            artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
-          }));
-          setFeaturedAlbums(processedAlbums);
-        }
+        const processedFeaturedAlbums = albumItems.length > 0
+          ? albumItems.map((album: any) => ({
+              ...album,
+              url: album.url ? resolveMediaUrl(album.url) : album.url,
+              coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
+              artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
+            }))
+          : [];
 
-        if (homepageData.beats && Array.isArray(homepageData.beats)) {
-          const processedBeats = homepageData.beats
-            .filter((beat: any) => beat.type?.toString().toUpperCase() === 'AUDIO')
-            .map((beat: any) => ({
-              ...beat,
-              url: beat.url ? resolveMediaUrl(beat.url) : beat.url,
-              coverArt: beat.coverArt ? resolveMediaUrl(beat.coverArt) : beat.coverArt,
-              artCoverUrl: beat.artCoverUrl ? resolveMediaUrl(beat.artCoverUrl) : (beat.coverArt ? resolveMediaUrl(beat.coverArt) : (beat.thumbnailUrl ? resolveMediaUrl(beat.thumbnailUrl) : undefined))
-            }));
-          setBeats(processedBeats);
-        }
+        const processedBeats = homepageData.beats && Array.isArray(homepageData.beats)
+          ? homepageData.beats
+              .filter((beat: any) => beat.type?.toString().toUpperCase() === 'AUDIO')
+              .map((beat: any) => ({
+                ...beat,
+                url: beat.url ? resolveMediaUrl(beat.url) : beat.url,
+                coverArt: beat.coverArt ? resolveMediaUrl(beat.coverArt) : beat.coverArt,
+                artCoverUrl: beat.artCoverUrl ? resolveMediaUrl(beat.artCoverUrl) : (beat.coverArt ? resolveMediaUrl(beat.coverArt) : (beat.thumbnailUrl ? resolveMediaUrl(beat.thumbnailUrl) : undefined))
+              }))
+          : [];
 
-        if (homepageData.musicVideos && Array.isArray(homepageData.musicVideos)) {
-          const processedVideos = homepageData.musicVideos.map((video: any) => ({
-            ...video,
-            url: video.url ? resolveMediaUrl(video.url) : video.url,
-            coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt,
-            artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
-          }));
-          setMusicVideos(processedVideos);
-        }
+        const processedMusicVideos = homepageData.musicVideos && Array.isArray(homepageData.musicVideos)
+          ? homepageData.musicVideos.map((video: any) => ({
+              ...video,
+              url: video.url ? resolveMediaUrl(video.url) : video.url,
+              coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt,
+              artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
+            }))
+          : [];
 
-        if (homepageData.otherVideos && Array.isArray(homepageData.otherVideos)) {
-          const processedVideos = homepageData.otherVideos.map((video: any) => ({
-            ...video,
-            url: video.url ? resolveMediaUrl(video.url) : video.url,
-            coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt,
-            artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
-          }));
-          setOtherVideos(processedVideos);
-        }
+        const processedOtherVideos = homepageData.otherVideos && Array.isArray(homepageData.otherVideos)
+          ? homepageData.otherVideos.map((video: any) => ({
+              ...video,
+              url: video.url ? resolveMediaUrl(video.url) : video.url,
+              coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt,
+              artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
+            }))
+          : [];
 
-        // Fetch featured artists
-        // Fetch featured artists with timeout and via proxy if possible
+        const processedArtists: any[] = [];
+        const processedPlaylists: any[] = [];
+        const processedFeaturedProducers: any[] = [];
+
         const artistsUrl = `/api/artists`;
         const artistsResponse = await fetchJsonWithTimeout(artistsUrl, 3000);
-        if (!artistsResponse.ok) throw new Error('Failed to fetch artists');
-        const artistsData = await artistsResponse.json();
-        const artistsArray = Array.isArray(artistsData) ? artistsData : artistsData.artists || [];
-        const processedArtists = artistsArray.map((artist: any) => ({
-          ...artist,
-          avatarUrl: artist.avatarUrl ? resolveMediaUrl(artist.avatarUrl) : artist.avatarUrl,
-        }));
-        setFeaturedArtists(processedArtists);
+        if (artistsResponse.ok) {
+          const artistsData = await artistsResponse.json();
+          const artistsArray = Array.isArray(artistsData) ? artistsData : artistsData.artists || [];
+          artistsArray.forEach((artist: any) => {
+            processedArtists.push({
+              ...artist,
+              avatarUrl: artist.avatarUrl ? resolveMediaUrl(artist.avatarUrl) : artist.avatarUrl,
+            });
+          });
+        }
 
-        // Fetch playlists
-        // Fetch playlists with timeout
         const playlistsUrl = `/api/playlist`;
         const playlistsResponse = await fetchJsonWithTimeout(playlistsUrl, 3000);
-        if (!playlistsResponse.ok) throw new Error('Failed to fetch playlists');
-        const playlistsData = await playlistsResponse.json();
-        const playlistsArray = Array.isArray(playlistsData) ? playlistsData : playlistsData.playlists || [];
-        const processedPlaylists = playlistsArray.map((playlist: any) => ({
-          ...playlist,
-          coverArt: playlist.coverArt ? resolveMediaUrl(playlist.coverArt) : playlist.coverArt
-        }));
-        setPlaylists(processedPlaylists);
+        if (playlistsResponse.ok) {
+          const playlistsData = await playlistsResponse.json();
+          const playlistsArray = Array.isArray(playlistsData) ? playlistsData : playlistsData.playlists || [];
+          playlistsArray.forEach((playlist: any) => {
+            processedPlaylists.push({
+              ...playlist,
+              coverArt: playlist.coverArt ? resolveMediaUrl(playlist.coverArt) : playlist.coverArt,
+            });
+          });
+        }
 
-        // Fetch producer users separately so the producer section can display actual producers
         const producersUrl = `/api/users`;
         let producersResponse = await fetchJsonWithTimeout(producersUrl, 3000);
         if (!producersResponse.ok) {
           console.warn('Producers proxy failed, retrying direct backend call');
           producersResponse = await fetchJsonWithTimeout(`${API_BASE}/api/v1/users`, 5000);
         }
-
         if (producersResponse.ok) {
           const producersData = await producersResponse.json();
           const producersArray = Array.isArray(producersData)
@@ -281,26 +312,50 @@ export default function GuestWelcome() {
             ? producersData.data
             : producersData.users || [];
 
-          const processedProducers = producersArray
-            .filter((user: any) => {
-              const role = user.role?.toString().toUpperCase();
-              return role === 'PRODUCER' || user.isProducer === true || !!user.producerName || !!user.producerBio;
-            })
-            .map((producer: any) => ({
-              ...producer,
-              avatarUrl: producer.avatarUrl ? resolveMediaUrl(producer.avatarUrl) : producer.avatarUrl,
-            }));
+          const fallbackProducers: any[] = [];
+          producersArray.forEach((user: any) => {
+            const role = user.role?.toString().toUpperCase();
+            if (role === 'PRODUCER' || user.isProducer === true || !!user.producerName || !!user.producerBio) {
+              processedFeaturedProducers.push({
+                ...user,
+                avatarUrl: user.avatarUrl ? resolveMediaUrl(user.avatarUrl) : user.avatarUrl,
+              });
+            } else if (user.isProducer === true || !!user.producerName || !!user.producerBio) {
+              fallbackProducers.push({
+                ...user,
+                avatarUrl: user.avatarUrl ? resolveMediaUrl(user.avatarUrl) : user.avatarUrl,
+              });
+            }
+          });
 
-          const fallbackProducers = producersArray
-            .filter((user: any) => user.isProducer === true || !!user.producerName || !!user.producerBio)
-            .map((producer: any) => ({
-              ...producer,
-              avatarUrl: producer.avatarUrl ? resolveMediaUrl(producer.avatarUrl) : producer.avatarUrl,
-            }));
-
-          setFeaturedProducers(processedProducers.length > 0 ? processedProducers : fallbackProducers.slice(0, 6));
+          if (processedFeaturedProducers.length === 0) {
+            processedFeaturedProducers.push(...fallbackProducers.slice(0, 6));
+          }
         }
 
+        setQuickPicks(processedQuickPicks);
+        setTrendingNow(processedTrendingNow);
+        setTopCharts(processedTopCharts);
+        setFeaturedAlbums(processedFeaturedAlbums);
+        setBeats(processedBeats);
+        setMusicVideos(processedMusicVideos);
+        setOtherVideos(processedOtherVideos);
+        setFeaturedArtists(processedArtists);
+        setPlaylists(processedPlaylists);
+        setFeaturedProducers(processedFeaturedProducers);
+
+        saveCachedHomepageData({
+          quickPicks: processedQuickPicks,
+          featuredAlbums: processedFeaturedAlbums,
+          featuredArtists: processedArtists,
+          featuredProducers: processedFeaturedProducers,
+          beats: processedBeats,
+          trendingNow: processedTrendingNow,
+          topCharts: processedTopCharts,
+          musicVideos: processedMusicVideos,
+          otherVideos: processedOtherVideos,
+          playlists: processedPlaylists,
+        });
       } catch (error) {
         console.error('Error fetching homepage data:', error);
         setIsLoading(false);
@@ -309,7 +364,13 @@ export default function GuestWelcome() {
       }
     };
 
-    fetchHomepageData();
+    const hasCache = loadCachedHomepageData();
+    if (hasCache) {
+      setIsLoading(false);
+      void fetchHomepageData(false);
+    } else {
+      void fetchHomepageData(true);
+    }
   }, []);
 
   const heroImages = [
@@ -465,10 +526,10 @@ export default function GuestWelcome() {
 
                     {showUserMenu && (
                       <>
-                        <div className="absolute right-0 top-full z-50 mt-3 w-60 rounded-3xl border border-white/10 bg-black/95 backdrop-blur-xl shadow-xl shadow-black/50 overflow-hidden">
-                          <div className="px-4 py-4 border-b border-white/10">
+                        <div className="absolute right-0 top-full z-50 mt-2 w-52 rounded-3xl bg-black/95 backdrop-blur-xl shadow-xl shadow-black/50 overflow-hidden">
+                          <div className="px-4 py-3">
                             <div className="flex items-center gap-3">
-                              <div className="relative h-12 w-12 rounded-full overflow-hidden bg-purple-500">
+                              <div className="relative h-10 w-10 rounded-full overflow-hidden bg-purple-500">
                                 {user.avatarUrl ? (
                                   <Image
                                     src={user.avatarUrl}
@@ -491,42 +552,48 @@ export default function GuestWelcome() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex flex-col text-left">
+                          <div className="space-y-1 px-1 py-1">
                             <button
                               onClick={() => handleUserMenuNavigation(getDashboardPath(user.role))}
-                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                              className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              Go to Dashboard
+                              <FaHome className="w-4 h-4 text-purple-300" />
+                              <span>Dashboard</span>
                             </button>
                             <button
                               onClick={() => handleUserMenuNavigation('/profile')}
-                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                              className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              Profile
+                              <FaUser className="w-4 h-4 text-purple-300" />
+                              <span>Profile</span>
                             </button>
                             <button
                               onClick={() => handleUserMenuNavigation('/browse')}
-                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                              className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              Browse
+                              <FaCompass className="w-4 h-4 text-purple-300" />
+                              <span>Browse</span>
                             </button>
                             <button
                               onClick={() => handleUserMenuNavigation('/videos')}
-                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                              className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              Videos
+                              <FaFilm className="w-4 h-4 text-purple-300" />
+                              <span>Videos</span>
                             </button>
                             <button
                               onClick={() => handleUserMenuNavigation('/settings')}
-                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                              className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              Settings
+                              <FaCog className="w-4 h-4 text-purple-300" />
+                              <span>Settings</span>
                             </button>
                             <button
                               onClick={handleUserLogout}
-                              className="px-4 py-3 text-sm text-red-400 hover:bg-white/10 transition"
+                              className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-red-400 hover:bg-white/10 transition"
                             >
-                              Logout
+                              <FaSignOutAlt className="w-4 h-4 text-red-400" />
+                              <span>Logout</span>
                             </button>
                           </div>
                         </div>
@@ -739,6 +806,45 @@ export default function GuestWelcome() {
                       {getProducerFollowers(producer)} followers
                     </p>
                   </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Beats & Instruments (mobile) */}
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Beats & Instruments</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {beats.slice(0, 6).map((beat: any, i: number) => (
+                  <div
+                    key={i}
+                    className="w-36 flex-shrink-0 cursor-pointer rounded-3xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+                    onClick={() => playTrack({
+                      id: beat.id,
+                      title: beat.title,
+                      artist: beat.user?.displayName || beat.user?.username || 'Unknown',
+                      imageUrl: beat.artCoverUrl,
+                      audioUrl: beat.audioUrl || beat.url,
+                      duration: beat.duration
+                    })}
+                  >
+                    <div className="relative aspect-[4/5] overflow-hidden bg-black/10">
+                      <div
+                        className={`absolute inset-0 ${beat.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                        style={{
+                          backgroundImage: beat.artCoverUrl ? `url(${beat.artCoverUrl})` : undefined,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                    </div>
+                    <div className="p-3">
+                      <p className="text-[11px] font-semibold truncate text-white mb-1">{beat.title}</p>
+                      <p className="text-[10px] text-gray-400 truncate">{beat.user?.displayName || beat.user?.username || 'Unknown Producer'}</p>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
