@@ -174,7 +174,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
        // persist short-lived token for other components if they need it
        if (typeof window !== 'undefined' && token) localStorage.setItem('authToken', token);
        
-       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
+       // Use frontend proxy to avoid CORS and surface upstream errors in dev
+       const response = await fetch(`/api/auth/me`, {
          headers: {
            'Authorization': `Bearer ${token}`,
            'Content-Type': 'application/json',
