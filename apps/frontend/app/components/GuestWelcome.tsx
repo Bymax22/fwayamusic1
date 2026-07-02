@@ -444,67 +444,97 @@ export default function GuestWelcome() {
                   <div className="relative">
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-2 text-sm text-white transition hover:border-white/30"
+                      className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 bg-white/5 hover:border-white/40 transition-colors"
                     >
-                      <span className="relative inline-flex h-8 w-8 overflow-hidden rounded-full bg-purple-500 text-white">
-                        {user.avatarUrl ? (
-                          <Image
-                            src={user.avatarUrl}
-                            alt={user.displayName || user.username || 'User'}
-                            fill
-                            className="object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/default-avatar.png';
-                            }}
-                          />
-                        ) : (
-                          <span className="flex h-full w-full items-center justify-center text-sm font-semibold">
-                            {(user.displayName || user.username || 'U').charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </span>
-                      <FaChevronDown className="h-4 w-4 text-white/80" />
+                      {user.avatarUrl ? (
+                        <Image
+                          src={user.avatarUrl}
+                          alt={user.displayName || user.username || 'User'}
+                          fill
+                          className="object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/default-avatar.png';
+                          }}
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-semibold text-white">
+                          {(user.displayName || user.username || 'U').charAt(0).toUpperCase()}
+                        </div>
+                      )}
                     </button>
 
                     {showUserMenu && (
-                      <div className="absolute right-0 top-full mt-2 w-56 rounded-3xl border border-white/10 bg-[#0b0b16]/95 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl z-50">
-                        <button
-                          onClick={() => handleUserMenuNavigation(getDashboardPath(user.role))}
-                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
-                        >
-                          Go to Dashboard
-                        </button>
-                        <button
-                          onClick={() => handleUserMenuNavigation('/profile')}
-                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
-                        >
-                          Profile
-                        </button>
-                        <button
-                          onClick={() => handleUserMenuNavigation('/browse')}
-                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
-                        >
-                          Browse
-                        </button>
-                        <button
-                          onClick={() => handleUserMenuNavigation('/videos')}
-                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
-                        >
-                          Videos
-                        </button>
-                        <button
-                          onClick={() => handleUserMenuNavigation('/settings')}
-                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
-                        >
-                          Settings
-                        </button>
-                        <button
-                          onClick={handleUserLogout}
-                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-red-400 hover:bg-white/10 transition"
-                        >
-                          Logout
-                        </button>
-                      </div>
+                      <>
+                        <div className="absolute right-0 top-full z-50 mt-3 w-60 rounded-3xl border border-white/10 bg-black/95 backdrop-blur-xl shadow-xl shadow-black/50 overflow-hidden">
+                          <div className="px-4 py-4 border-b border-white/10">
+                            <div className="flex items-center gap-3">
+                              <div className="relative h-12 w-12 rounded-full overflow-hidden bg-purple-500">
+                                {user.avatarUrl ? (
+                                  <Image
+                                    src={user.avatarUrl}
+                                    alt={user.displayName || user.username || 'User'}
+                                    fill
+                                    className="object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = '/default-avatar.png';
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-white">
+                                    {(user.displayName || user.username || 'U').charAt(0).toUpperCase()}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="truncate text-sm font-semibold text-white">{user.displayName || user.username}</p>
+                                <p className="truncate text-xs text-white/60">{user.role?.toLowerCase()}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col text-left">
+                            <button
+                              onClick={() => handleUserMenuNavigation(getDashboardPath(user.role))}
+                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                            >
+                              Go to Dashboard
+                            </button>
+                            <button
+                              onClick={() => handleUserMenuNavigation('/profile')}
+                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                            >
+                              Profile
+                            </button>
+                            <button
+                              onClick={() => handleUserMenuNavigation('/browse')}
+                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                            >
+                              Browse
+                            </button>
+                            <button
+                              onClick={() => handleUserMenuNavigation('/videos')}
+                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                            >
+                              Videos
+                            </button>
+                            <button
+                              onClick={() => handleUserMenuNavigation('/settings')}
+                              className="px-4 py-3 text-sm text-white/90 hover:bg-white/10 transition"
+                            >
+                              Settings
+                            </button>
+                            <button
+                              onClick={handleUserLogout}
+                              className="px-4 py-3 text-sm text-red-400 hover:bg-white/10 transition"
+                            >
+                              Logout
+                            </button>
+                          </div>
+                        </div>
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setShowUserMenu(false)}
+                        />
+                      </>
                     )}
                   </div>
                 )}
