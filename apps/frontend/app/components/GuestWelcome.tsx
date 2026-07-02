@@ -31,15 +31,16 @@ export default function GuestWelcome() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Data state
-  const [quickPicks, setQuickPicks] = useState([]);
-  const [featuredAlbums, setFeaturedAlbums] = useState([]);
-  const [featuredArtists, setFeaturedArtists] = useState([]);
-  const [beats, setBeats] = useState([]);
-  const [trendingNow, setTrendingNow] = useState([]);
-  const [topCharts, setTopCharts] = useState([]);
-  const [musicVideos, setMusicVideos] = useState([]);
-  const [otherVideos, setOtherVideos] = useState([]);
-  const [playlists, setPlaylists] = useState([]);
+  const [quickPicks, setQuickPicks] = useState<any[]>([]);
+  const [featuredAlbums, setFeaturedAlbums] = useState<any[]>([]);
+  const [featuredArtists, setFeaturedArtists] = useState<any[]>([]);
+  const [featuredProducers, setFeaturedProducers] = useState<any[]>([]);
+  const [beats, setBeats] = useState<any[]>([]);
+  const [trendingNow, setTrendingNow] = useState<any[]>([]);
+  const [topCharts, setTopCharts] = useState<any[]>([]);
+  const [musicVideos, setMusicVideos] = useState<any[]>([]);
+  const [otherVideos, setOtherVideos] = useState<any[]>([]);
+  const [playlists, setPlaylists] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -122,16 +123,38 @@ export default function GuestWelcome() {
           setTopCharts(processedSongs);
         }
 
-        // Set featured albums from beats
-        if (homepageData.beats && Array.isArray(homepageData.beats)) {
-          const processedAlbums = homepageData.beats.map((album: any) => ({
+        // Set featured albums from actual album media if available, otherwise fallback to any beat items marked as albums
+        const albumItems: any[] = [];
+        if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {
+          albumItems.push(...homepageData.featuredSongs.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
+        }
+        if (albumItems.length === 0 && homepageData.trendingSongs && Array.isArray(homepageData.trendingSongs)) {
+          albumItems.push(...homepageData.trendingSongs.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
+        }
+        if (albumItems.length === 0 && homepageData.beats && Array.isArray(homepageData.beats)) {
+          albumItems.push(...homepageData.beats.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
+        }
+
+        if (albumItems.length > 0) {
+          const processedAlbums = albumItems.map((album: any) => ({
             ...album,
             url: album.url ? resolveMediaUrl(album.url) : album.url,
             coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
             artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
           }));
           setFeaturedAlbums(processedAlbums);
-          setBeats(processedAlbums);
+        }
+
+        if (homepageData.beats && Array.isArray(homepageData.beats)) {
+          const processedBeats = homepageData.beats
+            .filter((beat: any) => beat.type?.toString().toUpperCase() === 'AUDIO')
+            .map((beat: any) => ({
+              ...beat,
+              url: beat.url ? resolveMediaUrl(beat.url) : beat.url,
+              coverArt: beat.coverArt ? resolveMediaUrl(beat.coverArt) : beat.coverArt,
+              artCoverUrl: beat.artCoverUrl ? resolveMediaUrl(beat.artCoverUrl) : (beat.coverArt ? resolveMediaUrl(beat.coverArt) : (beat.thumbnailUrl ? resolveMediaUrl(beat.thumbnailUrl) : undefined))
+            }));
+          setBeats(processedBeats);
         }
 
         if (homepageData.musicVideos && Array.isArray(homepageData.musicVideos)) {
@@ -163,7 +186,7 @@ export default function GuestWelcome() {
         const artistsArray = Array.isArray(artistsData) ? artistsData : artistsData.artists || [];
         const processedArtists = artistsArray.map((artist: any) => ({
           ...artist,
-          avatar: artist.avatar ? resolveMediaUrl(artist.avatar) : artist.avatar
+          avatarUrl: artist.avatarUrl ? resolveMediaUrl(artist.avatarUrl) : artist.avatarUrl,
         }));
         setFeaturedArtists(processedArtists);
 
@@ -179,6 +202,26 @@ export default function GuestWelcome() {
           coverArt: playlist.coverArt ? resolveMediaUrl(playlist.coverArt) : playlist.coverArt
         }));
         setPlaylists(processedPlaylists);
+
+        // Fetch producer users separately so the producer section can display actual producers
+        const producersUrl = `/api/users`;
+        let producersResponse = await fetchJsonWithTimeout(producersUrl, 3000);
+        if (!producersResponse.ok) {
+          console.warn('Producers proxy failed, retrying direct backend call');
+          producersResponse = await fetchJsonWithTimeout(`${API_BASE}/api/v1/users`, 5000);
+        }
+
+        if (producersResponse.ok) {
+          const producersData = await producersResponse.json();
+          const producersArray = Array.isArray(producersData) ? producersData : producersData.users || [];
+          const processedProducers = producersArray
+            .filter((user: any) => user.role?.toString().toUpperCase() === 'PRODUCER')
+            .map((producer: any) => ({
+              ...producer,
+              avatarUrl: producer.avatarUrl ? resolveMediaUrl(producer.avatarUrl) : producer.avatarUrl,
+            }));
+          setFeaturedProducers(processedProducers);
+        }
 
       } catch (error) {
         console.error('Error fetching homepage data:', error);
@@ -217,11 +260,6 @@ export default function GuestWelcome() {
       secondaryButton: "Download"
     }
   ];
-
-  const featuredProducers = featuredArtists.filter((artist: any) => {
-    const role = artist.role?.toString().toUpperCase();
-    return role === "PRODUCER";
-  });
 
   const musicVideoCards = musicVideos.slice(0, 6);
   const otherVideoCards = otherVideos.slice(0, 6);

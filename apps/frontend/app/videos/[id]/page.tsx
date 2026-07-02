@@ -251,15 +251,15 @@ export default function VideoWatchPage() {
                       onClick={handlePlay}
                       className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-500"
                     >
-                      {currentTrack?.id === video.id && isPlaying ? <Pause size={16} /> : <Play size={16} />}
-                      {currentTrack?.id === video.id && isPlaying ? "Pause" : "Play"}
+                      {isPlayingLocal ? <Pause size={16} /> : <Play size={16} />}
+                      {isPlayingLocal ? "Pause" : "Play"}
                     </button>
                     <button
-                      onClick={toggleMute}
+                      onClick={handleMute}
                       className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
                     >
-                      {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                      {isMuted ? "Unmute" : "Mute"}
+                      {isMutedLocal ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                      {isMutedLocal ? "Unmute" : "Mute"}
                     </button>
                     <button className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800">
                       <Maximize2 size={16} />
