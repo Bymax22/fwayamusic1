@@ -1,8 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Play, Pause, Volume2, VolumeX, Maximize2, Heart, Share2, Plus, X } from "lucide-react";
-import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useAuth } from "@/context/AuthContext";
 import VideoCard from "@/components/VideoCard";
 
@@ -39,7 +38,6 @@ const formatDuration = (seconds: number) => {
 export default function VideoWatchPage() {
   const params = useParams();
   const router = useRouter();
-  const { currentTrack, isPlaying, playTrack, togglePlay, toggleMute, isMuted } = useAudioPlayer();
   const { getToken } = useAuth();
   const searchParams = useSearchParams();
   const [video, setVideo] = useState<VideoDetail | null>(null);
@@ -49,33 +47,24 @@ export default function VideoWatchPage() {
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
+  const [isPlayingLocal, setIsPlayingLocal] = useState(false);
+  const [isMutedLocal, setIsMutedLocal] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const videoId = Array.isArray(params.id) ? params.id[0] : params.id;
   const shouldAutoplay = searchParams?.get('autoplay') === '1';
 
   useEffect(() => {
-    const fetchWithTimeout = async (input: RequestInfo, timeout = 10000, options: RequestInit = {}) => {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeout);
-      try {
-        const response = await fetch(input, { signal: controller.signal, ...options });
-        return response;
-      } finally {
-        clearTimeout(id);
-      }
-    };
-
     const fetchVideo = async () => {
       try {
         setLoading(true);
-        let res = await fetchWithTimeout(`/api/media/${videoId}`);
+        let res = await fetch(`/api/media/${videoId}`);
 
         if (!res.ok) {
-          const errorDetails = await res.json().catch(() => null);
           const backendUrl = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${videoId}` : null;
           if (backendUrl) {
             try {
-              res = await fetchWithTimeout(backendUrl, 10000);
+              res = await fetch(backendUrl);
             } catch (fallbackError) {
               console.warn('Fallback backend fetch failed', fallbackError);
             }
@@ -113,16 +102,13 @@ export default function VideoWatchPage() {
         };
         setVideo(mapped);
 
-        if (shouldAutoplay && mapped.videoUrl) {
-          playTrack({
-            id: mapped.id,
-            title: mapped.title,
-            artist: mapped.artist,
-            videoUrl: mapped.videoUrl,
-            imageUrl: mapped.thumbnail,
-            type: "VIDEO",
-            duration: mapped.duration,
-          });
+        if (shouldAutoplay && videoRef.current) {
+          try {
+            await videoRef.current.play();
+            setIsPlayingLocal(true);
+          } catch (err) {
+            console.warn('Native video autoplay blocked or failed', err);
+          }
         }
 
         void fetchComments();
@@ -148,24 +134,28 @@ export default function VideoWatchPage() {
     if (videoId) {
       void fetchVideo();
     }
-  }, [videoId, shouldAutoplay, playTrack]);
+  }, [videoId, shouldAutoplay]);
 
   const handlePlay = () => {
-    if (!video) return;
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
 
-    if (currentTrack?.id === video.id) {
-      togglePlay();
-    } else {
-      playTrack({
-        id: video.id,
-        title: video.title,
-        artist: video.artist,
-        videoUrl: video.videoUrl,
-        imageUrl: video.thumbnail,
-        type: "VIDEO",
-        duration: video.duration,
+    if (videoEl.paused) {
+      videoEl.play().then(() => setIsPlayingLocal(true)).catch((err) => {
+        console.warn('Video play failed:', err);
+        setIsPlayingLocal(false);
       });
+    } else {
+      videoEl.pause();
+      setIsPlayingLocal(false);
     }
+  };
+
+  const handleMute = () => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+    videoEl.muted = !isMutedLocal;
+    setIsMutedLocal(!isMutedLocal);
   };
 
   const handlePostComment = async () => {
@@ -208,6 +198,7 @@ export default function VideoWatchPage() {
       <div className="max-w-7xl mx-auto">
         <button
             className="mb-6 rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
+            onClick={() => router.back()}
         >
           Back
         </button>
@@ -230,12 +221,17 @@ export default function VideoWatchPage() {
               <div className="rounded-3xl bg-slate-950 p-4">
                 <div className="aspect-video w-full overflow-hidden rounded-3xl bg-slate-900">
                   <video
+                    ref={videoRef}
                     src={video.videoUrl}
                     controls
+                    autoPlay={shouldAutoplay}
+                    muted={isMutedLocal}
                     className="h-full w-full bg-black"
                     onClick={() => setShowControls(true)}
                     onTouchStart={() => setShowControls(true)}
                     onMouseMove={() => setShowControls(true)}
+                    onPlay={() => setIsPlayingLocal(true)}
+                    onPause={() => setIsPlayingLocal(false)}
                   />
                 </div>
               </div>
