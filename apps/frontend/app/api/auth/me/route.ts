@@ -1,14 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 function getBackendBaseUrl() {
   return process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+}
+
+function getCookieValue(request: Request, name: string): string | null {
+  const cookieHeader = request.headers.get('cookie');
+  if (!cookieHeader) return null;
+  const cookies = cookieHeader.split(';').map((cookie) => cookie.trim());
+  const match = cookies.find((cookie) => cookie.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.split('=')[1] || '') : null;
 }
 
 export async function GET(request: Request) {
   try {
     let authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
     if (!authHeader) {
-      const cookieToken = request.cookies.get('authToken')?.value;
+      const cookieToken = getCookieValue(request, 'authToken');
       if (cookieToken) {
         authHeader = `Bearer ${cookieToken}`;
       }
