@@ -226,6 +226,7 @@ export default function VideoPlayer({
           >
             <div
               className="relative bg-black"
+              style={{ touchAction: 'manipulation' }}
               onClick={handleMediaTap}
               onTouchStart={handleMediaTap}
               onMouseMove={handleMouseMove}
@@ -236,6 +237,7 @@ export default function VideoPlayer({
                 src={videoUrl}
                 poster={coverUrl ?? undefined}
                 className={isMinimized && isMobile ? 'aspect-video w-full object-cover' : 'aspect-video w-full object-contain bg-black'}
+                onTouchEnd={handleMediaTap}
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleTimeUpdate}
                 onPlay={() => setIsPlaying(true)}
@@ -248,9 +250,9 @@ export default function VideoPlayer({
                 webkit-playsinline="true"
               />
 
-              <div className={`absolute inset-0 ${isMinimized && isMobile ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent' : 'bg-gradient-to-t from-black/90 via-black/20 to-transparent'}`} />
+              <div className={`absolute inset-0 pointer-events-none ${isMinimized && isMobile ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent' : 'bg-gradient-to-t from-black/90 via-black/20 to-transparent'}`} />
 
-              <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3 sm:p-4" onClick={(e) => e.stopPropagation()}>
+              <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3 sm:p-4" onClick={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-white">{title}</p>
                   <p className="truncate text-xs text-white/70">{artist}</p>
@@ -282,7 +284,7 @@ export default function VideoPlayer({
               </div>
 
               {!isMinimized && (
-                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4" onClick={(e) => e.stopPropagation()}>
+                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4" onClick={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
                   <motion.div
                     animate={{ opacity: showControls ? 1 : 0 }}
                     transition={{ duration: 0.2 }}
@@ -329,9 +331,9 @@ export default function VideoPlayer({
               )}
 
               {isMinimized && isMobile && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center" onClick={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
                   <button
-                    onClick={togglePlayPause}
+                    onClick={(e) => { e.stopPropagation(); void togglePlayPause(); }}
                     className="rounded-full bg-white/15 p-3 text-white shadow-lg backdrop-blur"
                   >
                     {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 fill-white" />}
