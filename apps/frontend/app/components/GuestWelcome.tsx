@@ -56,7 +56,7 @@ export default function GuestWelcome() {
   };
 
   // Helper: fetch with timeout
-  const fetchJsonWithTimeout = async (input: RequestInfo, timeout = 4000, init?: RequestInit) => {
+  const fetchJsonWithTimeout = async (input: RequestInfo, timeout = 8000, init?: RequestInit) => {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     try {
@@ -81,7 +81,11 @@ export default function GuestWelcome() {
 
         // Fetch homepage sections (featured songs, trending, beats, top charts) via frontend proxy
         // Use timeout to avoid hanging the preloader
-        const homepageResponse = await fetchJsonWithTimeout(`/api/media/homepage-sections`, 4000);
+        let homepageResponse = await fetchJsonWithTimeout(`/api/media/homepage-sections`, 6000);
+        if (!homepageResponse.ok) {
+          console.warn('Homepage proxy failed, retrying direct backend call');
+          homepageResponse = await fetchJsonWithTimeout(`${API_BASE}/api/v1/media/homepage-sections`, 8000);
+        }
         if (!homepageResponse.ok) throw new Error('Failed to fetch homepage data');
         const homepageData = await homepageResponse.json();
 

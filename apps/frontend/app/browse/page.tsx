@@ -166,7 +166,7 @@ export default function Browse() {
   }, []);
 
   useEffect(() => {
-    const fetchWithTimeout = async (input: RequestInfo, timeout = 4000, options: RequestInit = {}) => {
+    const fetchWithTimeout = async (input: RequestInfo, timeout = 8000, options: RequestInit = {}) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
       try {
@@ -180,17 +180,15 @@ export default function Browse() {
     };
 
     const fetchWithFallback = async (primaryUrl: string, fallbackUrl: string, options: RequestInit = {}) => {
-      // Prefer the frontend proxy first for faster local response
       try {
-        const proxyRes = await fetchWithTimeout(fallbackUrl, 2500, options);
+        const proxyRes = await fetchWithTimeout(fallbackUrl, 5000, options);
         if (proxyRes.ok) return proxyRes;
         console.warn(`Proxy fetch failed: ${fallbackUrl}`, proxyRes.status, proxyRes.statusText);
       } catch (proxyErr) {
         console.warn(`Proxy fetch error: ${fallbackUrl}`, proxyErr);
       }
 
-      // Fall back to primary backend with a slightly longer timeout
-      return fetchWithTimeout(primaryUrl, 4000, options);
+      return fetchWithTimeout(primaryUrl, 8000, options);
     };
 
     const fetchData = async () => {
@@ -209,7 +207,7 @@ export default function Browse() {
           ),
           fetchWithFallback(
             `${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=USER`,
-            '/api/playlists?type=USER',
+            '/api/playlist?type=USER',
             {
               credentials: 'include',
               headers: { 'Accept': 'application/json' }
