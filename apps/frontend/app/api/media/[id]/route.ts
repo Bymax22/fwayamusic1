@@ -4,10 +4,13 @@ function getBackendBaseUrl() {
   return process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, context: any) {
   try {
     const baseUrl = getBackendBaseUrl();
-    const res = await fetch(`${baseUrl}/api/v1/media/${params.id}`, {
+    const id = context?.params?.id;
+    if (!id) return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
+
+    const res = await fetch(`${baseUrl}/api/v1/media/${id}`, {
       headers: { Accept: 'application/json' },
     });
 

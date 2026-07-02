@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Play, Pause, Volume2, VolumeX, ArrowsExpand, Heart, Share2, Plus, X } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize2, Heart, Share2, Plus, X } from "lucide-react";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import VideoCard from "@/components/VideoCard";
 
@@ -171,7 +171,7 @@ export default function VideoWatchPage() {
                       {isMuted ? "Unmute" : "Mute"}
                     </button>
                     <button className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800">
-                      <ArrowsExpand size={16} />
+                      <Maximize2 size={16} />
                       Fullscreen
                     </button>
                     <button className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800">
