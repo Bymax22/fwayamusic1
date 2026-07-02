@@ -414,7 +414,12 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {musicVideoCards.map((item: any, i: number) => (
-                  <div key={i} className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5">
+                  <div
+                    key={i}
+                    className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                    onClick={() => openVideoPlayer(item)}
+                    onTouchStart={() => openVideoPlayer(item)}
+                  >
                     <div className="relative aspect-[9/16]">
                       <div
                         className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
@@ -552,7 +557,7 @@ export default function GuestWelcome() {
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
                 {topCharts.slice(0, 6).map((track: any, i: number) => (
-                  <div key={track.id || i} className="bg-[#080a13] p-3 rounded-lg hover:bg-[#11131c] transition-colors">
+                  <div key={track.id || i} className="bg-white/5 border border-white/10 p-3 rounded-lg hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
                       <div className="w-10 h-10 rounded-md overflow-hidden bg-black flex-shrink-0 relative">
@@ -601,7 +606,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[120px] bg-transparent rounded-xl p-3 cursor-pointer hover:bg-[#11131c] transition-colors flex-shrink-0">
+                  <div key={i} className="min-w-[120px] bg-white/5 rounded-xl p-3 cursor-pointer border border-white/10 hover:bg-white/10 transition-colors flex-shrink-0">
                     <div 
                       className={`w-full aspect-square ${item.coverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'} rounded-lg mb-2`}
                       style={{
@@ -964,7 +969,12 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {musicVideoCards.map((item: any, i: number) => (
-                  <div key={i} className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5">
+                  <div
+                    key={i}
+                    className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                    onClick={() => openVideoPlayer(item)}
+                    onTouchStart={() => openVideoPlayer(item)}
+                  >
                     <div className="relative aspect-[9/16]">
                       <div
                         className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
@@ -994,7 +1004,12 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {otherVideoCards.map((item: any, i: number) => (
-                  <div key={i} className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5">
+                  <div
+                    key={i}
+                    className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                    onClick={() => openVideoPlayer(item)}
+                    onTouchStart={() => openVideoPlayer(item)}
+                  >
                     <div className="relative aspect-[9/16]">
                       <div
                         className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
