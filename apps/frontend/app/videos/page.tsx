@@ -96,7 +96,7 @@ export default function VideosPage() {
                   <h2 className="text-xl font-semibold text-white">Suggested videos</h2>
                 </div>
                 <button
-                  className="rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                  className="rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
                   onClick={() => router.push('/videos?section=recommended')}
                 >
                   View all
@@ -116,7 +116,7 @@ export default function VideosPage() {
                   <h2 className="text-xl font-semibold text-white">Trending videos</h2>
                 </div>
                 <button
-                  className="rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                  className="rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
                   onClick={() => router.push('/videos?section=trending')}
                 >
                   View all
@@ -136,7 +136,7 @@ export default function VideosPage() {
                   <h2 className="text-xl font-semibold text-white">Latest drops</h2>
                 </div>
                 <button
-                  className="rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                  className="rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
                   onClick={() => router.push('/videos?section=new-releases')}
                 >
                   View all

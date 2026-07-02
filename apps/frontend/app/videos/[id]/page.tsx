@@ -54,11 +54,39 @@ export default function VideoWatchPage() {
   const shouldAutoplay = searchParams?.get('autoplay') === '1';
 
   useEffect(() => {
+    const fetchWithTimeout = async (input: RequestInfo, timeout = 10000, options: RequestInit = {}) => {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+      try {
+        const response = await fetch(input, { signal: controller.signal, ...options });
+        return response;
+      } finally {
+        clearTimeout(id);
+      }
+    };
+
     const fetchVideo = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/media/${videoId}`);
-        if (!res.ok) throw new Error("Video not found");
+        let res = await fetchWithTimeout(`/api/media/${videoId}`);
+
+        if (!res.ok) {
+          const errorDetails = await res.json().catch(() => null);
+          const backendUrl = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${videoId}` : null;
+          if (backendUrl) {
+            try {
+              res = await fetchWithTimeout(backendUrl, 10000);
+            } catch (fallbackError) {
+              console.warn('Fallback backend fetch failed', fallbackError);
+            }
+          }
+        }
+
+        if (!res.ok) {
+          const errorDetails = await res.json().catch(() => null);
+          throw new Error(errorDetails?.error || `Video not found (${res.status})`);
+        }
+
         const data = await res.json();
         const item = data.data || data;
         const mapped = {
@@ -85,13 +113,6 @@ export default function VideoWatchPage() {
         };
         setVideo(mapped);
 
-        // Fetch comments for this video
-        const commentsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${videoId}/comments`);
-        if (commentsResponse.ok) {
-          const commentsData = await commentsResponse.json();
-          setComments(commentsData);
-        }
-
         if (shouldAutoplay && mapped.videoUrl) {
           playTrack({
             id: mapped.id,
@@ -103,6 +124,8 @@ export default function VideoWatchPage() {
             duration: mapped.duration,
           });
         }
+
+        void fetchComments();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unable to load video");
       } finally {
@@ -110,10 +133,22 @@ export default function VideoWatchPage() {
       }
     };
 
+    const fetchComments = async () => {
+      try {
+        setComments([]);
+        const commentsResponse = await fetch(`/api/media/${videoId}/comments`);
+        if (!commentsResponse.ok) return;
+        const commentsData = await commentsResponse.json();
+        setComments(commentsData);
+      } catch (err) {
+        console.warn('Unable to fetch comments', err);
+      }
+    };
+
     if (videoId) {
       void fetchVideo();
     }
-  }, [videoId]);
+  }, [videoId, shouldAutoplay, playTrack]);
 
   const handlePlay = () => {
     if (!video) return;
@@ -144,7 +179,7 @@ export default function VideoWatchPage() {
 
     setCommentLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${video.id}/comments`, {
+      const response = await fetch(`/api/media/${video.id}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -172,8 +207,7 @@ export default function VideoWatchPage() {
     <div className="min-h-screen px-4 pb-24 pt-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
         <button
-          className="mb-6 rounded-full bg-slate-950 px-4 py-2 text-sm text-white transition hover:bg-slate-900"
-          onClick={() => router.back()}
+            className="mb-6 rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
         >
           Back
         </button>
