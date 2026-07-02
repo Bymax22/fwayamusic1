@@ -9,6 +9,7 @@ import MobilePlayer from "../components/MobilePlayer";
 import NowPlayingPanel from "../components/NowPlayingPanel";
 import BottomNav from "../components/BottomNav";
 import Navbar from "../components/Navbar";
+import VideoMiniPlayer from "../components/VideoMiniPlayer";
 import { useAuth } from "../context/AuthContext";
 import AuthErrorBanner from "../components/AuthErrorBanner";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
@@ -134,6 +135,8 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
           </div>
         </div>
       )}
+
+      <VideoMiniPlayer />
     </div>
   );
 }

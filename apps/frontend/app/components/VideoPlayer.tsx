@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type MouseEvent, type TouchEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Volume2, VolumeX, Maximize2, Play, Pause, Minimize2 } from 'lucide-react';
 
@@ -181,7 +181,7 @@ export default function VideoPlayer({
     }
   };
 
-  const handleMediaTap = async (event?: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+  const handleMediaTap = async (event?: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement> | TouchEvent<HTMLVideoElement>) => {
     event?.stopPropagation();
 
     if (isMinimized && isMobile) {
