@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE() {
   try {
     const response = NextResponse.json({ success: true });
-    response.cookies.delete('authToken', { path: '/' });
+    response.cookies.delete('authToken');
     return response;
   } catch (error) {
     console.error('Failed to clear auth session cookie:', error);
