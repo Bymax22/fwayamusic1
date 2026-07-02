@@ -488,12 +488,15 @@ const signUp = async (data: SignUpData): Promise<User> => {
     try {
       const token = await getToken();
       if (token) await setSessionCookie(token);
+      const headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      if (token) {
+        headers.append('Authorization', `Bearer ${token}`);
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/verify-otp`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : undefined,
-        },
+        headers,
         body: JSON.stringify({ method, code }),
       });
 
