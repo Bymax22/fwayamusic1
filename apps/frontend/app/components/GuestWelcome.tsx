@@ -56,6 +56,33 @@ export default function GuestWelcome() {
     return url.startsWith('http://') || url.startsWith('https://') ? url : `${API_BASE}${url}`;
   };
 
+  const getProducerDisplayName = (producer: any) => {
+    return (
+      producer.producerName ||
+      producer.displayName ||
+      producer.username ||
+      producer.artistName ||
+      producer.stageName ||
+      'Unknown Producer'
+    );
+  };
+
+  const getProducerFollowers = (producer: any) => {
+    if (producer.producerFollowers != null) return producer.producerFollowers;
+    if (typeof producer.followers === 'number') return producer.followers;
+    if (Array.isArray(producer.followers)) return producer.followers.length;
+    return 0;
+  };
+
+  const getProducerInitials = (producer: any) => {
+    const name = getProducerDisplayName(producer).trim();
+    return name
+      .split(' ')
+      .slice(0, 2)
+      .map((part: string) => part.charAt(0).toUpperCase())
+      .join('') || 'P';
+  };
+
   // Helper: fetch with timeout
   const fetchJsonWithTimeout = async (input: RequestInfo, timeout = 8000, init?: RequestInit) => {
     const controller = new AbortController();
@@ -213,14 +240,30 @@ export default function GuestWelcome() {
 
         if (producersResponse.ok) {
           const producersData = await producersResponse.json();
-          const producersArray = Array.isArray(producersData) ? producersData : producersData.users || [];
+          const producersArray = Array.isArray(producersData)
+            ? producersData
+            : Array.isArray(producersData.data)
+            ? producersData.data
+            : producersData.users || [];
+
           const processedProducers = producersArray
-            .filter((user: any) => user.role?.toString().toUpperCase() === 'PRODUCER')
+            .filter((user: any) => {
+              const role = user.role?.toString().toUpperCase();
+              return role === 'PRODUCER' || user.isProducer === true || !!user.producerName || !!user.producerBio;
+            })
             .map((producer: any) => ({
               ...producer,
               avatarUrl: producer.avatarUrl ? resolveMediaUrl(producer.avatarUrl) : producer.avatarUrl,
             }));
-          setFeaturedProducers(processedProducers);
+
+          const fallbackProducers = producersArray
+            .filter((user: any) => user.isProducer === true || !!user.producerName || !!user.producerBio)
+            .map((producer: any) => ({
+              ...producer,
+              avatarUrl: producer.avatarUrl ? resolveMediaUrl(producer.avatarUrl) : producer.avatarUrl,
+            }));
+
+          setFeaturedProducers(processedProducers.length > 0 ? processedProducers : fallbackProducers.slice(0, 6));
         }
 
       } catch (error) {
@@ -528,6 +571,40 @@ export default function GuestWelcome() {
                     </div>
                     <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
                     <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Featured Producers (mobile) */}
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Producers & Beat Makers</h3>
+                <span className="text-xs text-gray-400">See All {'>'}</span>
+              </div>
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                {featuredProducers.slice(0, 6).map((producer: any, i: number) => (
+                  <Link key={i} href={`/artists/${producer.id || producer._id}`} className="flex-shrink-0 text-center cursor-pointer">
+                    <div 
+                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
+                      style={{
+                        backgroundImage: producer.avatarUrl ? `url(${producer.avatarUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    >
+                      {!producer.avatarUrl && (
+                        <span className="text-white font-bold text-lg">
+                          {getProducerInitials(producer)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs font-semibold truncate text-white mb-1">
+                      {getProducerDisplayName(producer)}
+                    </p>
+                    <p className="text-[10px] text-gray-400">
+                      {getProducerFollowers(producer)} followers
+                    </p>
                   </Link>
                 ))}
               </div>
@@ -1324,30 +1401,42 @@ export default function GuestWelcome() {
               </h3>
             </div>
 
-            <div className="grid grid-cols-6 gap-3">
-              {featuredProducers.slice(0, 6).map((artist: any, i: number) => (
-                <Link
-                  key={i}
-                  href={`/artists/${artist.id || artist._id}`}
-                  className="text-center cursor-pointer hover:bg-transparent rounded-xl p-3 transition-colors"
-                >
-                  <div
-                    className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mx-auto mb-2"
-                    style={{
-                      backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  ></div>
+              <div className="grid grid-cols-6 gap-3">
+              {featuredProducers.length === 0 ? (
+                <div className="col-span-6 rounded-xl border border-dashed border-white/10 bg-[#080a13] p-6 text-center text-sm text-gray-400">
+                  No producers found right now.
+                </div>
+              ) : (
+                featuredProducers.slice(0, 6).map((producer: any, i: number) => (
+                  <Link
+                    key={i}
+                    href={`/artists/${producer.id || producer._id}`}
+                    className="text-center cursor-pointer hover:bg-transparent rounded-xl p-3 transition-colors"
+                  >
+                    <div
+                      className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mx-auto mb-2 flex items-center justify-center overflow-hidden"
+                      style={{
+                        backgroundImage: producer.avatarUrl ? `url(${producer.avatarUrl})` : undefined,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }}
+                    >
+                      {!producer.avatarUrl && (
+                        <span className="text-white font-semibold text-base">
+                          {getProducerInitials(producer)}
+                        </span>
+                      )}
+                    </div>
 
-                  <p className="text-sm font-semibold truncate mb-1">
-                    {artist.displayName || artist.username || artist.artistName || 'Unknown Producer'}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {artist.followers ? `${artist.followers.length} followers` : '0 followers'}
-                  </p>
-                </Link>
-              ))}
+                    <p className="text-sm font-semibold truncate mb-1">
+                      {getProducerDisplayName(producer)}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {getProducerFollowers(producer)} followers
+                    </p>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
 
