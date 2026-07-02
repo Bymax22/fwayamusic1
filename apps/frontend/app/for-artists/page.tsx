@@ -456,33 +456,40 @@ export default function ForArtistsPage() {
         for (let index = 0; index < newMedia.tracks.length; index += 1) {
           const track = newMedia.tracks[index];
           const trackCloudinaryData = await uploadToCloudinary(track.file as File, 'auto');
-          const dbFormData = new FormData();
-          dbFormData.append('title', track.title.trim());
-          dbFormData.append('type', 'AUDIO');
-          dbFormData.append('releaseType', newMedia.type === 'EP' ? 'EP' : 'ALBUM');
-          dbFormData.append('cloudinaryPublicId', trackCloudinaryData.public_id);
-          dbFormData.append('url', trackCloudinaryData.secure_url);
-          dbFormData.append('duration', trackCloudinaryData.duration?.toString() || '0');
-          dbFormData.append('format', trackCloudinaryData.format);
-          dbFormData.append('resourceType', trackCloudinaryData.resource_type);
-          dbFormData.append('accessType', newMedia.accessType);
-          dbFormData.append('genre', newMedia.genre.trim());
-          dbFormData.append('description', newMedia.lyrics.trim());
-          dbFormData.append('isExplicit', 'false');
-          dbFormData.append('allowReselling', 'true');
-          if (newMedia.accessType !== 'FREE') dbFormData.append('price', newMedia.price.trim());
+          const metadataPayload: Record<string, any> = {
+            title: track.title.trim(),
+            type: 'AUDIO',
+            releaseType: newMedia.type === 'EP' ? 'EP' : 'ALBUM',
+            cloudinaryPublicId: trackCloudinaryData.public_id,
+            url: trackCloudinaryData.secure_url,
+            duration: Number(trackCloudinaryData.duration || 0),
+            format: trackCloudinaryData.format,
+            resourceType: trackCloudinaryData.resource_type,
+            accessType: newMedia.accessType,
+            genre: newMedia.genre.trim() || undefined,
+            description: newMedia.lyrics.trim() || undefined,
+            isExplicit: false,
+            allowReselling: true,
+          };
+
+          if (newMedia.accessType !== 'FREE') {
+            metadataPayload.price = Number(newMedia.price.trim());
+          }
           if (track.artCoverFile) {
             const trackCoverData = await uploadToCloudinary(track.artCoverFile, 'image');
-            dbFormData.append('artCoverUrl', trackCoverData.secure_url);
+            metadataPayload.coverUrl = trackCoverData.secure_url;
           }
           if (releaseAlbumId) {
-            dbFormData.append('albumId', releaseAlbumId.toString());
+            metadataPayload.albumId = releaseAlbumId;
           }
 
           const dbResponse = await fetch('/api/artist/media', {
             method: 'POST',
-            body: dbFormData,
-            headers,
+            headers: {
+              ...headers,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(metadataPayload),
           });
 
           if (!dbResponse.ok) {

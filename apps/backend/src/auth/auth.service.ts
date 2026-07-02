@@ -409,19 +409,29 @@ async findOrCreateUser(decodedFirebaseUser: any) {
         };
 
         console.log(`[sendOtp] Sending email via Brevo to: ${user.email}`);
-        const response = await axios.post('https://api.brevo.com/v3/smtp/email', payload, {
-          headers: {
-            'api-key': apiKey,
-            'Content-Type': 'application/json',
-          },
-        });
-        console.log(`[sendOtp] Email sent successfully to ${user.email}`);
+
+        const sendBrevoEmail = async () => {
+          try {
+            await axios.post('https://api.brevo.com/v3/smtp/email', payload, {
+              headers: {
+                'api-key': apiKey,
+                'Content-Type': 'application/json',
+              },
+              timeout: 15000,
+            });
+            console.log(`[sendOtp] Email sent successfully to ${user.email}`);
+          } catch (err: any) {
+            console.error('[sendOtp] Failed to send OTP email via Brevo');
+            console.error('[sendOtp] Error message:', err?.message || JSON.stringify(err));
+            if (err?.response?.data) console.error('[sendOtp] Brevo response data:', err.response.data);
+            if (err?.response?.status) console.error('[sendOtp] Brevo response status:', err.response.status);
+          }
+        };
+
+        void sendBrevoEmail();
       } catch (err: any) {
-        console.error('[sendOtp] Failed to send OTP email via Brevo');
+        console.error('[sendOtp] Failed to initiate OTP email send via Brevo');
         console.error('[sendOtp] Error message:', err?.message || JSON.stringify(err));
-        if (err?.response?.data) console.error('[sendOtp] Brevo response data:', err.response.data);
-        if (err?.response?.status) console.error('[sendOtp] Brevo response status:', err.response.status);
-        throw new Error(`Failed to send OTP: ${err?.message || 'Brevo error'}`);
       }
     } else {
       // For phone method: TODO integrate SMS provider like Twilio. For now log the code.

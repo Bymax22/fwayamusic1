@@ -12,13 +12,20 @@ function getBackendBaseUrl() {
 export async function GET(request: NextRequest) {
   try {
     const token = request.headers.get('authorization');
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Authorization required' },
+        { status: 401 }
+      );
+    }
+
     const baseUrl = getBackendBaseUrl();
+    const headers: Record<string, string> = {};
+    headers.Authorization = token;
     
     // Get the current user's media from backend
     const res = await fetch(`${baseUrl}/api/v1/media/user/me`, {
-      headers: {
-        'Authorization': token || '',
-      },
+      headers,
     });
 
     if (!res.ok) {
@@ -40,21 +47,29 @@ export async function POST(request: NextRequest) {
   try {
     console.log('[API Route] Media metadata save request received');
     const token = request.headers.get('authorization');
-    const formData = await request.formData();
-    
-    // Extract metadata (file has already been uploaded to Cloudinary)
-    const title = formData.get('title');
-    const type = formData.get('type');
-    const url = formData.get('url');
-    const cloudinaryPublicId = formData.get('cloudinaryPublicId');
-    const duration = formData.get('duration');
-    const format = formData.get('format');
-    const resourceType = formData.get('resourceType');
+    if (!token) {
+      return NextResponse.json({ error: 'Authorization required' }, { status: 401 });
+    }
+
+    const contentType = request.headers.get('content-type') || '';
+    const isJson = contentType.includes('application/json');
+
+    const requestData = isJson ? await request.json() : await request.formData();
+    const getField = (field: string) =>
+      isJson ? (requestData as any)[field] : (requestData as FormData).get(field);
+
+    const title = getField('title');
+    const type = getField('type');
+    const url = getField('url');
+    const cloudinaryPublicId = getField('cloudinaryPublicId');
+    const duration = getField('duration');
+    const format = getField('format');
+    const resourceType = getField('resourceType');
     
     console.log('[API Route] Received metadata:', { title, type, url, cloudinaryPublicId });
 
     // Check if this is a file upload (old way) or metadata-only (new way)
-    const file = formData.get('file');
+    const file = isJson ? null : (requestData as FormData).get('file');
     
     if (file && file instanceof File) {
       // Old way: File upload - shouldn't happen anymore but keep for compatibility
@@ -66,13 +81,13 @@ export async function POST(request: NextRequest) {
         controller.abort();
       }, 50000);
       const baseUrl = getBackendBaseUrl();
+      const formData = requestData as FormData;
 
       try {
+        const headers: Record<string, string> = { Authorization: token };
         const res = await fetch(`${baseUrl}/api/v1/media/upload`, {
           method: 'POST',
-          headers: {
-            'Authorization': token || '',
-          },
+          headers,
           body: formData,
           signal: controller.signal,
         });
@@ -111,18 +126,18 @@ export async function POST(request: NextRequest) {
       }
 
       // Create metadata object for database
-      const coverUrl = formData.get('artCoverUrl') || formData.get('coverUrl');
-      const description = formData.get('description');
-      const genre = formData.get('genre');
-      const accessType = formData.get('accessType');
-      const price = formData.get('price');
-      const isExplicit = formData.get('isExplicit');
-      const allowReselling = formData.get('allowReselling');
-      const artistCommissionRate = formData.get('artistCommissionRate');
-      const platformCommissionRate = formData.get('platformCommissionRate');
-      const tags = formData.get('tags');
-      const releaseType = formData.get('releaseType');
-      const albumId = formData.get('albumId');
+      const coverUrl = getField('artCoverUrl') || getField('coverUrl');
+      const description = getField('description');
+      const genre = getField('genre');
+      const accessType = getField('accessType');
+      const price = getField('price');
+      const isExplicit = getField('isExplicit');
+      const allowReselling = getField('allowReselling');
+      const artistCommissionRate = getField('artistCommissionRate');
+      const platformCommissionRate = getField('platformCommissionRate');
+      const tags = getField('tags');
+      const releaseType = getField('releaseType');
+      const albumId = getField('albumId');
       const baseUrl = getBackendBaseUrl();
 
       const metadata = {
@@ -130,15 +145,15 @@ export async function POST(request: NextRequest) {
         type,
         url,
         cloudinaryPublicId,
-        duration: duration ? parseInt(duration as string) : 0,
+        duration: duration ? Number(duration) : 0,
         format,
         resourceType,
         description: description ? String(description) : undefined,
         genre: genre ? String(genre) : undefined,
         accessType: accessType ? String(accessType) : undefined,
         price: price ? Number(price) : undefined,
-        isExplicit: String(isExplicit) === 'true',
-        allowReselling: String(allowReselling) === 'true',
+        isExplicit: isJson ? Boolean(isExplicit) : String(isExplicit) === 'true',
+        allowReselling: isJson ? Boolean(allowReselling) : String(allowReselling) === 'true',
         artistCommissionRate: artistCommissionRate ? Number(artistCommissionRate) : undefined,
         platformCommissionRate: platformCommissionRate ? Number(platformCommissionRate) : undefined,
         tags: tags ? String(tags) : undefined,
@@ -148,10 +163,11 @@ export async function POST(request: NextRequest) {
       };
 
       // Send to backend to save metadata only (no file upload)
+      const headers: Record<string, string> = { Authorization: token };
       const res = await fetch(`${baseUrl}/api/v1/media/save-metadata`, {
         method: 'POST',
         headers: {
-          'Authorization': token || '',
+          ...headers,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(metadata),
@@ -191,12 +207,13 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Delete media from backend
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${mediaId}`, {
+    const headers: Record<string, string> = {};
+    if (token) headers.Authorization = token;
+
+    const baseUrl = getBackendBaseUrl();
+    const res = await fetch(`${baseUrl}/api/v1/media/${mediaId}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': token || '',
-      },
+      headers,
     });
 
     if (!res.ok) {
