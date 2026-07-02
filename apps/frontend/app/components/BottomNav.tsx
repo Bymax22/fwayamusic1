@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Compass, Search, Library, MoreHorizontal } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface BottomNavProps {
   onMoreClick?: () => void;
@@ -12,9 +13,10 @@ interface BottomNavProps {
 export default function BottomNav({ onMoreClick }: BottomNavProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const navItems = [
-    { id: "home", label: "Fwaya", icon: null, image: "/fwaya-lp-01.png", inactiveImage: "/fwaya white icon-01.png", href: "/" },
+    { id: "home", label: "Home", icon: null, image: "/fwaya-lp-01.png", inactiveImage: "/fwaya white icon-01.png", href: user ? "/guestwelcome" : "/" },
     { id: "browse", label: "Browse", icon: Compass, href: "/browse" },
     { id: "search", label: "Search", icon: Search, href: "/search" },
     { id: "library", label: "Library", icon: Library, href: "/library" },

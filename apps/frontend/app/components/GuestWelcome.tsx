@@ -18,10 +18,12 @@ import {
   FaList,
   FaMicrophone,
   FaBookOpen,
-  FaHeadphones
+  FaHeadphones,
+  FaChevronDown
 } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { useAuth } from "@/context/AuthContext";
 import MobileMenu from "./MobileMenu";
 
 export default function GuestWelcome() {
@@ -42,7 +44,40 @@ export default function GuestWelcome() {
   const [otherVideos, setOtherVideos] = useState<any[]>([]);
   const [playlists, setPlaylists] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
+  const { user, logout } = useAuth();
+
+  const getDashboardPath = (role?: string) => {
+    switch (role?.toUpperCase()) {
+      case 'ARTIST':
+        return '/for-artists';
+      case 'RESELLER':
+        return '/reseller-dashboard';
+      case 'PRODUCER':
+        return '/producer';
+      case 'ADMIN':
+      case 'MODERATOR':
+        return '/admin';
+      default:
+        return '/';
+    }
+  };
+
+  const handleUserMenuNavigation = (path: string) => {
+    setShowUserMenu(false);
+    router.push(path);
+  };
+
+  const handleUserLogout = async () => {
+    setShowUserMenu(false);
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    router.push('/auth/logout');
+  };
 
   // Animation state for Discover text
   const [isDiscoverAnimating, setIsDiscoverAnimating] = useState(false);
@@ -405,6 +440,74 @@ export default function GuestWelcome() {
                 <button className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400">
                   Premium
                 </button>
+                {user && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                      className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-2 text-sm text-white transition hover:border-white/30"
+                    >
+                      <span className="relative inline-flex h-8 w-8 overflow-hidden rounded-full bg-purple-500 text-white">
+                        {user.avatarUrl ? (
+                          <Image
+                            src={user.avatarUrl}
+                            alt={user.displayName || user.username || 'User'}
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/default-avatar.png';
+                            }}
+                          />
+                        ) : (
+                          <span className="flex h-full w-full items-center justify-center text-sm font-semibold">
+                            {(user.displayName || user.username || 'U').charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </span>
+                      <FaChevronDown className="h-4 w-4 text-white/80" />
+                    </button>
+
+                    {showUserMenu && (
+                      <div className="absolute right-0 top-full mt-2 w-56 rounded-3xl border border-white/10 bg-[#0b0b16]/95 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl z-50">
+                        <button
+                          onClick={() => handleUserMenuNavigation(getDashboardPath(user.role))}
+                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
+                        >
+                          Go to Dashboard
+                        </button>
+                        <button
+                          onClick={() => handleUserMenuNavigation('/profile')}
+                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
+                        >
+                          Profile
+                        </button>
+                        <button
+                          onClick={() => handleUserMenuNavigation('/browse')}
+                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
+                        >
+                          Browse
+                        </button>
+                        <button
+                          onClick={() => handleUserMenuNavigation('/videos')}
+                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
+                        >
+                          Videos
+                        </button>
+                        <button
+                          onClick={() => handleUserMenuNavigation('/settings')}
+                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition"
+                        >
+                          Settings
+                        </button>
+                        <button
+                          onClick={handleUserLogout}
+                          className="w-full rounded-2xl px-4 py-3 text-left text-sm text-red-400 hover:bg-white/10 transition"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
