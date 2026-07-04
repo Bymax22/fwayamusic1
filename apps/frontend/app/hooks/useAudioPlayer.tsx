@@ -157,7 +157,6 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
         media.removeEventListener('error', handleError);
         media.removeEventListener('playing', handlePlaying);
         media.removeEventListener('pause', handlePause);
-        media.pause();
       });
     };
   }, [currentTrack, isMuted, volume, registeredVideoElement]);

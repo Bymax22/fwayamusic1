@@ -94,12 +94,22 @@ export default function VideoWatchPlayer({
 
     video.preload = "metadata";
     video.playsInline = true;
+    video.crossOrigin = "anonymous";
+    video.disablePictureInPicture = true;
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
     video.muted = isMuted;
     video.volume = volume;
     video.playbackRate = playbackRate;
-    video.crossOrigin = "anonymous";
-    video.disablePictureInPicture = true;
-    video.src = videoUrl;
+  }, [isMuted, volume, playbackRate]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
 
     const playWhenReady = async () => {
       if (autoPlay) {
@@ -113,7 +123,7 @@ export default function VideoWatchPlayer({
     };
 
     void playWhenReady();
-  }, [videoUrl, autoPlay, isMuted, volume, playbackRate]);
+  }, [autoPlay]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -252,10 +262,12 @@ export default function VideoWatchPlayer({
         <div className="aspect-video w-full bg-black">
           <video
             ref={videoRef}
+            src={videoUrl}
             poster={poster}
             className="h-full w-full object-contain bg-black"
             onClick={togglePlayPause}
             playsInline
+            muted={isMuted}
             preload="metadata"
             disablePictureInPicture
           />
