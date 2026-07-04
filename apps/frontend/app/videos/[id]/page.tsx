@@ -294,20 +294,20 @@ export default function VideoWatchPage() {
           Back
         </button>
 
-        <div className="mb-6 rounded-3xl bg-[#121418] border border-white/10 p-4 shadow-xl shadow-black/20 lg:px-6 lg:py-4">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mb-6 rounded-3xl bg-[#090b10] p-4 shadow-lg shadow-black/30 lg:px-6 lg:py-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3 text-white">
               <img src="/fwayalogo-01.png" alt="Fwaya" className="h-10 w-auto object-contain" />
               <div>
                 <p className="text-lg font-semibold">Fwaya</p>
-                <p className="text-sm text-slate-400">Watch video with comments and playback controls</p>
+                <p className="text-sm text-slate-400">Music and video playback</p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
-                Get App
-              </button>
-              <button className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-purple-400">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-300">
+              <a href="/" className="transition hover:text-white">Home</a>
+              <a href="/videos" className="transition hover:text-white">Videos</a>
+              <a href="/artists" className="transition hover:text-white">Artists</a>
+              <button className="rounded-full bg-purple-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-purple-500">
                 Premium
               </button>
             </div>
@@ -329,7 +329,7 @@ export default function VideoWatchPage() {
         ) : (
           <div className="grid gap-8 lg:grid-cols-[1.5fr_0.9fr]">
             <div className="space-y-6">
-              <div className="rounded-3xl bg-[#181b20] border border-white/10 p-4 shadow-lg shadow-black/10">
+              <div className="rounded-3xl bg-[#0f1115] p-4 shadow-lg shadow-black/20">
                 <VideoWatchPlayer
                   videoUrl={video.videoUrl}
                   poster={video.thumbnail}
@@ -338,7 +338,7 @@ export default function VideoWatchPage() {
                   autoPlay={shouldAutoplay}
                 />
 
-                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-400">
                   <span>{video.views.toLocaleString()} views</span>
                   <span>{new Date(video.createdAt).toLocaleDateString()}</span>
                   <span>{formatDuration(video.duration)}</span>
@@ -390,9 +390,9 @@ export default function VideoWatchPage() {
                 </div>
               </div>
 
-              <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 shadow-lg shadow-black/10">
+              <div className="rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
                 <div className="flex items-center gap-3">
-                  <div className="h-14 w-14 rounded-full bg-[#121418]" />
+                  <div className="h-14 w-14 rounded-full bg-[#090b10]" />
                   <div>
                     <p className="text-sm font-semibold text-white">{video.channelName}</p>
                     <p className="text-xs text-slate-400">Channel</p>
@@ -401,7 +401,7 @@ export default function VideoWatchPage() {
                 <div className="mt-6 text-sm leading-7 text-slate-300">{video.description}</div>
               </div>
 
-              <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 shadow-lg shadow-black/10">
+              <div className="rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -532,7 +532,7 @@ export default function VideoWatchPage() {
             </div>
 
             <aside className="space-y-4">
-              <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 shadow-lg shadow-black/10">
+              <div className="rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
                 <div className="mb-4 flex items-center justify-between">
                   <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Related videos</p>
                   <button className="text-sm text-purple-400 hover:text-purple-300">See all</button>

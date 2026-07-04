@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, Volume2, VolumeX, Maximize2 } from "lucide-react";
+import { FastForward, Maximize2, Pause, Play, Rewind, Volume2, VolumeX } from "lucide-react";
 
 interface VideoWatchPlayerProps {
   videoUrl: string;
@@ -26,14 +26,13 @@ export default function VideoWatchPlayer({
   autoPlay = false,
 }: VideoWatchPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const controlsTimeoutRef = useRef<number | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.75);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [showControls, setShowControls] = useState(true);
+  const [playbackRate, setPlaybackRate] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -44,6 +43,7 @@ export default function VideoWatchPlayer({
     video.playsInline = true;
     video.muted = isMuted;
     video.volume = volume;
+    video.playbackRate = playbackRate;
     video.crossOrigin = "anonymous";
     video.disablePictureInPicture = true;
     video.src = videoUrl;
@@ -60,7 +60,7 @@ export default function VideoWatchPlayer({
     };
 
     void playWhenReady();
-  }, [videoUrl, autoPlay, isMuted, volume]);
+  }, [videoUrl, autoPlay, isMuted, volume, playbackRate]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -99,21 +99,6 @@ export default function VideoWatchPlayer({
       video.removeEventListener("error", onError);
     };
   }, []);
-
-  useEffect(() => {
-    if (!showControls || !isPlaying) return;
-    if (controlsTimeoutRef.current !== null) {
-      window.clearTimeout(controlsTimeoutRef.current);
-    }
-    controlsTimeoutRef.current = window.setTimeout(() => {
-      setShowControls(false);
-    }, 2500);
-    return () => {
-      if (controlsTimeoutRef.current !== null) {
-        window.clearTimeout(controlsTimeoutRef.current);
-      }
-    };
-  }, [showControls, isPlaying]);
 
   const togglePlayPause = async () => {
     const video = videoRef.current;
@@ -162,6 +147,23 @@ export default function VideoWatchPlayer({
     setCurrentTime(nextTime);
   };
 
+  const handleSkip = (seconds: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    const nextTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + seconds));
+    video.currentTime = nextTime;
+    setCurrentTime(nextTime);
+  };
+
+  const handlePlaybackRateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const nextRate = Number(event.target.value);
+    const video = videoRef.current;
+    setPlaybackRate(nextRate);
+    if (video) {
+      video.playbackRate = nextRate;
+    }
+  };
+
   const handleToggleFullscreen = async () => {
     const video = videoRef.current;
     if (!video) return;
@@ -179,99 +181,124 @@ export default function VideoWatchPlayer({
     }
   };
 
-  const handleUserInteraction = () => {
-    setShowControls(true);
-  };
-
   const formattedCurrent = useMemo(() => formatTime(currentTime), [currentTime]);
   const formattedDuration = useMemo(() => formatTime(duration), [duration]);
 
   return (
-    <div className="rounded-3xl bg-[#121418] border border-white/10 shadow-lg shadow-black/20 overflow-hidden">
-      <div
-        className="relative bg-black"
-        onMouseMove={handleUserInteraction}
-        onTouchStart={handleUserInteraction}
-      >
-        <video
-          ref={videoRef}
-          poster={poster}
-          className="aspect-video w-full bg-black object-contain"
-          onClick={togglePlayPause}
-          playsInline
-          preload="metadata"
-          disablePictureInPicture
-        />
+    <div className="rounded-3xl bg-[#090b10] shadow-2xl shadow-black/40 overflow-hidden">
+      <div className="bg-black">
+        <div className="aspect-video w-full bg-black">
+          <video
+            ref={videoRef}
+            poster={poster}
+            className="h-full w-full object-contain bg-black"
+            onClick={togglePlayPause}
+            playsInline
+            preload="metadata"
+            disablePictureInPicture
+          />
+        </div>
+      </div>
 
-        <div className="absolute inset-0 bg-black/20" />
-
-        <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-4 p-4 text-white">
+      <div className="bg-[#090b10] p-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-white truncate">{title}</p>
             <p className="text-xs text-slate-400 truncate">{artist}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.2em] text-slate-500">
+            <span>{formattedCurrent}</span>
+            <span>•</span>
+            <span>{formattedDuration}</span>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={togglePlayPause}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500"
+            >
+              {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSkip(-10)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+            >
+              <Rewind size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSkip(10)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+            >
+              <FastForward size={16} />
+            </button>
             <button
               type="button"
               onClick={toggleMute}
-              className="rounded-full border border-white/10 bg-black/60 p-2 text-white transition hover:bg-white/10"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
             >
               {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
             </button>
             <button
               type="button"
               onClick={handleToggleFullscreen}
-              className="rounded-full border border-white/10 bg-black/60 p-2 text-white transition hover:bg-white/10"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-4 text-sm text-white transition hover:bg-slate-800"
             >
               <Maximize2 size={16} />
+              Fullscreen
             </button>
           </div>
-        </div>
 
-        {showControls && (
-          <div className="absolute inset-x-0 bottom-0 p-4">
-            <div className="mb-3 flex items-center justify-between gap-3 rounded-3xl border border-white/10 bg-black/70 p-3 backdrop-blur">
-              <button
-                type="button"
-                onClick={togglePlayPause}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+          <div className="grid gap-3 sm:grid-cols-[1.4fr_0.9fr]">
+            <div className="flex items-center gap-3 rounded-3xl bg-[#0f1115] px-4 py-3 text-sm text-slate-300">
+              <span className="uppercase tracking-[0.2em] text-slate-500">Volume</span>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={volume}
+                onChange={handleVolumeChange}
+                className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple-500"
+              />
+              <span className="min-w-[40px] text-right">{Math.round(volume * 100)}%</span>
+            </div>
+            <div className="flex items-center gap-3 rounded-3xl bg-[#0f1115] px-4 py-3 text-sm text-slate-300">
+              <span className="uppercase tracking-[0.2em] text-slate-500">Speed</span>
+              <select
+                value={playbackRate}
+                onChange={handlePlaybackRateChange}
+                className="rounded-2xl bg-[#090b10] px-3 py-2 text-sm text-white outline-none"
               >
-                {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-              </button>
-              <div className="min-w-0 flex-1">
-                <input
-                  type="range"
-                  min={0}
-                  max={duration || 0}
-                  value={currentTime}
-                  onChange={handleSeek}
-                  className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/20 accent-purple-500"
-                />
-                <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
-                  <span>{formattedCurrent}</span>
-                  <span>{formattedDuration}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">Vol</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  value={volume}
-                  onChange={handleVolumeChange}
-                  className="h-1 w-24 cursor-pointer appearance-none rounded-full bg-white/20 accent-purple-500"
-                />
-              </div>
+                {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
+                  <option key={rate} value={rate} className="bg-[#090b10] text-white">
+                    {rate}x
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
-        )}
 
-        {!isReady && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-sm text-slate-300">Loading video…</div>
-        )}
+          <div className="rounded-3xl bg-[#0f1115] px-4 py-3">
+            <input
+              type="range"
+              min={0}
+              max={duration || 0}
+              value={currentTime}
+              onChange={handleSeek}
+              className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple-500"
+            />
+          </div>
+        </div>
       </div>
+
+      {!isReady && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-sm text-slate-300">Loading video…</div>
+      )}
     </div>
   );
 }
