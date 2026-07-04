@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Play, Pause, X } from "lucide-react";
+import { Play, Pause, X, Maximize2 } from "lucide-react";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 export default function VideoMiniPlayer() {
@@ -9,14 +9,22 @@ export default function VideoMiniPlayer() {
   const pathname = usePathname();
   const { currentTrack, isPlaying, togglePlay, stopTrack } = useAudioPlayer();
   const [isVisible, setIsVisible] = useState(false);
+  const previousPathRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (currentTrack?.type === "VIDEO") {
+    const wasWatchPage = previousPathRef.current?.startsWith("/videos/");
+    const isWatchPage = pathname?.startsWith("/videos/");
+
+    if (wasWatchPage && !isWatchPage && currentTrack?.type === "VIDEO" && isPlaying) {
       setIsVisible(true);
-    } else {
+    }
+
+    if (isWatchPage) {
       setIsVisible(false);
     }
-  }, [currentTrack]);
+
+    previousPathRef.current = pathname ?? null;
+  }, [pathname, currentTrack, isPlaying]);
 
   if (!isVisible || !currentTrack) return null;
   if (pathname?.startsWith("/videos/") && String(currentTrack.id) === pathname.split("/videos/")[1]) {
