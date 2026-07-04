@@ -331,19 +331,6 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       videoElement.preload = 'auto';
       videoElement.crossOrigin = 'anonymous';
 
-      if (currentTrack?.type === 'VIDEO') {
-        const mediaUrl = applyAudioQualityToUrl(currentTrack.videoUrl || currentTrack.audioUrl || currentTrack.url || '');
-        if (mediaUrl && videoElement.src !== mediaUrl) {
-          videoElement.src = mediaUrl;
-        }
-        videoElement.currentTime = previousVideo?.currentTime ?? videoElement.currentTime ?? 0;
-        if (isPlaying) {
-          void videoElement.play().catch((err) => {
-            console.warn('GlobalPlayer: Failed to resume registered video element:', err);
-          });
-        }
-      }
-
       if (previousVideo && previousVideo !== videoElement) {
         previousVideo.pause();
       }

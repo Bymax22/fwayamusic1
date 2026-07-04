@@ -41,6 +41,7 @@ export default function VideoWatchPlayer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
   const touchProgressTimeout = useRef<number | null>(null);
+  const lastTimeUpdateRef = useRef<number>(0);
 
   const { currentTrack, setCurrentTrack, registerVideoElement } = useAudioPlayer();
 
@@ -135,12 +136,19 @@ export default function VideoWatchPlayer({
     };
 
     const onTimeUpdate = () => {
-      setCurrentTime(video.currentTime || 0);
+      const nextTime = video.currentTime || 0;
+      const now = performance.now();
+      const shouldUpdate = showProgress || now - lastTimeUpdateRef.current > 250;
+      if (shouldUpdate) {
+        setCurrentTime(nextTime);
+        lastTimeUpdateRef.current = now;
+      }
     };
 
     const onPlay = () => {
       setIsPlaying(true);
       updateGlobalTrack();
+      setCurrentTime(video.currentTime || 0);
     };
     const onPause = () => setIsPlaying(false);
     const onEnded = () => setIsPlaying(false);
@@ -213,6 +221,12 @@ export default function VideoWatchPlayer({
     video.currentTime = nextTime;
     setCurrentTime(nextTime);
   };
+
+  useEffect(() => {
+    if (showProgress && videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime || 0);
+    }
+  }, [showProgress]);
 
   const handleSkip = (seconds: number) => {
     const video = videoRef.current;
