@@ -1,11 +1,10 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { Play, Pause, Volume2, VolumeX, Maximize2 } from "lucide-react";
 import { FaHeart, FaShare, FaDownload, FaReply, FaCheckCircle } from "react-icons/fa";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/context/AuthContext";
-import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import VideoWatchPlayer from "@/components/VideoWatchPlayer";
 import VideoCard from "@/components/VideoCard";
 
 interface VideoDetail {
@@ -66,9 +65,6 @@ export default function VideoWatchPage() {
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState('');
   const [likedComments, setLikedComments] = useState<number[]>([]);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  const { currentTrack, isPlaying, isMuted, playTrack, togglePlay, toggleMute, registerVideoElement } = useAudioPlayer();
 
   const fetchComments = async (mediaId?: string) => {
     try {
@@ -84,7 +80,7 @@ export default function VideoWatchPage() {
     }
   };
 
-  const fetchLikedCommentIds = async (mediaId?: string) => {
+  const fetchLikedCommentIds = async (mediaId?: string | number) => {
     try {
       const targetId = mediaId || videoId;
       if (!targetId) return;
@@ -112,16 +108,6 @@ export default function VideoWatchPage() {
 
   const videoId = Array.isArray(params.id) ? params.id[0] : params.id;
   const shouldAutoplay = searchParams?.get('autoplay') === '1';
-  const playTrackRef = useRef(playTrack);
-
-  useEffect(() => {
-    playTrackRef.current = playTrack;
-  }, [playTrack]);
-
-  const isCurrentVideo = useMemo(
-    () => currentTrack?.type === 'VIDEO' && String(currentTrack.id) === String(video?.id),
-    [currentTrack, video?.id],
-  );
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -172,18 +158,6 @@ export default function VideoWatchPage() {
         };
         setVideo(mapped);
 
-        if (shouldAutoplay && mapped.videoUrl) {
-          playTrackRef.current?.({
-            id: mapped.id,
-            title: mapped.title,
-            artist: mapped.artist,
-            imageUrl: mapped.thumbnail,
-            videoUrl: mapped.videoUrl,
-            type: 'VIDEO',
-            duration: mapped.duration,
-          });
-        }
-
         await Promise.all([fetchComments(videoId), fetchLikedCommentIds(videoId)]);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unable to load video");
@@ -196,34 +170,6 @@ export default function VideoWatchPage() {
       void fetchVideo();
     }
   }, [videoId, shouldAutoplay]);
-
-  useEffect(() => {
-    if (!videoRef.current) return;
-    registerVideoElement(videoRef.current);
-    return () => registerVideoElement(null);
-  }, [registerVideoElement]);
-
-  const handlePlay = async () => {
-    if (!video) return;
-    if (isCurrentVideo) {
-      togglePlay();
-      return;
-    }
-
-    playTrack({
-      id: video.id,
-      title: video.title,
-      artist: video.artist,
-      imageUrl: video.thumbnail,
-      videoUrl: video.videoUrl,
-      type: 'VIDEO',
-      duration: video.duration,
-    });
-  };
-
-  const handleMute = () => {
-    toggleMute();
-  };
 
   const handlePostComment = async () => {
     if (!newComment.trim() || !video) return;
@@ -324,10 +270,12 @@ export default function VideoWatchPage() {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Reply failed response', response.status, errorText);
         throw new Error('Failed to post reply');
       }
 
-      await fetchComments();
+      await Promise.all([fetchComments(), fetchLikedCommentIds(video.id)]);
       setReplyText('');
       setReplyingTo(null);
     } catch (err) {
@@ -346,36 +294,50 @@ export default function VideoWatchPage() {
           Back
         </button>
 
+        <div className="mb-6 rounded-3xl bg-[#121418] border border-white/10 p-4 shadow-xl shadow-black/20 lg:px-6 lg:py-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center gap-3 text-white">
+              <img src="/fwayalogo-01.png" alt="Fwaya" className="h-10 w-auto object-contain" />
+              <div>
+                <p className="text-lg font-semibold">Fwaya</p>
+                <p className="text-sm text-slate-400">Watch video with comments and playback controls</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
+                Get App
+              </button>
+              <button className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-purple-400">
+                Premium
+              </button>
+            </div>
+          </div>
+        </div>
+
         {error ? (
-          <div className="rounded-3xl bg-slate-950 p-6 text-sm text-red-300">{error}</div>
+          <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 text-sm text-red-300">{error}</div>
         ) : loading || !video ? (
           <div className="space-y-4">
-            <div className="h-[420px] rounded-3xl bg-slate-900 animate-pulse" />
-            <div className="h-8 w-3/5 rounded-full bg-slate-900 animate-pulse" />
+            <div className="h-[420px] rounded-3xl bg-[#121418] animate-pulse" />
+            <div className="h-8 w-3/5 rounded-full bg-[#121418] animate-pulse" />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="h-48 rounded-3xl bg-slate-900 animate-pulse" />
+                <div key={index} className="h-48 rounded-3xl bg-[#121418] animate-pulse" />
               ))}
             </div>
           </div>
         ) : (
           <div className="grid gap-8 lg:grid-cols-[1.5fr_0.9fr]">
             <div className="space-y-6">
-              <div className="rounded-3xl bg-slate-950 p-4">
-                <div className="aspect-video w-full overflow-hidden rounded-3xl bg-slate-900">
-                  <video
-                    ref={videoRef}
-                    src={video.videoUrl}
-                    controls
-                    autoPlay={shouldAutoplay}
-                    muted={isMuted}
-                    className="h-full w-full bg-black"
-                    onClick={() => {}}
-                    onTouchStart={() => {}}
-                    onMouseMove={() => {}}
-                  />
-                </div>
-                <p className="mt-2 text-sm text-slate-400">{video.artist}</p>
+              <div className="rounded-3xl bg-[#181b20] border border-white/10 p-4 shadow-lg shadow-black/10">
+                <VideoWatchPlayer
+                  videoUrl={video.videoUrl}
+                  poster={video.thumbnail}
+                  title={video.title}
+                  artist={video.artist}
+                  autoPlay={shouldAutoplay}
+                />
+
                 <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
                   <span>{video.views.toLocaleString()} views</span>
                   <span>{new Date(video.createdAt).toLocaleDateString()}</span>
@@ -383,44 +345,6 @@ export default function VideoWatchPage() {
                 </div>
 
                 <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <button
-                    onClick={handlePlay}
-                    className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-500"
-                  >
-                    {isCurrentVideo && isPlaying ? <Pause size={16} /> : <Play size={16} />}
-                    {isCurrentVideo && isPlaying ? 'Pause' : 'Play'}
-                  </button>
-                  <button
-                    onClick={handleMute}
-                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
-                  >
-                    {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                    {isMuted ? 'Unmute' : 'Mute'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      const videoEl = videoRef.current;
-                      if (!videoEl) return;
-                      if (document.fullscreenElement) {
-                        document.exitFullscreen().catch(console.error);
-                      } else {
-                        videoEl.requestFullscreen().catch(console.error);
-                      }
-                    }}
-                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
-                  >
-                    <Maximize2 size={16} />
-                    Fullscreen
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsLiked(true);
-                    }}
-                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
-                  >
-                    <FaHeart size={16} className={isLiked ? 'text-red-400' : ''} />
-                    {isLiked ? 'Liked' : 'Like'}
-                  </button>
                   <button
                     onClick={() => {
                       const shareUrl = `${window.location.origin}/videos/${video.id}`;
@@ -466,9 +390,9 @@ export default function VideoWatchPage() {
                 </div>
               </div>
 
-              <div className="rounded-3xl bg-slate-950 p-6">
+              <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 shadow-lg shadow-black/10">
                 <div className="flex items-center gap-3">
-                  <div className="h-14 w-14 rounded-full bg-slate-800" />
+                  <div className="h-14 w-14 rounded-full bg-[#121418]" />
                   <div>
                     <p className="text-sm font-semibold text-white">{video.channelName}</p>
                     <p className="text-xs text-slate-400">Channel</p>
@@ -477,7 +401,7 @@ export default function VideoWatchPage() {
                 <div className="mt-6 text-sm leading-7 text-slate-300">{video.description}</div>
               </div>
 
-              <div className="rounded-3xl bg-slate-950 p-6">
+              <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 shadow-lg shadow-black/10">
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -492,7 +416,7 @@ export default function VideoWatchPage() {
                       onChange={(e) => setNewComment(e.target.value)}
                       rows={4}
                       placeholder="Write a comment..."
-                      className="w-full rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-purple-500 focus:outline-none"
+                      className="w-full rounded-3xl border border-white/10 bg-[#121418] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-purple-500 focus:outline-none"
                     />
                     <button
                       onClick={handlePostComment}
@@ -505,12 +429,12 @@ export default function VideoWatchPage() {
 
                   <div className="space-y-4 pt-4">
                     {comments.length === 0 ? (
-                      <div className="rounded-3xl bg-slate-900 p-4 text-sm text-slate-400">
+                      <div className="rounded-3xl bg-[#121418] p-4 text-sm text-slate-400">
                         No comments yet. Be the first to share your thoughts.
                       </div>
                     ) : (
                       comments.map((comment) => (
-                        <div key={comment.id} className="rounded-3xl bg-slate-900 p-4">
+                        <div key={comment.id} className="rounded-3xl bg-[#121418] p-4">
                           <div className="flex items-start gap-3">
                             <img
                               src={comment.userAvatar}
@@ -542,6 +466,31 @@ export default function VideoWatchPage() {
                                   Reply
                                 </button>
                               </div>
+
+                              {comment.replies && comment.replies.length > 0 && (
+                                <div className="mt-4 space-y-4 rounded-3xl bg-[#121418] p-4">
+                                  {comment.replies.map((reply) => (
+                                    <div key={reply.id} className="rounded-3xl bg-[#14161b] p-4">
+                                      <div className="flex items-start gap-3">
+                                        <img
+                                          src={reply.userAvatar}
+                                          alt={reply.userName}
+                                          className="h-10 w-10 rounded-full object-cover bg-slate-800"
+                                        />
+                                        <div className="flex-1">
+                                          <div className="flex flex-wrap items-center gap-2">
+                                            <p className="text-sm font-semibold text-white">{reply.userName}</p>
+                                            {reply.isVerified && <FaCheckCircle className="h-4 w-4 text-sky-400" />}
+                                            <span className="text-xs text-slate-500">{formatDistanceToNow(new Date(reply.timestamp), { addSuffix: true })}</span>
+                                          </div>
+                                          <p className="mt-2 text-sm leading-6 text-slate-300">{reply.content}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
                               {replyingTo === comment.id && (
                                 <div className="mt-3 space-y-3">
                                   <textarea
@@ -583,7 +532,7 @@ export default function VideoWatchPage() {
             </div>
 
             <aside className="space-y-4">
-              <div className="rounded-3xl bg-slate-950 p-6">
+              <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 shadow-lg shadow-black/10">
                 <div className="mb-4 flex items-center justify-between">
                   <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Related videos</p>
                   <button className="text-sm text-purple-400 hover:text-purple-300">See all</button>
