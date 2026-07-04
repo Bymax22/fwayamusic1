@@ -214,47 +214,71 @@ export default function VideoWatchPlayer({
         </div>
 
         <div className="mt-4 flex flex-col gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={togglePlayPause}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500"
-            >
-              {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSkip(-10)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
-            >
-              <Rewind size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSkip(10)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
-            >
-              <FastForward size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={toggleMute}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
-            >
-              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            </button>
-            <button
-              type="button"
-              onClick={handleToggleFullscreen}
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-4 text-sm text-white transition hover:bg-slate-800"
-            >
-              <Maximize2 size={16} />
-              Fullscreen
-            </button>
+          <div className="rounded-3xl bg-[#0f1115] px-4 py-3">
+            <input
+              type="range"
+              min={0}
+              max={duration || 0}
+              value={currentTime}
+              onChange={handleSeek}
+              className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple-500"
+            />
+            <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
+              <span>{formattedCurrent}</span>
+              <span>{formattedDuration}</span>
+            </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-[1.4fr_0.9fr]">
-            <div className="flex items-center gap-3 rounded-3xl bg-[#0f1115] px-4 py-3 text-sm text-slate-300">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleSkip(-10)}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                aria-label="Rewind 10 seconds"
+              >
+                <Rewind size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={togglePlayPause}
+                className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500"
+                aria-label={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSkip(10)}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                aria-label="Forward 10 seconds"
+              >
+                <FastForward size={16} />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleMute}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                aria-label={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
+              <button
+                type="button"
+                onClick={handleToggleFullscreen}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                aria-label="Fullscreen"
+              >
+                <Maximize2 size={16} />
+              </button>
+            </div>
+          </div>
+
+          <div className="hidden grid-cols-[1.4fr_0.9fr] gap-3 sm:grid">
+            <div className="flex items-center gap-2 rounded-3xl bg-[#0f1115] px-3 py-3 text-sm text-slate-300">
               <span className="uppercase tracking-[0.2em] text-slate-500">Volume</span>
               <input
                 type="range"
@@ -265,9 +289,9 @@ export default function VideoWatchPlayer({
                 onChange={handleVolumeChange}
                 className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple-500"
               />
-              <span className="min-w-[40px] text-right">{Math.round(volume * 100)}%</span>
+              <span className="min-w-[40px] text-right text-xs text-slate-400">{Math.round(volume * 100)}%</span>
             </div>
-            <div className="flex items-center gap-3 rounded-3xl bg-[#0f1115] px-4 py-3 text-sm text-slate-300">
+            <div className="flex items-center justify-between gap-3 rounded-3xl bg-[#0f1115] px-3 py-3 text-sm text-slate-300">
               <span className="uppercase tracking-[0.2em] text-slate-500">Speed</span>
               <select
                 value={playbackRate}
@@ -281,17 +305,6 @@ export default function VideoWatchPlayer({
                 ))}
               </select>
             </div>
-          </div>
-
-          <div className="rounded-3xl bg-[#0f1115] px-4 py-3">
-            <input
-              type="range"
-              min={0}
-              max={duration || 0}
-              value={currentTime}
-              onChange={handleSeek}
-              className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple-500"
-            />
           </div>
         </div>
       </div>
