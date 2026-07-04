@@ -49,10 +49,16 @@ const formatDuration = (seconds: number) => {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
-function VideoPageSkeleton() {
+function VideoPageSkeleton({ onBack }: { onBack: () => void }) {
   return (
     <div className="min-h-screen px-4 pb-24 pt-6 lg:px-10">
       <div className="max-w-7xl mx-auto space-y-6">
+        <button
+          className="mb-6 rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
+          onClick={onBack}
+        >
+          Back
+        </button>
         <div className="h-[420px] rounded-3xl bg-[#11131a] animate-pulse" />
         <div className="space-y-4 rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
           <div className="h-6 w-2/5 rounded-full bg-[#11131a] animate-pulse" />
