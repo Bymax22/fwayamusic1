@@ -20,6 +20,7 @@ import {
   FaMicrophone,
   FaBookOpen,
   FaHeadphones,
+  FaComment,
   FaChevronDown,
   FaCog,
   FaSignOutAlt
@@ -158,6 +159,14 @@ export default function GuestWelcome() {
       .join('') || 'P';
   };
 
+  const getMediaViews = (item: any) => item?.views ?? item?.playCount ?? 0;
+  const getMediaComments = (item: any) =>
+    typeof item?.commentCount === 'number'
+      ? item.commentCount
+      : Array.isArray(item?.comments)
+      ? item.comments.length
+      : 0;
+
   // Helper: fetch with timeout
   const fetchJsonWithTimeout = async (input: RequestInfo, timeout = 8000, init?: RequestInit) => {
     const controller = new AbortController();
@@ -255,7 +264,8 @@ export default function GuestWelcome() {
               ...video,
               url: video.url ? resolveMediaUrl(video.url) : video.url,
               coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt,
-              artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
+              artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined)),
+              coverPreview: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
             }))
           : [];
 
@@ -264,7 +274,8 @@ export default function GuestWelcome() {
               ...video,
               url: video.url ? resolveMediaUrl(video.url) : video.url,
               coverArt: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : video.coverArt,
-              artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
+              artCoverUrl: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined)),
+              coverPreview: video.artCoverUrl ? resolveMediaUrl(video.artCoverUrl) : (video.coverArt ? resolveMediaUrl(video.coverArt) : (video.thumbnailUrl ? resolveMediaUrl(video.thumbnailUrl) : undefined))
             }))
           : [];
 
@@ -721,24 +732,48 @@ export default function GuestWelcome() {
                 {musicVideoCards.map((item: any, i: number) => (
                   <div
                     key={i}
-                    className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+                    className="w-32 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
                     onClick={() => openVideoPlayer(item)}
                   >
                     <div className="relative aspect-[9/16]">
-                      <div
-                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
-                        style={{
-                          backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center'
-                        }}
-                      />
+                      {item.coverPreview ? (
+                        <div
+                          className="absolute inset-0 bg-black"
+                          style={{
+                            backgroundImage: `url(${item.coverPreview})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
+                          }}
+                        />
+                      ) : item.url ? (
+                        <video
+                          src={item.url}
+                          muted
+                          loop
+                          playsInline
+                          autoPlay
+                          preload="metadata"
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500" />
+                      )}
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                         <FaPlay className="text-white text-xl" />
                       </div>
                     </div>
                     <div className="p-2">
                       <p className="text-xs font-semibold truncate text-white">{item.title}</p>
+                      <div className="flex items-center justify-between text-[9px] text-gray-300 mb-1">
+                        <div className="flex items-center gap-1">
+                          <FaHeadphones className="text-[10px]" />
+                          <span>{getMediaViews(item).toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FaComment className="text-[10px]" />
+                          <span>{getMediaComments(item).toLocaleString()}</span>
+                        </div>
+                      </div>
                       <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Producer'}</p>
                     </div>
                   </div>
@@ -820,7 +855,7 @@ export default function GuestWelcome() {
                 {beats.slice(0, 6).map((beat: any, i: number) => (
                   <div
                     key={i}
-                    className="w-36 flex-shrink-0 cursor-pointer rounded-3xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+                    className="w-32 flex-shrink-0 cursor-pointer rounded-3xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
                     onClick={() => playTrack({
                       id: beat.id,
                       title: beat.title,
@@ -842,6 +877,16 @@ export default function GuestWelcome() {
                     </div>
                     <div className="p-3">
                       <p className="text-[11px] font-semibold truncate text-white mb-1">{beat.title}</p>
+                      <div className="flex items-center justify-between text-[9px] text-gray-300 mb-1">
+                        <div className="flex items-center gap-1">
+                          <FaHeadphones className="text-[10px]" />
+                          <span>{getMediaViews(beat).toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FaComment className="text-[10px]" />
+                          <span>{getMediaComments(beat).toLocaleString()}</span>
+                        </div>
+                      </div>
                       <p className="text-[10px] text-gray-400 truncate">{beat.user?.displayName || beat.user?.username || 'Unknown Producer'}</p>
                     </div>
                   </div>
@@ -1348,7 +1393,7 @@ export default function GuestWelcome() {
                 {musicVideoCards.map((item: any, i: number) => (
                   <div
                     key={i}
-                    className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+                    className="w-32 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
                     onClick={() => openVideoPlayer(item)}
                   >
                     <div className="relative aspect-[9/16]">
@@ -1366,6 +1411,16 @@ export default function GuestWelcome() {
                     </div>
                     <div className="p-2">
                       <p className="text-xs font-semibold truncate text-white">{item.title}</p>
+                      <div className="flex items-center justify-between text-[9px] text-gray-300 mb-1">
+                        <div className="flex items-center gap-1">
+                          <FaHeadphones className="text-[10px]" />
+                          <span>{getMediaViews(item).toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FaComment className="text-[10px]" />
+                          <span>{getMediaComments(item).toLocaleString()}</span>
+                        </div>
+                      </div>
                       <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Producer'}</p>
                     </div>
                   </div>
@@ -1382,7 +1437,7 @@ export default function GuestWelcome() {
                 {otherVideoCards.map((item: any, i: number) => (
                   <div
                     key={i}
-                    className="w-36 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+                    className="w-32 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
                     onClick={() => openVideoPlayer(item)}
                   >
                     <div className="relative aspect-[9/16]">
@@ -1400,6 +1455,16 @@ export default function GuestWelcome() {
                     </div>
                     <div className="p-2">
                       <p className="text-xs font-semibold truncate text-white">{item.title}</p>
+                      <div className="flex items-center justify-between text-[9px] text-gray-300 mb-1">
+                        <div className="flex items-center gap-1">
+                          <FaHeadphones className="text-[10px]" />
+                          <span>{getMediaViews(item).toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FaComment className="text-[10px]" />
+                          <span>{getMediaComments(item).toLocaleString()}</span>
+                        </div>
+                      </div>
                       <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Artist'}</p>
                     </div>
                   </div>
@@ -1697,14 +1762,28 @@ export default function GuestWelcome() {
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
                   <div className="relative aspect-[9/16]">
-                    <div
-                      className={`absolute inset-0 ${video.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
-                      style={{
-                        backgroundImage: video.artCoverUrl ? `url(${video.artCoverUrl})` : undefined,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center'
-                      }}
-                    />
+                    {video.coverPreview ? (
+                      <div
+                        className="absolute inset-0 bg-black"
+                        style={{
+                          backgroundImage: `url(${video.coverPreview})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                    ) : video.url ? (
+                      <video
+                        src={video.url}
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                        preload="metadata"
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500" />
+                    )}
                     <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/50 transition-colors">
                       <FaPlay className="text-white text-xl" />
                     </div>
