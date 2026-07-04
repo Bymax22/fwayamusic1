@@ -2,6 +2,7 @@
 /* eslint-disable */
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Sidebar from "../components/Sidebar";
 import MobileMenu from "../components/MobileMenu";
 import Player from "../components/Player";
@@ -17,9 +18,14 @@ import { useAudioPlayer } from "../hooks/useAudioPlayer";
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const { user, authError, clearAuthError, verificationError } = useAuth();
   const { currentTrack, isPlaying, togglePlay, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute } = useAudioPlayer();
+  const pathname = usePathname();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
+
+  const isVideoWatchPage = currentTrack?.type === 'VIDEO'
+    && pathname?.startsWith('/videos/')
+    && String(currentTrack.id) === pathname.split('/videos/')[1];
 
   return (
     <div className="w-full text-white bg-transparent lg:pt-14">
@@ -94,25 +100,27 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
       {currentTrack && (
         <div className="fixed bottom-0 left-0 right-0 z-30">
           {/* Mobile Player - shows on small screens */}
-          <div className="lg:hidden">
-            <MobilePlayer
-              track={currentTrack}
-              isPlaying={isPlaying}
-              currentTime={currentTime}
-              duration={duration}
-              volume={volume}
-              isMuted={isMuted}
-              isLoading={isLoading}
-              onPlayPause={togglePlay}
-              onClose={stopTrack}
-              onNext={() => console.log('Next track')}
-              onPrevious={() => console.log('Previous track')}
-              onRepeat={() => console.log('Toggle repeat')}
-              onSeek={seekTo}
-              onVolumeChange={setVolume}
-              onToggleMute={toggleMute}
-            />
-          </div>
+          {!isVideoWatchPage && (
+            <div className="lg:hidden">
+              <MobilePlayer
+                track={currentTrack}
+                isPlaying={isPlaying}
+                currentTime={currentTime}
+                duration={duration}
+                volume={volume}
+                isMuted={isMuted}
+                isLoading={isLoading}
+                onPlayPause={togglePlay}
+                onClose={stopTrack}
+                onNext={() => console.log('Next track')}
+                onPrevious={() => console.log('Previous track')}
+                onRepeat={() => console.log('Toggle repeat')}
+                onSeek={seekTo}
+                onVolumeChange={setVolume}
+                onToggleMute={toggleMute}
+              />
+            </div>
+          )}
           
           {/* Desktop Player - shows on large screens */}
           <div className="hidden lg:block bg-black/80 backdrop-blur-xl border-t border-white/10">

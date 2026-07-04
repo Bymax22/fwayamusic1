@@ -115,6 +115,7 @@ model User {
   liveStreams            LiveStream[]
   media                  Media[]
   mediaComments          MediaComment[]
+  mediaCommentLikes      MediaCommentLike[]
   interactions           MediaInteraction[]
   ratings                MediaRating[]
   news                   News[]
@@ -392,14 +393,29 @@ model MediaComment {
   isEdited  Boolean        @default(false) @map("is_edited")
   isPinned  Boolean        @default(false) @map("is_pinned")
   media     Media          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  parent    MediaComment?  @relation("CommentReplies", fields: [parentId], references: [id])
-  replies   MediaComment[] @relation("CommentReplies")
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent       MediaComment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  replies      MediaComment[]      @relation("CommentReplies")
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentLikes MediaCommentLike[]
 
   @@index([mediaId])
   @@index([userId])
   @@index([parentId])
   @@map("media_comments")
+}
+
+model MediaCommentLike {
+  id        Int          @id @default(autoincrement())
+  commentId Int          @map("comment_id")
+  userId    Int          @map("user_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  comment   MediaComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId], name: "commentId_userId")
+  @@index([userId])
+  @@map("media_comment_likes")
 }
 
 model MediaInteraction {

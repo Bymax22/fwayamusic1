@@ -65,9 +65,50 @@ export default function VideoWatchPage() {
   const [isSaved, setIsSaved] = useState(false);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [likedComments, setLikedComments] = useState<number[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const { currentTrack, isPlaying, isMuted, playTrack, togglePlay, toggleMute, registerVideoElement } = useAudioPlayer();
+
+  const fetchComments = async (mediaId?: string) => {
+    try {
+      setComments([]);
+      const targetId = mediaId || videoId;
+      if (!targetId) return;
+      const commentsResponse = await fetch(`/api/media/${targetId}/comments`);
+      if (!commentsResponse.ok) return;
+      const commentsData = await commentsResponse.json();
+      setComments(commentsData);
+    } catch (err) {
+      console.warn('Unable to fetch comments', err);
+    }
+  };
+
+  const fetchLikedCommentIds = async (mediaId?: string) => {
+    try {
+      const targetId = mediaId || videoId;
+      if (!targetId) return;
+      const token = await getToken();
+      if (!token) {
+        setLikedComments([]);
+        return;
+      }
+
+      const response = await fetch(`/api/media/${targetId}/comments/likes`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) return;
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setLikedComments(data.map((id) => Number(id)).filter((id) => Number.isFinite(id)));
+      }
+    } catch (err) {
+      console.warn('Unable to fetch liked comments', err);
+    }
+  };
 
   const videoId = Array.isArray(params.id) ? params.id[0] : params.id;
   const shouldAutoplay = searchParams?.get('autoplay') === '1';
@@ -143,23 +184,11 @@ export default function VideoWatchPage() {
           });
         }
 
-        void fetchComments();
+        await Promise.all([fetchComments(videoId), fetchLikedCommentIds(videoId)]);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unable to load video");
       } finally {
         setLoading(false);
-      }
-    };
-
-    const fetchComments = async () => {
-      try {
-        setComments([]);
-        const commentsResponse = await fetch(`/api/media/${videoId}/comments`);
-        if (!commentsResponse.ok) return;
-        const commentsData = await commentsResponse.json();
-        setComments(commentsData);
-      } catch (err) {
-        console.warn('Unable to fetch comments', err);
       }
     };
 
@@ -220,8 +249,7 @@ export default function VideoWatchPage() {
         throw new Error('Failed to post comment');
       }
 
-      const savedComment = await response.json();
-      setComments((prev) => [savedComment, ...prev]);
+      await fetchComments();
       setNewComment('');
     } catch (err) {
       console.error('Failed to post comment', err);
@@ -231,16 +259,49 @@ export default function VideoWatchPage() {
     }
   };
 
-  const handleToggleCommentLike = (commentId: number) => {
-    setComments((prev) =>
-      prev.map((comment) => {
-        if (comment.id !== commentId) return comment;
-        return {
-          ...comment,
-          likes: comment.likes + 1,
-        };
-      }),
-    );
+  const handleToggleCommentLike = async (commentId: number) => {
+    if (!video) return;
+
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to like comments.');
+      return;
+    }
+
+    const isCurrentlyLiked = likedComments.includes(commentId);
+    const method = isCurrentlyLiked ? 'DELETE' : 'POST';
+
+    try {
+      const response = await fetch(`/api/media/${video.id}/comments/${commentId}/like`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update comment like');
+      }
+
+      const updated = await response.json();
+      setComments((prev) =>
+        prev.map((comment) => {
+          if (comment.id !== commentId) return comment;
+          return {
+            ...comment,
+            likes: updated.likes,
+          };
+        }),
+      );
+
+      setLikedComments((prev) =>
+        isCurrentlyLiked ? prev.filter((id) => id !== commentId) : [...prev, commentId],
+      );
+    } catch (err) {
+      console.error('Failed to update comment like', err);
+      alert('Unable to update like. Please try again.');
+    }
   };
 
   const handleReply = async (commentId: number) => {
@@ -266,17 +327,7 @@ export default function VideoWatchPage() {
         throw new Error('Failed to post reply');
       }
 
-      const savedReply = await response.json();
-      setComments((prev) =>
-        prev.map((comment) =>
-          comment.id === commentId
-            ? {
-                ...comment,
-                replies: [...(comment.replies || []), savedReply],
-              }
-            : comment,
-        ),
-      );
+      await fetchComments();
       setReplyText('');
       setReplyingTo(null);
     } catch (err) {
@@ -477,7 +528,7 @@ export default function VideoWatchPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleToggleCommentLike(comment.id)}
-                                  className="inline-flex items-center gap-2 text-slate-300 hover:text-white"
+                                  className={`inline-flex items-center gap-2 ${likedComments.includes(comment.id) ? 'text-red-400' : 'text-slate-300 hover:text-white'}`}
                                 >
                                   <FaHeart size={14} />
                                   {comment.likes}

@@ -56,12 +56,16 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [registeredVideoElement, setRegisteredVideoElement] = useState<HTMLVideoElement | null>(null);
 
   const isVideoUrl = (url?: string) => Boolean(url && /\.(mp4|mov|m4v|webm|avi|mkv)(\?.*)?$/i.test(url));
   const isVideoTrack = (track?: Track | null) => track?.type === 'VIDEO' || isVideoUrl(track?.videoUrl || track?.audioUrl || track?.url);
 
   const getActiveMedia = (track?: Track | null) => {
     if (isVideoTrack(track)) {
+      if (registeredVideoElement) {
+        return registeredVideoElement;
+      }
       if (!videoRef.current) {
         videoRef.current = document.createElement('video');
       }
@@ -79,18 +83,25 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
     const audio = audioRef.current || new Audio();
     audioRef.current = audio;
-    const video = videoRef.current || document.createElement('video');
-    videoRef.current = video;
+
+    const fallbackVideo = videoRef.current || document.createElement('video');
+    videoRef.current = fallbackVideo;
+
+    const activeVideo = registeredVideoElement || fallbackVideo;
+    const mediaElements = [audio, fallbackVideo];
+    if (registeredVideoElement && registeredVideoElement !== fallbackVideo) {
+      mediaElements.push(registeredVideoElement);
+    }
+    const uniqueMedia = Array.from(new Set(mediaElements));
 
     const updateDuration = () => {
-      const activeMedia = isVideoTrack(currentTrack) ? video : audio;
-      const duration = activeMedia.duration || 0;
-      setDuration(duration);
+      const activeMedia = isVideoTrack(currentTrack) ? activeVideo : audio;
+      setDuration(activeMedia?.duration || 0);
     };
 
     const updateTime = () => {
-      const activeMedia = isVideoTrack(currentTrack) ? video : audio;
-      setCurrentTime(activeMedia.currentTime);
+      const activeMedia = isVideoTrack(currentTrack) ? activeVideo : audio;
+      setCurrentTime(activeMedia?.currentTime || 0);
     };
 
     const handleEnded = () => {
@@ -121,7 +132,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       setIsPlaying(false);
     };
 
-    [audio, video].forEach((media) => {
+    uniqueMedia.forEach((media) => {
       media.addEventListener('loadedmetadata', updateDuration);
       media.addEventListener('timeupdate', updateTime);
       media.addEventListener('ended', handleEnded);
@@ -137,7 +148,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => {
-      [audio, video].forEach((media) => {
+      uniqueMedia.forEach((media) => {
         media.removeEventListener('loadedmetadata', updateDuration);
         media.removeEventListener('timeupdate', updateTime);
         media.removeEventListener('ended', handleEnded);
@@ -149,7 +160,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
         media.pause();
       });
     };
-  }, [currentTrack, isMuted, volume]);
+  }, [currentTrack, isMuted, volume, registeredVideoElement]);
 
   const applyAudioQualityToUrl = (rawUrl: string) => {
     if (!rawUrl) return rawUrl;
@@ -303,7 +314,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     }
 
     setVolumeState(newVolume);
-    [audioRef.current, videoRef.current].forEach((media) => {
+    [audioRef.current, registeredVideoElement, videoRef.current].forEach((media) => {
       if (media) {
         media.volume = isMuted ? 0 : newVolume;
       }
@@ -313,9 +324,9 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   const registerVideoElement = (videoElement: HTMLVideoElement | null) => {
     if (typeof window === 'undefined') return;
 
-    const previousVideo = videoRef.current;
+    const previousVideo = registeredVideoElement || videoRef.current;
     if (videoElement) {
-      videoRef.current = videoElement;
+      setRegisteredVideoElement(videoElement);
       videoElement.muted = isMuted;
       videoElement.volume = isMuted ? 0 : volume;
       videoElement.preload = 'auto';
@@ -340,6 +351,8 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    setRegisteredVideoElement(null);
+
     if (!videoRef.current) {
       videoRef.current = document.createElement('video');
       videoRef.current.muted = isMuted;
@@ -357,7 +370,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
     setIsMuted((prev) => {
       const next = !prev;
-      [audioRef.current, videoRef.current].forEach((media) => {
+      [audioRef.current, registeredVideoElement, videoRef.current].forEach((media) => {
         if (media) {
           media.volume = next ? 0 : volume;
         }

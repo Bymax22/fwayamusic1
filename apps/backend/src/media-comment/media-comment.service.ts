@@ -100,4 +100,118 @@ export class MediaCommentService {
       replies: [],
     };
   }
+
+  async likeComment(mediaId: number, commentId: number, userId: number) {
+    const comment = await this.prisma.mediaComment.findFirst({
+      where: { id: commentId, mediaId },
+    });
+
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
+
+    const existingLike = await this.prisma.mediaCommentLike.findUnique({
+      where: {
+        commentId_userId: {
+          commentId,
+          userId,
+        },
+      },
+    });
+
+    if (existingLike) {
+      return {
+        id: comment.id,
+        likes: comment.likes,
+      };
+    }
+
+    const updated = await this.prisma.$transaction(async (prisma) => {
+      await prisma.mediaCommentLike.create({
+        data: {
+          commentId,
+          userId,
+        },
+      });
+
+      return prisma.mediaComment.update({
+        where: { id: commentId },
+        data: {
+          likes: {
+            increment: 1,
+          },
+        },
+      });
+    });
+
+    return {
+      id: updated.id,
+      likes: updated.likes,
+    };
+  }
+
+  async unlikeComment(mediaId: number, commentId: number, userId: number) {
+    const comment = await this.prisma.mediaComment.findFirst({
+      where: { id: commentId, mediaId },
+    });
+
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
+
+    const existingLike = await this.prisma.mediaCommentLike.findUnique({
+      where: {
+        commentId_userId: {
+          commentId,
+          userId,
+        },
+      },
+    });
+
+    if (!existingLike) {
+      return {
+        id: comment.id,
+        likes: comment.likes,
+      };
+    }
+
+    const updated = await this.prisma.$transaction(async (prisma) => {
+      await prisma.mediaCommentLike.delete({
+        where: {
+          commentId_userId: {
+            commentId,
+            userId,
+          },
+        },
+      });
+
+      return prisma.mediaComment.update({
+        where: { id: commentId },
+        data: {
+          likes: comment.likes > 0 ? { decrement: 1 } : undefined,
+        },
+      });
+    });
+
+    return {
+      id: updated.id,
+      likes: updated.likes,
+    };
+  }
+
+  async getLikedCommentIds(mediaId: number, userId: number) {
+    const likes = await this.prisma.mediaCommentLike.findMany({
+      where: {
+        userId,
+        comment: {
+          mediaId,
+        },
+      },
+      select: {
+        commentId: true,
+      },
+    });
+
+    return likes.map((like) => like.commentId);
+  }
 }
