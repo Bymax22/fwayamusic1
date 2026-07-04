@@ -549,8 +549,8 @@ export default function VideoWatchPage() {
               </div>
             </aside>
           </div>
-        )
-      }
+        )}
+      </div>
     </div>
   );
-
+}
