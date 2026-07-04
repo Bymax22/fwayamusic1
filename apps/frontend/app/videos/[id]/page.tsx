@@ -49,6 +49,33 @@ const formatDuration = (seconds: number) => {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
+function VideoPageSkeleton() {
+  return (
+    <div className="min-h-screen px-4 pb-24 pt-6 lg:px-10">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="h-[420px] rounded-3xl bg-[#11131a] animate-pulse" />
+        <div className="space-y-4 rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
+          <div className="h-6 w-2/5 rounded-full bg-[#11131a] animate-pulse" />
+          <div className="h-4 w-3/5 rounded-full bg-[#11131a] animate-pulse" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="h-28 rounded-3xl bg-[#11131a] animate-pulse" />
+            <div className="h-28 rounded-3xl bg-[#11131a] animate-pulse" />
+          </div>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-[1.5fr_0.9fr]">
+          <div className="space-y-4">
+            <div className="h-20 rounded-3xl bg-[#11131a] animate-pulse" />
+            <div className="h-80 rounded-3xl bg-[#11131a] animate-pulse" />
+          </div>
+          <div className="space-y-4">
+            <div className="h-96 rounded-3xl bg-[#11131a] animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function VideoWatchPage() {
   const params = useParams();
   const router = useRouter();
@@ -300,15 +327,7 @@ export default function VideoWatchPage() {
         {error ? (
           <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 text-sm text-red-300">{error}</div>
         ) : loading || !video ? (
-          <div className="space-y-4">
-            <div className="h-[420px] rounded-3xl bg-[#121418] animate-pulse" />
-            <div className="h-8 w-3/5 rounded-full bg-[#121418] animate-pulse" />
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="h-48 rounded-3xl bg-[#121418] animate-pulse" />
-              ))}
-            </div>
-          </div>
+          <VideoPageSkeleton onBack={() => router.back()} />
         ) : (
           <div className="grid gap-8 lg:grid-cols-[1.5fr_0.9fr]">
             <div className="space-y-6">
