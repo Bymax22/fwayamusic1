@@ -39,6 +39,7 @@ interface GlobalPlayerContextType {
   seekTo: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
+  registerVideoElement: (videoElement: HTMLVideoElement | null) => void;
 }
 
 const GlobalPlayerContext = createContext<GlobalPlayerContextType | null>(null);
@@ -309,6 +310,45 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const registerVideoElement = (videoElement: HTMLVideoElement | null) => {
+    if (typeof window === 'undefined') return;
+
+    const previousVideo = videoRef.current;
+    if (videoElement) {
+      videoRef.current = videoElement;
+      videoElement.muted = isMuted;
+      videoElement.volume = isMuted ? 0 : volume;
+      videoElement.preload = 'auto';
+      videoElement.crossOrigin = 'anonymous';
+
+      if (currentTrack?.type === 'VIDEO') {
+        const mediaUrl = applyAudioQualityToUrl(currentTrack.videoUrl || currentTrack.audioUrl || currentTrack.url || '');
+        if (mediaUrl && videoElement.src !== mediaUrl) {
+          videoElement.src = mediaUrl;
+        }
+        videoElement.currentTime = previousVideo?.currentTime ?? videoElement.currentTime ?? 0;
+        if (isPlaying) {
+          void videoElement.play().catch((err) => {
+            console.warn('GlobalPlayer: Failed to resume registered video element:', err);
+          });
+        }
+      }
+
+      if (previousVideo && previousVideo !== videoElement) {
+        previousVideo.pause();
+      }
+      return;
+    }
+
+    if (!videoRef.current) {
+      videoRef.current = document.createElement('video');
+      videoRef.current.muted = isMuted;
+      videoRef.current.volume = isMuted ? 0 : volume;
+      videoRef.current.preload = 'auto';
+      videoRef.current.crossOrigin = 'anonymous';
+    }
+  };
+
   const toggleMute = () => {
     if (typeof window === 'undefined') {
       setIsMuted((prev) => !prev);
@@ -381,6 +421,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       setVolume,
       toggleMute,
       stopTrack,
+      registerVideoElement,
       audioQuality,
       setAudioQuality
     }}>

@@ -1,8 +1,11 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { Play, Pause, Volume2, VolumeX, Maximize2, Heart, Share2, Plus, X } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize2 } from "lucide-react";
+import { FaHeart, FaShare, FaDownload, FaReply, FaCheckCircle } from "react-icons/fa";
+import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/context/AuthContext";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import VideoCard from "@/components/VideoCard";
 
 interface VideoDetail {
@@ -28,6 +31,18 @@ interface VideoDetail {
   }>;
 }
 
+interface VideoComment {
+  id: number;
+  userId: number;
+  userName: string;
+  userAvatar: string;
+  content: string;
+  timestamp: string;
+  likes: number;
+  isVerified?: boolean;
+  replies?: VideoComment[];
+}
+
 const formatDuration = (seconds: number) => {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
   const mins = Math.floor(seconds / 60);
@@ -43,16 +58,29 @@ export default function VideoWatchPage() {
   const [video, setVideo] = useState<VideoDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showControls, setShowControls] = useState(true);
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<VideoComment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
-  const [isPlayingLocal, setIsPlayingLocal] = useState(false);
-  const [isMutedLocal, setIsMutedLocal] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [replyText, setReplyText] = useState('');
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const { currentTrack, isPlaying, isMuted, playTrack, togglePlay, toggleMute, registerVideoElement } = useAudioPlayer();
 
   const videoId = Array.isArray(params.id) ? params.id[0] : params.id;
   const shouldAutoplay = searchParams?.get('autoplay') === '1';
+  const playTrackRef = useRef(playTrack);
+
+  useEffect(() => {
+    playTrackRef.current = playTrack;
+  }, [playTrack]);
+
+  const isCurrentVideo = useMemo(
+    () => currentTrack?.type === 'VIDEO' && String(currentTrack.id) === String(video?.id),
+    [currentTrack, video?.id],
+  );
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -103,13 +131,16 @@ export default function VideoWatchPage() {
         };
         setVideo(mapped);
 
-        if (shouldAutoplay && videoRef.current) {
-          try {
-            await videoRef.current.play();
-            setIsPlayingLocal(true);
-          } catch (err) {
-            console.warn('Native video autoplay blocked or failed', err);
-          }
+        if (shouldAutoplay && mapped.videoUrl) {
+          playTrackRef.current?.({
+            id: mapped.id,
+            title: mapped.title,
+            artist: mapped.artist,
+            imageUrl: mapped.thumbnail,
+            videoUrl: mapped.videoUrl,
+            type: 'VIDEO',
+            duration: mapped.duration,
+          });
         }
 
         void fetchComments();
@@ -137,26 +168,32 @@ export default function VideoWatchPage() {
     }
   }, [videoId, shouldAutoplay]);
 
-  const handlePlay = () => {
-    const videoEl = videoRef.current;
-    if (!videoEl) return;
+  useEffect(() => {
+    if (!videoRef.current) return;
+    registerVideoElement(videoRef.current);
+    return () => registerVideoElement(null);
+  }, [registerVideoElement]);
 
-    if (videoEl.paused) {
-      videoEl.play().then(() => setIsPlayingLocal(true)).catch((err) => {
-        console.warn('Video play failed:', err);
-        setIsPlayingLocal(false);
-      });
-    } else {
-      videoEl.pause();
-      setIsPlayingLocal(false);
+  const handlePlay = async () => {
+    if (!video) return;
+    if (isCurrentVideo) {
+      togglePlay();
+      return;
     }
+
+    playTrack({
+      id: video.id,
+      title: video.title,
+      artist: video.artist,
+      imageUrl: video.thumbnail,
+      videoUrl: video.videoUrl,
+      type: 'VIDEO',
+      duration: video.duration,
+    });
   };
 
   const handleMute = () => {
-    const videoEl = videoRef.current;
-    if (!videoEl) return;
-    videoEl.muted = !isMutedLocal;
-    setIsMutedLocal(!isMutedLocal);
+    toggleMute();
   };
 
   const handlePostComment = async () => {
@@ -194,6 +231,60 @@ export default function VideoWatchPage() {
     }
   };
 
+  const handleToggleCommentLike = (commentId: number) => {
+    setComments((prev) =>
+      prev.map((comment) => {
+        if (comment.id !== commentId) return comment;
+        return {
+          ...comment,
+          likes: comment.likes + 1,
+        };
+      }),
+    );
+  };
+
+  const handleReply = async (commentId: number) => {
+    if (!replyText.trim() || !video) return;
+
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to reply to comments.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/media/${video.id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content: replyText, parentId: commentId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to post reply');
+      }
+
+      const savedReply = await response.json();
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                replies: [...(comment.replies || []), savedReply],
+              }
+            : comment,
+        ),
+      );
+      setReplyText('');
+      setReplyingTo(null);
+    } catch (err) {
+      console.error('Failed to post reply', err);
+      alert('Unable to reply. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen px-4 pb-24 pt-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
@@ -226,118 +317,215 @@ export default function VideoWatchPage() {
                     src={video.videoUrl}
                     controls
                     autoPlay={shouldAutoplay}
-                    muted={isMutedLocal}
+                    muted={isMuted}
                     className="h-full w-full bg-black"
-                    onClick={() => setShowControls(true)}
-                    onTouchStart={() => setShowControls(true)}
-                    onMouseMove={() => setShowControls(true)}
-                    onPlay={() => setIsPlayingLocal(true)}
-                    onPause={() => setIsPlayingLocal(false)}
+                    onClick={() => {}}
+                    onTouchStart={() => {}}
+                    onMouseMove={() => {}}
                   />
+                </div>
+                <p className="mt-2 text-sm text-slate-400">{video.artist}</p>
+                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                  <span>{video.views.toLocaleString()} views</span>
+                  <span>{new Date(video.createdAt).toLocaleDateString()}</span>
+                  <span>{formatDuration(video.duration)}</span>
+                </div>
+
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={handlePlay}
+                    className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-500"
+                  >
+                    {isCurrentVideo && isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                    {isCurrentVideo && isPlaying ? 'Pause' : 'Play'}
+                  </button>
+                  <button
+                    onClick={handleMute}
+                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                  >
+                    {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                    {isMuted ? 'Unmute' : 'Mute'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const videoEl = videoRef.current;
+                      if (!videoEl) return;
+                      if (document.fullscreenElement) {
+                        document.exitFullscreen().catch(console.error);
+                      } else {
+                        videoEl.requestFullscreen().catch(console.error);
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                  >
+                    <Maximize2 size={16} />
+                    Fullscreen
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsLiked(true);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                  >
+                    <FaHeart size={16} className={isLiked ? 'text-red-400' : ''} />
+                    {isLiked ? 'Liked' : 'Like'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}/videos/${video.id}`;
+                      if (navigator.share) {
+                        navigator.share({ title: video.title, text: video.description, url: shareUrl }).catch(console.error);
+                      } else {
+                        navigator.clipboard.writeText(shareUrl).catch(console.error);
+                        alert('Link copied to clipboard');
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                  >
+                    <FaShare size={16} />
+                    Share
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!video) return;
+                      const token = await getToken();
+                      if (!token) {
+                        alert('Please sign in to save this video.');
+                        return;
+                      }
+
+                      try {
+                        await fetch(`/api/media/${video.id}/interact/heart`, {
+                          method: 'POST',
+                          headers: {
+                            Authorization: `Bearer ${token}`,
+                          },
+                        });
+                        setIsSaved(true);
+                      } catch (err) {
+                        console.error('Save failed', err);
+                        alert('Unable to save this video yet.');
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                  >
+                    <FaDownload size={16} />
+                    {isSaved ? 'Saved' : 'Save'}
+                  </button>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="rounded-3xl bg-slate-950 p-6">
-                  <h1 className="text-2xl font-semibold text-white">{video.title}</h1>
-                  <p className="mt-2 text-sm text-slate-400">{video.artist}</p>
-                  <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-                    <span>{video.views.toLocaleString()} views</span>
-                    <span>{new Date(video.createdAt).toLocaleDateString()}</span>
-                    <span>{formatDuration(video.duration)}</span>
-                  </div>
-
-                  <div className="mt-6 flex flex-wrap items-center gap-3">
-                    <button
-                      onClick={handlePlay}
-                      className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-500"
-                    >
-                      {isPlayingLocal ? <Pause size={16} /> : <Play size={16} />}
-                      {isPlayingLocal ? "Pause" : "Play"}
-                    </button>
-                    <button
-                      onClick={handleMute}
-                      className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
-                    >
-                      {isMutedLocal ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                      {isMutedLocal ? "Unmute" : "Mute"}
-                    </button>
-                    <button className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800">
-                      <Maximize2 size={16} />
-                      Fullscreen
-                    </button>
-                    <button className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800">
-                      <Heart size={16} />
-                      Like
-                    </button>
-                    <button className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800">
-                      <Share2 size={16} />
-                      Share
-                    </button>
-                    <button className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800">
-                      <Plus size={16} />
-                      Save
-                    </button>
+              <div className="rounded-3xl bg-slate-950 p-6">
+                <div className="flex items-center gap-3">
+                  <div className="h-14 w-14 rounded-full bg-slate-800" />
+                  <div>
+                    <p className="text-sm font-semibold text-white">{video.channelName}</p>
+                    <p className="text-xs text-slate-400">Channel</p>
                   </div>
                 </div>
+                <div className="mt-6 text-sm leading-7 text-slate-300">{video.description}</div>
+              </div>
 
-                <div className="rounded-3xl bg-slate-950 p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="h-14 w-14 rounded-full bg-slate-800" />
+              <div className="rounded-3xl bg-slate-950 p-6">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-semibold text-white">{video.channelName}</p>
-                      <p className="text-xs text-slate-400">Channel</p>
+                      <h2 className="text-lg font-semibold text-white">Comments</h2>
+                      <p className="text-sm text-slate-500">{comments.length} discussion{comments.length === 1 ? '' : 's'}</p>
                     </div>
                   </div>
-                  <div className="mt-6 text-sm leading-7 text-slate-300">{video.description}</div>
-                </div>
 
-                <div className="rounded-3xl bg-slate-950 p-6">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h2 className="text-lg font-semibold text-white">Comments</h2>
-                        <p className="text-sm text-slate-500">{comments.length} discussion{comments.length === 1 ? '' : 's'}</p>
+                  <div className="space-y-3">
+                    <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      rows={4}
+                      placeholder="Write a comment..."
+                      className="w-full rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-purple-500 focus:outline-none"
+                    />
+                    <button
+                      onClick={handlePostComment}
+                      disabled={commentLoading || !newComment.trim()}
+                      className="inline-flex items-center justify-center rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {commentLoading ? 'Posting...' : 'Post comment'}
+                    </button>
+                  </div>
+
+                  <div className="space-y-4 pt-4">
+                    {comments.length === 0 ? (
+                      <div className="rounded-3xl bg-slate-900 p-4 text-sm text-slate-400">
+                        No comments yet. Be the first to share your thoughts.
                       </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        rows={4}
-                        placeholder="Write a comment..."
-                        className="w-full rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-purple-500 focus:outline-none"
-                      />
-                      <button
-                        onClick={handlePostComment}
-                        disabled={commentLoading || !newComment.trim()}
-                        className="inline-flex items-center justify-center rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {commentLoading ? 'Posting...' : 'Post comment'}
-                      </button>
-                    </div>
-
-                    <div className="space-y-4 pt-4">
-                      {comments.length === 0 ? (
-                        <div className="rounded-3xl bg-slate-900 p-4 text-sm text-slate-400">
-                          No comments yet. Be the first to share your thoughts.
-                        </div>
-                      ) : (
-                        comments.map((comment) => (
-                          <div key={comment.id} className="rounded-3xl bg-slate-900 p-4">
-                            <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-full bg-slate-800" />
-                              <div>
-                                <p className="text-sm font-semibold text-white">{comment.user?.displayName || comment.user?.username || 'Anonymous'}</p>
-                                <p className="text-xs text-slate-500">{new Date(comment.createdAt).toLocaleString()}</p>
+                    ) : (
+                      comments.map((comment) => (
+                        <div key={comment.id} className="rounded-3xl bg-slate-900 p-4">
+                          <div className="flex items-start gap-3">
+                            <img
+                              src={comment.userAvatar}
+                              alt={comment.userName}
+                              className="h-10 w-10 rounded-full object-cover bg-slate-800"
+                            />
+                            <div className="flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-sm font-semibold text-white">{comment.userName}</p>
+                                {comment.isVerified && <FaCheckCircle className="h-4 w-4 text-sky-400" />}
+                                <span className="text-xs text-slate-500">{formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}</span>
                               </div>
+                              <p className="mt-3 text-sm leading-6 text-slate-300">{comment.content}</p>
+                              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleCommentLike(comment.id)}
+                                  className="inline-flex items-center gap-2 text-slate-300 hover:text-white"
+                                >
+                                  <FaHeart size={14} />
+                                  {comment.likes}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setReplyingTo(comment.id)}
+                                  className="inline-flex items-center gap-2 text-slate-300 hover:text-white"
+                                >
+                                  <FaReply size={14} />
+                                  Reply
+                                </button>
+                              </div>
+                              {replyingTo === comment.id && (
+                                <div className="mt-3 space-y-3">
+                                  <textarea
+                                    value={replyText}
+                                    onChange={(e) => setReplyText(e.target.value)}
+                                    rows={3}
+                                    placeholder="Write a reply..."
+                                    className="w-full rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-purple-500 focus:outline-none"
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleReply(comment.id)}
+                                      className="inline-flex items-center justify-center rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-500"
+                                    >
+                                      Reply
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setReplyingTo(null);
+                                        setReplyText('');
+                                      }}
+                                      className="inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            <p className="mt-4 text-sm leading-6 text-slate-300">{comment.content || comment.text || comment.body}</p>
                           </div>
-                        ))
-                      )}
-                    </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -351,14 +539,18 @@ export default function VideoWatchPage() {
                 </div>
                 <div className="space-y-4">
                   {video.related.map((relatedItem) => (
-                    <VideoCard key={relatedItem.id} {...relatedItem} href={`/videos/${relatedItem.id}`} />
+                    <VideoCard
+                      key={relatedItem.id}
+                      {...relatedItem}
+                      href={`/videos/${relatedItem.id}`}
+                    />
                   ))}
                 </div>
               </div>
             </aside>
           </div>
-        )}
-      </div>
+        )
+      }
     </div>
   );
-}
+
