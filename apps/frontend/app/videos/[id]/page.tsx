@@ -294,25 +294,7 @@ export default function VideoWatchPage() {
           Back
         </button>
 
-        <div className="mb-6 rounded-3xl bg-[#090b10] p-4 shadow-lg shadow-black/30 lg:px-6 lg:py-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3 text-white">
-              <img src="/fwayalogo-01.png" alt="Fwaya" className="h-10 w-auto object-contain" />
-              <div>
-                <p className="text-lg font-semibold">Fwaya</p>
-                <p className="text-sm text-slate-400">Music and video playback</p>
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-300">
-              <a href="/" className="transition hover:text-white">Home</a>
-              <a href="/videos" className="transition hover:text-white">Videos</a>
-              <a href="/artists" className="transition hover:text-white">Artists</a>
-              <button className="rounded-full bg-purple-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-purple-500">
-                Premium
-              </button>
-            </div>
-          </div>
-        </div>
+
 
         {error ? (
           <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 text-sm text-red-300">{error}</div>
@@ -331,10 +313,12 @@ export default function VideoWatchPage() {
             <div className="space-y-6">
               <div className="rounded-3xl bg-[#0f1115] p-4 shadow-lg shadow-black/20">
                 <VideoWatchPlayer
+                  trackId={video.id}
                   videoUrl={video.videoUrl}
                   poster={video.thumbnail}
                   title={video.title}
                   artist={video.artist}
+                  duration={video.duration}
                   autoPlay={shouldAutoplay}
                 />
 

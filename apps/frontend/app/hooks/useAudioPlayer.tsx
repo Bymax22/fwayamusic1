@@ -351,6 +351,13 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    if (registeredVideoElement) {
+      const detachedVideo = registeredVideoElement;
+      videoRef.current = detachedVideo;
+      setRegisteredVideoElement(null);
+      return;
+    }
+
     setRegisteredVideoElement(null);
 
     if (!videoRef.current) {

@@ -2,12 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FastForward, Maximize2, Pause, Play, Rewind, Volume2, VolumeX } from "lucide-react";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 interface VideoWatchPlayerProps {
+  trackId?: string | number;
   videoUrl: string;
   poster?: string;
   title?: string;
   artist?: string;
+  duration?: number;
   autoPlay?: boolean;
 }
 
@@ -19,10 +22,12 @@ const formatTime = (seconds: number) => {
 };
 
 export default function VideoWatchPlayer({
+  trackId,
   videoUrl,
   poster,
   title = "Video",
   artist = "Unknown",
+  duration: initialDuration,
   autoPlay = false,
 }: VideoWatchPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -31,9 +36,57 @@ export default function VideoWatchPlayer({
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.75);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(initialDuration || 0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
+  const touchProgressTimeout = useRef<number | null>(null);
+
+  const { currentTrack, setCurrentTrack, registerVideoElement } = useAudioPlayer();
+
+  const isSameTrack = useMemo(
+    () => currentTrack && trackId != null && String(currentTrack.id) === String(trackId),
+    [currentTrack, trackId],
+  );
+
+  const updateGlobalTrack = () => {
+    if (!trackId || !videoUrl) return;
+    if (isSameTrack) return;
+
+    setCurrentTrack({
+      id: trackId,
+      title,
+      artist,
+      imageUrl: poster,
+      videoUrl,
+      duration,
+      type: "VIDEO",
+    });
+  };
+
+  const showTouchProgress = () => {
+    setShowProgress(true);
+    if (touchProgressTimeout.current) {
+      window.clearTimeout(touchProgressTimeout.current);
+    }
+    touchProgressTimeout.current = window.setTimeout(() => {
+      setShowProgress(false);
+      touchProgressTimeout.current = null;
+    }, 2200);
+  };
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+    registerVideoElement(videoRef.current);
+  }, [registerVideoElement]);
+
+  useEffect(() => {
+    return () => {
+      if (touchProgressTimeout.current) {
+        window.clearTimeout(touchProgressTimeout.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -75,7 +128,10 @@ export default function VideoWatchPlayer({
       setCurrentTime(video.currentTime || 0);
     };
 
-    const onPlay = () => setIsPlaying(true);
+    const onPlay = () => {
+      setIsPlaying(true);
+      updateGlobalTrack();
+    };
     const onPause = () => setIsPlaying(false);
     const onEnded = () => setIsPlaying(false);
     const onError = (event: Event) => {
@@ -113,6 +169,7 @@ export default function VideoWatchPlayer({
     try {
       await video.play();
       setIsPlaying(true);
+      updateGlobalTrack();
     } catch (error) {
       console.error("VideoWatchPlayer: play failed", error);
     }
@@ -185,8 +242,13 @@ export default function VideoWatchPlayer({
   const formattedDuration = useMemo(() => formatTime(duration), [duration]);
 
   return (
-    <div className="rounded-3xl bg-[#090b10] shadow-2xl shadow-black/40 overflow-hidden">
-      <div className="bg-black">
+    <div className="group rounded-3xl bg-black shadow-2xl shadow-black/40 overflow-hidden">
+      <div
+        className="relative bg-black"
+        onMouseEnter={() => setShowProgress(true)}
+        onMouseLeave={() => setShowProgress(false)}
+        onTouchStart={showTouchProgress}
+      >
         <div className="aspect-video w-full bg-black">
           <video
             ref={videoRef}
@@ -198,23 +260,9 @@ export default function VideoWatchPlayer({
             disablePictureInPicture
           />
         </div>
-      </div>
 
-      <div className="bg-[#090b10] p-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-white truncate">{title}</p>
-            <p className="text-xs text-slate-400 truncate">{artist}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.2em] text-slate-500">
-            <span>{formattedCurrent}</span>
-            <span>•</span>
-            <span>{formattedDuration}</span>
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-col gap-4">
-          <div className="rounded-3xl bg-[#0f1115] px-4 py-3">
+        <div className={`absolute inset-x-0 bottom-0 px-4 pb-3 transition-all duration-200 ${showProgress ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
+          <div className="rounded-full bg-black/70 px-3 py-2 backdrop-blur-sm shadow-lg shadow-black/40">
             <input
               type="range"
               min={0}
@@ -223,12 +271,16 @@ export default function VideoWatchPlayer({
               onChange={handleSeek}
               className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple-500"
             />
-            <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
+            <div className="mt-2 flex items-center justify-between text-xs text-slate-300">
               <span>{formattedCurrent}</span>
               <span>{formattedDuration}</span>
             </div>
           </div>
+        </div>
+      </div>
 
+      <div className="px-4 py-4 bg-black">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <button

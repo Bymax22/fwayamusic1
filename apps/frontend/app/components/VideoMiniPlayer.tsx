@@ -67,6 +67,16 @@ export default function VideoMiniPlayer() {
         <button
           onClick={(event) => {
             event.stopPropagation();
+            openWatchPage();
+          }}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+          aria-label="Open video page"
+        >
+          <Maximize2 size={16} />
+        </button>
+        <button
+          onClick={(event) => {
+            event.stopPropagation();
             stopTrack();
           }}
           className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
