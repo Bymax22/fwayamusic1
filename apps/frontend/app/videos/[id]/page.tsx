@@ -157,11 +157,12 @@ export default function VideoWatchPage() {
           })),
         };
         setVideo(mapped);
+        setLoading(false);
 
-        await Promise.all([fetchComments(videoId), fetchLikedCommentIds(videoId)]);
+        void fetchComments(videoId);
+        void fetchLikedCommentIds(videoId);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unable to load video");
-      } finally {
         setLoading(false);
       }
     };

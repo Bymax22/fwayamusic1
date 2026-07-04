@@ -99,8 +99,8 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
       ======================== */}
       {currentTrack && (
         <div className="fixed bottom-0 left-0 right-0 z-30">
-          {/* Mobile Player - shows on small screens */}
-          {!isVideoWatchPage && (
+          {/* Mobile Player - audio only on small screens */}
+          {!isVideoWatchPage && currentTrack?.type !== 'VIDEO' && (
             <div className="lg:hidden">
               <MobilePlayer
                 track={currentTrack}
