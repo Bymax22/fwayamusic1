@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { FaHeart, FaShare, FaDownload, FaReply, FaCheckCircle, FaEye } from "react-icons/fa";
+import { FaHeart, FaReply, FaCheckCircle, FaEye } from "react-icons/fa";
+import { BookmarkCheck, BookmarkPlus, ListPlus, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/context/AuthContext";
 import VideoWatchPlayer from "@/components/VideoWatchPlayer";
@@ -97,13 +98,15 @@ export default function VideoWatchPage() {
   const [comments, setComments] = useState<VideoComment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState('');
   const [likedComments, setLikedComments] = useState<number[]>([]);
   const [followLoading, setFollowLoading] = useState(false);
   const [relativeTime, setRelativeTime] = useState('Recently uploaded');
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
+  const [isInPlaylist, setIsInPlaylist] = useState(false);
 
   const fetchComments = async (mediaId?: string) => {
     try {
@@ -440,16 +443,19 @@ export default function VideoWatchPage() {
                   autoPlay={shouldAutoplay}
                 />
 
-                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-400">
-                  <span className="inline-flex items-center gap-1.5 text-slate-300">
-                    <FaEye className="text-slate-400" />
-                    {video.views.toLocaleString()} views
-                  </span>
-                  <span>{relativeTime}</span>
-                  <span>{formatDuration(video.duration)}</span>
+                <div className="mt-3 space-y-2 sm:mt-4">
+                  <p className="text-base font-semibold text-white sm:hidden">{video.title}</p>
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
+                    <span className="inline-flex items-center gap-1.5 text-slate-300">
+                      <FaEye className="text-slate-400" />
+                      {video.views.toLocaleString()} views
+                    </span>
+                    <span>{relativeTime}</span>
+                    <span>{formatDuration(video.duration)}</span>
+                  </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between gap-3 rounded-3xl border border-white/10 bg-[#121418]/90 px-4 py-3">
+                <div className="mt-2 flex items-center justify-between gap-3 px-1 py-1 sm:mt-3 sm:px-0">
                   <div className="flex min-w-0 items-center gap-3">
                     <img
                       src={video.channelAvatar || '/default-avatar.jpg'}
@@ -471,8 +477,9 @@ export default function VideoWatchPage() {
                   </button>
                 </div>
 
-                <div className="mt-6 flex flex-wrap items-center gap-3">
+                <div className="mt-6 flex flex-wrap items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => {
                       const shareUrl = `${window.location.origin}/videos/${video.id}`;
                       if (navigator.share) {
@@ -482,12 +489,47 @@ export default function VideoWatchPage() {
                         alert('Link copied to clipboard');
                       }
                     }}
-                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-slate-900 text-white transition hover:bg-slate-800"
+                    aria-label="Share"
+                    title="Share"
                   >
-                    <FaShare size={16} />
-                    Share
+                    <Share2 size={18} strokeWidth={1.8} />
                   </button>
                   <button
+                    type="button"
+                    onClick={() => {
+                      setIsLiked((prev) => !prev);
+                      if (isDisliked) setIsDisliked(false);
+                    }}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition ${isLiked ? 'bg-purple-600 text-white' : 'bg-slate-900 text-slate-200 hover:bg-slate-800'}`}
+                    aria-label="Like"
+                    title="Like"
+                  >
+                    <ThumbsUp size={18} strokeWidth={1.8} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsDisliked((prev) => !prev);
+                      if (isLiked) setIsLiked(false);
+                    }}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition ${isDisliked ? 'bg-amber-600 text-white' : 'bg-slate-900 text-slate-200 hover:bg-slate-800'}`}
+                    aria-label="Dislike"
+                    title="Dislike"
+                  >
+                    <ThumbsDown size={18} strokeWidth={1.8} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsInPlaylist((prev) => !prev)}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition ${isInPlaylist ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-slate-200 hover:bg-slate-800'}`}
+                    aria-label="Add to playlist"
+                    title="Add to playlist"
+                  >
+                    <ListPlus size={18} strokeWidth={1.8} />
+                  </button>
+                  <button
+                    type="button"
                     onClick={async () => {
                       if (!video) return;
                       const token = await getToken();
@@ -509,10 +551,11 @@ export default function VideoWatchPage() {
                         alert('Unable to save this video yet.');
                       }
                     }}
-                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition ${isSaved ? 'bg-cyan-600 text-white' : 'bg-slate-900 text-slate-200 hover:bg-slate-800'}`}
+                    aria-label="Save"
+                    title="Save"
                   >
-                    <FaDownload size={16} />
-                    {isSaved ? 'Saved' : 'Save'}
+                    {isSaved ? <BookmarkCheck size={18} strokeWidth={1.8} /> : <BookmarkPlus size={18} strokeWidth={1.8} />}
                   </button>
                 </div>
               </div>

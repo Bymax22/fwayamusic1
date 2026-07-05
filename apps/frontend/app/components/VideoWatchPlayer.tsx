@@ -322,9 +322,13 @@ export default function VideoWatchPlayer({
       >
         <div className="aspect-video w-full bg-black">
           {showQualityBadge && (
-            <div className="absolute left-3 top-3 z-10 rounded-full border border-white/10 bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-200 backdrop-blur">
+            <button
+              type="button"
+              onClick={() => setShowQualityMenu((prev) => !prev)}
+              className="absolute left-3 top-3 z-10 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-200 backdrop-blur transition hover:bg-black/85"
+            >
               {selectedQuality === "auto" ? "Auto" : selectedQuality}
-            </div>
+            </button>
           )}
           <video
             ref={videoRef}
