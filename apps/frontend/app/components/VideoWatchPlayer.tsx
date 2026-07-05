@@ -134,7 +134,10 @@ export default function VideoWatchPlayer({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const connection = navigator.connection;
+    const connection = navigator.connection as {
+      addEventListener?: (type: string, listener: () => void) => void;
+      removeEventListener?: (type: string, listener: () => void) => void;
+    } | undefined;
     const handleNetworkChange = () => setQualityRefreshKey((prev) => prev + 1);
 
     window.addEventListener('online', handleNetworkChange);
