@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FastForward, Maximize2, Pause, Play, Rewind, Volume2, VolumeX } from "lucide-react";
+import { FastForward, Maximize2, Pause, Play, Rewind, Settings2, Volume2, VolumeX } from "lucide-react";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { getVideoQualityOptions, resolveVideoQualityUrl, type VideoQualityValue } from "@/lib/video-quality";
 
 interface VideoWatchPlayerProps {
   trackId?: string | number;
@@ -39,6 +40,8 @@ export default function VideoWatchPlayer({
   const [duration, setDuration] = useState(initialDuration || 0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedQuality, setSelectedQuality] = useState<VideoQualityValue>("auto");
+  const [showQualityMenu, setShowQualityMenu] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
   const touchProgressTimeout = useRef<number | null>(null);
   const lastTimeUpdateRef = useRef<number>(0);
@@ -125,6 +128,19 @@ export default function VideoWatchPlayer({
 
     void playWhenReady();
   }, [autoPlay]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const nextSrc = resolveVideoQualityUrl(videoUrl, selectedQuality);
+    videoRef.current.src = nextSrc;
+    videoRef.current.load();
+    if (autoPlay) {
+      void videoRef.current.play().catch(() => {
+        setIsPlaying(false);
+      });
+    }
+  }, [selectedQuality, videoUrl, autoPlay]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -276,7 +292,7 @@ export default function VideoWatchPlayer({
         <div className="aspect-video w-full bg-black">
           <video
             ref={videoRef}
-            src={videoUrl}
+            src={resolveVideoQualityUrl(videoUrl, selectedQuality)}
             poster={poster}
             className="h-full w-full object-contain bg-black"
             onClick={togglePlayPause}
@@ -336,6 +352,33 @@ export default function VideoWatchPlayer({
             </div>
 
             <div className="flex items-center gap-2">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowQualityMenu((prev) => !prev)}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                  aria-label="Video quality"
+                >
+                  <Settings2 size={16} />
+                </button>
+                {showQualityMenu && (
+                  <div className="absolute bottom-12 right-0 min-w-[120px] rounded-2xl border border-white/10 bg-black/90 p-2 text-sm shadow-xl">
+                    {getVideoQualityOptions(videoUrl).map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setSelectedQuality(option.value);
+                          setShowQualityMenu(false);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-xl px-2 py-2 text-left text-white transition ${selectedQuality === option.value ? 'bg-white/15' : 'hover:bg-white/10'}`}
+                      >
+                        <span>{option.label}</span>
+                        {selectedQuality === option.value && <span className="text-purple-400">●</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={toggleMute}

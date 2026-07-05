@@ -13,7 +13,7 @@ import { NotificationModule } from '../notification/notification.module';
     MulterModule.register({
       storage: memoryStorage(),
       limits: {
-        fileSize: 10 * 1024 * 1024, // Reduced to 10MB for Vercel serverless timeout safety
+        fileSize: 200 * 1024 * 1024,
       },
     }),
   ],

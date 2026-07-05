@@ -21,7 +21,7 @@ interface UploadMetadata {
 
 const validAudioTypes = ["audio/mpeg", "audio/wav", "audio/mp3", "audio/aac", "audio/flac"];
 const validVideoTypes = ["video/mp4", "video/quicktime", "video/x-msvideo"];
-const maxFileSize = 25 * 1024 * 1024; // 25MB
+const maxFileSize = 200 * 1024 * 1024; // 200MB
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);

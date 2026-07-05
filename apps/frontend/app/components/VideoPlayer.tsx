@@ -1,7 +1,8 @@
 'use client';
 import { useState, useRef, useEffect, type MouseEvent, type TouchEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Volume2, VolumeX, Maximize2, Play, Pause, Minimize2 } from 'lucide-react';
+import { X, Volume2, VolumeX, Maximize2, Play, Pause, Minimize2, Settings2 } from 'lucide-react';
+import { getVideoQualityOptions, resolveVideoQualityUrl, type VideoQualityValue } from '@/lib/video-quality';
 
 interface VideoPlayerProps {
   isOpen: boolean;
@@ -36,6 +37,8 @@ export default function VideoPlayer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [selectedQuality, setSelectedQuality] = useState<VideoQualityValue>('auto');
+  const [showQualityMenu, setShowQualityMenu] = useState(false);
   const controlsTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -63,6 +66,8 @@ export default function VideoPlayer({
       setVideoDuration(duration || 0);
       setIsMinimized(false);
       setShowControls(true);
+      setSelectedQuality('auto');
+      setShowQualityMenu(false);
       return;
     }
 
@@ -138,6 +143,21 @@ export default function VideoPlayer({
       videoRef.current.currentTime = newTime;
     }
   };
+
+  useEffect(() => {
+    if (!videoRef.current || !isOpen) return;
+
+    const nextSrc = resolveVideoQualityUrl(videoUrl, selectedQuality);
+    if (videoRef.current.currentSrc && videoRef.current.currentSrc.includes(nextSrc)) {
+      return;
+    }
+
+    videoRef.current.src = nextSrc;
+    videoRef.current.load();
+    void videoRef.current.play().catch(() => {
+      setIsPlaying(false);
+    });
+  }, [isOpen, selectedQuality, videoUrl]);
 
   const toggleFullscreen = async () => {
     if (!videoRef.current) return;
@@ -234,7 +254,7 @@ export default function VideoPlayer({
             >
               <video
                 ref={videoRef}
-                src={videoUrl}
+                src={resolveVideoQualityUrl(videoUrl, selectedQuality)}
                 poster={coverUrl ?? undefined}
                 className={isMinimized && isMobile ? 'aspect-video w-full object-cover' : 'aspect-video w-full object-contain bg-black'}
                 onTouchEnd={handleMediaTap}
@@ -304,6 +324,32 @@ export default function VideoPlayer({
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        <div className="relative">
+                          <button
+                            onClick={() => setShowQualityMenu((prev) => !prev)}
+                            className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
+                            aria-label="Quality"
+                          >
+                            <Settings2 className="h-4 w-4" />
+                          </button>
+                          {showQualityMenu && (
+                            <div className="absolute bottom-12 right-0 min-w-[120px] rounded-2xl border border-white/10 bg-black/90 p-2 text-sm shadow-xl">
+                              {getVideoQualityOptions(videoUrl).map((option) => (
+                                <button
+                                  key={option.value}
+                                  onClick={() => {
+                                    setSelectedQuality(option.value);
+                                    setShowQualityMenu(false);
+                                  }}
+                                  className={`flex w-full items-center justify-between rounded-xl px-2 py-2 text-left text-white transition ${selectedQuality === option.value ? 'bg-white/15' : 'hover:bg-white/10'}`}
+                                >
+                                  <span>{option.label}</span>
+                                  {selectedQuality === option.value && <span className="text-purple-400">●</span>}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                         <button onClick={toggleMute} className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20">
                           {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                         </button>

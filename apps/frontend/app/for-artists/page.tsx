@@ -620,9 +620,16 @@ export default function ForArtistsPage() {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setNewMedia(prev => ({ ...prev, file }));
+    if (!file) return;
+
+    const maxSize = newMedia.type === 'VIDEO' ? 200 * 1024 * 1024 : 50 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert(`Please choose a ${newMedia.type === 'VIDEO' ? 'video' : 'audio'} file smaller than ${maxSize / (1024 * 1024)}MB`);
+      e.target.value = '';
+      return;
     }
+
+    setNewMedia(prev => ({ ...prev, file }));
   };
 
   const handleTrackFileSelect = (trackId: string, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1798,7 +1805,7 @@ export default function ForArtistsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-gray-400 mb-2">File * (Max {newMedia.type === 'VIDEO' ? '30MB' : '10MB'})</label>
+                    <label className="block text-gray-400 mb-2">File * (Max {newMedia.type === 'VIDEO' ? '200MB' : '50MB'})</label>
                     <div className="bg-[#08080e] rounded-3xl p-4 text-center">
                       <div className="flex flex-col items-center justify-center gap-1 text-gray-400">
                         <Upload className="w-8 h-8 text-purple-400" />
