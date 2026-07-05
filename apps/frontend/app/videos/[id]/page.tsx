@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { FaHeart, FaShare, FaDownload, FaReply, FaCheckCircle } from "react-icons/fa";
+import { FaHeart, FaShare, FaDownload, FaReply, FaCheckCircle, FaEye } from "react-icons/fa";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/context/AuthContext";
 import VideoWatchPlayer from "@/components/VideoWatchPlayer";
@@ -12,6 +12,10 @@ interface VideoDetail {
   title: string;
   artist: string;
   channelName: string;
+  channelId?: number;
+  channelAvatar?: string;
+  followerCount?: number;
+  isFollowing?: boolean;
   description: string;
   duration: number;
   views: number;
@@ -98,6 +102,8 @@ export default function VideoWatchPage() {
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState('');
   const [likedComments, setLikedComments] = useState<number[]>([]);
+  const [followLoading, setFollowLoading] = useState(false);
+  const [relativeTime, setRelativeTime] = useState('Recently uploaded');
 
   const fetchComments = async (mediaId?: string) => {
     try {
@@ -143,6 +149,26 @@ export default function VideoWatchPage() {
   const shouldAutoplay = searchParams?.get('autoplay') === '1';
 
   useEffect(() => {
+    if (!video?.createdAt) return;
+
+    const parsedDate = new Date(video.createdAt);
+    const isValidDate = !Number.isNaN(parsedDate.getTime());
+
+    const updateRelativeTime = () => {
+      if (!isValidDate) {
+        setRelativeTime('Recently uploaded');
+        return;
+      }
+      setRelativeTime(formatDistanceToNow(parsedDate, { addSuffix: true }));
+    };
+
+    updateRelativeTime();
+    const intervalId = window.setInterval(updateRelativeTime, 60000);
+
+    return () => window.clearInterval(intervalId);
+  }, [video?.createdAt]);
+
+  useEffect(() => {
     const fetchVideo = async () => {
       try {
         setLoading(true);
@@ -171,6 +197,10 @@ export default function VideoWatchPage() {
           title: item.title || item.name || "Untitled",
           artist: item.user?.displayName || item.user?.username || item.artist || "Unknown",
           channelName: item.user?.displayName || item.user?.username || "Unknown",
+          channelId: item.user?.id ?? item.artistId ?? item.channelId,
+          channelAvatar: item.user?.avatarUrl || item.user?.avatar || item.channelAvatar || "/default-avatar.jpg",
+          followerCount: item.user?.followersCount || item.user?.followerCount || item.followersCount || 0,
+          isFollowing: Boolean(item.user?.isFollowing ?? item.isFollowing),
           description: item.description || item.summary || "No description available.",
           duration: item.duration || item.length || 0,
           views: item.views || item.playCount || 0,
@@ -204,6 +234,68 @@ export default function VideoWatchPage() {
       void fetchVideo();
     }
   }, [videoId, shouldAutoplay]);
+
+  useEffect(() => {
+    const fetchFollowStatus = async () => {
+      if (!video?.channelId) return;
+
+      const token = await getToken();
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/follow/status/${video.channelId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        setVideo((prev) => (prev ? { ...prev, isFollowing: Boolean(data.isFollowing) } : prev));
+      } catch (err) {
+        console.warn('Unable to load follow status', err);
+      }
+    };
+
+    void fetchFollowStatus();
+  }, [getToken, video?.channelId]);
+
+  const handleFollow = async () => {
+    if (!video?.channelId) return;
+
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to follow this creator.');
+      return;
+    }
+
+    const isCurrentlyFollowing = Boolean(video.isFollowing);
+    const nextFollowing = !isCurrentlyFollowing;
+    const nextFollowerCount = Math.max(0, (video.followerCount || 0) + (nextFollowing ? 1 : -1));
+
+    setFollowLoading(true);
+    setVideo((prev) => (prev ? { ...prev, isFollowing: nextFollowing, followerCount: nextFollowerCount } : prev));
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/follow/${video.channelId}`, {
+        method: isCurrentlyFollowing ? 'DELETE' : 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update follow state');
+      }
+    } catch (err) {
+      console.error('Follow update failed', err);
+      setVideo((prev) => (prev ? { ...prev, isFollowing: isCurrentlyFollowing, followerCount: Math.max(0, (prev.followerCount || 0) + (nextFollowing ? -1 : 1)) } : prev));
+      alert('Unable to update follow state right now.');
+    } finally {
+      setFollowLoading(false);
+    }
+  };
 
   const handlePostComment = async () => {
     if (!newComment.trim() || !video) return;
@@ -349,9 +441,34 @@ export default function VideoWatchPage() {
                 />
 
                 <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-400">
-                  <span>{video.views.toLocaleString()} views</span>
-                  <span>{new Date(video.createdAt).toLocaleDateString()}</span>
+                  <span className="inline-flex items-center gap-1.5 text-slate-300">
+                    <FaEye className="text-slate-400" />
+                    {video.views.toLocaleString()} views
+                  </span>
+                  <span>{relativeTime}</span>
                   <span>{formatDuration(video.duration)}</span>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-3 rounded-3xl border border-white/10 bg-[#121418]/90 px-4 py-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <img
+                      src={video.channelAvatar || '/default-avatar.jpg'}
+                      alt={video.channelName}
+                      className="h-11 w-11 rounded-full object-cover ring-1 ring-white/10"
+                    />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-white">{video.channelName}</p>
+                      <p className="text-xs text-slate-400">{(video.followerCount || 0).toLocaleString()} followers</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleFollow}
+                    disabled={followLoading || !video.channelId}
+                    className="rounded-full bg-purple-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {video.isFollowing ? 'Following' : 'Follow'}
+                  </button>
                 </div>
 
                 <div className="mt-6 flex flex-wrap items-center gap-3">

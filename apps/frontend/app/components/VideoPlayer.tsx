@@ -39,6 +39,7 @@ export default function VideoPlayer({
   const [isMinimized, setIsMinimized] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<VideoQualityValue>('auto');
   const [showQualityMenu, setShowQualityMenu] = useState(false);
+  const [qualityRefreshKey, setQualityRefreshKey] = useState(0);
   const controlsTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -145,10 +146,28 @@ export default function VideoPlayer({
   };
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const connection = navigator.connection as {
+      addEventListener?: (type: string, listener: () => void) => void;
+      removeEventListener?: (type: string, listener: () => void) => void;
+    } | undefined;
+    const handleNetworkChange = () => setQualityRefreshKey((prev) => prev + 1);
+
+    window.addEventListener('online', handleNetworkChange);
+    connection?.addEventListener?.('change', handleNetworkChange);
+
+    return () => {
+      window.removeEventListener('online', handleNetworkChange);
+      connection?.removeEventListener?.('change', handleNetworkChange);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!videoRef.current || !isOpen) return;
 
     const nextSrc = resolveVideoQualityUrl(videoUrl, selectedQuality);
-    if (videoRef.current.currentSrc && videoRef.current.currentSrc.includes(nextSrc)) {
+    if (videoRef.current.currentSrc && videoRef.current.currentSrc === nextSrc) {
       return;
     }
 
@@ -157,7 +176,7 @@ export default function VideoPlayer({
     void videoRef.current.play().catch(() => {
       setIsPlaying(false);
     });
-  }, [isOpen, selectedQuality, videoUrl]);
+  }, [isOpen, selectedQuality, videoUrl, qualityRefreshKey]);
 
   const toggleFullscreen = async () => {
     if (!videoRef.current) return;

@@ -42,6 +42,8 @@ export default function VideoWatchPlayer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<VideoQualityValue>("auto");
   const [showQualityMenu, setShowQualityMenu] = useState(false);
+  const [showQualityBadge, setShowQualityBadge] = useState(false);
+  const [qualityRefreshKey, setQualityRefreshKey] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
   const touchProgressTimeout = useRef<number | null>(null);
   const lastTimeUpdateRef = useRef<number>(0);
@@ -130,9 +132,28 @@ export default function VideoWatchPlayer({
   }, [autoPlay]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const connection = navigator.connection;
+    const handleNetworkChange = () => setQualityRefreshKey((prev) => prev + 1);
+
+    window.addEventListener('online', handleNetworkChange);
+    connection?.addEventListener?.('change', handleNetworkChange);
+
+    return () => {
+      window.removeEventListener('online', handleNetworkChange);
+      connection?.removeEventListener?.('change', handleNetworkChange);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!videoRef.current) return;
 
     const nextSrc = resolveVideoQualityUrl(videoUrl, selectedQuality);
+    if (videoRef.current.currentSrc && videoRef.current.currentSrc === nextSrc) {
+      return;
+    }
+
     videoRef.current.src = nextSrc;
     videoRef.current.load();
     if (autoPlay) {
@@ -140,7 +161,7 @@ export default function VideoWatchPlayer({
         setIsPlaying(false);
       });
     }
-  }, [selectedQuality, videoUrl, autoPlay]);
+  }, [selectedQuality, videoUrl, autoPlay, qualityRefreshKey]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -163,11 +184,18 @@ export default function VideoWatchPlayer({
 
     const onPlay = () => {
       setIsPlaying(true);
+      setShowQualityBadge(true);
       updateGlobalTrack();
       setCurrentTime(video.currentTime || 0);
     };
-    const onPause = () => setIsPlaying(false);
-    const onEnded = () => setIsPlaying(false);
+    const onPause = () => {
+      setIsPlaying(false);
+      setShowQualityBadge(false);
+    };
+    const onEnded = () => {
+      setIsPlaying(false);
+      setShowQualityBadge(false);
+    };
     const onError = (event: Event) => {
       console.error("VideoWatchPlayer error:", event);
       setIsPlaying(false);
@@ -290,6 +318,11 @@ export default function VideoWatchPlayer({
         onTouchStart={showTouchProgress}
       >
         <div className="aspect-video w-full bg-black">
+          {showQualityBadge && (
+            <div className="absolute left-3 top-3 z-10 rounded-full border border-white/10 bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-200 backdrop-blur">
+              {selectedQuality === "auto" ? "Auto" : selectedQuality}
+            </div>
+          )}
           <video
             ref={videoRef}
             src={resolveVideoQualityUrl(videoUrl, selectedQuality)}
@@ -328,7 +361,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={() => handleSkip(-10)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
                 aria-label="Rewind 10 seconds"
               >
                 <Rewind size={16} />
@@ -336,7 +369,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={togglePlayPause}
-                className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500 sm:h-12 sm:w-12"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? <Pause size={20} /> : <Play size={20} />}
@@ -344,7 +377,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={() => handleSkip(10)}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
                 aria-label="Forward 10 seconds"
               >
                 <FastForward size={16} />
@@ -356,7 +389,7 @@ export default function VideoWatchPlayer({
                 <button
                   type="button"
                   onClick={() => setShowQualityMenu((prev) => !prev)}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
                   aria-label="Video quality"
                 >
                   <Settings2 size={16} />
@@ -382,7 +415,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={toggleMute}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
                 {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
@@ -390,7 +423,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={handleToggleFullscreen}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
                 aria-label="Fullscreen"
               >
                 <Maximize2 size={16} />
