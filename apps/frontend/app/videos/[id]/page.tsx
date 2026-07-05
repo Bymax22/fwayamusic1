@@ -489,7 +489,7 @@ export default function VideoWatchPage() {
                         alert('Link copied to clipboard');
                       }
                     }}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-slate-900 text-white transition hover:bg-slate-800"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-black text-white transition hover:bg-neutral-800"
                     aria-label="Share"
                     title="Share"
                   >
@@ -501,7 +501,7 @@ export default function VideoWatchPage() {
                       setIsLiked((prev) => !prev);
                       if (isDisliked) setIsDisliked(false);
                     }}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition ${isLiked ? 'bg-purple-600 text-white' : 'bg-slate-900 text-slate-200 hover:bg-slate-800'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isLiked ? 'bg-black text-white' : 'bg-black text-slate-200 hover:bg-neutral-800'}`}
                     aria-label="Like"
                     title="Like"
                   >
@@ -513,7 +513,7 @@ export default function VideoWatchPage() {
                       setIsDisliked((prev) => !prev);
                       if (isLiked) setIsLiked(false);
                     }}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition ${isDisliked ? 'bg-amber-600 text-white' : 'bg-slate-900 text-slate-200 hover:bg-slate-800'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isDisliked ? 'bg-black text-white' : 'bg-black text-slate-200 hover:bg-neutral-800'}`}
                     aria-label="Dislike"
                     title="Dislike"
                   >
@@ -522,7 +522,7 @@ export default function VideoWatchPage() {
                   <button
                     type="button"
                     onClick={() => setIsInPlaylist((prev) => !prev)}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition ${isInPlaylist ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-slate-200 hover:bg-slate-800'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isInPlaylist ? 'bg-black text-white' : 'bg-black text-slate-200 hover:bg-neutral-800'}`}
                     aria-label="Add to playlist"
                     title="Add to playlist"
                   >
@@ -551,7 +551,7 @@ export default function VideoWatchPage() {
                         alert('Unable to save this video yet.');
                       }
                     }}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition ${isSaved ? 'bg-cyan-600 text-white' : 'bg-slate-900 text-slate-200 hover:bg-slate-800'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isSaved ? 'bg-black text-white' : 'bg-black text-slate-200 hover:bg-neutral-800'}`}
                     aria-label="Save"
                     title="Save"
                   >

@@ -194,6 +194,23 @@ export default function ForArtistsPage() {
     });
 
   const getBackendBaseUrl = () => process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+  const videoTagOptions = ['music', 'song', 'comedy', 'tutorial', 'dance', 'gaming', 'news', 'vlog', 'fashion', 'motivation', 'shorts'];
+
+  const toggleVideoTag = (tag: string) => {
+    setNewMedia((prev) => {
+      const selectedTags = prev.tags
+        ? prev.tags.split(',').map((item) => item.trim().toLowerCase()).filter(Boolean)
+        : [];
+      const nextTags = selectedTags.includes(tag)
+        ? selectedTags.filter((item) => item !== tag)
+        : [...selectedTags, tag];
+
+      return {
+        ...prev,
+        tags: nextTags.join(', '),
+      };
+    });
+  };
 
   const uploadToCloudinary = async (file: File, resourceType: 'image' | 'video' | 'auto' = 'auto') => {
     const cloudinaryCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dayn5vifn';
@@ -1688,15 +1705,26 @@ export default function ForArtistsPage() {
                   {newMedia.type === 'VIDEO' && (
                     <div>
                       <label className="block text-gray-400 mb-2">Video Tags</label>
-                      <input
-                        type="text"
-                        className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="e.g., music, song, music video, comedy, tutorial (comma-separated)"
-                        value={newMedia.tags}
-                        onChange={(e) => setNewMedia({ ...newMedia, tags: e.target.value })}
-                        disabled={isUploading}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Use 'music' or 'song' for music videos, 'comedy' for comedy videos, etc.</p>
+                      <div className="flex flex-wrap gap-2">
+                        {videoTagOptions.map((tag) => {
+                          const isSelected = newMedia.tags
+                            ? newMedia.tags.split(',').map((item) => item.trim().toLowerCase()).filter(Boolean).includes(tag)
+                            : false;
+
+                          return (
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={() => toggleVideoTag(tag)}
+                              disabled={isUploading}
+                              className={`rounded-full px-3 py-2 text-sm transition ${isSelected ? 'bg-purple-600 text-white' : 'bg-[#090a0f] text-gray-300 hover:bg-white/10'}`}
+                            >
+                              {tag}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">Choose one or more tags to describe your video.</p>
                     </div>
                   )}
 
