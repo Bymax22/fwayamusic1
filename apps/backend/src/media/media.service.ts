@@ -814,6 +814,45 @@ async getHomepageSections() {
   });
   otherVideos = otherVideos.filter(m => m.userId !== null);
 
+  // Fetch featured albums from Album table
+  let featuredAlbums = await this.prisma.album.findMany({
+    where: {
+      contentStatus: { in: ['PUBLISHED', 'APPROVED', 'DRAFT', 'SUBMITTED'] },
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          displayName: true,
+          avatarUrl: true
+        }
+      },
+      media: {
+        where: { deletedAt: null },
+        take: 1,
+        orderBy: { createdAt: 'asc' },
+      }
+    },
+    orderBy: { createdAt: "desc" },
+    take: 8,
+  });
+  
+  // Transform albums to match media format for frontend compatibility
+  const transformedAlbums = featuredAlbums.map((album: any) => ({
+    id: album.id,
+    title: album.title,
+    description: album.description,
+    artCoverUrl: album.coverUrl,
+    coverArt: album.coverUrl,
+    thumbnailUrl: album.coverUrl,
+    type: 'ALBUM',
+    userId: album.userId,
+    user: album.user,
+    createdAt: album.createdAt,
+    tags: ['album'],
+  }));
+
   return {
     featuredSongs,
     trendingSongs,
@@ -821,6 +860,7 @@ async getHomepageSections() {
     topCharts,
     musicVideos,
     otherVideos,
+    featuredAlbums: transformedAlbums,
   };
 }
 }

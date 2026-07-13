@@ -302,14 +302,21 @@ export default function GuestWelcome() {
           : [];
 
         const albumItems: any[] = [];
-        if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {
-          albumItems.push(...homepageData.featuredSongs.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
-        }
-        if (albumItems.length === 0 && homepageData.trendingSongs && Array.isArray(homepageData.trendingSongs)) {
-          albumItems.push(...homepageData.trendingSongs.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
-        }
-        if (albumItems.length === 0 && homepageData.beats && Array.isArray(homepageData.beats)) {
-          albumItems.push(...homepageData.beats.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
+        
+        // First, try to use the dedicated featuredAlbums field from backend
+        if (homepageData.featuredAlbums && Array.isArray(homepageData.featuredAlbums) && homepageData.featuredAlbums.length > 0) {
+          albumItems.push(...homepageData.featuredAlbums);
+        } else {
+          // Fallback: filter albums from other sections
+          if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {
+            albumItems.push(...homepageData.featuredSongs.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
+          }
+          if (albumItems.length === 0 && homepageData.trendingSongs && Array.isArray(homepageData.trendingSongs)) {
+            albumItems.push(...homepageData.trendingSongs.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
+          }
+          if (albumItems.length === 0 && homepageData.beats && Array.isArray(homepageData.beats)) {
+            albumItems.push(...homepageData.beats.filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM'));
+          }
         }
 
         const processedFeaturedAlbums = albumItems.length > 0
@@ -779,7 +786,7 @@ export default function GuestWelcome() {
             </div>
 
         {/* HERO SECTION - Mobile-friendly hero banner */}
-        <div className="relative mb-3 overflow-hidden rounded-3xl border border-white/10 bg-[#0d0f18] min-h-[220px] sm:min-h-[260px]">
+        <div className="relative mb-3 overflow-hidden rounded-3xl bg-[#0d0f18] min-h-[220px] sm:min-h-[260px]">
           <div className="absolute inset-0">
             <Image
               src={heroSlides[heroImageIndex].image}
@@ -802,18 +809,18 @@ export default function GuestWelcome() {
               </h2>
             </div>
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2 mt-auto">
               <button
                 type="button"
                 onClick={heroSlides[heroImageIndex]?.primaryAction}
-                className="inline-flex items-center justify-center rounded-full bg-purple-600 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-purple-500"
+                className="inline-flex items-center justify-center rounded-full bg-purple-600 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-purple-500 sm:px-3 sm:py-2 sm:text-[11px]"
               >
                 {heroSlides[heroImageIndex]?.primaryButton}
               </button>
               <button
                 type="button"
                 onClick={heroSlides[heroImageIndex]?.secondaryAction}
-                className="inline-flex items-center justify-center rounded-full bg-white/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-white/20"
+                className="inline-flex items-center justify-center rounded-full bg-white/10 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-white/20 sm:px-3 sm:py-2 sm:text-[11px]"
               >
                 {heroSlides[heroImageIndex]?.secondaryButton}
               </button>
@@ -1750,23 +1757,23 @@ export default function GuestWelcome() {
                   {heroSlides[heroImageIndex].subtitle}
                 </p>
 
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-2 sm:gap-4">
                   <button
                     onClick={heroSlides[heroImageIndex].primaryAction}
-                    className="bg-white text-black px-6 py-3 rounded-full flex items-center gap-2 text-sm font-medium hover:bg-gray-100 transition-colors"
+                    className="bg-white text-black px-3 py-1.5 sm:px-6 sm:py-3 rounded-full flex items-center gap-2 text-xs sm:text-sm font-medium hover:bg-gray-100 transition-colors"
                   >
                     <FaPlay /> {heroSlides[heroImageIndex].primaryButton}
                   </button>
                   <button
                     onClick={heroSlides[heroImageIndex].secondaryAction}
-                    className="bg-white/20 px-6 py-3 rounded-full text-sm text-white border border-white/30 hover:bg-white/30 transition-colors"
+                    className="bg-white/20 px-3 py-1.5 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm text-white hover:bg-white/30 transition-colors"
                   >
                     {heroSlides[heroImageIndex].secondaryButton}
                   </button>
                 </div>
               </div>
 
-              <div className={`relative w-48 h-48 rounded-3xl overflow-hidden border border-white/20 shadow-2xl transition-all duration-1000 ease-out ${isSliding ? 'translate-x-12 opacity-50 scale-95' : 'translate-x-0 opacity-100 scale-100'}`}>
+              <div className={`relative w-48 h-48 rounded-3xl overflow-hidden shadow-2xl transition-all duration-1000 ease-out ${isSliding ? 'translate-x-12 opacity-50 scale-95' : 'translate-x-0 opacity-100 scale-100'}`}>
                 <Image
                   src={heroSlides[heroImageIndex].image}
                   alt="Hero overlay"
