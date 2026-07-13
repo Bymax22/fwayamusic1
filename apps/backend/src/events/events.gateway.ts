@@ -5,7 +5,7 @@ import { Logger } from '@nestjs/common';
 @WebSocketGateway({ namespace: 'realtime', cors: { origin: '*' } })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   private logger = new Logger('EventsGateway');
 

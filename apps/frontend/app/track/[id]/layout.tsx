@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import type { Metadata } from "next";
+import { extractMediaIdFromSlug } from '@/lib/utils';
 
 interface TrackMeta {
   id: number;
