@@ -5,11 +5,25 @@ export const runtime = 'edge';
 const DEFAULT_IMAGE = 'https://res.cloudinary.com/dayn5vifn/image/upload/v1777067980/fwaya-01_eeob6c.png';
 
 export async function GET(req: Request, context: any) {
-  const videoId = context?.params?.id;
+  const videoSlug = context?.params?.id;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const requestUrl = new URL(req.url);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin;
   let video: { title?: string; description?: string; coverArt?: string; artCoverUrl?: string; thumbnailUrl?: string; user?: { username?: string; displayName?: string } } | null = null;
+
+  // Extract numeric ID from slug
+  const extractMediaIdFromSlug = (slug?: string) => {
+    if (!slug) return undefined;
+    const matches = slug.match(/-(\d+)(?:$|\/)/);
+    if (matches?.[1]) {
+      const parsed = Number(matches[1]);
+      return Number.isFinite(parsed) ? parsed : undefined;
+    }
+    const numeric = Number(slug);
+    return Number.isFinite(numeric) ? numeric : undefined;
+  };
+  
+  const videoId = extractMediaIdFromSlug(videoSlug);
 
   const backendUrls = Array.from(new Set([
     apiUrl,

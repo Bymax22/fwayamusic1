@@ -16,11 +16,21 @@ interface TrackMeta {
 
 async function fetchTrackMeta(id: string): Promise<TrackMeta | null> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}`, {
+    const { extractMediaIdFromSlug } = await import('@/lib/utils');
+    const mediaId = extractMediaIdFromSlug(id);
+    
+    if (!mediaId) {
+      console.warn("Could not extract media ID from slug:", id);
+      return null;
+    }
+    
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const response = await fetch(`${apiUrl}/api/v1/media/${mediaId}`, {
       next: { revalidate: 60 },
     });
 
     if (!response.ok) {
+      console.warn("Failed to fetch track metadata:", response.status);
       return null;
     }
 

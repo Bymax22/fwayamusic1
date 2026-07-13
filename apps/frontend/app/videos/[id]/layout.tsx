@@ -15,11 +15,21 @@ interface VideoMeta {
 
 async function fetchVideoMeta(id: string): Promise<VideoMeta | null> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/v1/media/${id}`, {
+    const { extractMediaIdFromSlug } = await import('@/lib/utils');
+    const mediaId = extractMediaIdFromSlug(id);
+    
+    if (!mediaId) {
+      console.warn('Could not extract media ID from slug:', id);
+      return null;
+    }
+    
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const response = await fetch(`${apiUrl}/api/v1/media/${mediaId}`, {
       next: { revalidate: 60 },
     });
 
     if (!response.ok) {
+      console.warn('Failed to fetch video metadata:', response.status);
       return null;
     }
 
