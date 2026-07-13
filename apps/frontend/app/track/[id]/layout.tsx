@@ -6,8 +6,11 @@ interface TrackMeta {
   id: number;
   title: string;
   description?: string;
+  coverArt?: string;
+  coverUrl?: string;
   artCoverUrl?: string;
   thumbnailUrl?: string;
+  previewVideoUrl?: string;
   user?: { id: number; username?: string; displayName?: string };
 }
 
