@@ -101,25 +101,27 @@ export default function TrackPage() {
       }
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${trackId}`);
+        const response = await fetch(`/api/media/${trackId}`);
         if (!response.ok) {
-          throw new Error('Track not found');
+          const errorText = await response.text().catch(() => '');
+          throw new Error(errorText || 'Track not found');
         }
         const data = await response.json();
         setTrack(data);
 
         // Fetch comments
-        const commentsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${trackId}/comments`);
+        const commentsRes = await fetch(`/api/media/${trackId}/comments`);
         if (commentsRes.ok) {
           const commentsData = await commentsRes.json();
           setComments(commentsData);
         }
 
         // Fetch related tracks (same genre or artist)
-        const relatedRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media?genre=${data.genre}&limit=5`);
+        const relatedRes = await fetch(`/api/media?genre=${encodeURIComponent(data.genre || '')}&limit=5`);
         if (relatedRes.ok) {
           const relatedData = await relatedRes.json();
-          setRelatedTracks(relatedData.filter((t: MediaItem) => trackId === undefined ? true : t.id !== trackId).slice(0, 4));
+          const list = Array.isArray(relatedData) ? relatedData : [];
+          setRelatedTracks(list.filter((t: MediaItem) => t.id !== trackId).slice(0, 4));
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load track');
@@ -181,7 +183,7 @@ export default function TrackPage() {
     if (!token) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${track.id}/interact/play`, {
+      await fetch(`/api/media/${track.id}/interact/play`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -213,7 +215,7 @@ export default function TrackPage() {
     );
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${track.id}/interact/like`, {
+      const response = await fetch(`/api/media/${track.id}/interact/like`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -251,7 +253,7 @@ export default function TrackPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${track.id}/interact/download`, {
+      const response = await fetch(`/api/media/${track.id}/interact/download`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -297,7 +299,7 @@ export default function TrackPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${track.id}/comments`, {
+      const response = await fetch(`/api/media/${track.id}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -329,7 +331,7 @@ export default function TrackPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${track.id}/comments`, {
+      const response = await fetch(`/api/media/${track.id}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

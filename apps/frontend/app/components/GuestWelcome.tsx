@@ -778,8 +778,8 @@ export default function GuestWelcome() {
               </div>
             </div>
 
-        {/* HERO SECTION - Minimal modern mobile hero */}
-        <div className="relative h-[150px] rounded-3xl overflow-hidden mb-3 pt-5">
+        {/* HERO SECTION - Mobile-friendly hero banner */}
+        <div className="relative mb-3 overflow-hidden rounded-3xl border border-white/10 bg-[#0d0f18] min-h-[220px] sm:min-h-[260px]">
           <div className="absolute inset-0">
             <Image
               src={heroSlides[heroImageIndex].image}
@@ -789,35 +789,37 @@ export default function GuestWelcome() {
             />
           </div>
 
-          <div className="absolute inset-0 bg-black/35"></div>
-          <div className="absolute top-0 left-0 right-0 h-2/3 bg-gradient-to-b from-purple-600/70 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-          <div className="relative z-10 flex flex-col justify-between h-full pb-5 px-4">
-            <div className="space-y-2">
-              <p className="text-[11px] uppercase tracking-[0.32em] text-white/70">
+          <div className="relative z-10 flex h-full flex-col justify-between px-4 py-4 sm:px-5 sm:py-5">
+            <div className="max-w-[80%] space-y-1.5">
+              <p className="text-[10px] uppercase tracking-[0.32em] text-white/70 sm:text-[11px]">
                 {heroSlides[heroImageIndex]?.subtitle}
               </p>
-              <h2 className="text-xl font-semibold text-white leading-tight">
+              <h2 className="text-lg font-semibold leading-tight text-white sm:text-xl">
                 {heroSlides[heroImageIndex]?.title}
               </h2>
             </div>
-            <div className="flex flex-wrap gap-2">
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
               <button
                 type="button"
                 onClick={heroSlides[heroImageIndex]?.primaryAction}
-                className="rounded-full bg-purple-600 px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-purple-500"
+                className="inline-flex items-center justify-center rounded-full bg-purple-600 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-purple-500"
               >
                 {heroSlides[heroImageIndex]?.primaryButton}
               </button>
               <button
                 type="button"
                 onClick={heroSlides[heroImageIndex]?.secondaryAction}
-                className="rounded-full bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-white/20"
+                className="inline-flex items-center justify-center rounded-full bg-white/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-white/20"
               >
                 {heroSlides[heroImageIndex]?.secondaryButton}
               </button>
             </div>
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center gap-2 pt-1">
               {heroSlides.map((_, idx) => (
                 <button
                   key={idx}
