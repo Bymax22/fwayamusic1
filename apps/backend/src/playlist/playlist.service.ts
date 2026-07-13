@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { PlaylistType } from '@prisma/client';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class PlaylistService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private eventsGateway: EventsGateway) {}
 
   async findAll() {
     return this.prisma.playlist.findMany({
@@ -86,7 +87,7 @@ export class PlaylistService {
     const nextPosition = (maxPosition._max.position || 0) + 1;
 
     // Add media to playlist
-    return this.prisma.playlistEntry.create({
+    const entry = await this.prisma.playlistEntry.create({
       data: {
         playlistId: playlistId,
         mediaId: mediaId,
@@ -97,6 +98,13 @@ export class PlaylistService {
         playlist: true,
       },
     });
+
+    // Emit realtime update
+    try {
+      this.eventsGateway.emitPlaylistUpdated({ playlistId, userId, action: 'add', entry });
+    } catch (err) {}
+
+    return entry;
   }
 
   async removeMediaFromPlaylist(playlistId: number, mediaId: number, userId: number) {
@@ -113,11 +121,17 @@ export class PlaylistService {
     }
 
     // Remove media from playlist
-    return this.prisma.playlistEntry.deleteMany({
+    const deleted = await this.prisma.playlistEntry.deleteMany({
       where: {
         playlistId: playlistId,
         mediaId: mediaId,
       },
     });
+
+    try {
+      this.eventsGateway.emitPlaylistUpdated({ playlistId, userId, action: 'remove', entry: { mediaId } });
+    } catch (err) {}
+
+    return deleted;
   }
 }

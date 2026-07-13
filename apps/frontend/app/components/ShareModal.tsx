@@ -136,6 +136,35 @@ export default function ShareModal({
             <RiWhatsappLine size={18} />
           </button>
           <button
+            onClick={async () => {
+              if (navigator.share) {
+                try {
+                  await navigator.share({
+                    title: subject,
+                    text: shareText || `${title} by ${artist || 'Fwaya'}`,
+                    url,
+                  });
+                  onShare?.();
+                } catch (err) {
+                  console.error('Native share failed', err);
+                }
+              } else {
+                // Fallback: copy link
+                try {
+                  await navigator.clipboard.writeText(url);
+                  alert('Link copied to clipboard!');
+                  onShare?.();
+                } catch (e) {
+                  console.error('Copy failed', e);
+                }
+              }
+            }}
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-2 text-white transition hover:border-purple-500 hover:text-purple-300"
+            aria-label="Share via device"
+          >
+            <RiFileCopyLine size={18} />
+          </button>
+          <button
             onClick={handleFacebook}
             className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-2 text-white transition hover:border-purple-500 hover:text-purple-300"
             aria-label="Share on Facebook"

@@ -167,6 +167,76 @@ export default function GuestWelcome() {
       ? item.comments.length
       : 0;
 
+  const getMediaLikes = (item: any) => {
+    if (typeof item.likeCount === 'number') return item.likeCount;
+    if (typeof item.likes === 'number') return item.likes;
+    if (typeof item.likesCount === 'number') return item.likesCount;
+    if (Array.isArray(item.likes)) return item.likes.length;
+    if (Array.isArray(item.likedBy)) return item.likedBy.length;
+    return 0;
+  };
+
+  const getArtistFollowers = (artist: any) => {
+    if (typeof artist.followers === 'number') return artist.followers;
+    if (Array.isArray(artist.followers)) return artist.followers.length;
+    if (typeof artist.followersCount === 'number') return artist.followersCount;
+    if (typeof artist.followersTotal === 'number') return artist.followersTotal;
+    return 0;
+  };
+
+  const getTrackCount = (item: any) => {
+    if (typeof item.mediasCount === 'number') return item.mediasCount;
+    if (typeof item.trackCount === 'number') return item.trackCount;
+    if (typeof item.tracksCount === 'number') return item.tracksCount;
+    if (typeof item.track_count === 'number') return item.track_count;
+    if (Array.isArray(item.tracks)) return item.tracks.length;
+    return 0;
+  };
+
+  const getSectionHref = (section: string) => {
+    switch (section) {
+      case 'quickPicks':
+        return '/browse';
+      case 'musicVideos':
+      case 'videos':
+      case 'otherVideos':
+        return '/videos';
+      case 'featuredArtists':
+        return '/artists';
+      case 'featuredProducers':
+        return '/artists?role=producer';
+      case 'beats':
+        return '/browse?section=beats';
+      case 'trendingNow':
+      case 'trending':
+        return '/trending';
+      case 'featuredAlbums':
+        return '/albums';
+      case 'newReleases':
+        return '/new-releases';
+      case 'suggestedPlaylists':
+        return '/playlist';
+      case 'topCharts':
+        return '/top-charts';
+      case 'news':
+        return '/news';
+      case 'podcasts':
+        return '/your-episodes';
+      default:
+        return '/browse';
+    }
+  };
+
+  const renderSeeAll = (section: string) => (
+    <button
+      type="button"
+      onClick={() => router.push(getSectionHref(section))}
+      className="text-xs text-purple-300 hover:text-white transition"
+    >
+      See All {'>'}
+    </button>
+  );
+
   // Helper: fetch with timeout
   const fetchJsonWithTimeout = async (input: RequestInfo, timeout = 8000, init?: RequestInit) => {
     const controller = new AbortController();
@@ -384,30 +454,51 @@ export default function GuestWelcome() {
     }
   }, []);
 
-  const heroImages = [
-    "/breadcumb3.jpg",
-    "/featured5.jpg",
-    "/featured6.jpg",
-  ];
-
-  const heroContent = [
+  const heroSlides = [
     {
       title: "We are fwaya (Remix)",
       subtitle: "Lusaka — Recharged",
+      image: "/breadcumb3.jpg",
       primaryButton: "Play",
-      secondaryButton: "Save"
+      secondaryButton: "Save",
+      primaryAction: () => {},
+      secondaryAction: () => {}
     },
     {
       title: "My Dreams",
       subtitle: "Zed — Infinite",
+      image: "/featured5.jpg",
       primaryButton: "Listen Now",
-      secondaryButton: "Add to Playlist"
+      secondaryButton: "Add to Playlist",
+      primaryAction: () => {},
+      secondaryAction: () => {}
     },
     {
       title: "Birthday",
       subtitle: "Fwaya — Enjoy",
+      image: "/featured6.jpg",
       primaryButton: "Stream",
-      secondaryButton: "Download"
+      secondaryButton: "Download",
+      primaryAction: () => {},
+      secondaryAction: () => {}
+    },
+    {
+      title: "New Single: Ignite",
+      subtitle: "Fresh audio release — Track ID 18",
+      image: "/featured5.jpg",
+      primaryButton: "Play Track",
+      secondaryButton: "View Details",
+      primaryAction: () => router.push('/track/18'),
+      secondaryAction: () => router.push('/track/18')
+    },
+    {
+      title: "Official Video Premiere",
+      subtitle: "Visual story live now — Video ID 11",
+      image: "/featured6.jpg",
+      primaryButton: "Watch Video",
+      secondaryButton: "Save to Library",
+      primaryAction: () => router.push('/videos/11?autoplay=1'),
+      secondaryAction: () => router.push('/videos/11')
     }
   ];
 
@@ -420,13 +511,13 @@ export default function GuestWelcome() {
     router.push(`/videos/${video.id}?autoplay=1`);
   };
 
-  // Auto-rotate hero images with sliding animation
+  // Auto-rotate hero slides with sliding animation
   React.useEffect(() => {
     const interval = setInterval(() => {
       setIsSliding(true);
-      // Wait for slide animation to complete before changing image
+      // Wait for slide animation to complete before changing slide
       setTimeout(() => {
-        setHeroImageIndex((prev) => (prev + 1) % heroImages.length);
+        setHeroImageIndex((prev) => (prev + 1) % heroSlides.length);
         setIsSliding(false);
       }, 1200); // Slightly slower slide duration
     }, 4000); // Total cycle time
@@ -634,8 +725,8 @@ export default function GuestWelcome() {
         <div className="relative h-[150px] rounded-3xl overflow-hidden mb-3 pt-5">
           <div className="absolute inset-0">
             <Image
-              src={heroImages[heroImageIndex]}
-              alt="Hero banner"
+              src={heroSlides[heroImageIndex].image}
+              alt={heroSlides[heroImageIndex].title}
               fill
               className="object-cover object-center"
             />
@@ -683,7 +774,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Quick Picks for You</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('quickPicks')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {quickPicks.slice(0, 6).map((item: any, i: number) => (
@@ -726,7 +817,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Music Videos</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('videos')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {musicVideoCards.map((item: any, i: number) => (
@@ -785,7 +876,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Featured Artists</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('featuredArtists')}
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
@@ -805,7 +896,7 @@ export default function GuestWelcome() {
                       )}
                     </div>
                     <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
-                    <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
+                    <p className="text-[10px] text-gray-400">{getArtistFollowers(artist)} followers</p>
                   </Link>
                 ))}
               </div>
@@ -815,7 +906,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Producers & Beat Makers</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('featuredProducers')}
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredProducers.slice(0, 6).map((producer: any, i: number) => (
@@ -849,7 +940,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Beats & Instruments</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('beats')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {beats.slice(0, 6).map((beat: any, i: number) => (
@@ -898,7 +989,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Trending Now</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('trendingNow')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {trendingNow.slice(0, 6).map((item: any, i: number) => (
@@ -951,7 +1042,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Featured Albums</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('featuredAlbums')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
@@ -967,7 +1058,7 @@ export default function GuestWelcome() {
                     <div className="p-3 bg-transparent">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                      <p className="text-xs text-gray-400">{item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks</p>
+                      <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
                     </div>
                   </div>
                 ))}
@@ -1024,7 +1115,7 @@ export default function GuestWelcome() {
             <div className="mt-3 mb-4">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Suggested Playlists</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('suggestedPlaylists')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.slice(0, 6).map((item: any, i: number) => (
@@ -1052,7 +1143,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Trending Now</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('trendingNow')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {trendingNow.slice(0, 6).map((item: any, i: number) => (
@@ -1101,7 +1192,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Featured Albums</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('featuredAlbums')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
@@ -1117,7 +1208,7 @@ export default function GuestWelcome() {
                     <div className="p-3 bg-transparent">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                      <p className="text-xs text-gray-400">{item.mediasCount || Math.floor(Math.random() * 20) + 5} tracks</p>
+                      <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
                     </div>
                   </div>
                 ))}
@@ -1176,7 +1267,7 @@ export default function GuestWelcome() {
             <div className="mt-3 mb-4">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Suggested Playlists</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('suggestedPlaylists')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.slice(0, 6).map((item: any, i: number) => (
@@ -1203,7 +1294,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Trending Now</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('trendingNow')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {trendingNow.slice(0, 6).map((item: any, i: number) => (
@@ -1245,7 +1336,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Artists</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('featuredArtists')}
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
@@ -1265,7 +1356,7 @@ export default function GuestWelcome() {
                       )}
                     </div>
                     <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
-                    <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
+                    <p className="text-[10px] text-gray-400">{getArtistFollowers(artist)} followers</p>
                   </Link>
                 ))}
               </div>
@@ -1278,7 +1369,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Albums</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('featuredAlbums')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
@@ -1356,7 +1447,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Latest News</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('news')}
               </div>
               <div className="space-y-3">
                 {featuredArtists.slice(0, 4).map((artist: any, i: number) => (
@@ -1387,7 +1478,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Music Videos</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('videos')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {musicVideoCards.map((item: any, i: number) => (
@@ -1431,7 +1522,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Other Videos</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('otherVideos')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {otherVideoCards.map((item: any, i: number) => (
@@ -1480,7 +1571,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Featured Podcasts</h3>
-                <span className="text-xs text-gray-400">See All {'>'}</span>
+                {renderSeeAll('podcasts')}
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
@@ -1500,7 +1591,7 @@ export default function GuestWelcome() {
                       )}
                     </div>
                     <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
-                    <p className="text-[10px] text-gray-400">{artist.followers?.length || '0'} followers</p>
+                    <p className="text-[10px] text-gray-400">{getArtistFollowers(artist)} followers</p>
                   </Link>
                 ))}
               </div>
@@ -1548,8 +1639,8 @@ export default function GuestWelcome() {
           <div className="relative rounded-3xl mb-10 overflow-hidden h-80">
             <div className="absolute inset-0">
               <Image
-                src={heroImages[heroImageIndex]}
-                alt="Hero banner"
+                src={heroSlides[heroImageIndex].image}
+                alt={heroSlides[heroImageIndex].title}
                 fill
                 className="object-cover"
               />
@@ -1562,25 +1653,31 @@ export default function GuestWelcome() {
             <div className="relative p-8 flex justify-between items-center h-full">
               <div className="max-w-xl z-10">
                 <h2 className="text-4xl font-bold mb-2 text-white">
-                  {heroContent[heroImageIndex].title}
+                  {heroSlides[heroImageIndex].title}
                 </h2>
                 <p className="text-lg text-white/90 mb-6">
-                  {heroContent[heroImageIndex].subtitle}
+                  {heroSlides[heroImageIndex].subtitle}
                 </p>
 
-                <div className="flex gap-4">
-                  <button className="bg-white text-black px-6 py-3 rounded-full flex items-center gap-2 text-sm font-medium hover:bg-gray-100 transition-colors">
-                    <FaPlay /> {heroContent[heroImageIndex].primaryButton}
+                <div className="flex flex-wrap gap-4">
+                  <button
+                    onClick={heroSlides[heroImageIndex].primaryAction}
+                    className="bg-white text-black px-6 py-3 rounded-full flex items-center gap-2 text-sm font-medium hover:bg-gray-100 transition-colors"
+                  >
+                    <FaPlay /> {heroSlides[heroImageIndex].primaryButton}
                   </button>
-                  <button className="bg-white/20 px-6 py-3 rounded-full text-sm text-white border border-white/30 hover:bg-white/30 transition-colors">
-                    {heroContent[heroImageIndex].secondaryButton}
+                  <button
+                    onClick={heroSlides[heroImageIndex].secondaryAction}
+                    className="bg-white/20 px-6 py-3 rounded-full text-sm text-white border border-white/30 hover:bg-white/30 transition-colors"
+                  >
+                    {heroSlides[heroImageIndex].secondaryButton}
                   </button>
                 </div>
               </div>
 
               <div className={`relative w-48 h-48 rounded-3xl overflow-hidden border border-white/20 shadow-2xl transition-all duration-1000 ease-out ${isSliding ? 'translate-x-12 opacity-50 scale-95' : 'translate-x-0 opacity-100 scale-100'}`}>
                 <Image
-                  src={heroImages[heroImageIndex]}
+                  src={heroSlides[heroImageIndex].image}
                   alt="Hero overlay"
                   fill
                   className="object-cover"
@@ -1648,19 +1745,28 @@ export default function GuestWelcome() {
                 Featured Albums
               </h3>
 
-              <div className="flex gap-1">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => scroll(quickRef, "left")}
-                  className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center"
+                  type="button"
+                  onClick={() => router.push(getSectionHref('featuredAlbums'))}
+                  className="rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
                 >
-                  <FaChevronLeft className="text-sm" />
+                  See All
                 </button>
-                <button
-                  onClick={() => scroll(quickRef, "right")}
-                  className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center"
-                >
-                  <FaChevronRight className="text-sm" />
-                </button>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => scroll(quickRef, "left")}
+                    className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center"
+                  >
+                    <FaChevronLeft className="text-sm" />
+                  </button>
+                  <button
+                    onClick={() => scroll(quickRef, "right")}
+                    className="w-8 h-8 bg-white/10 rounded-full hover:bg-white/20 transition-colors flex items-center justify-center"
+                  >
+                    <FaChevronRight className="text-sm" />
+                  </button>
+                </div>
               </div>
             </div>
 

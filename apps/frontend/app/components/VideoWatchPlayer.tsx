@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FastForward, Maximize2, Pause, Play, Rewind, Settings2, Volume2, VolumeX } from "lucide-react";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { useAuth } from '@/context/AuthContext';
+import { subscribe } from '@/lib/realtime';
 import { getVideoQualityOptions, resolveVideoQualityUrl, type VideoQualityValue } from "@/lib/video-quality";
 
 interface VideoWatchPlayerProps {
@@ -49,6 +51,9 @@ export default function VideoWatchPlayer({
   const lastTimeUpdateRef = useRef<number>(0);
 
   const { currentTrack, setCurrentTrack, registerVideoElement } = useAudioPlayer();
+  const { getToken } = useAuth();
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState<number | null>(null);
 
   const isSameTrack = useMemo(
     () => currentTrack && trackId != null && String(currentTrack.id) === String(trackId),
@@ -148,6 +153,42 @@ export default function VideoWatchPlayer({
       connection?.removeEventListener?.('change', handleNetworkChange);
     };
   }, []);
+
+  // Fetch initial likes and subscribe to realtime media:liked events
+  useEffect(() => {
+    let unsub: (() => void) | undefined;
+    const setup = async () => {
+      try {
+        if (trackId) {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${trackId}`);
+          if (res.ok) {
+            const data = await res.json();
+            setLikesCount(typeof data.likes === 'number' ? data.likes : null);
+          }
+        }
+      } catch (err) {
+        // ignore
+      }
+
+      try {
+        unsub = await subscribe('media:liked', (payload: any) => {
+          try {
+            if (!payload) return;
+            if (Number(payload.mediaId) === Number(trackId)) {
+              if (typeof payload.likes === 'number') setLikesCount(payload.likes);
+              if (typeof payload.liked === 'boolean') setIsLiked(Boolean(payload.liked));
+            }
+          } catch (err) {
+            console.error('media:liked handler error', err);
+          }
+        });
+      } catch (err) {
+        // ignore
+      }
+    };
+    void setup();
+    return () => { if (unsub) unsub(); };
+  }, [trackId]);
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -437,7 +478,33 @@ export default function VideoWatchPlayer({
               </button>
             </div>
           </div>
-
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!trackId) return;
+                  const token = await getToken();
+                  try {
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${trackId}/interact/like`, {
+                      method: 'POST',
+                      headers: {
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                      },
+                    });
+                    if (!res.ok) throw new Error('Like failed');
+                    // optimistic toggle handled by realtime event; but toggle locally for immediate feedback
+                    setIsLiked(prev => !prev);
+                  } catch (err) {
+                    console.error('VideoWatchPlayer like failed', err);
+                  }
+                }}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
+                aria-label="Like"
+              >
+                {isLiked ? <span className="text-pink-400">❤</span> : <span className="text-white/70">♡</span>}
+              </button>
+              <div className="text-sm text-white/70">{likesCount ?? '-'}</div>
+            </div>
           <div className="hidden grid-cols-[1.4fr_0.9fr] gap-3 sm:grid">
             <div className="flex items-center gap-2 rounded-3xl bg-[#0f1115] px-3 py-3 text-sm text-slate-300">
               <span className="uppercase tracking-[0.2em] text-slate-500">Volume</span>

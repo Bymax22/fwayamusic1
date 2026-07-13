@@ -3,12 +3,17 @@ import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { MediaType, MediaAccessType, NotificationType, UserRole, ModerationStatus } from '@prisma/client';
 import { NotificationService } from '../notification/notification.service';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class MediaService {
   private readonly logger = new Logger(MediaService.name);
 
-  constructor(private readonly prisma: PrismaService, private readonly notificationService: NotificationService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationService: NotificationService,
+    private readonly eventsGateway: EventsGateway,
+  ) {
     try {
       cloudinary.config({
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -248,6 +253,20 @@ export class MediaService {
         );
       }
 
+      try {
+        this.eventsGateway.emitMediaUploaded({
+          mediaId: media.id,
+          userId,
+          type: media.type,
+          albumId: (media as any).albumId || null,
+          title: media.title,
+        });
+      } catch (emitError) {
+        this.logger.error(
+          `Failed to emit media uploaded event: ${emitError instanceof Error ? emitError.message : String(emitError)}`,
+        );
+      }
+
       this.logger.log(`Media created successfully: ${media.id}`);
       return media;
     } catch (error) {
@@ -371,6 +390,20 @@ export class MediaService {
         this.logger.error(
           `Media metadata created but failed to notify followers: ${notificationError instanceof Error ? notificationError.message : String(notificationError)}`,
           notificationError instanceof Error ? notificationError.stack : undefined
+        );
+      }
+
+      try {
+        this.eventsGateway.emitMediaUploaded({
+          mediaId: media.id,
+          userId,
+          type: media.type,
+          albumId: (media as any).albumId || null,
+          title: media.title,
+        });
+      } catch (emitError) {
+        this.logger.error(
+          `Failed to emit media uploaded event: ${emitError instanceof Error ? emitError.message : String(emitError)}`,
         );
       }
 

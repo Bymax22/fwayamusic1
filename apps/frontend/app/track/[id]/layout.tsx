@@ -37,8 +37,18 @@ export async function generateMetadata(props: any): Promise<Metadata> {
   const track = await fetchTrackMeta(params.id);
   const artistName = track?.user?.displayName || track?.user?.username || "Fwaya";
   const title = track?.title ? `${track.title} • ${artistName}` : "Fwaya";
-  const ogImage = `${baseUrl}/api/og/track/${params.id}`;
-  const fallbackImage = track?.artCoverUrl || track?.thumbnailUrl || ogImage;
+  const mediaId = extractMediaIdFromSlug(params.id);
+  const ogImage = `${baseUrl}/api/og/track/${mediaId}`;
+  // Preview video URL (if a short MP4 preview is available). Falls back to a generated preview route.
+  const previewVideoUrl =
+    (track as any)?.previewVideoUrl || `${baseUrl}/api/og/track/${mediaId}/video`;
+  // Prefer any available cover fields (coverArt, artCoverUrl, coverUrl, thumbnailUrl)
+  const fallbackImage =
+    track?.coverArt ||
+    (track as any)?.coverUrl ||
+    track?.artCoverUrl ||
+    track?.thumbnailUrl ||
+    ogImage;
   const trackUrl = `${baseUrl}/track/${params.id}`;
 
   // eslint-disable-next-line no-console
@@ -53,6 +63,16 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       description: '',
       url: trackUrl,
       siteName: "Fwaya",
+      // Provide a video object so crawlers (WhatsApp/Facebook) can show an inline player
+      videos: [
+        {
+          url: previewVideoUrl,
+          secureUrl: previewVideoUrl,
+          type: "video/mp4",
+          width: 1280,
+          height: 720,
+        },
+      ],
       images: [
         {
           url: fallbackImage,

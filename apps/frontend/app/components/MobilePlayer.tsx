@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlayIcon,
@@ -16,6 +16,8 @@ import {
   VideoCameraIcon,
 } from "@heroicons/react/24/solid";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
+import { useAuth } from '@/context/AuthContext';
+import { subscribe } from '@/lib/realtime';
 
 type TrackType = {
   id: string | number;
@@ -73,6 +75,29 @@ export default function MobilePlayer({
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffled, setIsShuffled] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const { getToken } = useAuth();
+
+  // Realtime: update like state when other clients like/unlike the same media
+  useEffect(() => {
+    let unsub: (() => void) | undefined;
+    const setup = async () => {
+      unsub = await subscribe('media:liked', (payload: any) => {
+        try {
+          if (!track?.id) return;
+          const targetId = Number(track.id);
+          if (Number(payload?.mediaId) === targetId) {
+            if (typeof payload.liked === 'boolean') setIsLiked(Boolean(payload.liked));
+          }
+        } catch (err) {
+          console.error('MobilePlayer realtime handler error', err);
+        }
+      });
+    };
+    void setup();
+    return () => {
+      if (unsub) unsub();
+    };
+  }, [track?.id]);
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const isVideo = track.type === 'VIDEO' || Boolean((track.videoUrl || track.url || track.audioUrl)?.match(/\.(mp4|mov|m4v|webm|avi|mkv)(\?.*)?$/i));
@@ -283,17 +308,32 @@ export default function MobilePlayer({
 
             {/* Controls */}
             <div className="flex items-center gap-1 relative z-10">
-              <button
-                onClick={() => setIsLiked(!isLiked)}
-                className="p-1 rounded-full hover:bg-white/10 transition-colors"
-                aria-label="Like track"
-              >
-                {isLiked ? (
-                  <HeartIcon className="w-4 h-4 text-pink-400" />
-                ) : (
-                  <HeartOutline className="w-4 h-4 text-white/70" />
-                )}
-              </button>
+                <button
+                  onClick={async () => {
+                    if (!track?.id) return;
+                    const next = !isLiked;
+                    setIsLiked(next);
+                    const token = await getToken();
+                    if (!token) return setIsLiked(!next);
+                    try {
+                      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${track.id}/interact/like`, {
+                        method: 'POST',
+                        headers: { Authorization: `Bearer ${token}` },
+                      });
+                    } catch (err) {
+                      console.error('MobilePlayer: like failed', err);
+                      setIsLiked(!next);
+                    }
+                  }}
+                  className="p-1 rounded-full hover:bg-white/10 transition-colors"
+                  aria-label="Like track"
+                >
+                  {isLiked ? (
+                    <HeartIcon className="w-4 h-4 text-pink-400" />
+                  ) : (
+                    <HeartOutline className="w-4 h-4 text-white/70" />
+                  )}
+                </button>
 
               <button
                 onClick={onPrevious}
@@ -369,3 +409,6 @@ export default function MobilePlayer({
     </AnimatePresence>
   );
 }
+
+// Subscribe to realtime updates for this component's lifecycle
+// (Note: subscription to updates for current track is handled via effect below)

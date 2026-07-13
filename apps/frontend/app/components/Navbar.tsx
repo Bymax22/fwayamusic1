@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { User, ChevronDown, Settings } from "lucide-react";
+import { User, ChevronDown, Settings, Crown } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Image from "next/image";
 import NotificationBell from "./NotificationBell";
@@ -42,6 +42,16 @@ export default function Navbar({ currentTrack }: { currentTrack: any }) {
           <Link href="/settings" className="text-gray-400 hover:text-white transition" aria-label="Settings">
             <Settings size={20} />
           </Link>
+          {/* Premium CTA: full button for guests, icon-only stroke for logged-in users */}
+          {user ? (
+            <Link href="/premium" aria-label="Premium" className="p-2 rounded-full border border-purple-500 text-purple-500 hover:bg-purple-500/10 transition mr-2">
+              <Crown size={18} />
+            </Link>
+          ) : (
+            <Link href="/premium" className="px-4 py-2 bg-purple-600 rounded-full text-sm font-medium hover:bg-purple-700 transition mr-2">
+              Go Premium
+            </Link>
+          )}
           {user ? (
             <div className="flex items-center gap-2 cursor-pointer hover:bg-white/10 px-3 py-1.5 rounded-full transition">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">

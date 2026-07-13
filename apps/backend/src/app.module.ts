@@ -12,9 +12,10 @@ import { NewsModule } from './news/news.module';
 import { MediaInteractionModule } from './media-interaction/media-interaction.module';
 import { MediaCommentModule } from './media-comment/media-comment.module';
 import { FollowerModule } from './follower/follower.module';
-import {PlaylistModule} from './playlist/playlist.module';
-import {ArtistsModule} from './artists/artists.module';
-import {UserModule} from './user/user.module';
+import { PlaylistModule } from './playlist/playlist.module';
+import { EventsModule } from './events/events.module';
+import { ArtistsModule } from './artists/artists.module';
+import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { KycModule } from './kyc/kyc.module';
@@ -41,6 +42,7 @@ const logger = new Logger('AppModule');
     UserModule,
     NotificationModule,
     SubscriptionModule,
+    EventsModule,
     KycModule,
   ],
   controllers: [AppController],

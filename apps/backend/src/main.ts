@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
@@ -49,6 +50,8 @@ async function initializeApp() {
       next();
     });
     await app.init();
+    // Register socket.io adapter for realtime gateways
+    app.useWebSocketAdapter(new IoAdapter(app));
     logger.log('NestJS application initialized successfully');
 
     if (!process.env.VERCEL) {

@@ -8,14 +8,14 @@ import {
   Star, Mic2, Video, Headphones, Radio
 } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { useAuth } from '@/context/AuthContext';
 import Waveform from '@/components/Waveform';
 import ShareModal from '@/components/ShareModal';
-import { formatDuration, formatFileSize } from '@/lib/utils';
+import { createMediaSlug, formatDuration, formatFileSize } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from "../context/AuthContext";
 import { MobileMoneyPaymentModal } from '../components/modal/MobileMoneyPaymentModal';
 
 interface MediaFile {
@@ -114,7 +114,7 @@ interface PlaylistAPI {
 }
 
 export default function Browse() {
-  const { getToken } = useAuth();
+  const { getToken, user } = useAuth();
   const router = useRouter();
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<MediaFile[]>([]);
@@ -656,16 +656,14 @@ export default function Browse() {
 
   const handleAddToPlaylist = async (playlistId: number, mediaId: number) => {
     try {
+      const token = await getToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlists/${playlistId}/media`, {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ 
-          mediaId,
-          userId: 1 // TODO: Get from auth context
-        })
+        body: JSON.stringify({ mediaId, userId: user?.id })
       });
 
       if (!response.ok) throw new Error('Failed to add to playlist');
@@ -970,7 +968,7 @@ export default function Browse() {
                       }}
                     />
                     <div className="flex-1 min-w-0">
-                      <Link href={`/track/${file.id}`}>
+                      <Link href={`/track/${createMediaSlug(file.title, file.id)}`}>
                         <p className={`font-medium flex items-center gap-2 cursor-pointer hover:text-green-400 transition-colors ${
                           String(currentTrack?.id) === String(file.id) 
                             ? 'text-[#a855f7]' 
@@ -1146,7 +1144,7 @@ export default function Browse() {
                 </div>
 
                 <div className="p-4">
-                  <Link href={`/track/${file.id}`}>
+                  <Link href={`/track/${createMediaSlug(file.title, file.id)}`}>
                     <h3 className="font-medium text-white truncate mb-1 hover:text-green-400 transition-colors cursor-pointer">{file.title}</h3>
                   </Link>
                   <div className="flex items-center gap-2 mb-2">
@@ -1230,7 +1228,7 @@ export default function Browse() {
                 {/* Track info - 2 lines only */}
                 <div className="flex-1 min-w-0 py-0.5">
                   {/* Line 1: Title - Artist (with horizontal scroll animation when playing) */}
-                  <Link href={`/track/${file.id}`}>
+                  <Link href={`/track/${createMediaSlug(file.title, file.id)}`}>
                     <div className="overflow-hidden cursor-pointer hover:text-green-400 transition-colors">
                       <p 
                         className={`font-medium text-white text-sm whitespace-nowrap ${

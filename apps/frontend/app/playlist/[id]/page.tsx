@@ -18,6 +18,8 @@ import {
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Waveform from '@/components/Waveform';
+import { useAuth } from '@/context/AuthContext';
+import { subscribe } from '@/lib/realtime';
 
 // Track interface
 interface Track {
@@ -92,6 +94,7 @@ const PlaylistDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
+  const { user, getToken } = useAuth();
 
   useEffect(() => {
     const fetchPlaylist = async () => {
@@ -112,6 +115,36 @@ const PlaylistDetailPage = () => {
     if (params.id) {
       fetchPlaylist();
     }
+  }, [params.id]);
+
+  // Realtime: refresh playlist when updates occur
+  useEffect(() => {
+    let unsub: (() => void) | undefined;
+    const setup = async () => {
+      try {
+        unsub = await subscribe('playlist:updated', (payload: any) => {
+          try {
+            if (!params.id) return;
+            const pid = Number(params.id);
+            if (Number(payload?.playlistId) === pid) {
+              // refetch playlist
+              fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist/${params.id}`)
+                .then((res) => res.ok ? res.json() : null)
+                .then((data) => {
+                  if (data) setPlaylist(data);
+                })
+                .catch(() => {});
+            }
+          } catch (err) {
+            console.error('playlist:updated handler error', err);
+          }
+        });
+      } catch (err) {
+        // ignore
+      }
+    };
+    void setup();
+    return () => { if (unsub) unsub(); };
   }, [params.id]);
 
   const handlePlay = (track: Track) => {

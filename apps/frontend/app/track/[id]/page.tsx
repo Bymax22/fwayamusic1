@@ -26,7 +26,7 @@ import {
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import ShareModal from '@/components/ShareModal';
 import { useAuth } from '@/context/AuthContext';
-import { formatDuration } from '@/lib/utils';
+import { createMediaSlug, extractMediaIdFromSlug, formatDuration } from '@/lib/utils';
 
 interface Comment {
   id: number;
@@ -75,10 +75,8 @@ export default function TrackPage() {
   const params = useParams();
   const router = useRouter();
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
-  const paramId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const trackId = typeof paramId === 'string' ? paramId : undefined;
-  const trackIdNumber = trackId ? Number(trackId) : undefined;
-  
+  const trackSlug = Array.isArray(params.id) ? params.id[0] : params.id;
+  const trackId = extractMediaIdFromSlug(trackSlug);
   const [track, setTrack] = useState<MediaItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,6 +94,12 @@ export default function TrackPage() {
 
   useEffect(() => {
     const fetchTrack = async () => {
+      if (!trackId) {
+        setError('Invalid track identifier');
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${trackId}`);
         if (!response.ok) {
@@ -115,7 +119,7 @@ export default function TrackPage() {
         const relatedRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media?genre=${data.genre}&limit=5`);
         if (relatedRes.ok) {
           const relatedData = await relatedRes.json();
-          setRelatedTracks(relatedData.filter((t: MediaItem) => trackIdNumber === undefined ? true : t.id !== trackIdNumber).slice(0, 4));
+          setRelatedTracks(relatedData.filter((t: MediaItem) => trackId === undefined ? true : t.id !== trackId).slice(0, 4));
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load track');
@@ -128,6 +132,34 @@ export default function TrackPage() {
       fetchTrack();
     }
   }, [trackId]);
+
+  // Realtime updates for like counts/state
+  useEffect(() => {
+    let unsub: (() => void) | undefined;
+    const setup = async () => {
+      try {
+        const { subscribe } = await import('@/lib/realtime');
+        unsub = await subscribe('media:liked', (payload: any) => {
+          if (!track) return;
+          if (Number(payload?.mediaId) === Number(track.id)) {
+            if (typeof payload.likes === 'number') {
+              setTrack((prev) => prev ? { ...prev, likes: payload.likes } : prev);
+            }
+            if (typeof payload.liked === 'boolean') {
+              // If payload.userId matches current user, ignore (local update handled elsewhere)
+              setIsLiked(Boolean(payload.liked));
+            }
+          }
+        });
+      } catch (err) {
+        // ignore
+      }
+    };
+    void setup();
+    return () => {
+      if (unsub) unsub();
+    };
+  }, [track]);
 
   const handlePlayTrack = async () => {
     if (!track) return;
@@ -245,7 +277,7 @@ export default function TrackPage() {
     }
   };
 
-  const getTrackShareUrl = () => `${window.location.origin}/track/${track?.id}`;
+  const getTrackShareUrl = () => track ? `${window.location.origin}/track/${createMediaSlug(track.title, track.id)}` : '';
 
   const shareUrl = track ? getTrackShareUrl() : '';
   const shareText = track ? `Listen to ${track.title} by ${track.artist} on Fwaya.\n${shareUrl}` : undefined;
@@ -535,7 +567,7 @@ export default function TrackPage() {
                     {relatedTracks.map((relatedTrack) => (
                       <button
                         key={relatedTrack.id}
-                        onClick={() => router.push(`/track/${relatedTrack.id}`)}
+                        onClick={() => router.push(`/track/${createMediaSlug(relatedTrack.title, relatedTrack.id)}`)}
                         className="snap-start min-w-[110px] max-w-[110px] sm:min-w-[120px] sm:max-w-[120px] lg:min-w-[240px] lg:max-w-[240px] rounded-[32px] bg-black p-2 sm:p-3 lg:p-4 text-left transition hover:bg-white/5 shadow-sm"
                       >
                         <div className="relative mb-2 sm:mb-3 lg:mb-4 h-20 sm:h-28 lg:h-36 overflow-hidden rounded-3xl bg-slate-900">

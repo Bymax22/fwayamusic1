@@ -25,6 +25,7 @@
     "db:setup": "npm run prisma:migrate && npm run prisma:seed"
   },
   "dependencies": {
+    "@fwaya-music/types": "*",
     "@nestjs-modules/mailer": "^1.6.1",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.1",
@@ -33,12 +34,12 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.13",
+    "@nestjs/platform-socket.io": "^11.1.28",
     "@nestjs/sequelize": "^11.0.0",
     "@nestjs/swagger": "^5.2.1",
     "@nestjs/throttler": "^6.4.0",
     "@nestjs/typeorm": "^11.0.0",
     "@prisma/client": "^6.6.0",
-    "@fwaya-music/types": "*",
     "@sendgrid/mail": "^8.1.6",
     "bcrypt": "^5.1.1",
     "buffer-to-stream": "^1.0.0",
@@ -61,6 +62,7 @@
     "rxjs": "^7.8.1",
     "sequelize": "^6.37.7",
     "sequelize-typescript": "^2.1.6",
+    "socket.io": "^4.8.3",
     "typeorm": "^0.3.22",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"

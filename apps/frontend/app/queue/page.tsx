@@ -5,6 +5,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from "next/image";
 import Waveform from '@/components/Waveform';
+import { subscribe } from '@/lib/realtime';
 
 interface QueueItem {
   id: number;
@@ -72,6 +73,32 @@ export default function QueuePage() {
 
     setQueue(mockQueue);
     setUpNext(mockUpNext);
+  }, []);
+
+  // Subscribe to playlist updates and apply to upNext where plausible
+  useEffect(() => {
+    let unsub: (() => void) | undefined;
+    const setup = async () => {
+      try {
+        unsub = await subscribe('playlist:updated', (payload: any) => {
+          try {
+            if (!payload) return;
+            if (payload.action === 'add' && payload.entry) {
+              setUpNext((prev) => [...prev, payload.entry.media]);
+            }
+            if (payload.action === 'remove' && payload.entry?.mediaId) {
+              setUpNext((prev) => prev.filter(t => t.id !== payload.entry.mediaId));
+            }
+          } catch (err) {
+            console.error('Queue handler error', err);
+          }
+        });
+      } catch (err) {
+        // ignore
+      }
+    };
+    void setup();
+    return () => { if (unsub) unsub(); };
   }, []);
 
   const handlePlay = (track: QueueItem) => {

@@ -108,6 +108,25 @@ export function slugify(text: string): string {
     .replace(/-+$/, '');
 }
 
+export function createMediaSlug(title: string, id: string | number) {
+  const safeTitle = title ? slugify(title) : 'untitled';
+  return `${safeTitle}-${id}`;
+}
+
+export function extractMediaIdFromSlug(slug?: string | string[] | null) {
+  const value = Array.isArray(slug) ? slug[0] : slug;
+  if (!value) return undefined;
+
+  const matches = value.match(/-(\d+)(?:$|\/)/);
+  if (matches?.[1]) {
+    const parsed = Number(matches[1]);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : undefined;
+}
+
 // Audio Utilities
 /**
  * Converts BPM to human-readable tempo

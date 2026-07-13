@@ -17,6 +17,8 @@ import DashboardHeader from '@/components/DashboardHeader';
 import MobilePlayer from '@/components/MobilePlayer';
 import ShareModal from '@/components/ShareModal';
 import VideoPlayer from '@/components/VideoPlayer';
+import { createMediaSlug } from '@/lib/utils';
+import { subscribe } from '@/lib/realtime';
 
 
 
@@ -355,6 +357,31 @@ export default function ForArtistsPage() {
 
   useEffect(() => {
     fetchDashboardData();
+  }, [user]);
+
+  useEffect(() => {
+    let unsub: (() => void) | undefined;
+    const setupRealtime = async () => {
+      try {
+        unsub = await subscribe('media:uploaded', (payload: any) => {
+          try {
+            if (!user?.id || !payload?.userId) return;
+            if (Number(payload.userId) === Number(user.id)) {
+              fetchDashboardData();
+            }
+          } catch (err) {
+            console.error('Artist dashboard realtime handler error:', err);
+          }
+        });
+      } catch (err) {
+        console.error('Failed to subscribe to realtime media:uploaded events:', err);
+      }
+    };
+
+    void setupRealtime();
+    return () => {
+      if (unsub) unsub();
+    };
   }, [user]);
 
   const fetchDashboardData = async () => {
@@ -828,7 +855,7 @@ export default function ForArtistsPage() {
     }
   };
 
-  const getTrackShareUrl = (media: Media) => `${window.location.origin}/track/${media.id}`;
+  const getTrackShareUrl = (media: Media) => `${window.location.origin}/track/${createMediaSlug(media.title, media.id)}`;
 
   const buildTrackShareText = (media: Media) => {
     const durationText = media.duration ? `${Math.floor(media.duration / 60)}:${String(media.duration % 60).padStart(2, '0')}` : 'Unknown duration';
