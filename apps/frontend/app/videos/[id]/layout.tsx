@@ -40,7 +40,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const video = await fetchVideoMeta(id);
   const title = video?.title ? `${video.title} • ${video.user?.displayName || video.user?.username || 'Fwaya'}` : 'Fwaya Video';
   const description = video?.description || 'Watch this video on Fwaya';
-  const image = video?.thumbnail || video?.artCoverUrl || video?.coverArt || video?.thumbnailUrl || `${baseUrl}/default-cover.jpg`;
+  
+  // Ensure image URL is absolute
+  const rawImageUrl = video?.thumbnail || video?.artCoverUrl || video?.coverArt || video?.thumbnailUrl;
+  const image = (rawImageUrl && /^https?:\/\//i.test(rawImageUrl)) 
+    ? rawImageUrl 
+    : (rawImageUrl ? `${baseUrl}${rawImageUrl.startsWith('/') ? '' : '/'}${rawImageUrl}` : `${baseUrl}/api/og/video/${id}`);
+  
   const videoUrl = video?.videoUrl || `${baseUrl}/videos/${id}`;
 
   return {

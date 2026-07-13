@@ -47,13 +47,16 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   // Preview video URL (if a short MP4 preview is available). Falls back to a generated preview route.
   const previewVideoUrl =
     (track as any)?.previewVideoUrl || `${baseUrl}/api/og/track/${mediaId}/video`;
-  // Prefer any available cover fields (coverArt, artCoverUrl, coverUrl, thumbnailUrl)
-  const fallbackImage =
-    track?.coverArt ||
+  
+  // Ensure cover URL is absolute
+  const rawCoverUrl = track?.coverArt ||
     (track as any)?.coverUrl ||
     track?.artCoverUrl ||
-    track?.thumbnailUrl ||
-    ogImage;
+    track?.thumbnailUrl;
+  const fallbackImage = rawCoverUrl && /^https?:\/\//i.test(rawCoverUrl) 
+    ? rawCoverUrl 
+    : (rawCoverUrl ? `${baseUrl}${rawCoverUrl.startsWith('/') ? '' : '/'}${rawCoverUrl}` : ogImage);
+  
   const trackUrl = `${baseUrl}/track/${id}`;
 
   // eslint-disable-next-line no-console

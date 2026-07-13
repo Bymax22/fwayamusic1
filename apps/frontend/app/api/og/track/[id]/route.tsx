@@ -4,43 +4,6 @@ export const runtime = 'edge';
 
 const DEFAULT_IMAGE = 'https://res.cloudinary.com/dayn5vifn/image/upload/v1777067980/fwaya-01_eeob6c.png';
 
-function toAbsoluteUrl(url: string | undefined, base: string) {
-  if (!url) return null;
-  return /^https?:\/\//i.test(url) ? url : `${base}${url.startsWith('/') ? '' : '/'}${url}`;
-}
-
-function normalizeCoverUrl(url: string) {
-  if (/res\.cloudinary\.com\/dayn5vifn\/image\/upload\//.test(url)) {
-    return url.replace('/upload/', '/upload/f_auto,q_auto,w_1200/');
-  }
-  return url;
-}
-
-async function fetchImageDataUrl(url: string) {
-  try {
-    const response = await fetch(url, { next: { revalidate: 60 } });
-    if (!response.ok) {
-      console.error(`Failed to fetch OG cover image: ${response.status} ${response.statusText}`);
-      return null;
-    }
-
-    const contentType = response.headers.get('content-type') || 'image/png';
-    const arrayBuffer = await response.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    let binary = '';
-    const chunkSize = 0x8000;
-
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-    }
-
-    return `data:${contentType};base64,${btoa(binary)}`;
-  } catch (error) {
-    console.error('Failed to fetch OG cover image:', error);
-    return null;
-  }
-}
-
 export async function GET(req: Request, context: any) {
   const trackId = context?.params?.id;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -63,7 +26,6 @@ export async function GET(req: Request, context: any) {
           track = await response.json();
           break;
         }
-        console.error(`OG image media fetch failed for ${backendUrl}:`, response.status, response.statusText);
       } catch (error) {
         console.error(`OG image fetch error for ${backendUrl}:`, error);
       }
@@ -73,12 +35,8 @@ export async function GET(req: Request, context: any) {
   const title = track?.title || 'Fwaya';
   const artist = track?.user?.displayName || track?.user?.username || 'Fwaya';
   const description = track?.description || `Listen to ${title} on Fwaya.`;
-  const rawCoverUrl = toAbsoluteUrl(
-    track?.coverArt || track?.artCoverUrl || track?.thumbnailUrl || (track as any)?.coverUrl,
-    baseUrl,
-  ) || DEFAULT_IMAGE;
-  const coverUrl = normalizeCoverUrl(rawCoverUrl);
-  const coverImageUrl = (await fetchImageDataUrl(coverUrl)) || coverUrl;
+  const coverUrl = (track?.coverArt || track?.artCoverUrl || track?.thumbnailUrl || (track as any)?.coverUrl) || DEFAULT_IMAGE;
+  const absoluteCoverUrl = /^https?:\/\//i.test(coverUrl) ? coverUrl : `${baseUrl}${coverUrl}`;
 
   return new ImageResponse(
     (
@@ -92,7 +50,7 @@ export async function GET(req: Request, context: any) {
         position: 'relative',
         fontFamily: 'Inter, sans-serif',
       }}>
-        <img src={coverImageUrl} alt="cover" style={{
+        <img src={absoluteCoverUrl} alt="cover" style={{
           position: 'absolute',
           inset: 0,
           width: '100%',

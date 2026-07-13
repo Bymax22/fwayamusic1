@@ -809,18 +809,18 @@ export default function GuestWelcome() {
               </h2>
             </div>
 
-            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2 mt-auto">
+            <div className="flex flex-row gap-1.5 sm:gap-2 mt-auto">
               <button
                 type="button"
                 onClick={heroSlides[heroImageIndex]?.primaryAction}
-                className="inline-flex items-center justify-center rounded-full bg-purple-600 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-purple-500 sm:px-3 sm:py-2 sm:text-[11px]"
+                className="inline-flex items-center justify-center rounded-full bg-purple-600 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-purple-500 sm:px-3 sm:py-2 sm:text-[11px] whitespace-nowrap"
               >
                 {heroSlides[heroImageIndex]?.primaryButton}
               </button>
               <button
                 type="button"
                 onClick={heroSlides[heroImageIndex]?.secondaryAction}
-                className="inline-flex items-center justify-center rounded-full bg-white/10 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-white/20 sm:px-3 sm:py-2 sm:text-[11px]"
+                className="inline-flex items-center justify-center rounded-full bg-white/10 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-white/20 sm:px-3 sm:py-2 sm:text-[11px] whitespace-nowrap"
               >
                 {heroSlides[heroImageIndex]?.secondaryButton}
               </button>
