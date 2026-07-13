@@ -30,17 +30,18 @@ async function fetchVideoMeta(id: string): Promise<VideoMeta | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
   const requestHeaders = await headers();
   const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host') || 'fwaya.net';
   const protocol = requestHeaders.get('x-forwarded-proto') || requestHeaders.get('x-forwarded-protocol') || 'https';
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
 
-  const video = await fetchVideoMeta(params.id);
+  const video = await fetchVideoMeta(id);
   const title = video?.title ? `${video.title} • ${video.user?.displayName || video.user?.username || 'Fwaya'}` : 'Fwaya Video';
   const description = video?.description || 'Watch this video on Fwaya';
   const image = video?.thumbnail || video?.artCoverUrl || video?.coverArt || video?.thumbnailUrl || `${baseUrl}/default-cover.jpg`;
-  const videoUrl = video?.videoUrl || `${baseUrl}/videos/${params.id}`;
+  const videoUrl = video?.videoUrl || `${baseUrl}/videos/${id}`;
 
   return {
     title,
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       type: 'video.other',
       title,
       description,
-      url: `${baseUrl}/videos/${params.id}`,
+      url: `${baseUrl}/videos/${id}`,
       siteName: 'Fwaya',
       images: [
         {

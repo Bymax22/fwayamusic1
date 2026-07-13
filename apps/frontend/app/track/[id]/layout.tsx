@@ -31,17 +31,18 @@ async function fetchTrackMeta(id: string): Promise<TrackMeta | null> {
   }
 }
 
-export async function generateMetadata(props: any): Promise<Metadata> {
-  const { params } = props as { params: { id: string } };
+export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { params } = props;
+  const { id } = await params;
   const requestHeaders = await headers();
   const host = requestHeaders.get("x-forwarded-host") || requestHeaders.get("host") || "fwaya.net";
   const protocol = requestHeaders.get("x-forwarded-proto") || requestHeaders.get("x-forwarded-protocol") || "https";
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
 
-  const track = await fetchTrackMeta(params.id);
+  const track = await fetchTrackMeta(id);
   const artistName = track?.user?.displayName || track?.user?.username || "Fwaya";
   const title = track?.title ? `${track.title} • ${artistName}` : "Fwaya";
-  const mediaId = extractMediaIdFromSlug(params.id);
+  const mediaId = extractMediaIdFromSlug(id);
   const ogImage = `${baseUrl}/api/og/track/${mediaId}`;
   // Preview video URL (if a short MP4 preview is available). Falls back to a generated preview route.
   const previewVideoUrl =
@@ -53,10 +54,10 @@ export async function generateMetadata(props: any): Promise<Metadata> {
     track?.artCoverUrl ||
     track?.thumbnailUrl ||
     ogImage;
-  const trackUrl = `${baseUrl}/track/${params.id}`;
+  const trackUrl = `${baseUrl}/track/${id}`;
 
   // eslint-disable-next-line no-console
-  console.log("[layout] generateMetadata for track id=", params.id);
+  console.log("[layout] generateMetadata for track id=", id);
 
   return {
     title,
