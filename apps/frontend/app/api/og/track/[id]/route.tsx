@@ -52,6 +52,8 @@ export async function GET(req: Request, context: any) {
   const coverUrl = (track?.coverArt || track?.artCoverUrl || track?.thumbnailUrl || (track as any)?.coverUrl) || DEFAULT_IMAGE;
   const absoluteCoverUrl = /^https?:\/\//i.test(coverUrl) ? coverUrl : `${baseUrl}${coverUrl}`;
 
+  console.log('[og-track] Generating image:', { trackId, title, artist, coverUrl, absoluteCoverUrl, hasTrack: !!track });
+
   return new ImageResponse(
     (
       <div style={{

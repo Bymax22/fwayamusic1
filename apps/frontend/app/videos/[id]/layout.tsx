@@ -1,5 +1,6 @@
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
+import { extractMediaIdFromSlug } from '@/lib/utils';
 
 interface VideoMeta {
   id: number;
@@ -48,16 +49,26 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
 
   const video = await fetchVideoMeta(id);
+  const videoId = video?.id || extractMediaIdFromSlug(id);
   const title = video?.title ? `${video.title} • ${video.user?.displayName || video.user?.username || 'Fwaya'}` : 'Fwaya Video';
-  const description = video?.description || 'Watch this video on Fwaya';
+  const description = video?.description || `Watch ${video?.title || 'this video'} on Fwaya`;
   
   // Ensure image URL is absolute
   const rawImageUrl = video?.thumbnail || video?.artCoverUrl || video?.coverArt || video?.thumbnailUrl;
-  const image = (rawImageUrl && /^https?:\/\//i.test(rawImageUrl)) 
-    ? rawImageUrl 
-    : (rawImageUrl ? `${baseUrl}${rawImageUrl.startsWith('/') ? '' : '/'}${rawImageUrl}` : `${baseUrl}/api/og/video/${id}`);
+  let image = `${baseUrl}/api/og/video/${videoId}`;
+  if (rawImageUrl) {
+    if (/^https?:\/\//i.test(rawImageUrl)) {
+      image = rawImageUrl;
+    } else if (rawImageUrl.startsWith('/')) {
+      image = `${baseUrl}${rawImageUrl}`;
+    } else {
+      image = `${baseUrl}/${rawImageUrl}`;
+    }
+  }
   
   const videoUrl = video?.videoUrl || `${baseUrl}/videos/${id}`;
+  
+  console.log('[video-layout] Metadata:', { videoId, title, description, image });
 
   return {
     title,

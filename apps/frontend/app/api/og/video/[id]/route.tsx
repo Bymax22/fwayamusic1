@@ -50,6 +50,8 @@ export async function GET(req: Request, context: any) {
   const coverUrl = (video?.coverArt || video?.artCoverUrl || video?.thumbnailUrl || (video as any)?.coverUrl) || DEFAULT_IMAGE;
   const absoluteCoverUrl = /^https?:\/\//i.test(coverUrl) ? coverUrl : `${baseUrl}${coverUrl}`;
 
+  console.log('[og-video] Generating image:', { videoId, title, artist, coverUrl, absoluteCoverUrl, hasVideo: !!video });
+
   return new ImageResponse(
     (
       <div style={{

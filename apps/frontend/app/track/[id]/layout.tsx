@@ -52,7 +52,8 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   const track = await fetchTrackMeta(id);
   const artistName = track?.user?.displayName || track?.user?.username || "Fwaya";
   const title = track?.title ? `${track.title} • ${artistName}` : "Fwaya";
-  const mediaId = extractMediaIdFromSlug(id);
+  const mediaId = track?.id || extractMediaIdFromSlug(id);
+  const description = track?.description || `Listen to ${track?.title || 'this track'} by ${artistName} on Fwaya`;
   const ogImage = `${baseUrl}/api/og/track/${mediaId}`;
   // Preview video URL (if a short MP4 preview is available). Falls back to a generated preview route.
   const previewVideoUrl =
@@ -70,27 +71,17 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   const trackUrl = `${baseUrl}/track/${id}`;
 
   // eslint-disable-next-line no-console
-  console.log("[layout] generateMetadata for track id=", id);
+  console.log("[track-layout] Metadata:", { mediaId, title, description, fallbackImage, ogImage });
 
   return {
     title,
-    description: '',
+    description,
     openGraph: {
       type: "music.song",
       title,
-      description: '',
+      description,
       url: trackUrl,
       siteName: "Fwaya",
-      // Provide a video object so crawlers (WhatsApp/Facebook) can show an inline player
-      videos: [
-        {
-          url: previewVideoUrl,
-          secureUrl: previewVideoUrl,
-          type: "video/mp4",
-          width: 1280,
-          height: 720,
-        },
-      ],
       images: [
         {
           url: fallbackImage,
@@ -111,7 +102,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
     twitter: {
       card: "summary_large_image",
       title,
-      description: '',
+      description,
       images: [fallbackImage, ogImage],
       site: "@fwayamusic",
       creator: "@fwayamusic",
