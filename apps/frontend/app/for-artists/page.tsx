@@ -473,7 +473,7 @@ export default function ForArtistsPage() {
 
         setUploadProgress(10);
 
-        const albumResponse = await fetch(`${getBackendBaseUrl()}/api/v1/albums`, {
+        const albumResponse = await fetch('/api/albums', {
           method: 'POST',
           headers: {
             ...headers,

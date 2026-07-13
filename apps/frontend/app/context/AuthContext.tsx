@@ -347,7 +347,7 @@ const signUp = async (data: SignUpData): Promise<User> => {
         localStorage.setItem('authToken', token);
       }
       await setSessionCookie(token);
-      const backendResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/signup`, {
+      const backendResponse = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -459,7 +459,7 @@ const signUp = async (data: SignUpData): Promise<User> => {
 
   const sendOTP = async (method: 'email' | 'phone' | 'link', identifier: string): Promise<void> => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/send-otp`, {
+      const response = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -478,6 +478,11 @@ const signUp = async (data: SignUpData): Promise<User> => {
         }
         throw new Error(errorText);
       }
+
+      const data = await response.json().catch(() => ({}));
+      if (data && typeof data === 'object' && 'success' in data && data.success === false) {
+        throw new Error((data as { message?: string }).message || 'Unable to send verification code.');
+      }
     } catch (error) {
       console.error('OTP sending error:', error);
       throw error;
@@ -494,16 +499,33 @@ const signUp = async (data: SignUpData): Promise<User> => {
         headers.append('Authorization', `Bearer ${token}`);
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/verify-otp`, {
+      const response = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers,
         body: JSON.stringify({ method, code }),
       });
 
-      return response.ok;
+      if (!response.ok) {
+        let errorText = `Failed to verify OTP (status ${response.status})`;
+        try {
+          const errorData = await response.json();
+          errorText = errorData.message || errorData.error || JSON.stringify(errorData);
+        } catch {
+          const rawText = await response.text();
+          if (rawText) errorText = rawText;
+        }
+        throw new Error(errorText);
+      }
+
+      const data = await response.json().catch(() => ({}));
+      if (data && typeof data === 'object' && 'success' in data) {
+        return Boolean((data as { success?: boolean }).success);
+      }
+
+      return true;
     } catch (error) {
       console.error('OTP verification error:', error);
-      return false;
+      throw error;
     }
   };
 
@@ -566,7 +588,7 @@ const signInWithFacebook = async (role?: UserRole) => {
       localStorage.setItem('authToken', token);
     }
     await setSessionCookie(token);
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/social-login`, {
+    const response = await fetch('/api/auth/social-login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -28,6 +28,17 @@ const sanitizeErrorText = (message: string) => {
 
 export const getFriendlyFirebaseError = (error: Error) => {
   const firebaseError = error as { code?: string; message?: string };
+  const message = firebaseError.message || '';
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes('failed to fetch') || normalized.includes('network request failed') || normalized.includes('fetch failed')) {
+    return 'We could not reach the server. Please check your connection and try again.';
+  }
+
+  if (normalized.includes('email delivery') || normalized.includes('verification email')) {
+    return 'We could not send your verification email right now. Please try again in a moment.';
+  }
+
   switch (firebaseError.code) {
     case 'auth/user-not-found':
       return 'No account was found with that email. Please sign up or check your email and try again.';
@@ -56,8 +67,8 @@ export const getFriendlyFirebaseError = (error: Error) => {
     case 'auth/operation-not-allowed':
       return 'This sign-in method is disabled. Please contact support.';
     default:
-        return firebaseError.message
-          ? sanitizeErrorText(firebaseError.message)
+        return message
+          ? sanitizeErrorText(message)
           : 'An unexpected error occurred. Please try again.';
   }
 };

@@ -364,9 +364,8 @@ async findOrCreateUser(decodedFirebaseUser: any) {
         console.log(`[sendOtp] API Key configured: ${!!apiKey}`);
         
         if (!apiKey) {
-          console.error('[sendOtp] BREVO_API_KEY not set; OTP will be logged to console instead');
-          console.log(`[sendOtp] OTP for user(${user.email}) [${method}]: ${code} (expires ${expiresAt.toISOString()})`);
-          return { success: true };
+          console.error('[sendOtp] BREVO_API_KEY not set; cannot send verification email');
+          throw new Error('Email delivery is not configured. Please contact support.');
         }
         
         let subject: string;
@@ -425,13 +424,15 @@ async findOrCreateUser(decodedFirebaseUser: any) {
             console.error('[sendOtp] Error message:', err?.message || JSON.stringify(err));
             if (err?.response?.data) console.error('[sendOtp] Brevo response data:', err.response.data);
             if (err?.response?.status) console.error('[sendOtp] Brevo response status:', err.response.status);
+            throw new Error('Failed to send verification email. Please try again.');
           }
         };
 
-        void sendBrevoEmail();
+        await sendBrevoEmail();
       } catch (err: any) {
-        console.error('[sendOtp] Failed to initiate OTP email send via Brevo');
+        console.error('[sendOtp] Failed to send OTP email via Brevo');
         console.error('[sendOtp] Error message:', err?.message || JSON.stringify(err));
+        throw err;
       }
     } else {
       // For phone method: TODO integrate SMS provider like Twilio. For now log the code.

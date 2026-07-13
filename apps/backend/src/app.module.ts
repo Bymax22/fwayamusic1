@@ -19,6 +19,7 @@ import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { KycModule } from './kyc/kyc.module';
+import { AlbumsModule } from './albums/albums.module';
 
 const logger = new Logger('AppModule');
 
@@ -44,6 +45,7 @@ const logger = new Logger('AppModule');
     SubscriptionModule,
     EventsModule,
     KycModule,
+    AlbumsModule,
   ],
   controllers: [AppController],
   providers: [AppService,
