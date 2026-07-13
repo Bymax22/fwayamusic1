@@ -486,15 +486,21 @@ export class MediaService {
   }
 
   async getAllMedia() {
-    const media = await this.prisma.media.findMany({
-      include: {
-        user: {
-          select: { id: true, username: true, displayName: true, avatarUrl: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-    return media.filter(m => m.userId !== null);
+    try {
+      const media = await this.prisma.media.findMany({
+        include: {
+          user: {
+            select: { id: true, username: true, displayName: true, avatarUrl: true }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+      return media.filter(m => m.userId !== null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown database error';
+      this.logger.error(`getAllMedia failed: ${message}`, error instanceof Error ? error.stack : undefined);
+      throw new InternalServerErrorException('Unable to fetch media list');
+    }
   }
 
   async getUserMedia(userId: number) {

@@ -134,15 +134,27 @@ export class MediaController {
   // NEW: Homepage sections endpoint (must come before generic @Get())
   @Get('homepage-sections')
   async getHomepageSections() {
-    const sections = await this.mediaService.getHomepageSections();
-    return this.sanitizeForJson(sections);
+    try {
+      const sections = await this.mediaService.getHomepageSections();
+      return this.sanitizeForJson(sections);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown homepage sections error';
+      this.logger.error(`Homepage sections failed: ${message}`, error instanceof Error ? error.stack : undefined);
+      throw new InternalServerErrorException('Failed to load homepage sections');
+    }
   }
 
   @Get()
   async getAllMedia() {
-    // Return all public media (for browse page, landing page, etc)
-    const media = await this.mediaService.getAllMedia();
-    return this.sanitizeForJson(media);
+    try {
+      // Return all public media (for browse page, landing page, etc)
+      const media = await this.mediaService.getAllMedia();
+      return this.sanitizeForJson(media);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown media fetch error';
+      this.logger.error(`Media list fetch failed: ${message}`, error instanceof Error ? error.stack : undefined);
+      throw new InternalServerErrorException('Failed to load media');
+    }
   }
 
   @UseGuards(FirebaseAuthGuard)
