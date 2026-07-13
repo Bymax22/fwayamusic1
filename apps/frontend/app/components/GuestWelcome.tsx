@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -29,6 +29,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useAuth } from "@/context/AuthContext";
 import MobileMenu from "./MobileMenu";
+import { createMediaSlug } from "@/lib/utils";
 
 export default function GuestWelcome() {
   const [activeTab, setActiveTab] = useState<string>("for-you");
@@ -254,6 +255,8 @@ export default function GuestWelcome() {
   // Audio player hook
   const { playTrack, isPlaying } = useAudioPlayer();
 
+  const featuredSongs = quickPicks;
+
   // Fetch homepage data from backend
   useEffect(() => {
     const fetchHomepageData = async (showLoader = true) => {
@@ -454,7 +457,7 @@ export default function GuestWelcome() {
     }
   }, []);
 
-  const heroSlides = [
+  const defaultHeroSlides = [
     {
       title: "We are fwaya (Remix)",
       subtitle: "Lusaka — Recharged",
@@ -501,6 +504,60 @@ export default function GuestWelcome() {
       secondaryAction: () => router.push('/videos/11')
     }
   ];
+
+  const heroSlides = useMemo(() => {
+    const slides: any[] = [];
+
+    if (featuredSongs.length) {
+      const item = featuredSongs[0];
+      slides.push({
+        title: item.title || 'Featured Track',
+        subtitle: item.user?.displayName || item.user?.username || item.artist || 'Featured audio',
+        image: item.artCoverUrl || item.coverArt || item.thumbnailUrl || item.url || '/featured5.jpg',
+        primaryButton: 'Play Track',
+        secondaryButton: 'View Details',
+        primaryAction: () => {
+          if (item.id) {
+            playTrack({
+              id: item.id,
+              title: item.title,
+              artist: item.user?.displayName || item.user?.username || item.artist || 'Unknown',
+              imageUrl: item.artCoverUrl || item.coverArt || item.thumbnailUrl,
+              audioUrl: item.url,
+            });
+          }
+        },
+        secondaryAction: () => {
+          if (item.id && item.title) {
+            router.push(`/track/${createMediaSlug(item.title, item.id)}`);
+          }
+        },
+      });
+    }
+
+    if (musicVideos.length) {
+      const item = musicVideos[0];
+      slides.push({
+        title: item.title || 'Featured Video',
+        subtitle: item.user?.displayName || item.user?.username || item.artist || 'New video',
+        image: item.coverPreview || item.artCoverUrl || item.thumbnailUrl || item.coverArt || item.url || '/featured6.jpg',
+        primaryButton: 'Watch Video',
+        secondaryButton: 'View Details',
+        primaryAction: () => {
+          if (item.id) router.push(`/videos/${item.id}?autoplay=1`);
+        },
+        secondaryAction: () => {
+          if (item.id) router.push(`/videos/${item.id}`);
+        },
+      });
+    }
+
+    if (slides.length === 0) {
+      return defaultHeroSlides;
+    }
+
+    return [...slides, ...defaultHeroSlides.slice(0, Math.max(0, 3 - slides.length))];
+  }, [featuredSongs, musicVideos, playTrack, router]);
 
   const musicVideoCards = musicVideos.slice(0, 6);
   const otherVideoCards = otherVideos.slice(0, 6);
@@ -735,8 +792,40 @@ export default function GuestWelcome() {
           <div className="absolute inset-0 bg-black/35"></div>
           <div className="absolute top-0 left-0 right-0 h-2/3 bg-gradient-to-b from-purple-600/70 to-transparent"></div>
 
-          <div className="relative z-10 flex flex-col justify-between h-full pb-5">
-            <div className="space-y-3">
+          <div className="relative z-10 flex flex-col justify-between h-full pb-5 px-4">
+            <div className="space-y-2">
+              <p className="text-[11px] uppercase tracking-[0.32em] text-white/70">
+                {heroSlides[heroImageIndex]?.subtitle}
+              </p>
+              <h2 className="text-xl font-semibold text-white leading-tight">
+                {heroSlides[heroImageIndex]?.title}
+              </h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={heroSlides[heroImageIndex]?.primaryAction}
+                className="rounded-full bg-purple-600 px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-purple-500"
+              >
+                {heroSlides[heroImageIndex]?.primaryButton}
+              </button>
+              <button
+                type="button"
+                onClick={heroSlides[heroImageIndex]?.secondaryAction}
+                className="rounded-full bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white transition hover:bg-white/20"
+              >
+                {heroSlides[heroImageIndex]?.secondaryButton}
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              {heroSlides.map((_, idx) => (
+                <button
+                  key={idx}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  onClick={() => setHeroImageIndex(idx)}
+                  className={`h-2 w-2 rounded-full transition ${idx === heroImageIndex ? 'bg-white' : 'bg-white/30'}`}
+                />
+              ))}
             </div>
           </div>
         </div>
