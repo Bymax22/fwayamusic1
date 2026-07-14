@@ -58,8 +58,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const image = resolveMediaUrl(rawImageUrl, baseUrl) || `${baseUrl}/api/og/video/${videoId}`;
   
   const pageUrl = `${baseUrl}/videos/${id}`;
-  const videoUrl = video?.videoUrl && /^https?:\/\//i.test(video.videoUrl) ? video.videoUrl : undefined;
-  
+  const videoUrl = resolveMediaUrl(video?.videoUrl, baseUrl);
+
   console.log('[video-layout] Metadata:', { videoId, title, description, image, videoUrl });
 
   return {
