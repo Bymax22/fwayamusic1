@@ -127,6 +127,18 @@ export function extractMediaIdFromSlug(slug?: string | string[] | null) {
   return Number.isFinite(numeric) ? numeric : undefined;
 }
 
+/**
+ * Resolve a media URL to an absolute URL using a base URL.
+ * Supports HTTP(S), protocol-relative URLs (//), and relative paths.
+ */
+export function resolveMediaUrl(url: string | undefined, baseUrl: string): string | undefined {
+  if (!url) return undefined;
+  if (/^https?:\/\//i.test(url)) return url;
+  if (/^\/\//.test(url)) return `https:${url}`;
+  if (url.startsWith('/')) return `${baseUrl}${url}`;
+  return `${baseUrl}/${url}`;
+}
+
 // Audio Utilities
 /**
  * Converts BPM to human-readable tempo

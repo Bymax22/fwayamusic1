@@ -41,6 +41,7 @@ export default function ShareModal({
   const resolveCover = (u?: string) => {
     if (!u) return '/default-cover.jpg';
     if (u.startsWith('http://') || u.startsWith('https://')) return u;
+    if (u.startsWith('//')) return `https:${u}`;
     try {
       const apiBase = (process.env.NEXT_PUBLIC_API_URL as string) || window.location.origin;
       if (u.startsWith('/')) return `${window.location.origin}${u}`;

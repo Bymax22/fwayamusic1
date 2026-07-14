@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import type { Metadata } from "next";
-import { extractMediaIdFromSlug } from '@/lib/utils';
+import { extractMediaIdFromSlug, resolveMediaUrl } from '@/lib/utils';
 
 interface TrackMeta {
   id: number;
@@ -64,9 +64,9 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
     (track as any)?.coverUrl ||
     track?.artCoverUrl ||
     track?.thumbnailUrl;
-  const fallbackImage = rawCoverUrl && /^https?:\/\//i.test(rawCoverUrl) 
-    ? rawCoverUrl 
-    : (rawCoverUrl ? `${baseUrl}${rawCoverUrl.startsWith('/') ? '' : '/'}${rawCoverUrl}` : ogImage);
+  const fallbackImage = rawCoverUrl
+    ? resolveMediaUrl(rawCoverUrl, baseUrl) ?? ogImage
+    : ogImage;
   
   const trackUrl = `${baseUrl}/track/${id}`;
 

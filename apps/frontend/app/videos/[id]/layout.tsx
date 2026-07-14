@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
-import { extractMediaIdFromSlug } from '@/lib/utils';
+import { extractMediaIdFromSlug, resolveMediaUrl } from '@/lib/utils';
 
 interface VideoMeta {
   id: number;
@@ -55,20 +55,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   
   // Ensure image URL is absolute
   const rawImageUrl = video?.thumbnail || video?.artCoverUrl || video?.coverArt || video?.thumbnailUrl;
-  let image = `${baseUrl}/api/og/video/${videoId}`;
-  if (rawImageUrl) {
-    if (/^https?:\/\//i.test(rawImageUrl)) {
-      image = rawImageUrl;
-    } else if (rawImageUrl.startsWith('/')) {
-      image = `${baseUrl}${rawImageUrl}`;
-    } else {
-      image = `${baseUrl}/${rawImageUrl}`;
-    }
-  }
+  const image = resolveMediaUrl(rawImageUrl, baseUrl) || `${baseUrl}/api/og/video/${videoId}`;
   
-  const videoUrl = video?.videoUrl || `${baseUrl}/videos/${id}`;
+  const pageUrl = `${baseUrl}/videos/${id}`;
+  const videoUrl = video?.videoUrl && /^https?:\/\//i.test(video.videoUrl) ? video.videoUrl : undefined;
   
-  console.log('[video-layout] Metadata:', { videoId, title, description, image });
+  console.log('[video-layout] Metadata:', { videoId, title, description, image, videoUrl });
 
   return {
     title,
@@ -77,7 +69,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       type: 'video.other',
       title,
       description,
-      url: `${baseUrl}/videos/${id}`,
+      url: pageUrl,
       siteName: 'Fwaya',
       images: [
         {
@@ -88,18 +80,22 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
           type: 'image/png',
         },
       ],
-      videos: [
-        {
-          url: videoUrl,
-          secureUrl: videoUrl,
-          type: 'video/mp4',
-          width: 1280,
-          height: 720,
-        },
-      ],
+      ...(videoUrl
+        ? {
+            videos: [
+              {
+                url: videoUrl,
+                secureUrl: videoUrl,
+                type: 'video/mp4',
+                width: 1280,
+                height: 720,
+              },
+            ],
+          }
+        : {}),
     },
     twitter: {
-      card: 'player',
+      card: 'summary_large_image',
       title,
       description,
       images: [image],

@@ -48,7 +48,11 @@ export async function GET(req: Request, context: any) {
   const artist = video?.user?.displayName || video?.user?.username || 'Fwaya';
   const description = video?.description || 'Watch this video on Fwaya.';
   const coverUrl = (video?.coverArt || video?.artCoverUrl || video?.thumbnailUrl || (video as any)?.coverUrl) || DEFAULT_IMAGE;
-  const absoluteCoverUrl = /^https?:\/\//i.test(coverUrl) ? coverUrl : `${baseUrl}${coverUrl}`;
+  const absoluteCoverUrl = /^https?:\/\//i.test(coverUrl)
+    ? coverUrl
+    : /^\/\//.test(coverUrl)
+    ? `https:${coverUrl}`
+    : `${baseUrl}${coverUrl.startsWith('/') ? '' : '/'}${coverUrl}`;
 
   console.log('[og-video] Generating image:', { videoId, title, artist, coverUrl, absoluteCoverUrl, hasVideo: !!video });
 
