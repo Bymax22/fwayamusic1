@@ -1449,10 +1449,10 @@ export default function Browse() {
         title={selectedMediaForShare?.title ?? ''}
         artist={selectedMediaForShare?.artist}
         coverUrl={selectedMediaForShare?.coverArt}
-        url={selectedMediaForShare ? `${window.location.origin}/track/${selectedMediaForShare.id}` : ''}
+        url={selectedMediaForShare ? `${window.location.origin}/track/${createMediaSlug(selectedMediaForShare.title, selectedMediaForShare.id)}` : ''}
         genre={selectedMediaForShare?.genre ?? undefined}
         duration={selectedMediaForShare ? formatDuration(selectedMediaForShare.duration) : undefined}
-        shareText={selectedMediaForShare ? `Check out "${selectedMediaForShare.title}" by ${selectedMediaForShare.artist} on Fwaya.\n${window.location.origin}/track/${selectedMediaForShare.id}` : undefined}
+        shareText={selectedMediaForShare ? `Check out "${selectedMediaForShare.title}" by ${selectedMediaForShare.artist} on Fwaya.\n${window.location.origin}/track/${createMediaSlug(selectedMediaForShare.title, selectedMediaForShare.id)}` : undefined}
         onShare={handleShareSuccess}
       />
 

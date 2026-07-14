@@ -7,6 +7,8 @@ import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/context/AuthContext";
 import VideoWatchPlayer from "@/components/VideoWatchPlayer";
 import VideoCard from "@/components/VideoCard";
+import ShareModal from '@/components/ShareModal';
+import { createMediaSlug } from '@/lib/utils';
 
 interface VideoDetail {
   id: number;
@@ -107,6 +109,7 @@ export default function VideoWatchPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
   const [isInPlaylist, setIsInPlaylist] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const fetchComments = async (mediaId?: string) => {
     try {
@@ -481,13 +484,7 @@ export default function VideoWatchPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      const shareUrl = `${window.location.origin}/videos/${video.id}`;
-                      if (navigator.share) {
-                        navigator.share({ title: video.title, text: video.description, url: shareUrl }).catch(console.error);
-                      } else {
-                        navigator.clipboard.writeText(shareUrl).catch(console.error);
-                        alert('Link copied to clipboard');
-                      }
+                      setShowShareModal(true);
                     }}
                     className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-black text-white transition hover:bg-neutral-800"
                     aria-label="Share"
@@ -559,6 +556,17 @@ export default function VideoWatchPage() {
                   </button>
                 </div>
               </div>
+              <ShareModal
+                open={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                title={video?.title ?? ''}
+                artist={video?.artist}
+                coverUrl={video?.thumbnail}
+                url={video ? `${window.location.origin}/videos/${createMediaSlug(video.title, video.id)}` : ''}
+                description={video?.description}
+                duration={video ? formatDuration(video.duration) : undefined}
+                shareText={video ? `Watch ${video.title} by ${video.artist} on Fwaya.\n${window.location.origin}/videos/${createMediaSlug(video.title, video.id)}` : undefined}
+              />
 
               <div className="rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
                 <div className="flex items-center gap-3">

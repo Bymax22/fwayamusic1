@@ -38,7 +38,19 @@ export default function ShareModal({
 
   const payload = url;
   const subject = `Listen to ${title}${artist ? ` by ${artist}` : ''} on Fwaya`;
-  const coverImage = coverUrl || '/default-cover.jpg';
+  const resolveCover = (u?: string) => {
+    if (!u) return '/default-cover.jpg';
+    if (u.startsWith('http://') || u.startsWith('https://')) return u;
+    try {
+      const apiBase = (process.env.NEXT_PUBLIC_API_URL as string) || window.location.origin;
+      if (u.startsWith('/')) return `${window.location.origin}${u}`;
+      return apiBase.endsWith('/') ? `${apiBase}${u}` : `${apiBase}/${u}`;
+    } catch (err) {
+      return u;
+    }
+  };
+
+  const coverImage = resolveCover(coverUrl);
 
   const handleWhatsApp = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(payload)}`, '_blank');
