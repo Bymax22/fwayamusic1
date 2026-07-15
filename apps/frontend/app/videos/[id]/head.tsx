@@ -34,7 +34,7 @@ async function fetchVideoMeta(id: string): Promise<VideoMeta | null> {
 
 export default async function Head({ params }: { params: { id: string } }) {
   const { id } = params;
-  const requestHeaders = headers();
+  const requestHeaders = await headers();
   const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host') || 'fwaya.net';
   const protocol = requestHeaders.get('x-forwarded-proto') || requestHeaders.get('x-forwarded-protocol') || 'https';
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
