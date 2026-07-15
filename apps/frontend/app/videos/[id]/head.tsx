@@ -49,7 +49,8 @@ export default async function Head({ params }: { params: { id: string } }) {
   const imageUrl = rawImageUrl ? resolveMediaUrl(rawImageUrl, baseUrl) : undefined;
   const image = imageUrl || (videoId ? `${baseUrl}/api/og/video/${videoId}` : `${baseUrl}/default-cover.jpg`);
   const pageUrl = `${baseUrl}/videos/${id}`;
-  const videoUrl = resolveMediaUrl(video?.videoUrl, baseUrl);
+  const rawVideoUrl = video?.videoUrl || video?.url || video?.audioUrl || video?.mediaUrl || video?.fileUrl;
+  const videoUrl = resolveMediaUrl(rawVideoUrl, baseUrl);
 
   return (
     <>

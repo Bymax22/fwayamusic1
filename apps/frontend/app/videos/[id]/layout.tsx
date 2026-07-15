@@ -14,6 +14,10 @@ interface VideoMeta {
   coverArt?: string;
   thumbnailUrl?: string;
   videoUrl?: string;
+  url?: string;
+  audioUrl?: string;
+  mediaUrl?: string;
+  fileUrl?: string;
   user?: { displayName?: string; username?: string };
 }
 
@@ -62,14 +66,25 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const image = imageUrl || (videoId ? `${baseUrl}/api/og/video/${videoId}` : `${baseUrl}/default-cover.jpg`);
   
   const pageUrl = `${baseUrl}/videos/${id}`;
-  const videoUrl = resolveMediaUrl(video?.videoUrl, baseUrl);
+  const rawVideoUrl = video?.videoUrl || video?.url || video?.audioUrl || video?.mediaUrl || video?.fileUrl;
+  const videoUrl = resolveMediaUrl(rawVideoUrl, baseUrl);
 
-  console.log('[video-layout] Metadata:', { videoId, title, description, image, videoUrl });
+  console.log('[video-layout] Metadata:', {
+    videoId,
+    title,
+    description,
+    image,
+    rawVideoUrl,
+    videoUrl,
+  });
 
   return {
     title,
     description,
     metadataBase: new URL(baseUrl),
+    alternates: {
+      canonical: pageUrl,
+    },
     openGraph: {
       type: 'video.other',
       title,

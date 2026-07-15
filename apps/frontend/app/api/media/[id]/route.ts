@@ -9,20 +9,28 @@ export async function GET(request: Request, context: any) {
     const baseUrl = getBackendBaseUrl();
     const id = context?.params?.id;
     if (!id) return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
-
+    // Proxy the backend media endpoint. Capture and return backend errors
+    // as a 502 so crawlers/in-app browsers don't see an internal server error.
     const res = await fetch(`${baseUrl}/api/v1/media/${id}`, {
       headers: { Accept: 'application/json' },
     });
 
     if (!res.ok) {
       const errorText = await res.text().catch(() => '');
-      return NextResponse.json({ error: errorText }, { status: res.status });
+      console.warn(`[api/media/[id]] backend returned ${res.status} for id=${id} baseUrl=${baseUrl} message=${errorText}`);
+      return NextResponse.json({ error: 'Upstream service error', details: errorText }, { status: Math.max(502, res.status) });
     }
 
     const media = await res.json();
     return NextResponse.json(media);
   } catch (error) {
-    console.error('Failed to fetch media by ID:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    // Log contextual info to help debug requests that fail for specific UAs
+    try {
+      const id = context?.params?.id;
+      console.error(`[api/media/[id]] fetch failed for id=${id} backend=${getBackendBaseUrl()} error=`, error);
+    } catch (e) {
+      console.error('[api/media/[id]] fetch failed, unable to log context', e);
+    }
+    return NextResponse.json({ error: 'Upstream fetch failed' }, { status: 502 });
   }
 }
