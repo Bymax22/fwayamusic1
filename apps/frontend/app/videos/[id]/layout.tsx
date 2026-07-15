@@ -2,6 +2,9 @@ import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import { extractMediaIdFromSlug, resolveMediaUrl } from '@/lib/utils';
 
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+
 interface VideoMeta {
   id: number;
   title?: string;

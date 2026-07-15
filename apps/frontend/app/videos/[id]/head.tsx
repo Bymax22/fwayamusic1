@@ -1,6 +1,8 @@
 import { headers } from 'next/headers';
 import { extractMediaIdFromSlug, resolveMediaUrl } from '@/lib/utils';
 
+export const dynamic = 'force-dynamic';
+
 interface VideoMeta {
   id: number;
   title?: string;
