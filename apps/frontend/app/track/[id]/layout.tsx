@@ -103,7 +103,6 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
       card: "summary_large_image",
       title,
       description,
-      url: trackUrl,
       images: [fallbackImage, ogImage],
       site: "@fwayamusic",
       creator: "@fwayamusic",
