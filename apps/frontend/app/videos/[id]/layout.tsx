@@ -53,9 +53,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const title = video?.title ? `${video.title} • ${video.user?.displayName || video.user?.username || 'Fwaya'}` : 'Fwaya Video';
   const description = video?.description || `Watch ${video?.title || 'this video'} on Fwaya`;
   
-  // Ensure image URL is absolute
+  // Ensure image URL is absolute and always available for share previews.
   const rawImageUrl = video?.thumbnail || video?.artCoverUrl || video?.coverArt || video?.thumbnailUrl;
-  const image = resolveMediaUrl(rawImageUrl, baseUrl) || `${baseUrl}/api/og/video/${videoId}`;
+  const imageUrl = rawImageUrl ? resolveMediaUrl(rawImageUrl, baseUrl) : undefined;
+  const image = imageUrl || (videoId ? `${baseUrl}/api/og/video/${videoId}` : `${baseUrl}/default-cover.jpg`);
   
   const pageUrl = `${baseUrl}/videos/${id}`;
   const videoUrl = resolveMediaUrl(video?.videoUrl, baseUrl);
@@ -65,6 +66,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title,
     description,
+    metadataBase: new URL(baseUrl),
     openGraph: {
       type: 'video.other',
       title,
@@ -95,12 +97,21 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         : {}),
     },
     twitter: {
-      card: 'summary_large_image',
+      card: videoUrl ? 'player' : 'summary_large_image',
       title,
       description,
       images: [image],
       site: '@fwayamusic',
       creator: '@fwayamusic',
+      ...(videoUrl
+        ? {
+            player: {
+              url: videoUrl,
+              width: 1280,
+              height: 720,
+            },
+          }
+        : {}),
     },
   };
 }
