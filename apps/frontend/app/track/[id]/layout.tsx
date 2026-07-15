@@ -76,6 +76,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   return {
     title,
     description,
+    metadataBase: new URL(baseUrl),
     openGraph: {
       type: "music.song",
       title,

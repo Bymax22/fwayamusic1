@@ -97,21 +97,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         : {}),
     },
     twitter: {
-      card: videoUrl ? 'player' : 'summary_large_image',
+      card: 'summary_large_image',
       title,
       description,
       images: [image],
       site: '@fwayamusic',
       creator: '@fwayamusic',
-      ...(videoUrl
-        ? {
-            player: {
-              url: videoUrl,
-              width: 1280,
-              height: 720,
-            },
-          }
-        : {}),
     },
   };
 }
