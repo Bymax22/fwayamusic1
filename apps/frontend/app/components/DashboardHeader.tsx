@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { FaCog, FaSignOutAlt, FaShare, FaUser, FaMusic, FaHeadphones } from 'react-icons/fa';
+import { FaCog, FaSignOutAlt, FaShare, FaUser, FaMusic, FaHeadphones, FaStar } from 'react-icons/fa';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import NotificationBell from './NotificationBell';
@@ -94,10 +94,20 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
 
           {/* Right side buttons */}
           <div className="flex items-center gap-3">
-            {/* Get App Button */}
-            <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
-              Get App
-            </button>
+            {user ? (
+              <button
+                type="button"
+                aria-label="Premium"
+                onClick={() => router.push('/premium')}
+                className="rounded-full bg-purple-500 p-2.5 text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
+              >
+                <FaStar className="h-4 w-4" />
+              </button>
+            ) : (
+              <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
+                Get App
+              </button>
+            )}
 
             {/* Notifications Bell */}
             <NotificationBell />

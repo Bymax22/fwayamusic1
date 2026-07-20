@@ -42,9 +42,9 @@ export default function Navbar({ currentTrack }: { currentTrack: any }) {
           <Link href="/settings" className="text-gray-400 hover:text-white transition" aria-label="Settings">
             <Settings size={20} />
           </Link>
-          {/* Premium CTA: full button for guests, icon-only stroke for logged-in users */}
+          {/* Premium CTA: full button for guests, icon-only filled button for logged-in users */}
           {user ? (
-            <Link href="/premium" aria-label="Premium" className="p-2 rounded-full border border-purple-500 text-purple-500 hover:bg-purple-500/10 transition mr-2">
+            <Link href="/premium" aria-label="Premium" className="p-2 rounded-full bg-purple-600 text-white hover:bg-purple-500 transition mr-2">
               <Crown size={18} />
             </Link>
           ) : (

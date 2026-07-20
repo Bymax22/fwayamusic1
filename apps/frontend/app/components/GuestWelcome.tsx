@@ -23,7 +23,8 @@ import {
   FaComment,
   FaChevronDown,
   FaCog,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaStar
 } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
@@ -670,12 +671,25 @@ export default function GuestWelcome() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
-                  Get App
-                </button>
-                <button className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400">
-                  Premium
-                </button>
+                {!user && (
+                  <>
+                    <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
+                      Get App
+                    </button>
+                    <button className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400">
+                      Premium
+                    </button>
+                  </>
+                )}
+                {user && (
+                  <button
+                    type="button"
+                    aria-label="Premium"
+                    className="rounded-full bg-purple-500 p-2.5 text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
+                  >
+                    <FaStar className="h-4 w-4" />
+                  </button>
+                )}
                 {user && (
                   <div className="relative">
                     <button
