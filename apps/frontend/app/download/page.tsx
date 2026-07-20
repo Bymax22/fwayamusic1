@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Download, Music, Headphones, HardDrive, ArrowDown, Check, Crown, Clock, Sparkles, Play, Shield, Lock, Wifi, WifiOff } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { formatFileSize, formatDuration } from '@/lib/utils';
 import Image from "next/image";
 import Protected from '@/components/Protected';
@@ -147,7 +147,7 @@ useEffect(() => {
       setShowNetworkNotification(true);
       setTimeout(() => setShowNetworkNotification(false), 5000);
     }
-  } else if (isOnline && connectionQuality !== 'offline' && connectionQuality !== 'poor') {
+  } else {
     // Only auto-disable if user had enabled it for network reasons
     if (isOfflineMode) {
       setShowNetworkNotification(true);
