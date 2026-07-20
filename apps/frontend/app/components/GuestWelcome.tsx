@@ -566,6 +566,9 @@ export default function GuestWelcome() {
     return [...slides, ...defaultHeroSlides.slice(0, Math.max(0, 3 - slides.length))];
   }, [featuredSongs, musicVideos, playTrack, router]);
 
+  const safeHeroIndex = heroSlides.length > 0 ? Math.min(heroImageIndex, heroSlides.length - 1) : 0;
+  const activeHeroSlide = heroSlides[safeHeroIndex] || heroSlides[0] || defaultHeroSlides[0];
+
   const musicVideoCards = musicVideos.slice(0, 6);
   const otherVideoCards = otherVideos.slice(0, 6);
   const relatedVideoPool = [...musicVideos, ...otherVideos].filter((video: any) => video?.url).slice(0, 10);
@@ -575,18 +578,22 @@ export default function GuestWelcome() {
     router.push(`/videos/${video.id}?autoplay=1`);
   };
 
+  useEffect(() => {
+    setHeroImageIndex((prev) => (prev < heroSlides.length ? prev : 0));
+  }, [heroSlides.length]);
+
   // Auto-rotate hero slides with sliding animation
   React.useEffect(() => {
     const interval = setInterval(() => {
       setIsSliding(true);
       // Wait for slide animation to complete before changing slide
       setTimeout(() => {
-        setHeroImageIndex((prev) => (prev + 1) % heroSlides.length);
+        setHeroImageIndex((prev) => (prev + 1) % Math.max(heroSlides.length, 1));
         setIsSliding(false);
       }, 1200); // Slightly slower slide duration
     }, 4000); // Total cycle time
     return () => clearInterval(interval);
-  }, []);
+  }, [heroSlides.length]);
 
   // Periodic animation for Discover text: animate for 30s, stop for 60s, repeat
   React.useEffect(() => {
@@ -789,8 +796,8 @@ export default function GuestWelcome() {
         <div className="relative mb-3 overflow-hidden rounded-3xl bg-[#0d0f18] min-h-[220px] sm:min-h-[260px]">
           <div className="absolute inset-0">
             <Image
-              src={heroSlides[heroImageIndex].image}
-              alt={heroSlides[heroImageIndex].title}
+              src={activeHeroSlide?.image || '/featured5.jpg'}
+              alt={activeHeroSlide?.title || 'Featured hero banner'}
               fill
               className="object-cover object-center"
             />
@@ -802,27 +809,27 @@ export default function GuestWelcome() {
           <div className="relative z-10 flex h-full flex-col justify-between px-4 py-4 sm:px-5 sm:py-5">
             <div className="max-w-[80%] space-y-1.5">
               <p className="text-[10px] uppercase tracking-[0.32em] text-white/70 sm:text-[11px]">
-                {heroSlides[heroImageIndex]?.subtitle}
+                {activeHeroSlide?.subtitle}
               </p>
               <h2 className="text-lg font-semibold leading-tight text-white sm:text-xl">
-                {heroSlides[heroImageIndex]?.title}
+                {activeHeroSlide?.title}
               </h2>
             </div>
 
             <div className="flex flex-row gap-1.5 sm:gap-2 mt-auto">
               <button
                 type="button"
-                onClick={heroSlides[heroImageIndex]?.primaryAction}
+                onClick={activeHeroSlide?.primaryAction}
                 className="inline-flex items-center justify-center rounded-full bg-purple-600 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-purple-500 sm:px-3 sm:py-2 sm:text-[11px] whitespace-nowrap"
               >
-                {heroSlides[heroImageIndex]?.primaryButton}
+                {activeHeroSlide?.primaryButton}
               </button>
               <button
                 type="button"
-                onClick={heroSlides[heroImageIndex]?.secondaryAction}
+                onClick={activeHeroSlide?.secondaryAction}
                 className="inline-flex items-center justify-center rounded-full bg-white/10 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-white/20 sm:px-3 sm:py-2 sm:text-[11px] whitespace-nowrap"
               >
-                {heroSlides[heroImageIndex]?.secondaryButton}
+                {activeHeroSlide?.secondaryButton}
               </button>
             </div>
 
@@ -1737,8 +1744,8 @@ export default function GuestWelcome() {
           <div className="relative rounded-3xl mb-10 overflow-hidden h-80">
             <div className="absolute inset-0">
               <Image
-                src={heroSlides[heroImageIndex].image}
-                alt={heroSlides[heroImageIndex].title}
+                src={activeHeroSlide?.image || '/featured5.jpg'}
+                alt={activeHeroSlide?.title || 'Featured hero banner'}
                 fill
                 className="object-cover"
               />
@@ -1751,31 +1758,31 @@ export default function GuestWelcome() {
             <div className="relative p-8 flex justify-between items-center h-full">
               <div className="max-w-xl z-10">
                 <h2 className="text-4xl font-bold mb-2 text-white">
-                  {heroSlides[heroImageIndex].title}
+                  {activeHeroSlide?.title}
                 </h2>
                 <p className="text-lg text-white/90 mb-6">
-                  {heroSlides[heroImageIndex].subtitle}
+                  {activeHeroSlide?.subtitle}
                 </p>
 
                 <div className="flex flex-wrap gap-2 sm:gap-4">
                   <button
-                    onClick={heroSlides[heroImageIndex].primaryAction}
+                    onClick={activeHeroSlide?.primaryAction}
                     className="bg-white text-black px-3 py-1.5 sm:px-6 sm:py-3 rounded-full flex items-center gap-2 text-xs sm:text-sm font-medium hover:bg-gray-100 transition-colors"
                   >
-                    <FaPlay /> {heroSlides[heroImageIndex].primaryButton}
+                    <FaPlay /> {activeHeroSlide?.primaryButton}
                   </button>
                   <button
-                    onClick={heroSlides[heroImageIndex].secondaryAction}
+                    onClick={activeHeroSlide?.secondaryAction}
                     className="bg-white/20 px-3 py-1.5 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm text-white hover:bg-white/30 transition-colors"
                   >
-                    {heroSlides[heroImageIndex].secondaryButton}
+                    {activeHeroSlide?.secondaryButton}
                   </button>
                 </div>
               </div>
 
               <div className={`relative w-48 h-48 rounded-3xl overflow-hidden shadow-2xl transition-all duration-1000 ease-out ${isSliding ? 'translate-x-12 opacity-50 scale-95' : 'translate-x-0 opacity-100 scale-100'}`}>
                 <Image
-                  src={heroSlides[heroImageIndex].image}
+                  src={activeHeroSlide?.image || '/featured5.jpg'}
                   alt="Hero overlay"
                   fill
                   className="object-cover"
