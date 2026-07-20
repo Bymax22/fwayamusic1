@@ -1,7 +1,10 @@
 "use client";
 
+import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { createMediaSlug } from '@/lib/utils';
 import { FaHeadphones, FaRegHeart } from 'react-icons/fa';
 
 interface AlbumItem {
@@ -105,7 +108,7 @@ export default function AlbumsPage() {
                 {featuredAlbums.slice(0, 8).map((album) => (
                   <Link
                     key={album.id}
-                    href={`/albums/${album.id}`}
+                    href={`/albums/${createMediaSlug(album.title, album.id)}`}
                     className="rounded-3xl overflow-hidden bg-[#041021] shadow-lg shadow-black/20 transition hover:-translate-y-1"
                   >
                     <div className="relative h-64 bg-black">
@@ -149,7 +152,7 @@ export default function AlbumsPage() {
                 {albums.map((album) => (
                   <Link
                     key={album.id}
-                    href={`/albums/${album.id}`}
+                    href={`/albums/${createMediaSlug(album.title, album.id)}`}
                     className="rounded-3xl overflow-hidden bg-[#041021] shadow-lg shadow-black/20 transition hover:-translate-y-1"
                   >
                     <div className="relative h-56 bg-black">

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { createMediaSlug } from '@/lib/utils';
+import { createMediaSlug, extractMediaIdFromSlug } from '@/lib/utils';
 
 function getBackendBaseUrl() {
   return process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
@@ -21,7 +21,9 @@ async function fetchAlbum(albumId: string) {
 
 export default async function AlbumDetailPage(props: any) {
   const { params } = props ?? {};
-  const album = await fetchAlbum(params?.id);
+  const rawId = params?.id;
+  const albumId = extractMediaIdFromSlug(rawId) ?? rawId;
+  const album = await fetchAlbum(String(albumId));
   if (!album) {
     notFound();
   }

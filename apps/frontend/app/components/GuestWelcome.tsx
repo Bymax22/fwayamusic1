@@ -123,9 +123,10 @@ export default function GuestWelcome() {
     router.push('/auth/logout');
   };
 
-  const goToAlbum = (albumId: number | string) => {
+  const goToAlbum = (albumId: number | string, title?: string) => {
     if (!albumId) return;
-    router.push(`/albums/${albumId}`);
+    const slug = title ? createMediaSlug(title, albumId) : String(albumId);
+    router.push(`/albums/${slug}`);
   };
 
   // Animation state for Discover text
@@ -1210,7 +1211,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} onClick={() => goToAlbum(item.id)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
+                  <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                     <div 
                       className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
                       style={{
@@ -1537,7 +1538,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} onClick={() => goToAlbum(item.id)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
+                  <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                     <div className="relative">
                       <div 
                         className="aspect-square bg-black"
@@ -1941,7 +1942,7 @@ export default function GuestWelcome() {
               {featuredAlbums.slice(0, 5).map((album: any, i: number) => (
                 <div
                   key={i}
-                  onClick={() => goToAlbum(album.id)}
+                  onClick={() => goToAlbum(album.id, album.title)}
                   role="button"
                   tabIndex={0}
                   className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all cursor-pointer group"
