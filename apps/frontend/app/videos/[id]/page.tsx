@@ -19,6 +19,7 @@ interface VideoDetail {
   channelAvatar?: string;
   followerCount?: number;
   isFollowing?: boolean;
+  isVerified?: boolean;
   description: string;
   duration: number;
   views: number;
@@ -466,7 +467,16 @@ export default function VideoWatchPage() {
                       className="h-11 w-11 rounded-full object-cover ring-1 ring-white/10"
                     />
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-white">{video.channelName}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="truncate text-sm font-semibold text-white">{video.channelName}</p>
+                        {video.isVerified && (
+                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified user">
+                            <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-slate-400">{(video.followerCount || 0).toLocaleString()} followers</p>
                     </div>
                   </div>
@@ -621,7 +631,16 @@ export default function VideoWatchPage() {
                             />
                             <div className="flex-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-sm font-semibold text-white">{comment.userName}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-semibold text-white">{comment.userName}</p>
+                                  {comment.isVerified && (
+                                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified user">
+                                      <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+                                      </svg>
+                                    </span>
+                                  )}
+                                </div>
                                 {comment.isVerified && <FaCheckCircle className="h-4 w-4 text-sky-400" />}
                                 <span className="text-xs text-slate-500">{formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}</span>
                               </div>
@@ -657,7 +676,16 @@ export default function VideoWatchPage() {
                                         />
                                         <div className="flex-1">
                                           <div className="flex flex-wrap items-center gap-2">
-                                            <p className="text-sm font-semibold text-white">{reply.userName}</p>
+                                            <div className="flex items-center gap-2">
+                                              <p className="text-sm font-semibold text-white">{reply.userName}</p>
+                                              {reply.isVerified && (
+                                                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified user">
+                                                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+                                                  </svg>
+                                                </span>
+                                              )}
+                                            </div>
                                             {reply.isVerified && <FaCheckCircle className="h-4 w-4 text-sky-400" />}
                                             <span className="text-xs text-slate-500">{formatDistanceToNow(new Date(reply.timestamp), { addSuffix: true })}</span>
                                           </div>

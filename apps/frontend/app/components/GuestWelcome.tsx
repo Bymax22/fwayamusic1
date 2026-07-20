@@ -469,46 +469,31 @@ export default function GuestWelcome() {
       title: "We are fwaya (Remix)",
       subtitle: "Lusaka — Recharged",
       image: "/breadcumb3.jpg",
-      primaryButton: "Play",
-      secondaryButton: "Save",
-      primaryAction: () => {},
-      secondaryAction: () => {}
+      href: "/browse"
     },
     {
       title: "My Dreams",
       subtitle: "Zed — Infinite",
       image: "/featured5.jpg",
-      primaryButton: "Listen Now",
-      secondaryButton: "Add to Playlist",
-      primaryAction: () => {},
-      secondaryAction: () => {}
+      href: "/browse"
     },
     {
       title: "Birthday",
       subtitle: "Fwaya — Enjoy",
       image: "/featured6.jpg",
-      primaryButton: "Stream",
-      secondaryButton: "Download",
-      primaryAction: () => {},
-      secondaryAction: () => {}
+      href: "/browse"
     },
     {
       title: "New Single: Ignite",
       subtitle: "Fresh audio release — Track ID 18",
       image: "/featured5.jpg",
-      primaryButton: "Play Track",
-      secondaryButton: "View Details",
-      primaryAction: () => router.push('/track/18'),
-      secondaryAction: () => router.push('/track/18')
+      href: "/track/18"
     },
     {
       title: "Official Video Premiere",
       subtitle: "Visual story live now — Video ID 11",
       image: "/featured6.jpg",
-      primaryButton: "Watch Video",
-      secondaryButton: "Save to Library",
-      primaryAction: () => router.push('/videos/11?autoplay=1'),
-      secondaryAction: () => router.push('/videos/11')
+      href: "/videos/11"
     }
   ];
 
@@ -523,6 +508,7 @@ export default function GuestWelcome() {
         image: item.artCoverUrl || item.coverArt || item.thumbnailUrl || item.url || '/featured5.jpg',
         primaryButton: 'Play Track',
         secondaryButton: 'View Details',
+        href: item.id && item.title ? `/track/${createMediaSlug(item.title, item.id)}` : '/browse',
         primaryAction: () => {
           if (item.id) {
             playTrack({
@@ -550,6 +536,7 @@ export default function GuestWelcome() {
         image: item.coverPreview || item.artCoverUrl || item.thumbnailUrl || item.coverArt || item.url || '/featured6.jpg',
         primaryButton: 'Watch Video',
         secondaryButton: 'View Details',
+        href: item.id ? `/videos/${item.id}` : '/videos',
         primaryAction: () => {
           if (item.id) router.push(`/videos/${item.id}?autoplay=1`);
         },
@@ -568,6 +555,21 @@ export default function GuestWelcome() {
 
   const safeHeroIndex = heroSlides.length > 0 ? Math.min(heroImageIndex, heroSlides.length - 1) : 0;
   const activeHeroSlide = heroSlides[safeHeroIndex] || heroSlides[0] || defaultHeroSlides[0];
+
+  const handleHeroSlideClick = (slide: any) => {
+    if (!slide) return;
+
+    if (slide.href) {
+      router.push(slide.href);
+      return;
+    }
+
+    if (typeof slide.primaryAction === 'function') {
+      slide.primaryAction();
+    } else if (typeof slide.secondaryAction === 'function') {
+      slide.secondaryAction();
+    }
+  };
 
   const musicVideoCards = musicVideos.slice(0, 6);
   const otherVideoCards = otherVideos.slice(0, 6);
@@ -793,7 +795,18 @@ export default function GuestWelcome() {
             </div>
 
         {/* HERO SECTION - Mobile-friendly hero banner */}
-        <div className="relative mb-3 overflow-hidden rounded-3xl bg-[#0d0f18] min-h-[220px] sm:min-h-[260px]">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => handleHeroSlideClick(activeHeroSlide)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              handleHeroSlideClick(activeHeroSlide);
+            }
+          }}
+          className="relative mb-3 overflow-hidden rounded-3xl bg-[#0d0f18] min-h-[220px] sm:min-h-[260px] cursor-pointer"
+        >
           <div className="absolute inset-0">
             <Image
               src={activeHeroSlide?.image || '/featured5.jpg'}
@@ -803,46 +816,19 @@ export default function GuestWelcome() {
             />
           </div>
 
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-black/20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-          <div className="relative z-10 flex h-full flex-col justify-between px-4 py-4 sm:px-5 sm:py-5">
-            <div className="max-w-[80%] space-y-1.5">
-              <p className="text-[10px] uppercase tracking-[0.32em] text-white/70 sm:text-[11px]">
-                {activeHeroSlide?.subtitle}
-              </p>
-              <h2 className="text-lg font-semibold leading-tight text-white sm:text-xl">
-                {activeHeroSlide?.title}
-              </h2>
-            </div>
-
-            <div className="flex flex-row gap-1.5 sm:gap-2 mt-auto">
+          <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-3 py-3">
+            {heroSlides.map((_, idx) => (
               <button
+                key={idx}
                 type="button"
-                onClick={activeHeroSlide?.primaryAction}
-                className="inline-flex items-center justify-center rounded-full bg-purple-600 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-purple-500 sm:px-3 sm:py-2 sm:text-[11px] whitespace-nowrap"
-              >
-                {activeHeroSlide?.primaryButton}
-              </button>
-              <button
-                type="button"
-                onClick={activeHeroSlide?.secondaryAction}
-                className="inline-flex items-center justify-center rounded-full bg-white/10 px-2 py-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-white/20 sm:px-3 sm:py-2 sm:text-[11px] whitespace-nowrap"
-              >
-                {activeHeroSlide?.secondaryButton}
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2 pt-1">
-              {heroSlides.map((_, idx) => (
-                <button
-                  key={idx}
-                  aria-label={`Go to slide ${idx + 1}`}
-                  onClick={() => setHeroImageIndex(idx)}
-                  className={`h-2 w-2 rounded-full transition ${idx === heroImageIndex ? 'bg-white' : 'bg-white/30'}`}
-                />
-              ))}
-            </div>
+                aria-label={`Go to slide ${idx + 1}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setHeroImageIndex(idx);
+                }}
+                className={`h-2 w-2 rounded-full transition ${idx === heroImageIndex ? 'bg-white' : 'bg-white/30'}`}
+              />
+            ))}
           </div>
         </div>
 
@@ -1030,9 +1016,18 @@ export default function GuestWelcome() {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs font-semibold truncate text-white mb-1">
-                      {getProducerDisplayName(producer)}
-                    </p>
+                    <div className="flex items-center justify-center gap-1">
+                      <p className="text-xs font-semibold truncate text-white mb-1">
+                        {getProducerDisplayName(producer)}
+                      </p>
+                      {producer.isVerified && (
+                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-white" title="Verified producer">
+                          <svg viewBox="0 0 20 20" fill="currentColor" className="h-2.5 w-2.5">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[10px] text-gray-400">
                       {getProducerFollowers(producer)} followers
                     </p>
@@ -1083,7 +1078,16 @@ export default function GuestWelcome() {
                           <span>{getMediaComments(beat).toLocaleString()}</span>
                         </div>
                       </div>
-                      <p className="text-[10px] text-gray-400 truncate">{beat.user?.displayName || beat.user?.username || 'Unknown Producer'}</p>
+                      <div className="flex items-center gap-1">
+                        <p className="text-[10px] text-gray-400 truncate">{beat.user?.displayName || beat.user?.username || 'Unknown Producer'}</p>
+                        {beat.user?.isVerified && (
+                          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-white" title="Verified producer">
+                            <svg viewBox="0 0 20 20" fill="currentColor" className="h-2.5 w-2.5">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1567,7 +1571,16 @@ export default function GuestWelcome() {
                         }}
                       />
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-white">{artist.name || artist.username || 'Unknown Artist'}</p>
+                        <div className="flex items-center gap-1">
+                          <p className="text-sm font-semibold text-white">{artist.name || artist.username || 'Unknown Artist'}</p>
+                          {artist.isVerified && (
+                            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified artist">
+                              <svg viewBox="0 0 20 20" fill="currentColor" className="h-2.5 w-2.5">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+                              </svg>
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-gray-400">Latest update from your favorite artists</p>
                       </div>
                     </div>
@@ -1741,7 +1754,18 @@ export default function GuestWelcome() {
 
 
           {/* ===== HERO ===== */}
-          <div className="relative rounded-3xl mb-10 overflow-hidden h-80">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => handleHeroSlideClick(activeHeroSlide)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                handleHeroSlideClick(activeHeroSlide);
+              }
+            }}
+            className="relative rounded-3xl mb-10 overflow-hidden h-80 cursor-pointer"
+          >
             <div className="absolute inset-0">
               <Image
                 src={activeHeroSlide?.image || '/featured5.jpg'}
@@ -1750,44 +1774,20 @@ export default function GuestWelcome() {
                 className="object-cover"
               />
             </div>
-            <div className="absolute inset-0 bg-black/35" />
 
-            {/* Purple overlay on the left side */}
-            <div className="absolute left-0 top-0 bottom-0 w-1/2 bg-gradient-to-r from-purple-600/80 to-transparent" />
-
-            <div className="relative p-8 flex justify-between items-center h-full">
-              <div className="max-w-xl z-10">
-                <h2 className="text-4xl font-bold mb-2 text-white">
-                  {activeHeroSlide?.title}
-                </h2>
-                <p className="text-lg text-white/90 mb-6">
-                  {activeHeroSlide?.subtitle}
-                </p>
-
-                <div className="flex flex-wrap gap-2 sm:gap-4">
-                  <button
-                    onClick={activeHeroSlide?.primaryAction}
-                    className="bg-white text-black px-3 py-1.5 sm:px-6 sm:py-3 rounded-full flex items-center gap-2 text-xs sm:text-sm font-medium hover:bg-gray-100 transition-colors"
-                  >
-                    <FaPlay /> {activeHeroSlide?.primaryButton}
-                  </button>
-                  <button
-                    onClick={activeHeroSlide?.secondaryAction}
-                    className="bg-white/20 px-3 py-1.5 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm text-white hover:bg-white/30 transition-colors"
-                  >
-                    {activeHeroSlide?.secondaryButton}
-                  </button>
-                </div>
-              </div>
-
-              <div className={`relative w-48 h-48 rounded-3xl overflow-hidden shadow-2xl transition-all duration-1000 ease-out ${isSliding ? 'translate-x-12 opacity-50 scale-95' : 'translate-x-0 opacity-100 scale-100'}`}>
-                <Image
-                  src={activeHeroSlide?.image || '/featured5.jpg'}
-                  alt="Hero overlay"
-                  fill
-                  className="object-cover"
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-4 py-4">
+              {heroSlides.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  aria-label={`Go to slide ${idx + 1}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setHeroImageIndex(idx);
+                  }}
+                  className={`h-2.5 w-2.5 rounded-full transition ${idx === heroImageIndex ? 'bg-white' : 'bg-white/40'}`}
                 />
-              </div>
+              ))}
             </div>
           </div>
 

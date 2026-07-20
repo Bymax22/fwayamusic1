@@ -1007,6 +1007,13 @@ export default function Browse() {
     />
   )}
   <span className="text-gray-300">{file.artist}</span>
+  {file.user?.isVerified && (
+    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified artist">
+      <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
+        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+      </svg>
+    </span>
+  )}
   <span title="Location">
     <MapPin className="w-3 h-3 text-gray-400" />
   </span>

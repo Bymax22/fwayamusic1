@@ -258,7 +258,16 @@ export default function ArtistPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
             <div className="space-y-3">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Artist</p>
-              <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">{artist.name}</h1>
+              <h1 className="flex items-center gap-2 text-4xl md:text-5xl font-semibold tracking-tight">
+                <span>{artist.name}</span>
+                {artist.isVerified && (
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-lg shadow-purple-600/30" title="Verified artist">
+                    <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                )}
+              </h1>
               <p className="max-w-2xl text-gray-400">
                 {artist.followers.toLocaleString()} followers • {artist.mediaCount} songs • {artist.totalPlays.toLocaleString()} plays
                 {artist.isVerified && ' • Verified Artist'}
