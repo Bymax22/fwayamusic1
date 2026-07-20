@@ -69,7 +69,21 @@ export default function CreatePlaylistPage() {
         throw new Error(error.message || 'Failed to create playlist');
       }
 
+      const data = await response.json();
       alert('Playlist created successfully!');
+
+      // Broadcast update for other tabs/components to refresh library
+      try {
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+          const bc = new BroadcastChannel('fwaya');
+          bc.postMessage({ type: 'playlists-updated', playlist: data });
+          bc.close();
+        } else {
+          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'playlists-updated', playlist: data, t: Date.now() }));
+        }
+      } catch (e) {
+        // ignore
+      }
       setPlaylistData({
         name: '',
         description: '',

@@ -494,6 +494,16 @@ export default function VideoWatchPlayer({
                     if (!res.ok) throw new Error('Like failed');
                     // optimistic toggle handled by realtime event; but toggle locally for immediate feedback
                     setIsLiked(prev => !prev);
+
+                    try {
+                      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+                        const bc = new BroadcastChannel('fwaya');
+                        bc.postMessage({ type: 'media-liked', id: trackId });
+                        bc.close();
+                      } else {
+                        localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', id: trackId, t: Date.now() }));
+                      }
+                    } catch (_) {}
                   } catch (err) {
                     console.error('VideoWatchPlayer like failed', err);
                   }

@@ -25,36 +25,62 @@ export default function RecentlyPlayedPage() {
   const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
 
+  const fetchRecentlyPlayed = async () => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        setRecentTracks([]);
+        return;
+      }
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/recent`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        console.error('Failed to fetch recently played:', res.statusText);
+        setRecentTracks([]);
+        return;
+      }
+
+      const json = await res.json();
+      const data = Array.isArray(json) ? json : (json.data ?? json.recent ?? []);
+      setRecentTracks(data as MediaFile[]);
+    } catch (error) {
+      console.error('Error fetching recently played:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchRecentlyPlayed = async () => {
-      try {
-        const token = await getToken();
-        if (!token) {
-          setRecentTracks([]);
-          return;
-        }
+    fetchRecentlyPlayed();
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/recent`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) {
-          console.error('Failed to fetch recently played:', res.statusText);
-          setRecentTracks([]);
-          return;
-        }
-
-        const json = await res.json();
-        const data = Array.isArray(json) ? json : (json.data ?? json.recent ?? []);
-        setRecentTracks(data as MediaFile[]);
-      } catch (error) {
-        console.error('Error fetching recently played:', error);
-      } finally {
-        setLoading(false);
+    let bc: BroadcastChannel | null = null;
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'fwaya:message' && e.newValue) {
+        try {
+          const msg = JSON.parse(e.newValue);
+          if (msg?.type === 'media-played') fetchRecentlyPlayed();
+        } catch (_) {}
       }
     };
 
-    fetchRecentlyPlayed();
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      try {
+        bc = new BroadcastChannel('fwaya');
+        bc.onmessage = (ev) => {
+          const msg = ev.data;
+          if (msg?.type === 'media-played') fetchRecentlyPlayed();
+        };
+      } catch (e) {
+        if (typeof window !== 'undefined') (globalThis as any).addEventListener('storage', handleStorage);
+      }
+    } else {
+      if (typeof window !== 'undefined') (globalThis as any).addEventListener('storage', handleStorage);
+    }
+
+    return () => { try { bc?.close(); } catch (_) {} if (typeof window !== 'undefined') (globalThis as any).removeEventListener('storage', handleStorage); };
   }, []);
 
   const handlePlay = (track: MediaFile) => {

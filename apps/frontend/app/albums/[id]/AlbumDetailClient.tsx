@@ -53,11 +53,11 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
   };
 
   return (
-    <div className="min-h-screen text-white px-2 py-6 lg:px-0">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen text-white overflow-x-hidden px-2 py-6 lg:px-0">
+      <div className="max-w-7xl mx-auto space-y-6 overflow-hidden">
         <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
           <div className="rounded-3xl overflow-hidden bg-[#08111f] shadow-2xl shadow-black/30">
-            <div className="relative h-96 bg-black">
+            <div className="relative w-full overflow-hidden bg-black aspect-square sm:aspect-[4/5] lg:h-96">
               <Image
                 src={album.coverUrl || album.artCoverUrl || album.thumbnailUrl || '/default-cover.jpg'}
                 alt={album.title || 'Album cover'}

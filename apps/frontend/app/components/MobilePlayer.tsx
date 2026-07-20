@@ -320,6 +320,16 @@ export default function MobilePlayer({
                         method: 'POST',
                         headers: { Authorization: `Bearer ${token}` },
                       });
+
+                      try {
+                        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+                          const bc = new BroadcastChannel('fwaya');
+                          bc.postMessage({ type: 'media-liked', id: track.id });
+                          bc.close();
+                        } else {
+                          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', id: track.id, t: Date.now() }));
+                        }
+                      } catch (_) {}
                     } catch (err) {
                       console.error('MobilePlayer: like failed', err);
                       setIsLiked(!next);

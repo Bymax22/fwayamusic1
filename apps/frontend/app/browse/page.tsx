@@ -436,14 +436,29 @@ export default function Browse() {
       }
 
       // Track play interaction
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/play`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: 1 }) // TODO: Get from auth context
-      }).catch(err => console.warn('Play tracking failed:', err));
+      (async () => {
+        try {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/play`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId: 1 }) // TODO: Get from auth context
+          });
+        } catch (err) {
+          console.warn('Play tracking failed:', err);
+        }
+        try {
+          if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+            const bc = new BroadcastChannel('fwaya');
+            bc.postMessage({ type: 'media-played', id: file.id });
+            bc.close();
+          } else {
+            localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-played', id: file.id, t: Date.now() }));
+          }
+        } catch (_) {}
+      })();
     }
   };
 
@@ -468,6 +483,16 @@ export default function Browse() {
           interactions: [...(file.interactions || []), { liked: true, saved: false }]
         } : file
       ));
+
+      try {
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+          const bc = new BroadcastChannel('fwaya');
+          bc.postMessage({ type: 'media-liked', id });
+          bc.close();
+        } else {
+          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', id, t: Date.now() }));
+        }
+      } catch (_) {}
     } catch (err) {
       console.error('Like error:', err);
       setError({
@@ -524,6 +549,16 @@ export default function Browse() {
       setMediaFiles(mediaFiles.map(f => 
         f.id === file.id ? { ...f, downloadCount: f.downloadCount + 1 } : f
       ));
+
+      try {
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+          const bc = new BroadcastChannel('fwaya');
+          bc.postMessage({ type: 'media-downloaded', id: file.id });
+          bc.close();
+        } else {
+          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-downloaded', id: file.id, t: Date.now() }));
+        }
+      } catch (_) {}
 
       // Encrypt and download the file
       const downloadResponse = await fetch(downloadData.downloadUrl);

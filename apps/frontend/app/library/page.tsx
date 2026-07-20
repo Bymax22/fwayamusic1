@@ -124,6 +124,49 @@ export default function LibraryPage() {
 
     fetchData();
     initDB();
+    // Listen for broadcast updates to refresh playlists / liked / recent
+    let bc: BroadcastChannel | null = null;
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'fwaya:message' && e.newValue) {
+        try {
+          const msg = JSON.parse(e.newValue);
+          if (msg?.type === 'playlists-updated') {
+            setPlaylists(prev => [mapPlaylist(msg.playlist), ...prev]);
+          } else if (msg?.type === 'media-downloaded') {
+            if (db) loadDownloadedFiles(db);
+          } else if (msg?.type === 'media-liked') {
+            // could refetch liked items if desired
+          }
+        } catch (_) {}
+      }
+    };
+
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      try {
+        bc = new BroadcastChannel('fwaya');
+        bc.onmessage = (ev) => {
+          const msg = ev.data;
+          if (!msg) return;
+          if (msg.type === 'playlists-updated') {
+            setPlaylists(prev => [mapPlaylist(msg.playlist), ...prev]);
+          } else if (msg.type === 'media-downloaded') {
+            if (db) loadDownloadedFiles(db);
+          } else if (msg.type === 'media-liked') {
+            // no-op here; liked songs page listens separately
+          }
+        };
+      } catch (e) {
+        // fallback to storage event
+        if (typeof window !== 'undefined') (globalThis as any).addEventListener('storage', handleStorage);
+      }
+    } else {
+      if (typeof window !== 'undefined') (globalThis as any).addEventListener('storage', handleStorage);
+    }
+
+    return () => {
+      try { bc?.close(); } catch (_) {}
+      if (typeof window !== 'undefined') (globalThis as any).removeEventListener('storage', handleStorage);
+    };
   }, [getToken]);
 
   const getKey = async (deviceId: string): Promise<CryptoKey> => {

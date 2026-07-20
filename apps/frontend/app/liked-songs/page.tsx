@@ -26,55 +26,81 @@ export default function LikedSongsPage() {
   const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
 
-  useEffect(() => {
-    const fetchLikedSongs = async () => {
-      setLoading(true);
-      try {
-        const token = await getToken();
-        if (!token) {
-          setLikedSongs([]);
-          return;
-        }
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/liked`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          console.error('Failed to fetch liked songs:', response.statusText);
-          setLikedSongs([]);
-          return;
-        }
-
-        const json = await response.json();
-        const data = Array.isArray(json) ? json : (json.data ?? json.liked ?? []);
-
-        const formattedData = (data as MediaFile[]).map((item: MediaFile) => ({
-          id: item.id,
-          title: item.title || 'Untitled',
-          artist: item.artist || 'Unknown Artist',
-          url: item.url,
-          duration: item.duration || 0,
-          coverArt: item.coverArt || '/default-cover.jpg',
-          views: item.views || 0,
-          likes: item.likes || 0,
-          genre: item.genre || 'Other',
-          liked: true
-        }));
-
-        setLikedSongs(formattedData);
-      } catch (err) {
-        console.error('Fetch error:', err);
+  const fetchLikedSongs = async () => {
+    setLoading(true);
+    try {
+      const token = await getToken();
+      if (!token) {
         setLikedSongs([]);
-      } finally {
-        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/liked`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Failed to fetch liked songs:', response.statusText);
+        setLikedSongs([]);
+        return;
+      }
+
+      const json = await response.json();
+      const data = Array.isArray(json) ? json : (json.data ?? json.liked ?? []);
+
+      const formattedData = (data as MediaFile[]).map((item: MediaFile) => ({
+        id: item.id,
+        title: item.title || 'Untitled',
+        artist: item.artist || 'Unknown Artist',
+        url: item.url,
+        duration: item.duration || 0,
+        coverArt: item.coverArt || '/default-cover.jpg',
+        views: item.views || 0,
+        likes: item.likes || 0,
+        genre: item.genre || 'Other',
+        liked: true
+      }));
+
+      setLikedSongs(formattedData);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setLikedSongs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLikedSongs();
+
+    let bc: BroadcastChannel | null = null;
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'fwaya:message' && e.newValue) {
+        try {
+          const msg = JSON.parse(e.newValue);
+          if (msg?.type === 'media-liked') fetchLikedSongs();
+        } catch (_) {}
       }
     };
 
-    fetchLikedSongs();
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      try {
+        bc = new BroadcastChannel('fwaya');
+        bc.onmessage = (ev) => {
+          const msg = ev.data;
+          if (msg?.type === 'media-liked') fetchLikedSongs();
+        };
+      } catch (e) {
+        if (typeof window !== 'undefined') (globalThis as any).addEventListener('storage', handleStorage);
+      }
+    } else {
+      if (typeof window !== 'undefined') (globalThis as any).addEventListener('storage', handleStorage);
+    }
+
+    return () => { try { bc?.close(); } catch (_) {} if (typeof window !== 'undefined') (globalThis as any).removeEventListener('storage', handleStorage); };
   }, []);
 
   const handlePlay = (file: MediaFile) => {

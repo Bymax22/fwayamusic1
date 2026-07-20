@@ -224,6 +224,16 @@ export default function TrackPage() {
       if (!response.ok) {
         throw new Error('Like request failed');
       }
+
+      try {
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+          const bc = new BroadcastChannel('fwaya');
+          bc.postMessage({ type: 'media-liked', id: track.id });
+          bc.close();
+        } else {
+          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', id: track.id, t: Date.now() }));
+        }
+      } catch (_) {}
     } catch (err) {
       setIsLiked((prev) => !prev);
       setTrack((prev) =>
