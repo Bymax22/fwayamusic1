@@ -6,11 +6,14 @@ function getBackendBaseUrl() {
 
 export async function GET(request: Request) {
   try {
+    const authHeader = request.headers.get('authorization');
     const baseUrl = getBackendBaseUrl();
     const url = new URL(request.url);
     const search = url.search || '';
     const start = Date.now();
-    const res = await fetch(`${baseUrl}/api/v1/playlist${search}`, { headers: { Accept: 'application/json' } });
+    const headers: Record<string, string> = { Accept: 'application/json' };
+    if (authHeader) headers.Authorization = authHeader;
+    const res = await fetch(`${baseUrl}/api/v1/playlist${search}`, { headers });
     const upstreamMs = Date.now() - start;
     if (!res.ok) {
       const text = await res.text().catch(() => '');

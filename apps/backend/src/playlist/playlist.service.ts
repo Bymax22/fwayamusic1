@@ -45,6 +45,26 @@ export class PlaylistService {
     });
   }
 
+  async createPlaylist(userId: number, data: { name: string; description?: string; isPublic?: boolean; coverUrl?: string; type?: string }) {
+    return this.prisma.playlist.create({
+      data: {
+        name: data.name,
+        description: data.description ?? null,
+        isPublic: data.isPublic ?? false,
+        coverUrl: data.coverUrl ?? null,
+        type: data.type ? (data.type as PlaylistType) : PlaylistType.USER,
+        userId,
+      },
+      include: {
+        entries: {
+          include: {
+            media: true,
+          },
+        },
+      },
+    });
+  }
+
   async addMediaToPlaylist(playlistId: number, mediaId: number, userId: number) {
     // First check if the playlist exists and belongs to the user
     const playlist = await this.prisma.playlist.findFirst({

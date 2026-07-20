@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Save, Upload, X, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
@@ -14,7 +14,7 @@ export default function CreatePlaylistPage() {
     coverPreview: ''
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setPlaylistData(prev => ({
       ...prev,
@@ -22,7 +22,7 @@ export default function CreatePlaylistPage() {
     }));
   };
 
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setPlaylistData(prev => ({
@@ -41,7 +41,7 @@ export default function CreatePlaylistPage() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const token = await getToken();
@@ -84,11 +84,17 @@ export default function CreatePlaylistPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Create Playlist</h1>
-        <p className="text-gray-400">Build your perfect music collection</p>
+    <div className="p-6 max-w-4xl mx-auto bg-gradient-to-br from-[#090b14]/95 via-[#120a28]/80 to-[#160930]/95 min-h-screen pb-32">
+      <div className="mb-8 rounded-3xl border border-purple-700/40 bg-[#090b14]/80 p-8 shadow-2xl shadow-purple-900/20">
+        <div className="flex flex-col gap-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-purple-500/10 px-4 py-2 text-sm uppercase tracking-[0.24em] text-purple-300">
+            Create Playlist
+          </div>
+          <h1 className="text-4xl font-semibold tracking-tight text-white">Build your playlist, your way</h1>
+          <p className="max-w-2xl text-sm text-slate-400">
+            Use the same library style as your music experience. Create a playlist, give it a cover, and share it with fans.
+          </p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -158,7 +164,7 @@ export default function CreatePlaylistPage() {
                 value={playlistData.name}
                 onChange={handleInputChange}
                 placeholder="My Awesome Playlist"
-                className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a3747] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent placeholder-gray-400"
+                className="w-full px-4 py-3 bg-[#0f1320] border border-purple-700/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400"
                 required
               />
             </div>
@@ -174,7 +180,7 @@ export default function CreatePlaylistPage() {
                 onChange={handleInputChange}
                 placeholder="Describe your playlist..."
                 rows={4}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-[#0a3747] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent placeholder-gray-400 resize-none"
+                className="w-full px-4 py-3 bg-[#0f1320] border border-purple-700/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400 resize-none"
               />
             </div>
 
@@ -190,7 +196,7 @@ export default function CreatePlaylistPage() {
                     name="isPublic"
                     checked={playlistData.isPublic}
                     onChange={() => setPlaylistData(prev => ({ ...prev, isPublic: true }))}
-                    className="text-[#e51f48] focus:ring-[#e51f48]"
+                    className="text-purple-500 focus:ring-purple-500"
                   />
                   <span className="text-white">Public</span>
                 </label>
@@ -200,7 +206,7 @@ export default function CreatePlaylistPage() {
                     name="isPublic"
                     checked={!playlistData.isPublic}
                     onChange={() => setPlaylistData(prev => ({ ...prev, isPublic: false }))}
-                    className="text-[#e51f48] focus:ring-[#e51f48]"
+                    className="text-purple-500 focus:ring-purple-500"
                   />
                   <span className="text-white">Private</span>
                 </label>
@@ -213,7 +219,7 @@ export default function CreatePlaylistPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="flex items-center gap-2 px-6 py-3 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors font-medium"
+            className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-full transition-colors font-medium shadow-lg shadow-purple-500/20"
           >
             <Save className="w-5 h-5" />
             Create Playlist

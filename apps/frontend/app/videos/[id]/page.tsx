@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import VideoWatchPlayer from "@/components/VideoWatchPlayer";
 import VideoCard from "@/components/VideoCard";
 import ShareModal from '@/components/ShareModal';
+import PlaylistPickerModal from '@/components/PlaylistPickerModal';
 import { createMediaSlug } from '@/lib/utils';
 
 interface VideoDetail {
@@ -111,6 +112,7 @@ export default function VideoWatchPage() {
   const [isDisliked, setIsDisliked] = useState(false);
   const [isInPlaylist, setIsInPlaylist] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
 
   const fetchComments = async (mediaId?: string) => {
     try {
@@ -528,7 +530,7 @@ export default function VideoWatchPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setIsInPlaylist((prev) => !prev)}
+                    onClick={() => setShowPlaylistModal(true)}
                     className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isInPlaylist ? 'bg-black text-white' : 'bg-black text-slate-200 hover:bg-neutral-800'}`}
                     aria-label="Add to playlist"
                     title="Add to playlist"
@@ -757,6 +759,16 @@ export default function VideoWatchPage() {
           </div>
         )}
       </div>
+      <PlaylistPickerModal
+        open={showPlaylistModal}
+        mediaId={video?.id ?? 0}
+        onClose={() => setShowPlaylistModal(false)}
+        onSuccess={() => {
+          setShowPlaylistModal(false);
+          setIsInPlaylist(true);
+          alert('Added to playlist successfully!');
+        }}
+      />
     </div>
   );
 }

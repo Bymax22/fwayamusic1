@@ -22,6 +22,7 @@ import {
   FaComment,
   FaStar
 } from 'react-icons/fa';
+import PlaylistPickerModal from '@/components/PlaylistPickerModal';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import { formatDuration } from '@/lib/utils';
@@ -239,7 +240,6 @@ export default function ArtistPage() {
   const handleAddToPlaylist = (song: MediaItem) => {
     setSelectedSong(song);
     setShowPlaylistModal(true);
-    // TODO: Implement playlist modal
   };
 
   const handleShare = () => {
@@ -478,6 +478,19 @@ export default function ArtistPage() {
           </div>
         </div>
       </div>
+      <PlaylistPickerModal
+        open={showPlaylistModal}
+        mediaId={selectedSong?.id ?? 0}
+        onClose={() => {
+          setShowPlaylistModal(false);
+          setSelectedSong(null);
+        }}
+        onSuccess={() => {
+          setShowPlaylistModal(false);
+          setSelectedSong(null);
+          alert('Added to playlist successfully!');
+        }}
+      />
     </div>
   );
 }

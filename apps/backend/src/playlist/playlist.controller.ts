@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Param, Query, Delete, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Delete, Req, UseGuards, Logger } from '@nestjs/common';
+import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { PlaylistService } from './playlist.service';
 
 @Controller('v1/playlist')
@@ -37,6 +38,22 @@ export class PlaylistController {
       this.logger.error('Failed to fetch playlists', error instanceof Error ? error.message : String(error), error instanceof Error ? error.stack : undefined);
       throw error;
     }
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post()
+  async createPlaylist(
+    @Req() req: any,
+    @Body() body: { name: string; description?: string; isPublic?: boolean; coverUrl?: string; type?: string },
+  ) {
+    const user = req.user;
+    return this.playlistService.createPlaylist(user.id, {
+      name: body.name,
+      description: body.description,
+      isPublic: body.isPublic ?? false,
+      coverUrl: body.coverUrl,
+      type: body.type,
+    });
   }
 
   @Get(':id')

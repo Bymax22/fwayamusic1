@@ -103,7 +103,11 @@ export default function AlbumsPage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {featuredAlbums.slice(0, 8).map((album) => (
-                  <div key={album.id} className="rounded-3xl overflow-hidden bg-[#041021] shadow-lg shadow-black/20 transition hover:-translate-y-1">
+                  <Link
+                    key={album.id}
+                    href={`/albums/${album.id}`}
+                    className="rounded-3xl overflow-hidden bg-[#041021] shadow-lg shadow-black/20 transition hover:-translate-y-1"
+                  >
                     <div className="relative h-64 bg-black">
                       <Image
                         src={album.coverArt}
@@ -129,7 +133,7 @@ export default function AlbumsPage() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </section>
@@ -143,7 +147,11 @@ export default function AlbumsPage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {albums.map((album) => (
-                  <div key={album.id} className="rounded-3xl overflow-hidden bg-[#041021] shadow-lg shadow-black/20 transition hover:-translate-y-1">
+                  <Link
+                    key={album.id}
+                    href={`/albums/${album.id}`}
+                    className="rounded-3xl overflow-hidden bg-[#041021] shadow-lg shadow-black/20 transition hover:-translate-y-1"
+                  >
                     <div className="relative h-56 bg-black">
                       <Image
                         src={album.coverArt}
@@ -160,7 +168,7 @@ export default function AlbumsPage() {
                         <span>{album.releaseDate ? new Date(album.releaseDate).toLocaleDateString() : 'Unknown date'}</span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </section>

@@ -1,24 +1,46 @@
 
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export const GET = async (req: NextRequest) => {
-  const authHeader = req.headers.get('authorization');
-  if (!authHeader) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-  }
+function getBackendBaseUrl() {
+  return process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+}
+
+export async function GET(request: NextRequest) {
   try {
-    // Proxy the request to the backend
-    const backendRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/playlists`, {
+    const authHeader = request.headers.get('authorization');
+    const url = new URL(request.url);
+    const search = url.search || '';
+    const backendRes = await fetch(`${getBackendBaseUrl()}/api/v1/playlist${search}`, {
       method: 'GET',
-      headers: { 'Authorization': authHeader },
+      headers: {
+        Accept: 'application/json',
+        ...(authHeader ? { Authorization: authHeader } : {}),
+      },
     });
     const data = await backendRes.json();
-    if (!backendRes.ok) {
-      return new Response(JSON.stringify(data), { status: backendRes.status });
-    }
-    return new Response(JSON.stringify(data), { status: 200 });
-  } catch (_error) {
-    console.error(_error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch playlists' }), { status: 500 });
+    return NextResponse.json(data, { status: backendRes.status });
+  } catch (error) {
+    console.error('Failed to proxy playlists request:', error);
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
-};
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get('authorization');
+    const body = await request.json();
+    const backendRes = await fetch(`${getBackendBaseUrl()}/api/v1/playlist`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authHeader ? { Authorization: authHeader } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await backendRes.json();
+    return NextResponse.json(data, { status: backendRes.status });
+  } catch (error) {
+    console.error('Failed to proxy create playlist:', error);
+    return NextResponse.json({ error: String(error) }, { status: 500 });
+  }
+}
