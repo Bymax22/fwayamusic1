@@ -373,6 +373,7 @@ export default function GuestWelcome() {
             processedArtists.push({
               ...artist,
               avatarUrl: artist.avatarUrl ? resolveMediaUrl(artist.avatarUrl) : artist.avatarUrl,
+              isVerified: artist.isVerified || artist.verified || artist.is_verified || false,
             });
           });
         }
@@ -407,16 +408,16 @@ export default function GuestWelcome() {
           const fallbackProducers: any[] = [];
           producersArray.forEach((user: any) => {
             const role = user.role?.toString().toUpperCase();
+            const normalized = {
+              ...user,
+              avatarUrl: user.avatarUrl ? resolveMediaUrl(user.avatarUrl) : user.avatarUrl,
+              isVerified: user.isVerified || user.verified || user.is_verified || false,
+            };
+
             if (role === 'PRODUCER' || user.isProducer === true || !!user.producerName || !!user.producerBio) {
-              processedFeaturedProducers.push({
-                ...user,
-                avatarUrl: user.avatarUrl ? resolveMediaUrl(user.avatarUrl) : user.avatarUrl,
-              });
+              processedFeaturedProducers.push(normalized);
             } else if (user.isProducer === true || !!user.producerName || !!user.producerBio) {
-              fallbackProducers.push({
-                ...user,
-                avatarUrl: user.avatarUrl ? resolveMediaUrl(user.avatarUrl) : user.avatarUrl,
-              });
+              fallbackProducers.push(normalized);
             }
           });
 
@@ -593,8 +594,8 @@ export default function GuestWelcome() {
       setTimeout(() => {
         setHeroImageIndex((prev) => (prev + 1) % Math.max(heroSlides.length, 1));
         setIsSliding(false);
-      }, 1200); // Slightly slower slide duration
-    }, 4000); // Total cycle time
+      }, 800); // animation lead-in before switching
+    }, 4800); // a slightly longer cycle for smoother viewing
     return () => clearInterval(interval);
   }, [heroSlides.length]);
 
@@ -671,15 +672,13 @@ export default function GuestWelcome() {
                 )}
               </div>
               <div className="flex items-center gap-2">
+                <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
+                  Get App
+                </button>
                 {!user && (
-                  <>
-                    <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
-                      Get App
-                    </button>
-                    <button className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400">
-                      Premium
-                    </button>
-                  </>
+                  <button className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400">
+                    Premium
+                  </button>
                 )}
                 {user && (
                   <button
@@ -821,14 +820,20 @@ export default function GuestWelcome() {
           }}
           className="relative mb-3 overflow-hidden rounded-3xl bg-[#0d0f18] min-h-[220px] sm:min-h-[260px] cursor-pointer"
         >
-          <div className="absolute inset-0">
+          <motion.div
+            key={safeHeroIndex}
+            className="absolute inset-0"
+            initial={{ opacity: 0, scale: 1.03 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
+          >
             <Image
               src={activeHeroSlide?.image || '/featured5.jpg'}
               alt={activeHeroSlide?.title || 'Featured hero banner'}
               fill
               className="object-cover object-center"
             />
-          </div>
+          </motion.div>
 
           <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-3 py-3">
             {heroSlides.map((_, idx) => (
@@ -985,9 +990,9 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="flex-shrink-0 text-center cursor-pointer">
+                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
                     <div 
-                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
+                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto"
                       style={{
                         backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -1000,7 +1005,16 @@ export default function GuestWelcome() {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
+                    <div className="flex items-center justify-center gap-1">
+                      <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
+                      {artist.isVerified && (
+                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-white" title="Verified artist">
+                          <svg viewBox="0 0 20 20" fill="currentColor" className="h-2.5 w-2.5">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[10px] text-gray-400">{getArtistFollowers(artist)} followers</p>
                   </Link>
                 ))}
@@ -1015,9 +1029,9 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredProducers.slice(0, 6).map((producer: any, i: number) => (
-                  <Link key={i} href={`/artists/${producer.id || producer._id}`} className="flex-shrink-0 text-center cursor-pointer">
+                  <Link key={i} href={`/artists/${producer.id || producer._id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
                     <div 
-                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
+                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto overflow-hidden"
                       style={{
                         backgroundImage: producer.avatarUrl ? `url(${producer.avatarUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -1025,15 +1039,14 @@ export default function GuestWelcome() {
                       }}
                     >
                       {!producer.avatarUrl && (
-                        <span className="text-white font-bold text-lg">
+                        <span className="text-white font-semibold text-base">
                           {getProducerInitials(producer)}
                         </span>
                       )}
                     </div>
+
                     <div className="flex items-center justify-center gap-1">
-                      <p className="text-xs font-semibold truncate text-white mb-1">
-                        {getProducerDisplayName(producer)}
-                      </p>
+                      <p className="text-xs font-semibold truncate mb-1">{getProducerDisplayName(producer)}</p>
                       {producer.isVerified && (
                         <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-white" title="Verified producer">
                           <svg viewBox="0 0 20 20" fill="currentColor" className="h-2.5 w-2.5">
@@ -1042,9 +1055,8 @@ export default function GuestWelcome() {
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-gray-400">
-                      {getProducerFollowers(producer)} followers
-                    </p>
+
+                    <p className="text-[10px] text-gray-400">{getProducerFollowers(producer)} followers</p>
                   </Link>
                 ))}
               </div>
@@ -1780,14 +1792,20 @@ export default function GuestWelcome() {
             }}
             className="relative rounded-3xl mb-10 overflow-hidden h-80 cursor-pointer"
           >
-            <div className="absolute inset-0">
+            <motion.div
+              key={safeHeroIndex}
+              className="absolute inset-0"
+              initial={{ opacity: 0, scale: 1.02 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: 'easeInOut' }}
+            >
               <Image
                 src={activeHeroSlide?.image || '/featured5.jpg'}
                 alt={activeHeroSlide?.title || 'Featured hero banner'}
                 fill
                 className="object-cover"
               />
-            </div>
+            </motion.div>
 
             <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-4 py-4">
               {heroSlides.map((_, idx) => (
