@@ -19,8 +19,9 @@ async function fetchAlbum(albumId: string) {
   return res.json();
 }
 
-export default async function AlbumDetailPage({ params }: { params: { id: string } }) {
-  const album = await fetchAlbum(params.id);
+export default async function AlbumDetailPage(props: any) {
+  const { params } = props ?? {};
+  const album = await fetchAlbum(params?.id);
   if (!album) {
     notFound();
   }
