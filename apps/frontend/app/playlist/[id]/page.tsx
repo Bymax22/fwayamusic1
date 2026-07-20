@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -13,7 +13,10 @@ import {
   FaArrowLeft,
   FaDownload,
   FaHeart,
-  FaRegHeart
+  FaRegHeart,
+  FaPlus,
+  FaRedo,
+  FaTrash,
 } from 'react-icons/fa';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
