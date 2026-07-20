@@ -31,6 +31,7 @@ import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useAuth } from "@/context/AuthContext";
 import MobileMenu from "./MobileMenu";
 import { createMediaSlug } from "@/lib/utils";
+import { subscribe } from '@/lib/realtime';
 
 export default function GuestWelcome() {
   const [activeTab, setActiveTab] = useState<string>("for-you");
@@ -464,6 +465,29 @@ export default function GuestWelcome() {
     } else {
       void fetchHomepageData(true);
     }
+
+    // Subscribe to realtime media uploads so homepage updates when artists upload releases
+    let unsub: (() => void) | undefined;
+    const setupRealtime = async () => {
+      try {
+        unsub = await subscribe('media:uploaded', (payload: any) => {
+          try {
+            if (typeof window !== 'undefined') sessionStorage.removeItem(cacheKey);
+            void fetchHomepageData(false);
+          } catch (err) {
+            console.error('Homepage realtime handler error:', err);
+          }
+        });
+      } catch (err) {
+        console.error('Failed to subscribe to realtime media:uploaded events:', err);
+      }
+    };
+
+    void setupRealtime();
+
+    return () => {
+      if (unsub) unsub();
+    };
   }, []);
 
   const defaultHeroSlides = [
