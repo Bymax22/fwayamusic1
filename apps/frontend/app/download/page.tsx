@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Download, Music, Headphones, HardDrive, ArrowDown, Check, Crown, Clock, Sparkles, Play, Shield, Lock } from 'lucide-react';
+import { Download, Music, Headphones, HardDrive, ArrowDown, Check, Crown, Clock, Sparkles, Play, Shield, Lock, Wifi, WifiOff } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { formatFileSize, formatDuration } from '@/lib/utils';
 import Image from "next/image";
 import Protected from '@/components/Protected';
@@ -48,8 +49,10 @@ export default function DownloadPage() {
   const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
   const [db, setDb] = useState<IDBDatabase | null>(null);
   const [downloadedFiles, setDownloadedFiles] = useState<DownloadItem[]>([]);
+  const [showNetworkNotification, setShowNetworkNotification] = useState(false);
   const { currentTrack, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
+  const { isOnline, connectionQuality } = useNetworkStatus();
 
 useEffect(() => {
   const generateDeviceId = () => {
@@ -134,7 +137,32 @@ useEffect(() => {
   setStorageUsage(prev => ({ ...prev, used }));
 }, [downloads, downloadedFiles]);
 
-  const handleDownload = async (item: DownloadItem) => {
+// Auto-enable offline mode when network is offline or poor quality
+useEffect(() => {
+  const wasOnline = isOfflineMode === false;
+  
+  if (!isOnline || connectionQuality === 'offline' || connectionQuality === 'poor') {
+    setIsOfflineMode(true);
+    if (wasOnline && connectionQuality === 'offline') {
+      setShowNetworkNotification(true);
+      setTimeout(() => setShowNetworkNotification(false), 5000);
+    }
+  } else if (isOnline && connectionQuality !== 'offline' && connectionQuality !== 'poor') {
+    // Only auto-disable if user had enabled it for network reasons
+    if (isOfflineMode) {
+      setShowNetworkNotification(true);
+      setTimeout(() => setShowNetworkNotification(false), 5000);
+    }
+  }
+}, [isOnline, connectionQuality]);
+
+const handleDownload = async (item: DownloadItem) => {
+  // Prevent downloading when offline
+    if (!isOnline || connectionQuality === 'offline' || isOfflineMode) {
+      alert('Cannot download while offline. Please check your internet connection and try again.');
+      return;
+    }
+
     try {
       // For DRM protected content, generate license first
       if (item.isDRMProtected) {
@@ -369,6 +397,32 @@ useEffect(() => {
   return (
     <Protected>
       <div className="bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen p-4 sm:p-6">
+      
+      {/* Network Status Notification */}
+      {showNetworkNotification && (
+        <div className={`mb-4 p-4 rounded-lg flex items-center gap-3 ${
+          isOnline && connectionQuality !== 'offline' && connectionQuality !== 'poor'
+            ? 'bg-green-500/10 border border-green-500/30'
+            : 'bg-red-500/10 border border-red-500/30'
+        }`}>
+          {isOnline && connectionQuality !== 'offline' && connectionQuality !== 'poor' ? (
+            <>
+              <Wifi className="w-5 h-5 text-green-400" />
+              <span className="text-sm text-green-300">
+                Internet connection restored. All features are now available.
+              </span>
+            </>
+          ) : (
+            <>
+              <WifiOff className="w-5 h-5 text-red-400" />
+              <span className="text-sm text-red-300">
+                You're offline or have a poor connection. Switched to offline mode.
+              </span>
+            </>
+          )}
+        </div>
+      )}
+      
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -396,14 +450,26 @@ useEffect(() => {
             </div>
             <button 
               onClick={() => setIsOfflineMode(!isOfflineMode)}
-              className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center ${
+              className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center transition-colors ${
                 isOfflineMode 
                   ? 'bg-purple-500 text-white' 
                   : 'bg-[#0a3747] text-gray-300'
               }`}
+              title={!isOnline || connectionQuality === 'offline' ? 'You are offline' : 'Toggle offline mode'}
             >
-              <Headphones className="w-3 h-3 sm:w-4 sm:h-4" />
-              {isOfflineMode ? 'Offline' : 'Online'}
+              {!isOnline || connectionQuality === 'offline' || connectionQuality === 'poor' ? (
+                <>
+                  <WifiOff className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="text-xs">
+                    {connectionQuality === 'offline' ? 'No Connection' : 'Poor Connection'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Wifi className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="text-xs">{isOfflineMode ? 'Offline Mode' : 'Online'}</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -574,7 +640,12 @@ useEffect(() => {
                         ) : (
                           <button 
                             onClick={() => handleDownload(item)}
-                            className="text-xs text-purple-300 hover:text-purple-200 flex items-center gap-1"
+                            disabled={!isOnline || connectionQuality === 'offline' || isOfflineMode}
+                            className={`text-xs flex items-center gap-1 ${
+                              !isOnline || connectionQuality === 'offline' || isOfflineMode
+                                ? 'text-gray-600 cursor-not-allowed'
+                                : 'text-purple-300 hover:text-purple-200'
+                            }`}
                           >
                             <ArrowDown className="w-3 h-3" />
                             <span className="hidden sm:inline">Download</span>

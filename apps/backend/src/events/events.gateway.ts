@@ -33,7 +33,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  emitPlaylistUpdated(payload: { playlistId: number; userId?: number; action: 'add' | 'remove'; entry?: any }) {
+  emitPlaylistUpdated(payload: { playlistId: number; userId?: number; action: 'add' | 'remove' | 'update' | 'delete'; entry?: any; playlist?: any }) {
     try {
       this.server.emit('playlist:updated', payload);
     } catch (err) {

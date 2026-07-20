@@ -14,6 +14,7 @@ import VideoMiniPlayer from "../components/VideoMiniPlayer";
 import { useAuth } from "../context/AuthContext";
 import AuthErrorBanner from "../components/AuthErrorBanner";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
+import { ServiceWorkerProvider } from "../components/ServiceWorkerProvider";
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const { user, authError, clearAuthError, verificationError } = useAuth();
@@ -29,6 +30,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
 
   return (
     <div className="w-full text-white bg-transparent lg:pt-14">
+      <ServiceWorkerProvider />
       {/* Global auth error banner (shows verification and other auth errors) */}
       {(() => {
         const bannerError = authError ?? (verificationError ? { message: verificationError } : null);
