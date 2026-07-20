@@ -85,12 +85,40 @@ export default function ArtistPage() {
   useEffect(() => {
     const fetchArtist = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/artists/${params.id}`);
-        if (!response.ok) {
-          throw new Error('Artist not found');
+        const base = process.env.NEXT_PUBLIC_API_URL || '';
+        const response = await fetch(`${base}/api/v1/artists/${params.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setArtist(data);
+        } else {
+          // Try falling back to users endpoint (covers producers or generic users)
+          const userRes = await fetch(`${base}/api/v1/users/${params.id}`);
+          if (userRes.ok) {
+            const u = await userRes.json();
+            const media = Array.isArray(u.media)
+              ? u.media.map((m: any) => ({ ...m, artist: u.displayName || u.username }))
+              : [];
+
+            const mapped = {
+              id: u.id?.toString(),
+              name: u.displayName || u.username || u.artistName || 'Unknown',
+              imageUrl: u.avatarUrl || '/default-artist.png',
+              avatarUrl: u.avatarUrl || '/default-artist.png',
+              bio: u.bio || u.description || '',
+              website: u.website || '',
+              followers: (u._count && u._count.followers) || (Array.isArray(u.followers) ? u.followers.length : (u.followersCount || 0)) || 0,
+              isVerified: u.status === 'VERIFIED' || u.isVerified || u.verified || false,
+              isFollowing: false,
+              mediaCount: (u._count && u._count.media) || media.length,
+              media,
+              totalPlays: media.reduce((sum: number, m: any) => sum + (m.playCount || 0), 0)
+            } as any;
+
+            setArtist(mapped);
+          } else {
+            throw new Error('Artist not found');
+          }
         }
-        const data = await response.json();
-        setArtist(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load artist');
       } finally {

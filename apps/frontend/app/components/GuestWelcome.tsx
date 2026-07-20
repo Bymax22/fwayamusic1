@@ -818,7 +818,7 @@ export default function GuestWelcome() {
               handleHeroSlideClick(activeHeroSlide);
             }
           }}
-          className="relative mb-3 overflow-hidden rounded-3xl bg-[#0d0f18] min-h-[220px] sm:min-h-[260px] cursor-pointer"
+          className="relative mb-3 overflow-hidden rounded-3xl bg-[#0d0f18] min-h-[140px] sm:min-h-[260px] cursor-pointer"
         >
           <motion.div
             key={safeHeroIndex}
@@ -990,7 +990,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
+                  <Link key={i} href={`/artists/${artist.id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto"
                       style={{
@@ -1029,7 +1029,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredProducers.slice(0, 6).map((producer: any, i: number) => (
-                  <Link key={i} href={`/artists/${producer.id || producer._id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
+                  <Link key={i} href={`/producers/${producer.id || producer._id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto overflow-hidden"
                       style={{
@@ -1475,7 +1475,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="flex-shrink-0 text-center cursor-pointer">
+                  <Link key={i} href={`/artists/${artist.id}`} className="flex-shrink-0 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
                       style={{
@@ -1586,7 +1586,7 @@ export default function GuestWelcome() {
               </div>
               <div className="space-y-3">
                 {featuredArtists.slice(0, 4).map((artist: any, i: number) => (
-                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="rounded-3xl bg-transparent p-4 block">
+                  <Link key={i} href={`/artists/${artist.id}`} className="rounded-3xl bg-transparent p-4 block">
                     <div className="flex items-center gap-3">
                       <div
                         className="w-12 h-12 rounded-full bg-black flex-shrink-0"
@@ -1719,7 +1719,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-                  <Link key={i} href={`/artists/${artist.id || artist._id}`} className="flex-shrink-0 text-center cursor-pointer">
+                  <Link key={i} href={`/artists/${artist.id}`} className="flex-shrink-0 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
                       style={{
@@ -1957,7 +1957,7 @@ export default function GuestWelcome() {
                 featuredProducers.slice(0, 6).map((producer: any, i: number) => (
                   <Link
                     key={i}
-                    href={`/artists/${producer.id || producer._id}`}
+                    href={`/producers/${producer.id || producer._id}`}
                     className="text-center cursor-pointer hover:bg-transparent rounded-xl p-3 transition-colors"
                   >
                     <div
@@ -2056,9 +2056,9 @@ export default function GuestWelcome() {
             {/* GRID LAYOUT - 6 ARTISTS */}
             <div className="grid grid-cols-6 gap-3">
               {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
-                <Link
+                  <Link
                   key={i}
-                  href={`/artists/${artist.id || artist._id}`}
+                  href={`/artists/${artist.id}`}
                   className="text-center cursor-pointer hover:bg-transparent rounded-xl p-3 transition-colors"
                 >
                   {/* ARTIST IMAGE */}
