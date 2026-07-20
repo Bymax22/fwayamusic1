@@ -154,4 +154,71 @@ export class PlaylistService {
 
     return deleted;
   }
+
+  async updatePlaylist(playlistId: number, userId: number, data: { name?: string; description?: string; isPublic?: boolean; coverUrl?: string }) {
+    // Verify ownership
+    const playlist = await this.prisma.playlist.findFirst({
+      where: {
+        id: playlistId,
+        userId: userId,
+      },
+    });
+
+    if (!playlist) {
+      throw new Error('Playlist not found or access denied');
+    }
+
+    const updated = await this.prisma.playlist.update({
+      where: { id: playlistId },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.isPublic !== undefined && { isPublic: data.isPublic }),
+        ...(data.coverUrl !== undefined && { coverUrl: data.coverUrl }),
+      },
+      include: {
+        entries: {
+          include: {
+            media: true,
+          },
+        },
+      },
+    });
+
+    try {
+      this.eventsGateway.emitPlaylistUpdated({ playlistId, userId, action: 'update', playlist: updated });
+    } catch (err) {}
+
+    return updated;
+  }
+
+  async deletePlaylist(playlistId: number, userId: number) {
+    // Verify ownership
+    const playlist = await this.prisma.playlist.findFirst({
+      where: {
+        id: playlistId,
+        userId: userId,
+      },
+    });
+
+    if (!playlist) {
+      throw new Error('Playlist not found or access denied');
+    }
+
+    // Delete all entries first
+    await this.prisma.playlistEntry.deleteMany({
+      where: { playlistId: playlistId },
+    });
+
+    // Delete the playlist
+    const deleted = await this.prisma.playlist.delete({
+      where: { id: playlistId },
+    });
+
+    try {
+      this.eventsGateway.emitPlaylistUpdated({ playlistId, userId, action: 'delete' });
+    } catch (err) {}
+
+    return deleted;
+  }
 }

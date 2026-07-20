@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, Delete, Req, UseGuards, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Delete, Patch, Req, UseGuards, Logger } from '@nestjs/common';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { PlaylistService } from './playlist.service';
 
@@ -82,5 +82,30 @@ export class PlaylistController {
     @Body() body: { userId: number }
   ) {
     return this.playlistService.removeMediaFromPlaylist(Number(playlistId), Number(mediaId), body.userId);
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Patch(':id')
+  async updatePlaylist(
+    @Param('id') playlistId: string,
+    @Req() req: any,
+    @Body() body: { name?: string; description?: string; isPublic?: boolean; coverUrl?: string }
+  ) {
+    const user = req.user;
+    return this.sanitizeForJson(
+      await this.playlistService.updatePlaylist(Number(playlistId), user.id, body)
+    );
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Delete(':id')
+  async deletePlaylist(
+    @Param('id') playlistId: string,
+    @Req() req: any
+  ) {
+    const user = req.user;
+    return this.sanitizeForJson(
+      await this.playlistService.deletePlaylist(Number(playlistId), user.id)
+    );
   }
 }

@@ -438,7 +438,7 @@ export default function Browse() {
       // Track play interaction
       (async () => {
         try {
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/play`, {
+          await fetch(`/api/media/${file.id}/interact/play`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -465,7 +465,12 @@ export default function Browse() {
   const handleLike = async (id: number) => {
     try {
       const token = await getToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/interact/like`, { 
+      if (!token) {
+        alert('Please sign in to like tracks.');
+        return;
+      }
+
+      const response = await fetch(`/api/media/${id}/interact/like`, { 
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -474,7 +479,11 @@ export default function Browse() {
         },
       });
 
-      if (!response.ok) throw new Error('Like action failed');
+      if (!response.ok) {
+        let details = 'Like action failed';
+        try { const j = await response.json(); details = j.message || j.error || details; } catch (_) {}
+        throw new Error(details);
+      }
 
       setMediaFiles(mediaFiles.map(file => 
         file.id === id ? { 
@@ -502,34 +511,53 @@ export default function Browse() {
     }
   };
 
-  // const handleSave = async (id: number) => {
-  //   try {
-  //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${id}/save`, { 
-  //       method: 'POST',
-  //       credentials: 'include'
-  //     });
+  const handleSave = async (id: number) => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        alert('Please sign in to save tracks.');
+        return;
+      }
 
-  //     if (!response.ok) throw new Error('Save action failed');
+      const response = await fetch(`/api/media/${id}/interact/heart`, { 
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-  //     setMediaFiles(mediaFiles.map(file => 
-  //       file.id === id ? { 
-  //         ...file, 
-  //         interactions: [...(file.interactions || []), { liked: false, saved: true }]
-  //       } : file
-  //     ));
-  //   } catch (err) {
-  //     console.error('Save error:', err);
-  //     setError({
-  //       message: 'Failed to save media',
-  //       details: err instanceof Error ? err.message : String(err)
-  //     });
-  //   }
-  // };
+      if (!response.ok) {
+        let details = 'Save action failed';
+        try { const j = await response.json(); details = j.message || j.error || j.details || details; } catch (_) {}
+        throw new Error(details);
+      }
+
+      setMediaFiles(mediaFiles.map(file => 
+        file.id === id ? { 
+          ...file, 
+          interactions: [...(file.interactions || []), { liked: false, saved: true }]
+        } : file
+      ));
+    } catch (err) {
+      console.error('Save error:', err);
+      setError({
+        message: 'Failed to save media',
+        details: err instanceof Error ? err.message : String(err)
+      });
+    }
+  };
 
   const handleDownload = async (file: MediaFile) => {
     try {
       const token = await getToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${file.id}/interact/download`, {
+      if (!token) {
+        alert('Please sign in to download this file.');
+        return;
+      }
+
+      const response = await fetch(`/api/media/${file.id}/interact/download`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -692,16 +720,26 @@ export default function Browse() {
   const handleAddToPlaylist = async (playlistId: number, mediaId: number) => {
     try {
       const token = await getToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlists/${playlistId}/media`, {
+      if (!token) {
+        alert('Please sign in to add to playlists.');
+        return;
+      }
+
+      const response = await fetch(`/api/playlists/${playlistId}/media`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ mediaId, userId: user?.id })
       });
 
-      if (!response.ok) throw new Error('Failed to add to playlist');
+      if (!response.ok) {
+        let details = 'Failed to add to playlist';
+        try { const j = await response.json(); details = j.message || j.error || j.details || details; } catch (_) {}
+        throw new Error(details);
+      }
 
       setShowAddToPlaylist(false);
       alert('Added to playlist successfully!');
@@ -1421,7 +1459,7 @@ export default function Browse() {
 
                 <button
   className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
-  onClick={() => alert('Bookmark feature coming soon!')}
+  onClick={() => selectedMedia && handleSave(selectedMedia.id)}
 >
   <Bookmark className="w-5 h-5 text-[#a855f7]" />
   <span className="text-white">Bookmark</span>
@@ -1429,7 +1467,7 @@ export default function Browse() {
 
                 <button
   className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
-  onClick={() => alert('Save to Library feature coming soon!')}
+  onClick={() => selectedMedia && handleSave(selectedMedia.id)}
 >
   <BookmarkCheck className="w-5 h-5 text-[#a855f7]" />
   <span className="text-white">Save to Library</span>

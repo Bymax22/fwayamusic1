@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { Play, Heart, Plus, Download, Disc, ListMusic, History, Folder } from 'lucide-react';
+import { Play, Heart, Plus, Download, Disc, ListMusic, History, Folder, Trash2, Edit2, MoreVertical } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface MediaFile {
   id: number;
@@ -63,6 +64,10 @@ export default function LibraryPage() {
   const [downloadedSongs, setDownloadedSongs] = useState<MediaFile[]>([]);
   const [db, setDb] = useState<IDBDatabase | null>(null);
   const [activeTab, setActiveTab] = useState<'playlists' | 'liked' | 'recent' | 'downloaded'>('playlists');
+  const [editingPlaylist, setEditingPlaylist] = useState<Playlist | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
   const { currentTrack, togglePlay, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
 
@@ -325,6 +330,79 @@ export default function LibraryPage() {
     }
   };
 
+  const handleDeletePlaylist = async (playlistId: number) => {
+    if (!window.confirm('Are you sure you want to delete this playlist?')) return;
+
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to delete playlists.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/playlists/${playlistId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Failed to delete playlist' }));
+        throw new Error(error.message || 'Failed to delete playlist');
+      }
+
+      setPlaylists((prev) => prev.filter((p) => p.id !== playlistId));
+    } catch (err) {
+      console.error('Playlist deletion failed', err);
+      alert('Could not delete playlist. Please try again.');
+    }
+  };
+
+  const handleRenamePlaylist = (playlist: Playlist) => {
+    setEditingPlaylist(playlist);
+    setEditName(playlist.name);
+    setEditDescription(playlist.description);
+    setShowEditModal(true);
+  };
+
+  const handleSavePlaylistEdit = async () => {
+    if (!editingPlaylist || !editName.trim()) return;
+
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to edit playlists.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/playlists/${editingPlaylist.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: editName, description: editDescription }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Failed to update playlist' }));
+        throw new Error(error.message || 'Failed to update playlist');
+      }
+
+      const data = await response.json();
+      setPlaylists((prev) =>
+        prev.map((p) => (p.id === editingPlaylist.id ? mapPlaylist(data) : p))
+      );
+      setShowEditModal(false);
+      setEditingPlaylist(null);
+    } catch (err) {
+      console.error('Playlist update failed', err);
+      alert('Could not update playlist. Please try again.');
+    }
+  };
+
   const getContent = () => {
     switch (activeTab) {
       case 'playlists':
@@ -421,8 +499,8 @@ export default function LibraryPage() {
             {activeTab === 'playlists' ? (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {(getContent() as Playlist[]).map((playlist) => (
-                  <div key={playlist.id} className="group overflow-hidden rounded-[32px] bg-black transition hover:bg-white/5">
-                    <div className="relative overflow-hidden">
+                  <div key={playlist.id} className="group overflow-hidden rounded-[32px] bg-black transition hover:bg-white/5 flex flex-col">
+                    <div className="relative overflow-hidden flex-1">
                       <Image
                         src={playlist.coverArt}
                         alt={playlist.name}
@@ -434,22 +512,40 @@ export default function LibraryPage() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                      <button
-                        className="absolute bottom-4 right-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/30 opacity-0 transition group-hover:opacity-100"
-                        onClick={() =>
-                          playTrack({
-                            id: playlist.id,
-                            title: playlist.name,
-                            artist: playlist.description,
-                            audioUrl: playlist.coverArt,
-                            url: playlist.coverArt,
-                            coverArt: playlist.coverArt,
-                            duration: playlist.duration,
-                          })
-                        }
-                      >
-                        <Play className="w-5 h-5" />
-                      </button>
+                      <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 transition group-hover:opacity-100">
+                        <button
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/30 hover:bg-purple-500 transition"
+                          onClick={() =>
+                            playTrack({
+                              id: playlist.id,
+                              title: playlist.name,
+                              artist: playlist.description,
+                              audioUrl: playlist.coverArt,
+                              url: playlist.coverArt,
+                              coverArt: playlist.coverArt,
+                              duration: playlist.duration,
+                            })
+                          }
+                        >
+                          <Play className="w-5 h-5" />
+                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-600/80 text-white hover:bg-purple-500 transition"
+                            onClick={() => handleRenamePlaylist(playlist)}
+                            title="Edit playlist"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-red-600/80 text-white hover:bg-red-500 transition"
+                            onClick={() => handleDeletePlaylist(playlist.id)}
+                            title="Delete playlist"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                     <div className="space-y-2 p-5">
                       <div className="text-xs uppercase tracking-[0.24em] text-purple-300">Playlist</div>
@@ -525,6 +621,67 @@ export default function LibraryPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Playlist Modal */}
+      <AnimatePresence>
+        {showEditModal && editingPlaylist && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowEditModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#0a0a0d] rounded-2xl p-6 w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-2xl font-semibold text-white mb-6">Edit Playlist</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Playlist Name</label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full px-4 py-2 bg-[#15121f] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Enter playlist name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                  <textarea
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    className="w-full px-4 py-2 bg-[#15121f] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none h-24"
+                    placeholder="Enter playlist description"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/15 text-white rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSavePlaylistEdit}
+                  className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors font-medium"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
