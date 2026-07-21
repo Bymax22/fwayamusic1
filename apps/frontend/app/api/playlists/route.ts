@@ -28,15 +28,32 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization');
-    const body = await request.json();
-    const backendRes = await fetch(`${getBackendBaseUrl()}/api/v1/playlist`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authHeader ? { Authorization: authHeader } : {}),
-      },
-      body: JSON.stringify(body),
-    });
+    const backendUrl = `${getBackendBaseUrl()}/api/v1/playlist`;
+
+    // If the incoming request is multipart/form-data, forward the FormData
+    const contentType = request.headers.get('content-type') || '';
+    let backendRes;
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await request.formData();
+      backendRes = await fetch(backendUrl, {
+        method: 'POST',
+        headers: {
+          ...(authHeader ? { Authorization: authHeader } : {}),
+          // Let fetch set Content-Type with boundary for FormData
+        },
+        body: formData as unknown as BodyInit,
+      });
+    } else {
+      const body = await request.json().catch(() => ({}));
+      backendRes = await fetch(backendUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authHeader ? { Authorization: authHeader } : {}),
+        },
+        body: JSON.stringify(body),
+      });
+    }
     const data = await backendRes.json();
     return NextResponse.json(data, { status: backendRes.status });
   } catch (error) {

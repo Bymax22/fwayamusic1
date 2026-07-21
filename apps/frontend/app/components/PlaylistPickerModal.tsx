@@ -21,6 +21,9 @@ interface PlaylistPickerModalProps {
 export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess }: PlaylistPickerModalProps) {
   const { user, getToken } = useAuth();
   const [playlists, setPlaylists] = useState<PlaylistItem[]>([]);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newCover, setNewCover] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,11 +88,9 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
 
     try {
       const token = await getToken();
-      if (!token) {
-        throw new Error('Session expired. Please sign in again.');
-      }
+      if (!token) throw new Error('Session expired. Please sign in again.');
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlists/${playlistId}/media`, {
+      const response = await fetch(`/api/playlists/${playlistId}/media`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,6 +107,82 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to add to playlist.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCreatePlaylist = async () => {
+    if (!user) {
+      setError('Sign in to create playlists.');
+      return;
+    }
+
+    if (!newName.trim()) {
+      setError('Please enter a playlist name.');
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('Session expired');
+
+      let response: Response;
+      if (newCover) {
+        const fd = new FormData();
+        fd.append('name', newName.trim());
+        fd.append('isPublic', 'false');
+        fd.append('cover', newCover);
+        if (typeof window !== 'undefined') fd.append('source', 'frontend-modal');
+
+        response = await fetch('/api/playlists', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: fd,
+        });
+      } else {
+        response = await fetch('/api/playlists', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: newName.trim(), isPublic: false }),
+        });
+      }
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || 'Failed to create playlist');
+      }
+
+      const created = await response.json();
+      const item = {
+        id: Number(created.id || created.playlistId || created.data?.id),
+        name: created.name || created.title || newName.trim(),
+        mediaCount: 0,
+        coverUrl: created.coverUrl || created.cover || '/playlists/default.jpg',
+      } as PlaylistItem;
+
+      setPlaylists((prev) => [item, ...prev]);
+      setShowCreate(false);
+      setNewName('');
+      setNewCover(null);
+
+      // Optionally auto-add media to new playlist
+      try {
+        await handleAddToPlaylist(item.id);
+      } catch (err) {
+        // ignore add errors, main creation succeeded
+      }
+
+      onSuccess?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create playlist');
     } finally {
       setSubmitting(false);
     }
@@ -140,6 +217,53 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
           </div>
         ) : (
           <div className="space-y-3 max-h-72 overflow-y-auto">
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowCreate((s) => !s)}
+                className="w-full flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 text-left transition hover:border-purple-500/40 hover:bg-white/10"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-600 text-white">+</div>
+                <div className="min-w-0">
+                  <p className="font-medium text-white">Create new playlist</p>
+                  <p className="text-sm text-slate-400">Create a playlist and add this item</p>
+                </div>
+              </button>
+
+              {showCreate && (
+                <div className="mt-3 space-y-2">
+                  <input
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="Playlist name"
+                    className="w-full rounded-lg bg-[#0b0c12] px-3 py-2 text-white"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setNewCover(e.target.files ? e.target.files[0] : null)}
+                    className="w-full text-sm text-slate-300"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleCreatePlaylist}
+                      disabled={submitting}
+                      className="flex-1 rounded-full bg-purple-600 px-4 py-2 text-white"
+                    >
+                      {submitting ? 'Creating...' : 'Create and add'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowCreate(false); setNewName(''); setNewCover(null); }}
+                      className="rounded-full bg-white/5 px-4 py-2 text-white"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             {playlists.map((playlist) => (
               <button
                 key={playlist.id}

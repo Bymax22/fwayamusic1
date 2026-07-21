@@ -1284,8 +1284,15 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[120px] bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0">
-                    <div 
+                  <div
+                    key={i}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => router.push(`/playlist/${item.id}`)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/playlist/${item.id}`); }}
+                    className="min-w-[120px] bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0"
+                  >
+                    <div
                       className={`w-full aspect-square ${item.coverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'} rounded-lg mb-2`}
                       style={{
                         backgroundImage: item.coverUrl ? `url(${item.coverUrl})` : undefined,
@@ -2175,6 +2182,10 @@ export default function GuestWelcome() {
               {playlists.slice(0, 5).map((playlist: any, i: number) => (
                 <div
                   key={i}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => router.push(`/playlist/${playlist.id}`)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/playlist/${playlist.id}`); }}
                   className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all cursor-pointer group"
                 >
                   {/* PLAYLIST COVER */}
