@@ -30,8 +30,11 @@ type TrackType = {
   accessType?: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
   price?: number;
   currency?: string;
- 
+  liked?: boolean;
+  likes?: number;
 };
+
+type RepeatMode = 'off' | 'repeat-all' | 'repeat-one';
 
 interface PlayerProps {
   track: TrackType;
@@ -45,6 +48,8 @@ interface PlayerProps {
   onClose: () => void;
   onNext?: () => void;
   onPrevious?: () => void;
+  onRepeat?: () => void;
+  repeatMode?: RepeatMode;
   onSeek?: (time: number) => void;
   onVolumeChange?: (volume: number) => void;
   onToggleMute?: () => void;
@@ -63,6 +68,8 @@ export default function Player({
   onClose,
   onNext,
   onPrevious,
+  onRepeat,
+  repeatMode,
   onSeek,
   onVolumeChange,
   onToggleMute,
@@ -71,11 +78,12 @@ export default function Player({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [isLooping, setIsLooping] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const previewTimerRef = useRef<number | null>(null);
+  const isLooping = repeatMode && repeatMode !== 'off';
+  const isRepeatOne = repeatMode === 'repeat-one';
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
 
@@ -103,8 +111,7 @@ export default function Player({
   };
 
   const toggleLoop = () => {
-    setIsLooping((l) => !l);
-    // Note: Loop functionality should be handled by the global audio player
+    if (onRepeat) onRepeat();
   };
 
   const changePlaybackRate = () => {

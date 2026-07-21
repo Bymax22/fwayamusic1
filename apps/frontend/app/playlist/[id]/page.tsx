@@ -23,6 +23,7 @@ import { formatDuration } from '@/lib/utils';
 import Waveform from '@/components/Waveform';
 import { useAuth } from '@/context/AuthContext';
 import { subscribe } from '@/lib/realtime';
+import PlaylistPickerModal from '@/components/PlaylistPickerModal';
 
 // Track interface
 interface Track {
@@ -98,6 +99,10 @@ const PlaylistDetailPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const { user, getToken } = useAuth();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerMediaId, setPickerMediaId] = useState<number | null>(null);
+  const [liking, setLiking] = useState<Record<number, boolean>>({});
+  const [removing, setRemoving] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const extractId = (raw: any) => {
@@ -182,7 +187,7 @@ const PlaylistDetailPage = () => {
       const firstTrack = {
         id: playlist.entries[0].media.id.toString(),
         title: playlist.entries[0].media.title,
-        artist: playlist.entries[0].media.user?.displayName || playlist.entries[0].media.user?.username || "Unknown Artist",
+            artist: (playlist.entries[0].media as any).artist || playlist.entries[0].media.user?.displayName || playlist.entries[0].media.user?.username || "Unknown Artist",
         imageUrl: playlist.entries[0].media.coverArt || playlist.entries[0].media.artCoverUrl || playlist.entries[0].media.imageUrl || "/default-cover.png",
         audioUrl: playlist.entries[0].media.audioUrl || playlist.entries[0].media.url,
         duration: playlist.entries[0].media.duration,
@@ -195,6 +200,98 @@ const PlaylistDetailPage = () => {
   const handleLike = () => {
     setIsLiked(!isLiked);
     // TODO: Implement like functionality
+  };
+
+  const openAddToPlaylist = (mediaId: number) => {
+    setPickerMediaId(mediaId);
+    setPickerOpen(true);
+  };
+
+  const closePicker = () => {
+    setPickerOpen(false);
+    setPickerMediaId(null);
+  };
+
+  const handleLikeTrack = async (mediaId: number) => {
+    try {
+      setLiking((s) => ({ ...s, [mediaId]: true }));
+      const token = await getToken().catch(() => null);
+      await fetch(`/api/media/${mediaId}/interact/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({}),
+      });
+    } catch (e) {
+      // ignore
+    } finally {
+      setLiking((s) => ({ ...s, [mediaId]: false }));
+    }
+  };
+
+  const handleDownloadTrack = async (media: any) => {
+    try {
+      const token = await getToken().catch(() => null);
+      const res = await fetch(`/api/media/${media.id}/interact/download`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        const url = data?.url || media.url || media.audioUrl;
+        if (url) window.open(url, '_blank');
+      } else {
+        // fallback to media url
+        const url = media.url || media.audioUrl;
+        if (url) window.open(url, '_blank');
+      }
+    } catch (e) {
+      const url = media.url || media.audioUrl;
+      if (url) window.open(url, '_blank');
+    }
+  };
+
+  const handleShareTrack = (media: any) => {
+    if (navigator.share) {
+      navigator.share({
+        title: media.title,
+        text: `Check out ${media.title} by ${media.artist || media.user?.displayName || media.user?.username}`,
+        url: `${window.location.origin}/songs/${media.id}`,
+      });
+    } else {
+      navigator.clipboard.writeText(`${window.location.origin}/songs/${media.id}`);
+    }
+  };
+
+  const handleRemoveTrack = async (mediaId: number) => {
+    if (!playlist) return;
+    try {
+      setRemoving((s) => ({ ...s, [mediaId]: true }));
+      const token = await getToken().catch(() => null);
+      const res = await fetch(`/api/playlists/${playlist.id}/media`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ mediaId, userId: user?.id }),
+      });
+
+      if (res.ok) {
+        setPlaylist((p) => p ? { ...p, entries: p.entries.filter(e => Number(e.media.id) !== Number(mediaId)) } : p);
+      }
+    } catch (e) {
+      // ignore
+    } finally {
+      setRemoving((s) => ({ ...s, [mediaId]: false }));
+    }
   };
 
   const handleShare = () => {
@@ -361,7 +458,7 @@ const PlaylistDetailPage = () => {
                           onClick={() => handlePlay({
                             id: track.id.toString(),
                             title: track.title,
-                            artist: track.user?.displayName || track.user?.username || "Unknown Artist",
+                            artist: (track as any).artist || track.user?.displayName || track.user?.username || "Unknown Artist",
                             imageUrl: track.coverArt || track.artCoverUrl || track.imageUrl || "/default-cover.png",
                             audioUrl: track.audioUrl || track.url,
                             duration: track.duration,
@@ -377,7 +474,7 @@ const PlaylistDetailPage = () => {
                             onClick={() => handlePlay({
                               id: track.id.toString(),
                               title: track.title,
-                              artist: track.user?.displayName || track.user?.username || "Unknown Artist",
+                              artist: (track as any).artist || track.user?.displayName || track.user?.username || "Unknown Artist",
                               imageUrl: track.coverArt || track.artCoverUrl || track.imageUrl || "/default-cover.png",
                               audioUrl: track.audioUrl || track.url,
                               duration: track.duration,
@@ -413,7 +510,7 @@ const PlaylistDetailPage = () => {
                         </span>
                       </h3>
                       <p className="text-sm text-gray-400 truncate">
-                        {track.user?.displayName || track.user?.username || "Unknown Artist"}
+                        {(track as any).artist || track.user?.displayName || track.user?.username || "Unknown Artist"}
                       </p>
                     </div>
 
@@ -424,6 +521,51 @@ const PlaylistDetailPage = () => {
                         {track.plays?.toLocaleString() || 0}
                       </span>
                       <span>{formatDuration(track.duration || 0)}</span>
+                    </div>
+
+                    {/* Track Actions */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openAddToPlaylist(Number(track.id))}
+                        className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10"
+                        title="Add to playlist"
+                      >
+                        <FaPlus size={14} />
+                      </button>
+
+                      <button
+                        onClick={() => handleLikeTrack(Number(track.id))}
+                        className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10"
+                        title="Like"
+                      >
+                        <FaRegHeart size={14} />
+                      </button>
+
+                      <button
+                        onClick={() => handleDownloadTrack(track)}
+                        className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10"
+                        title="Download"
+                      >
+                        <FaDownload size={14} />
+                      </button>
+
+                      <button
+                        onClick={() => handleShareTrack(track)}
+                        className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10"
+                        title="Share"
+                      >
+                        <FaShare size={14} />
+                      </button>
+
+                      {user && (
+                        <button
+                          onClick={() => handleRemoveTrack(Number(track.id))}
+                          className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10"
+                          title="Remove from playlist"
+                        >
+                          <FaTrash size={14} />
+                        </button>
+                      )}
                     </div>
 
                     {/* Access Type */}
@@ -439,6 +581,27 @@ const PlaylistDetailPage = () => {
           </div>
         </div>
       </div>
+        {/* Playlist picker modal for adding single tracks */}
+        <PlaylistPickerModal
+          open={pickerOpen}
+          mediaId={pickerMediaId ?? 0}
+          onClose={closePicker}
+          onSuccess={async () => {
+            try {
+              const id = String(params.id).match(/(\d+)$/)?.[1] || params.id;
+              const token = await getToken().catch(() => null);
+              const r = await fetch(`/api/playlists/${id}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } });
+              if (r.ok) {
+                const d = await r.json().catch(() => null);
+                if (d) setPlaylist(d);
+              }
+            } catch (e) {
+              // ignore
+            } finally {
+              closePicker();
+            }
+          }}
+        />
     </div>
   );
 };

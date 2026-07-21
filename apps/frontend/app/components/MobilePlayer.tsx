@@ -33,7 +33,11 @@ type TrackType = {
   accessType?: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
   price?: number;
   currency?: string;
+  liked?: boolean;
+  likes?: number;
 };
+
+type RepeatMode = 'off' | 'repeat-all' | 'repeat-one';
 
 interface MobilePlayerProps {
   track: TrackType;
@@ -48,6 +52,7 @@ interface MobilePlayerProps {
   onNext?: () => void;
   onPrevious?: () => void;
   onRepeat?: () => void;
+  repeatMode?: RepeatMode;
   onSeek?: (time: number) => void;
   onVolumeChange?: (volume: number) => void;
   onToggleMute?: () => void;
@@ -67,15 +72,18 @@ export default function MobilePlayer({
   onNext,
   onPrevious,
   onRepeat,
+  repeatMode,
   onSeek,
   onVolumeChange,
   onToggleMute,
   className,
 }: MobilePlayerProps) {
-  const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffled, setIsShuffled] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState<number | null>(null);
   const { getToken } = useAuth();
+  const isRepeatEnabled = repeatMode && repeatMode !== 'off';
+  const isRepeatOne = repeatMode === 'repeat-one';
 
   // Realtime: update like state when other clients like/unlike the same media
   useEffect(() => {
@@ -98,6 +106,15 @@ export default function MobilePlayer({
       if (unsub) unsub();
     };
   }, [track?.id]);
+
+  useEffect(() => {
+    if (track?.liked !== undefined) {
+      setIsLiked(Boolean(track.liked));
+    }
+    if (typeof track?.likes === 'number') {
+      setLikesCount(track.likes);
+    }
+  }, [track?.id, track?.liked, track?.likes]);
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const isVideo = track.type === 'VIDEO' || Boolean((track.videoUrl || track.url || track.audioUrl)?.match(/\.(mp4|mov|m4v|webm|avi|mkv)(\?.*)?$/i));
@@ -122,6 +139,51 @@ export default function MobilePlayer({
   const toggleMute = () => {
     if (onToggleMute) {
       onToggleMute();
+    }
+  };
+
+  const handleLike = async () => {
+    if (!track?.id) return;
+    const nextLiked = !isLiked;
+    setIsLiked(nextLiked);
+    setLikesCount((prev) => {
+      if (prev == null) return prev;
+      return nextLiked ? prev + 1 : Math.max(prev - 1, 0);
+    });
+
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('Authentication required');
+
+      const response = await fetch(`/api/media/${track.id}/interact/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        throw new Error('Like request failed');
+      }
+
+      try {
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+          const bc = new BroadcastChannel('fwaya');
+          bc.postMessage({ type: 'media-liked', mediaId: track.id, liked: nextLiked, likes: likesCount });
+          bc.close();
+        } else {
+          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', mediaId: track.id, liked: nextLiked, likes: likesCount, t: Date.now() }));
+        }
+      } catch (_) {}
+    } catch (err) {
+      console.error('MobilePlayer: like failed', err);
+      setIsLiked(!nextLiked);
+      setLikesCount((prev) => {
+        if (prev == null) return prev;
+        return nextLiked ? Math.max(prev - 1, 0) : prev + 1;
+      });
     }
   };
 
@@ -378,11 +440,11 @@ export default function MobilePlayer({
 
               <button
                 onClick={() => {
-                  setIsRepeat(!isRepeat);
                   if (onRepeat) onRepeat();
                 }}
-                className={`p-1 rounded-full hover:bg-white/10 transition-colors ${isRepeat ? 'text-purple-400' : 'text-white/70'}`}
-                aria-label="Repeat"
+                className={`p-1 rounded-full hover:bg-white/10 transition-colors ${isRepeatEnabled ? 'text-purple-400' : 'text-white/70'}`}
+                aria-label={isRepeatEnabled ? (isRepeatOne ? 'Repeat one' : 'Repeat all') : 'Repeat'}
+                title={isRepeatEnabled ? (isRepeatOne ? 'Repeat one' : 'Repeat all') : 'Repeat'}
               >
                 <ArrowPathIcon className="w-4 h-4" />
               </button>

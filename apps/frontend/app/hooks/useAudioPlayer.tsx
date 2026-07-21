@@ -20,10 +20,14 @@ interface Track {
 }
 
 type AudioQuality = 'low' | 'normal' | 'high';
+type RepeatMode = 'off' | 'repeat-all' | 'repeat-one';
 
 // Create a context for global player state
 interface GlobalPlayerContextType {
   currentTrack: Track | null;
+  queue: Track[];
+  queueIndex: number;
+  repeatMode: RepeatMode;
   isPlaying: boolean;
   currentTime: number;
   duration: number;
@@ -33,6 +37,11 @@ interface GlobalPlayerContextType {
   audioQuality: AudioQuality;
   setAudioQuality: (quality: AudioQuality) => void;
   setCurrentTrack: (track: Track | null) => void;
+  setQueue: (tracks: Track[], startIndex?: number) => void;
+  addToQueue: (track: Track) => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  toggleRepeat: () => void;
   togglePlay: () => void;
   playTrack: (track: Track | Record<string, unknown>) => void;
   stopTrack: () => void;
@@ -46,6 +55,9 @@ const GlobalPlayerContext = createContext<GlobalPlayerContextType | null>(null);
 
 export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [queue, setQueueState] = useState<Track[]>([]);
+  const [queueIndex, setQueueIndex] = useState(-1);
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>('off');
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -240,6 +252,75 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const setQueue = (tracks: Track[], startIndex = 0) => {
+    setQueueState(tracks);
+    setQueueIndex(startIndex);
+    if (tracks[startIndex]) {
+      playTrack(tracks[startIndex]);
+    }
+  };
+
+  const addToQueue = (track: Track) => {
+    setQueueState((prev) => [...prev, track]);
+  };
+
+  const goToTrackIndex = (index: number) => {
+    if (queue.length === 0) return;
+    const normalizedIndex = ((index % queue.length) + queue.length) % queue.length;
+    if (queue[normalizedIndex]) {
+      setQueueIndex(normalizedIndex);
+      playTrack(queue[normalizedIndex]);
+    }
+  };
+
+  const nextTrack = () => {
+    if (queue.length === 0) return;
+    if (repeatMode === 'repeat-one') {
+      if (currentTrack) {
+        playTrack(currentTrack);
+      }
+      return;
+    }
+    const nextIndex = queueIndex + 1;
+    if (nextIndex >= queue.length) {
+      if (repeatMode === 'repeat-all') {
+        goToTrackIndex(0);
+      } else {
+        setIsPlaying(false);
+      }
+      return;
+    }
+    goToTrackIndex(nextIndex);
+  };
+
+  const previousTrack = () => {
+    if (queue.length === 0) return;
+    if (repeatMode === 'repeat-one') {
+      if (currentTrack) {
+        playTrack(currentTrack);
+      }
+      return;
+    }
+    const prevIndex = queueIndex - 1;
+    if (prevIndex < 0) {
+      if (repeatMode === 'repeat-all') {
+        goToTrackIndex(queue.length - 1);
+      } else {
+        setIsPlaying(false);
+      }
+      return;
+    }
+    goToTrackIndex(prevIndex);
+  };
+
+  const toggleRepeat = () => {
+    setRepeatMode((prev) => {
+      if (prev === 'off') return 'repeat-all';
+      if (prev === 'repeat-all') return 'repeat-one';
+      return 'off';
+    });
+  };
+
   const playTrack = (track: Track | Record<string, unknown>) => {
     if (typeof window === 'undefined') {
       console.error('GlobalPlayer: playTrack called on server side');
@@ -414,6 +495,9 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   return (
     <GlobalPlayerContext.Provider value={{
       currentTrack,
+      queue,
+      queueIndex,
+      repeatMode,
       isPlaying,
       currentTime,
       duration,
@@ -421,12 +505,17 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       isMuted,
       isLoading,
       setCurrentTrack,
+      setQueue,
+      addToQueue,
+      nextTrack,
+      previousTrack,
+      toggleRepeat,
       togglePlay,
       playTrack,
+      stopTrack,
       seekTo,
       setVolume,
       toggleMute,
-      stopTrack,
       registerVideoElement,
       audioQuality,
       setAudioQuality

@@ -18,7 +18,7 @@ import { ServiceWorkerProvider } from "../components/ServiceWorkerProvider";
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const { user, authError, clearAuthError, verificationError } = useAuth();
-  const { currentTrack, isPlaying, togglePlay, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute, nextTrack, previousTrack, toggleRepeat, repeatMode } = useAudioPlayer();
   const pathname = usePathname();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -114,9 +114,10 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
                 isLoading={isLoading}
                 onPlayPause={togglePlay}
                 onClose={stopTrack}
-                onNext={() => console.log('Next track')}
-                onPrevious={() => console.log('Previous track')}
-                onRepeat={() => console.log('Toggle repeat')}
+                onNext={nextTrack}
+                onPrevious={previousTrack}
+                onRepeat={toggleRepeat}
+                repeatMode={repeatMode}
                 onSeek={seekTo}
                 onVolumeChange={setVolume}
                 onToggleMute={toggleMute}
@@ -136,8 +137,10 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
               isLoading={isLoading}
               onPlayPause={togglePlay}
               onClose={stopTrack}
-              onNext={() => console.log('Next track')}
-              onPrevious={() => console.log('Previous track')}
+              onNext={nextTrack}
+              onPrevious={previousTrack}
+              onRepeat={toggleRepeat}
+              repeatMode={repeatMode}
               onSeek={seekTo}
               onVolumeChange={setVolume}
               onToggleMute={toggleMute}
