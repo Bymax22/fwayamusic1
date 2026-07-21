@@ -156,8 +156,14 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
       }
 
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data?.message || 'Failed to create playlist');
+        let message = 'Failed to create playlist';
+        try {
+          const data = await response.json();
+          message = data?.message || JSON.stringify(data) || message;
+        } catch (e) {
+          try { const txt = await response.text(); if (txt) message = txt; } catch (_) {}
+        }
+        throw new Error(message);
       }
 
       const created = await response.json();
@@ -181,6 +187,19 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
       }
 
       onSuccess?.();
+      // Broadcast update so other open pages can refresh
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('fwaya');
+          bc.postMessage({ type: 'playlists-updated', playlist: item });
+          bc.close();
+        }
+      } catch (e) {}
+      try {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'playlists-updated', playlist: item, ts: Date.now() }));
+        }
+      } catch (e) {}
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create playlist');
     } finally {
@@ -211,12 +230,9 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
           <div className="rounded-3xl bg-[#0d1120] p-8 text-center text-sm text-slate-400">Loading playlists...</div>
         ) : error ? (
           <div className="rounded-3xl bg-[#0d1120] p-4 text-sm text-red-300">{error}</div>
-        ) : playlists.length === 0 ? (
-          <div className="rounded-3xl bg-[#0d1120] p-8 text-center text-sm text-slate-400">
-            No playlists found. Create one first on the library page.
-          </div>
         ) : (
           <div className="space-y-3 max-h-72 overflow-y-auto">
+            {/* Always offer create UI */}
             <div>
               <button
                 type="button"
@@ -264,6 +280,13 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
                 </div>
               )}
             </div>
+
+            {playlists.length === 0 && (
+              <div className="rounded-3xl bg-[#0d1120] p-6 text-center text-sm text-slate-400">
+                You don't have any playlists yet. Use the form above to create one.
+              </div>
+            )}
+
             {playlists.map((playlist) => (
               <button
                 key={playlist.id}

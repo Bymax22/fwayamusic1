@@ -100,13 +100,32 @@ const PlaylistDetailPage = () => {
   const { user, getToken } = useAuth();
 
   useEffect(() => {
+    const extractId = (raw: any) => {
+      if (!raw) return raw;
+      const s = String(raw);
+      const m = s.match(/(\d+)$/);
+      return m ? m[1] : s;
+    };
+
     const fetchPlaylist = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist/${params.id}`);
-        if (!response.ok) {
-          throw new Error('Playlist not found');
+        const id = extractId(params.id);
+        if (!id) throw new Error('Invalid playlist id');
+
+        const token = await getToken().catch(() => null);
+        const res = await fetch(`/api/playlists/${id}`, {
+          headers: {
+            Accept: 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => '');
+          throw new Error(text || 'Playlist not found');
         }
-        const data = await response.json();
+
+        const data = await res.json();
         setPlaylist(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load playlist');
@@ -116,9 +135,9 @@ const PlaylistDetailPage = () => {
     };
 
     if (params.id) {
-      fetchPlaylist();
+      void fetchPlaylist();
     }
-  }, [params.id]);
+  }, [params.id, getToken]);
 
   // Realtime: refresh playlist when updates occur
   useEffect(() => {
@@ -128,15 +147,19 @@ const PlaylistDetailPage = () => {
         unsub = await subscribe('playlist:updated', (payload: any) => {
           try {
             if (!params.id) return;
-            const pid = Number(params.id);
+            const pid = Number(String(params.id).match(/(\d+)$/)?.[1] || params.id);
             if (Number(payload?.playlistId) === pid) {
-              // refetch playlist
-              fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist/${params.id}`)
-                .then((res) => res.ok ? res.json() : null)
-                .then((data) => {
-                  if (data) setPlaylist(data);
-                })
-                .catch(() => {});
+              // refetch via frontend proxy
+              (async () => {
+                try {
+                  const token = await getToken().catch(() => null);
+                  const id = String(params.id).match(/(\d+)$/)?.[1] || params.id;
+                  const r = await fetch(`/api/playlists/${id}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } });
+                  if (!r.ok) return;
+                  const d = await r.json().catch(() => null);
+                  if (d) setPlaylist(d);
+                } catch (e) {}
+              })();
             }
           } catch (err) {
             console.error('playlist:updated handler error', err);
