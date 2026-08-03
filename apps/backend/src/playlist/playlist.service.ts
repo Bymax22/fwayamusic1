@@ -7,8 +7,9 @@ import { EventsGateway } from '../events/events.gateway';
 export class PlaylistService {
   constructor(private prisma: PrismaService, private eventsGateway: EventsGateway) {}
 
-  async findAll() {
+  async findAll(userId?: number) {
     return this.prisma.playlist.findMany({
+      where: userId ? { OR: [{ isPublic: true }, { userId }] } : { isPublic: true },
       include: {
         entries: {
           include: {
@@ -19,9 +20,12 @@ export class PlaylistService {
     });
   }
 
-  async findByType(type: string) {
+  async findByType(type: string, userId?: number) {
     return this.prisma.playlist.findMany({
-      where: { type: type as PlaylistType },
+      where: {
+        type: type as PlaylistType,
+        ...(userId ? { OR: [{ isPublic: true }, { userId }] } : { isPublic: true }),
+      },
       include: {
         entries: {
           include: {
@@ -32,9 +36,9 @@ export class PlaylistService {
     });
   }
 
-  async findOne(id: number) {
-    return this.prisma.playlist.findUnique({
-      where: { id },
+  async findOne(id: number, userId?: number) {
+    const playlist = await this.prisma.playlist.findFirst({
+      where: userId ? { id, OR: [{ isPublic: true }, { userId }] } : { id, isPublic: true },
       include: {
         entries: {
           include: {
@@ -43,6 +47,12 @@ export class PlaylistService {
         },
       },
     });
+
+    if (!playlist) {
+      throw new Error('Playlist not found or access denied');
+    }
+
+    return playlist;
   }
 
   async createPlaylist(userId: number, data: { name: string; description?: string; isPublic?: boolean; coverUrl?: string; type?: string }) {

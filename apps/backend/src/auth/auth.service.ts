@@ -224,28 +224,86 @@ export class AuthService {
   /**
    * Social login (Google, Apple, etc.)
    */
+  private normalizeRole(role?: UserRole | string): UserRole {
+    if (!role) return UserRole.USER;
+    const normalized = String(role).toUpperCase();
+    return Object.values(UserRole).includes(normalized as UserRole) ? (normalized as UserRole) : UserRole.USER;
+  }
+
+  private async buildUniqueSocialUsername(base: string): Promise<string> {
+    const safeBase = (base || 'user')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 30) || 'user';
+
+    let username = safeBase || 'user';
+    let suffix = 1;
+
+    while (await this.prisma.user.findUnique({ where: { username } })) {
+      username = `${safeBase}_${suffix}`;
+      suffix += 1;
+    }
+
+    return username;
+  }
+
   async socialLogin(dto: any) {
+    const normalizedRole = this.normalizeRole(dto.role);
+    const fallbackUsername = await this.buildUniqueSocialUsername(
+      dto.username || dto.displayName || dto.email?.split('@')[0] || 'user',
+    );
+
     let user = await this.prisma.user.findUnique({ where: { email: dto.email } });
 
-if (!user) {
-  user = await this.prisma.user.create({
-    data: {
-      email: dto.email,
-      username: dto.username || dto.displayName?.replace(/\s+/g, '_').toLowerCase(),
-      displayName: dto.displayName,
-      avatarUrl: dto.avatarUrl,
-      isSocialAuth: true,
-      provider: dto.provider,
-      socialId: dto.socialId,
-      role: (dto.role as UserRole) || UserRole.USER,
-      status: UserStatus.ACTIVE,
-      isEmailVerified: true,
-      passwordHash: 'SOCIAL_LOGIN', // <-- Add this line
-    },
-  });
+    if (user) {
+      const updates: any = {
+        displayName: dto.displayName || user.displayName,
+        avatarUrl: dto.avatarUrl || user.avatarUrl,
+        isSocialAuth: true,
+        provider: dto.provider || user.provider,
+        socialId: dto.socialId || user.socialId,
+        lastLoginAt: new Date(),
+      };
 
-  await this.createWelcomeNotification(user.id);
-}
+      if (!user.username || user.username.trim() === '') {
+        updates.username = fallbackUsername;
+      }
+
+      if (!user.passwordHash || user.passwordHash === 'SOCIAL_LOGIN') {
+        updates.passwordHash = 'SOCIAL_LOGIN';
+      }
+
+      if (normalizedRole && user.role !== normalizedRole) {
+        updates.role = normalizedRole;
+      }
+
+      user = await this.prisma.user.update({
+        where: { id: user.id },
+        data: updates,
+      });
+      return user;
+    }
+
+    const newUsername = await this.buildUniqueSocialUsername(dto.username || dto.displayName || dto.email?.split('@')[0] || 'user');
+    user = await this.prisma.user.create({
+      data: {
+        email: dto.email,
+        username: newUsername,
+        displayName: dto.displayName || dto.email?.split('@')[0] || 'User',
+        avatarUrl: dto.avatarUrl,
+        isSocialAuth: true,
+        provider: dto.provider,
+        socialId: dto.socialId,
+        role: normalizedRole,
+        status: UserStatus.ACTIVE,
+        isEmailVerified: true,
+        passwordHash: 'SOCIAL_LOGIN',
+      },
+    });
+
+    await this.createWelcomeNotification(user.id);
 
     return user;
   }
@@ -259,15 +317,15 @@ async findOrCreateUser(decodedFirebaseUser: any) {
   let user = await this.prisma.user.findUnique({ where: { email } });
 
   if (!user) {
+    const derivedUsername = await this.buildUniqueSocialUsername(
+      decodedFirebaseUser.username || decodedFirebaseUser.name || email?.split('@')[0] || 'user',
+    );
+
     user = await this.prisma.user.create({
       data: {
         email,
-        username:
-          decodedFirebaseUser.username
-          || (typeof decodedFirebaseUser.name === 'string'
-              ? decodedFirebaseUser.name.replace(/\s+/g, '_').toLowerCase()
-              : 'user_' + Date.now()),
-        displayName: decodedFirebaseUser.name,
+        username: derivedUsername,
+        displayName: decodedFirebaseUser.name || decodedFirebaseUser.username || email?.split('@')[0] || 'User',
         isSocialAuth: true,
         provider: decodedFirebaseUser.firebase?.sign_in_provider || 'firebase',
         role: UserRole.USER,

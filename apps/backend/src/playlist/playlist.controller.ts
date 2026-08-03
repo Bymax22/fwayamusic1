@@ -1,4 +1,6 @@
 import { Controller, Get, Post, Body, Param, Query, Delete, Patch, Req, UseGuards, Logger } from '@nestjs/common';
+import * as admin from 'firebase-admin';
+import { PrismaService } from '../db/prisma.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { PlaylistService } from './playlist.service';
 
@@ -6,7 +8,28 @@ import { PlaylistService } from './playlist.service';
 export class PlaylistController {
   private readonly logger = new Logger(PlaylistController.name);
 
-  constructor(private readonly playlistService: PlaylistService) {}
+  constructor(
+    private readonly playlistService: PlaylistService,
+    private readonly prisma: PrismaService,
+  ) {}
+
+  private async resolveAuthenticatedUserId(req: any): Promise<number | undefined> {
+    const authHeader = req?.headers?.authorization;
+    if (!authHeader?.startsWith('Bearer ')) return undefined;
+
+    const token = authHeader.split('Bearer ')[1]?.trim();
+    if (!token) return undefined;
+
+    try {
+      const decoded = await admin.auth().verifyIdToken(token);
+      if (!decoded.email) return undefined;
+      const user = await this.prisma.user.findUnique({ where: { email: decoded.email } });
+      return user?.id;
+    } catch (error) {
+      this.logger.warn(`Failed to resolve playlist access user from bearer token: ${error instanceof Error ? error.message : String(error)}`);
+      return undefined;
+    }
+  }
 
   private sanitizeForJson(value: any): any {
     if (value === null || value === undefined) return value;
@@ -30,9 +53,10 @@ export class PlaylistController {
   }
 
   @Get()
-  async getAll(@Query('type') type?: string) {
+  async getAll(@Req() req: any, @Query('type') type?: string) {
     try {
-      const playlists = type ? await this.playlistService.findByType(type) : await this.playlistService.findAll();
+      const userId = await this.resolveAuthenticatedUserId(req);
+      const playlists = type ? await this.playlistService.findByType(type, userId) : await this.playlistService.findAll(userId);
       return this.sanitizeForJson(playlists);
     } catch (error) {
       this.logger.error('Failed to fetch playlists', error instanceof Error ? error.message : String(error), error instanceof Error ? error.stack : undefined);
@@ -57,9 +81,10 @@ export class PlaylistController {
   }
 
   @Get(':id')
-  async getOne(@Param('id') id: string) {
+  async getOne(@Req() req: any, @Param('id') id: string) {
     try {
-      const playlist = await this.playlistService.findOne(Number(id));
+      const userId = await this.resolveAuthenticatedUserId(req);
+      const playlist = await this.playlistService.findOne(Number(id), userId);
       return this.sanitizeForJson(playlist);
     } catch (error) {
       this.logger.error('Failed to fetch playlist', error instanceof Error ? error.message : String(error), error instanceof Error ? error.stack : undefined);

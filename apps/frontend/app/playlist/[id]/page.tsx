@@ -93,7 +93,19 @@ interface Playlist {
 const PlaylistDetailPage = () => {
   const params = useParams();
   const router = useRouter();
-  const { currentTrack, isPlaying, playTrack } = useAudioPlayer();
+  const {
+    currentTrack,
+    isPlaying,
+    playTrack,
+    setQueue,
+    nextTrack,
+    previousTrack,
+    toggleRepeat,
+    repeatMode,
+    stopTrack,
+    queue,
+    queueIndex,
+  } = useAudioPlayer();
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -178,24 +190,41 @@ const PlaylistDetailPage = () => {
     return () => { if (unsub) unsub(); };
   }, [params.id]);
 
+  const buildQueueFromPlaylist = (entries: Playlist['entries']) =>
+    entries
+      .slice()
+      .sort((a, b) => a.position - b.position)
+      .map((entry) => {
+        const media = entry.media;
+        const track: Track = {
+          id: media.id.toString(),
+          title: media.title,
+          artist: (media as any).artist || media.user?.displayName || media.user?.username || 'Unknown Artist',
+          imageUrl: media.coverArt || media.artCoverUrl || media.imageUrl || '/default-cover.png',
+          audioUrl: media.audioUrl || media.url,
+          duration: media.duration,
+          isDRMProtected: media.isDRMProtected,
+          url: media.url,
+          coverArt: media.coverArt || media.artCoverUrl || media.imageUrl || '/default-cover.png',
+        };
+        return track;
+      });
+
   const handlePlay = (track: Track) => {
-    playTrack(track);
+    const queueTracks = playlist ? buildQueueFromPlaylist(playlist.entries) : [track];
+    const trackIndex = queueTracks.findIndex((item) => String(item.id) === String(track.id));
+    setQueue(queueTracks, trackIndex >= 0 ? trackIndex : 0, true);
   };
 
   const handlePlayAll = () => {
-    if (playlist?.entries && playlist.entries.length > 0) {
-      const firstTrack = {
-        id: playlist.entries[0].media.id.toString(),
-        title: playlist.entries[0].media.title,
-            artist: (playlist.entries[0].media as any).artist || playlist.entries[0].media.user?.displayName || playlist.entries[0].media.user?.username || "Unknown Artist",
-        imageUrl: playlist.entries[0].media.coverArt || playlist.entries[0].media.artCoverUrl || playlist.entries[0].media.imageUrl || "/default-cover.png",
-        audioUrl: playlist.entries[0].media.audioUrl || playlist.entries[0].media.url,
-        duration: playlist.entries[0].media.duration,
-        isDRMProtected: playlist.entries[0].media.isDRMProtected
-      };
-      handlePlay(firstTrack);
-    }
+    if (!playlist || playlist.entries.length === 0) return;
+    const queueTracks = buildQueueFromPlaylist(playlist.entries);
+    setQueue(queueTracks, 0, true);
   };
+
+  const handlePlaylistNext = () => nextTrack();
+  const handlePlaylistPrevious = () => previousTrack();
+  const handlePlaylistRepeatToggle = () => toggleRepeat();
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -285,7 +314,27 @@ const PlaylistDetailPage = () => {
       });
 
       if (res.ok) {
-        setPlaylist((p) => p ? { ...p, entries: p.entries.filter(e => Number(e.media.id) !== Number(mediaId)) } : p);
+        const nextEntries = playlist.entries.filter((entry) => Number(entry.media.id) !== Number(mediaId));
+        setPlaylist((p) => (p ? { ...p, entries: nextEntries } : p));
+
+        const nextQueue = buildQueueFromPlaylist(nextEntries);
+        const currentId = currentTrack?.id ? String(currentTrack.id) : null;
+        const currentIndex = currentId ? nextQueue.findIndex((track) => String(track.id) === currentId) : -1;
+        const fallbackIndex = currentIndex >= 0 ? currentIndex : Math.max(0, Math.min(queueIndex, nextQueue.length - 1));
+
+        if (nextQueue.length === 0) {
+          stopTrack();
+          setQueue([], 0, false);
+          return;
+        }
+
+        if (currentId && Number(currentTrack?.id) === Number(mediaId)) {
+          const nextTrackToPlay = nextQueue[Math.max(0, fallbackIndex)] || nextQueue[0];
+          setQueue(nextQueue, Math.max(0, fallbackIndex), false);
+          playTrack(nextTrackToPlay);
+        } else {
+          setQueue(nextQueue, Math.max(0, fallbackIndex), false);
+        }
       }
     } catch (e) {
       // ignore
@@ -408,6 +457,32 @@ const PlaylistDetailPage = () => {
                 >
                   <FaPlay size={16} />
                   Play All
+                </button>
+
+                <button
+                  onClick={handlePlaylistPrevious}
+                  className="bg-[#0a3747] text-white px-4 py-3 rounded-full hover:bg-[#0b2936] transition-colors"
+                  title="Previous track"
+                >
+                  <FaArrowLeft size={14} />
+                </button>
+
+                <button
+                  onClick={handlePlaylistNext}
+                  className="bg-[#0a3747] text-white px-4 py-3 rounded-full hover:bg-[#0b2936] transition-colors"
+                  title="Next track"
+                >
+                  <FaPlay size={14} />
+                </button>
+
+                <button
+                  onClick={handlePlaylistRepeatToggle}
+                  className={`px-4 py-3 rounded-full transition-colors ${
+                    repeatMode !== 'off' ? 'bg-[#e51f48] text-white' : 'bg-[#0a3747] text-white hover:bg-[#0b2936]'
+                  }`}
+                  title={repeatMode === 'repeat-all' ? 'Repeat all on' : repeatMode === 'repeat-one' ? 'Repeat one on' : 'Repeat all'}
+                >
+                  <FaRedo size={14} />
                 </button>
 
                 <button

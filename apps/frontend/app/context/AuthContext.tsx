@@ -584,6 +584,14 @@ const signInWithFacebook = async (role?: UserRole) => {
 
   const handleSocialSignIn = async (firebaseUser: FirebaseUser, role?: UserRole) => {
     const token = await firebaseUser.getIdToken();
+    const normalizedRole = role?.toUpperCase() as UserRole | undefined;
+    const derivedUsername = (firebaseUser.email || firebaseUser.displayName || 'user')
+      .trim()
+      .split('@')[0]
+      .replace(/[^a-zA-Z0-9_]/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .toLowerCase() || `user_${Date.now()}`;
+
     if (typeof window !== 'undefined' && token) {
       localStorage.setItem('authToken', token);
     }
@@ -596,11 +604,12 @@ const signInWithFacebook = async (role?: UserRole) => {
       },
       body: JSON.stringify({
         email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
+        username: derivedUsername,
+        displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
         avatarUrl: firebaseUser.photoURL,
-        provider: firebaseUser.providerData[0]?.providerId,
-        socialId: firebaseUser.providerData[0]?.uid,
-        role,
+        provider: firebaseUser.providerData[0]?.providerId || 'google.com',
+        socialId: firebaseUser.providerData[0]?.uid || firebaseUser.uid,
+        role: normalizedRole,
       }),
     });
 

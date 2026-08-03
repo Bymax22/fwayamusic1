@@ -408,10 +408,10 @@ export default function MobilePlayer({
                 </button>
 
               <button
-                onClick={onPrevious}
-                disabled={!onPrevious}
+                onClick={() => onSeek && onSeek(Math.max(0, currentTime - 10))}
+                disabled={!onSeek}
                 className="p-1.5 rounded-full hover:bg-white/10 transition-colors disabled:opacity-30"
-                aria-label="Previous track"
+                aria-label="Rewind 10 seconds"
               >
                 <BackwardIcon className="w-4 h-4 text-white" />
               </button>
@@ -430,10 +430,20 @@ export default function MobilePlayer({
               </button>
 
               <button
+                onClick={() => onSeek && onSeek(Math.min(duration, currentTime + 10))}
+                disabled={!onSeek}
+                className="p-1.5 rounded-full hover:bg-white/10 transition-colors disabled:opacity-30"
+                aria-label="Forward 10 seconds"
+              >
+                <ForwardIcon className="w-4 h-4 text-white" />
+              </button>
+
+              <button
                 onClick={onNext}
                 disabled={!onNext}
                 className="p-1.5 rounded-full hover:bg-white/10 transition-colors disabled:opacity-30"
                 aria-label="Next track"
+                title="Next track"
               >
                 <ForwardIcon className="w-4 h-4 text-white" />
               </button>

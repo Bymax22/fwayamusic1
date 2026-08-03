@@ -25,8 +25,7 @@ import {
   FaCog,
   FaSignOutAlt,
   FaStar,
-  FaSignInAlt,
-  FaUserPlus
+  FaTimes
 } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
@@ -54,9 +53,49 @@ export default function GuestWelcome() {
   const [playlists, setPlaylists] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const router = useRouter();
   const { user, logout } = useAuth();
   const cacheKey = 'fwayaGuestWelcomeHomepageData';
+
+  const roleOptions = [
+    {
+      id: 'USER',
+      title: 'Listener',
+      subtitle: 'Discover music & playlists',
+      icon: <FaUser className="h-5 w-5" />,
+      signInHref: '/auth/user/signin',
+      signUpHref: '/auth/user/signup',
+      accent: 'from-purple-500 to-pink-500',
+    },
+    {
+      id: 'ARTIST',
+      title: 'Artist',
+      subtitle: 'Upload, grow & monetize',
+      icon: <FaMicrophone className="h-5 w-5" />,
+      signInHref: '/auth/artist/signin',
+      signUpHref: '/auth/artist/signup',
+      accent: 'from-cyan-500 to-blue-500',
+    },
+    {
+      id: 'RESELLER',
+      title: 'Reseller',
+      subtitle: 'Sell music & earn commissions',
+      icon: <FaBookOpen className="h-5 w-5" />,
+      signInHref: '/auth/reseller/signin',
+      signUpHref: '/auth/reseller/signup',
+      accent: 'from-amber-500 to-orange-500',
+    },
+    {
+      id: 'PRODUCER',
+      title: 'Producer',
+      subtitle: 'Create beats & manage releases',
+      icon: <FaMusic className="h-5 w-5" />,
+      signInHref: '/auth/producer/signin',
+      signUpHref: '/auth/producer/signup',
+      accent: 'from-emerald-500 to-teal-500',
+    },
+  ];
 
   const loadCachedHomepageData = () => {
     if (typeof window === 'undefined') return false;
@@ -652,6 +691,60 @@ export default function GuestWelcome() {
 
   return (
     <>
+      {showRoleModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm px-4">
+          <div className="w-full max-w-3xl rounded-[28px] border border-white/10 bg-[#0f1112] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.6)] sm:p-6">
+            <div className="mb-5 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-purple-300">Welcome</p>
+                <h2 className="mt-1 text-2xl font-bold text-white">Choose your role</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowRoleModal(false)}
+                className="rounded-full bg-white/5 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
+                aria-label="Close role selector"
+              >
+                <FaTimes className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {roleOptions.map((role) => (
+                <div
+                  key={role.id}
+                  className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-purple-500/60 hover:bg-white/[0.04]"
+                >
+                  <div className={`mb-4 inline-flex rounded-full bg-gradient-to-r ${role.accent} p-3 text-white`}>
+                    {role.icon}
+                  </div>
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-white">{role.title}</h3>
+                    <p className="mt-1 text-sm text-white/60">{role.subtitle}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Link
+                      href={role.signInHref}
+                      onClick={() => setShowRoleModal(false)}
+                      className="flex-1 rounded-xl bg-white/5 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-white/10"
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href={role.signUpHref}
+                      onClick={() => setShowRoleModal(false)}
+                      className="flex-1 rounded-xl bg-purple-500 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-purple-400"
+                    >
+                      Register
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black relative">
       {isLoading && (
         <div className="absolute inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-50">
@@ -722,22 +815,14 @@ export default function GuestWelcome() {
                   </button>
                 )}
                 {!user && (
-                  <>
-                    <Link
-                      href="/auth/user/signin"
-                      aria-label="Login"
-                      className="rounded-full bg-white/10 p-2.5 text-white transition hover:bg-white/15"
-                    >
-                      <FaSignInAlt className="h-4 w-4" />
-                    </Link>
-                    <Link
-                      href="/auth/user/signup"
-                      aria-label="Register"
-                      className="rounded-full bg-purple-500 p-2.5 text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
-                    >
-                      <FaUserPlus className="h-4 w-4" />
-                    </Link>
-                  </>
+                  <button
+                    type="button"
+                    onClick={() => setShowRoleModal(true)}
+                    aria-label="Register or log in"
+                    className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
+                  >
+                    Register
+                  </button>
                 )}
                 {user && (
                   <div className="relative">

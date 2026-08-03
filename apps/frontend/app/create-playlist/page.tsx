@@ -9,7 +9,7 @@ export default function CreatePlaylistPage() {
   const [playlistData, setPlaylistData] = useState({
     name: '',
     description: '',
-    isPublic: true,
+    isPublic: false,
     coverImage: null as File | null,
     coverPreview: ''
   });
@@ -87,7 +87,7 @@ export default function CreatePlaylistPage() {
       setPlaylistData({
         name: '',
         description: '',
-        isPublic: true,
+        isPublic: false,
         coverImage: null,
         coverPreview: ''
       });

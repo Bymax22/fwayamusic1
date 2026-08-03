@@ -37,7 +37,7 @@ interface GlobalPlayerContextType {
   audioQuality: AudioQuality;
   setAudioQuality: (quality: AudioQuality) => void;
   setCurrentTrack: (track: Track | null) => void;
-  setQueue: (tracks: Track[], startIndex?: number) => void;
+  setQueue: (tracks: Track[], startIndex?: number, shouldPlay?: boolean) => void;
   addToQueue: (track: Track) => void;
   nextTrack: () => void;
   previousTrack: () => void;
@@ -117,6 +117,26 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const handleEnded = () => {
+      if (repeatMode === 'repeat-one') {
+        if (currentTrack) {
+          playTrack(currentTrack);
+          return;
+        }
+      }
+
+      if (repeatMode === 'repeat-all') {
+        if (queue.length > 0) {
+          const nextIndex = (queueIndex + 1) % queue.length;
+          goToTrackIndex(nextIndex);
+          return;
+        }
+
+        if (currentTrack) {
+          playTrack(currentTrack);
+          return;
+        }
+      }
+
       setIsPlaying(false);
       setCurrentTime(0);
     };
@@ -252,10 +272,10 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const setQueue = (tracks: Track[], startIndex = 0) => {
+  const setQueue = (tracks: Track[], startIndex = 0, shouldPlay = true) => {
     setQueueState(tracks);
     setQueueIndex(startIndex);
-    if (tracks[startIndex]) {
+    if (tracks[startIndex] && shouldPlay) {
       playTrack(tracks[startIndex]);
     }
   };
@@ -274,13 +294,20 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const nextTrack = () => {
-    if (queue.length === 0) return;
+    if (queue.length === 0) {
+      if (repeatMode !== 'off' && currentTrack) {
+        playTrack(currentTrack);
+      }
+      return;
+    }
+
     if (repeatMode === 'repeat-one') {
       if (currentTrack) {
         playTrack(currentTrack);
       }
       return;
     }
+
     const nextIndex = queueIndex + 1;
     if (nextIndex >= queue.length) {
       if (repeatMode === 'repeat-all') {
@@ -294,13 +321,20 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const previousTrack = () => {
-    if (queue.length === 0) return;
+    if (queue.length === 0) {
+      if (repeatMode !== 'off' && currentTrack) {
+        playTrack(currentTrack);
+      }
+      return;
+    }
+
     if (repeatMode === 'repeat-one') {
       if (currentTrack) {
         playTrack(currentTrack);
       }
       return;
     }
+
     const prevIndex = queueIndex - 1;
     if (prevIndex < 0) {
       if (repeatMode === 'repeat-all') {
