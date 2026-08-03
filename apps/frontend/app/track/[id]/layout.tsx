@@ -11,6 +11,8 @@ interface TrackMeta {
   artCoverUrl?: string;
   thumbnailUrl?: string;
   previewVideoUrl?: string;
+  duration?: number;
+  album?: string;
   user?: { id: number; username?: string; displayName?: string };
 }
 
@@ -59,7 +61,8 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   const previewVideoUrl =
     (track as any)?.previewVideoUrl || `${baseUrl}/api/og/track/${mediaId}/video`;
 
-  // Ensure cover URL is absolute. Prefer the real artwork if available; otherwise fall back to the generated OG image.
+  // Prefer the real cover art as the primary social preview image for music tracks.
+  // Keep the generated OG image route as a fallback only when the track has no usable cover.
   const rawCoverUrl = track?.coverArt ||
     (track as any)?.coverUrl ||
     track?.artCoverUrl ||
@@ -69,6 +72,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
     : ogImage;
 
   const trackUrl = `${baseUrl}/track/${id}`;
+  const imageType = previewImage.toLowerCase().includes('.png') ? 'image/png' : 'image/jpeg';
 
   // eslint-disable-next-line no-console
   console.log("[track-layout] Metadata:", { mediaId, title, description, previewImage, ogImage, previewVideoUrl });
@@ -89,10 +93,11 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
       images: [
         {
           url: previewImage,
+          secureUrl: previewImage,
           alt: `${track?.title || "Track"} cover art`,
           width: 1200,
-          height: 630,
-          type: "image/png",
+          height: 1200,
+          type: imageType,
         },
       ],
     },
@@ -103,6 +108,11 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
       images: [previewImage],
       site: "@fwayamusic",
       creator: "@fwayamusic",
+    },
+    other: {
+      'music:musician': artistName,
+      ...(typeof track?.duration === 'number' ? { 'music:duration': String(track.duration) } : {}),
+      ...(track?.album ? { 'music:album': track.album } : {}),
     },
   };
 }
