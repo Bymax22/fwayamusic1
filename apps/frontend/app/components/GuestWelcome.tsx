@@ -24,7 +24,9 @@ import {
   FaChevronDown,
   FaCog,
   FaSignOutAlt,
-  FaStar
+  FaStar,
+  FaSignInAlt,
+  FaUserPlus
 } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
@@ -718,6 +720,24 @@ export default function GuestWelcome() {
                   >
                     <FaStar className="h-4 w-4" />
                   </button>
+                )}
+                {!user && (
+                  <>
+                    <Link
+                      href="/auth/user/signin"
+                      aria-label="Login"
+                      className="rounded-full bg-white/10 p-2.5 text-white transition hover:bg-white/15"
+                    >
+                      <FaSignInAlt className="h-4 w-4" />
+                    </Link>
+                    <Link
+                      href="/auth/user/signup"
+                      aria-label="Register"
+                      className="rounded-full bg-purple-500 p-2.5 text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
+                    >
+                      <FaUserPlus className="h-4 w-4" />
+                    </Link>
+                  </>
                 )}
                 {user && (
                   <div className="relative">

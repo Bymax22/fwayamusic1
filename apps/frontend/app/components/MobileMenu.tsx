@@ -210,18 +210,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link href="/premium" className="p-2 rounded-full border border-purple-500 text-purple-500 hover:bg-purple-500/10 transition-colors">
-                    <Crown className="w-5 h-5" />
-                  </Link>
-                  {!user && (
-                    <>
-                      <Link href="/auth/user/signin" className="p-2 rounded-full bg-white/10 text-white hover:bg-white/15 transition-colors" aria-label="Login">
-                        <LogIn className="w-5 h-5" />
-                      </Link>
-                      <Link href="/auth/user/signup" className="p-2 rounded-full bg-purple-600 text-white hover:bg-purple-500 transition-colors" aria-label="Register">
-                        <UserPlus className="w-5 h-5" />
-                      </Link>
-                    </>
+                  {user && (
+                    <Link href="/premium" className="p-2 rounded-full border border-purple-500 text-purple-500 hover:bg-purple-500/10 transition-colors">
+                      <Crown className="w-5 h-5" />
+                    </Link>
                   )}
                   <button
                     onClick={() => setIsDarkMode(!isDarkMode)}
