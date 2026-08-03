@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { User, ChevronDown, Settings, Crown } from "lucide-react";
+import { User, ChevronDown, Settings, Crown, LogIn, UserPlus } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Image from "next/image";
 import NotificationBell from "./NotificationBell";
@@ -63,9 +63,14 @@ export default function Navbar({ currentTrack }: { currentTrack: any }) {
               <ChevronDown size={16} className="hidden xl:block" />
             </div>
           ) : (
-            <button className="px-4 py-2 bg-purple-600 rounded-full text-sm font-medium hover:bg-purple-700 transition">
-              Sign In
-            </button>
+            <div className="flex items-center gap-2">
+              <Link href="/auth/user/signin" aria-label="Login" className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10 transition">
+                <LogIn size={18} />
+              </Link>
+              <Link href="/auth/user/signup" aria-label="Register" className="p-2 rounded-full bg-purple-600 text-white hover:bg-purple-500 transition">
+                <UserPlus size={18} />
+              </Link>
+            </div>
           )}
         </div>
       </div>
