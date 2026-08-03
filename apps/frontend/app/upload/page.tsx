@@ -13,6 +13,7 @@ interface UploadMetadata {
   title: string;
   description: string;
   genre: string;
+  releaseDate?: string;
   type: "AUDIO" | "VIDEO" | "PODCAST" | "LIVE_STREAM";
   isPremium: boolean;
   isExplicit: boolean;
@@ -33,6 +34,7 @@ export default function UploadPage() {
     title: "",
     description: "",
     genre: "other",
+    releaseDate: "",
     type: "AUDIO",
     isPremium: false,
     isExplicit: false,
@@ -213,6 +215,7 @@ export default function UploadPage() {
             title: metadata.title,
             description: metadata.description,
             genre: metadata.genre,
+            releaseDate: metadata.releaseDate || undefined,
             type: metadata.type,
             isPremium: metadata.isPremium,
             isExplicit: metadata.isExplicit,
@@ -494,6 +497,20 @@ export default function UploadPage() {
               <option value="jazz">Jazz</option>
               <option value="other">Other</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Release Date
+            </label>
+            <input
+              type="date"
+              value={metadata.releaseDate || ''}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setMetadata({ ...metadata, releaseDate: e.target.value })
+              }
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
 
           <div className="flex gap-4">

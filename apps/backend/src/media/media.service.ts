@@ -276,7 +276,7 @@ export class MediaService {
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
@@ -335,6 +335,7 @@ export class MediaService {
         description: metadata.description || null,
         format: metadata.format,
         duration: Math.floor(metadata.duration || 0),
+        releaseDate: metadata.releaseDate ? new Date(metadata.releaseDate) : undefined,
         type: normalizedType,
         accessType: normalizedAccessType === 'PAY_PER_VIEW'
           ? MediaAccessType.PAY_PER_VIEW

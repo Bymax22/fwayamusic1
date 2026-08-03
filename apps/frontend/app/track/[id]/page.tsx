@@ -58,6 +58,7 @@ interface MediaItem {
   currency?: string;
   isExplicit: boolean;
   createdAt: string;
+  releaseDate?: string;
   description?: string;
   lyrics?: string;
   tags: string[];
@@ -107,7 +108,15 @@ export default function TrackPage() {
           throw new Error(errorText || 'Track not found');
         }
         const data = await response.json();
-        setTrack(data);
+        const resolvedTrack: MediaItem = {
+          ...data,
+          artist: data.artist || data.user?.displayName || data.user?.username || 'Unknown Artist',
+          artistId: data.artistId ?? data.user?.id ?? 0,
+          url: data.url || data.audioUrl || data.videoUrl || data.fileUrl || '',
+          coverArt: data.coverArt || data.artCoverUrl || data.thumbnailUrl || data.thumbnail || '/default-cover.jpg',
+          releaseDate: data.releaseDate || data.publishedAt || data.createdAt || '',
+        };
+        setTrack(resolvedTrack);
 
         // Fetch comments
         const commentsRes = await fetch(`/api/media/${trackId}/comments`);
@@ -174,7 +183,7 @@ export default function TrackPage() {
     playTrack({
       id: track.id,
       title: track.title,
-      artist: track.artist,
+      artist: track.artist || track.user?.displayName || track.user?.username || 'Unknown Artist',
       imageUrl: track.coverArt,
       audioUrl: track.url
     });
@@ -373,8 +382,9 @@ export default function TrackPage() {
     }
   };
 
-    const artistDisplay = track?.user?.displayName || track?.artist || 'Unknown Artist';
+    const artistDisplay = track?.artist || track?.user?.displayName || track?.user?.username || 'Unknown Artist';
     const coverArtUrl = track?.coverArt || (track as any)?.artCoverUrl || (track as any)?.thumbnailUrl || (track as any)?.coverUrl || '/default-cover.jpg';
+  const releaseLabel = track?.releaseDate ? new Date(track.releaseDate).toLocaleDateString() : track?.createdAt ? new Date(track.createdAt).toLocaleDateString() : 'Unknown';
   const viewCount = typeof track?.views === 'number' ? track.views : 0;
   const likeCount = typeof track?.likes === 'number' ? track.likes : 0;
   const downloadCount = typeof track?.downloads === 'number' ? track.downloads : 0;
@@ -554,7 +564,7 @@ export default function TrackPage() {
                       )}
                     </span>
                       <span className="text-gray-400">Released:</span>
-                      <span className="text-white font-semibold">{track.createdAt ? new Date(track.createdAt).toLocaleDateString() : 'Unknown'}</span>
+                      <span className="text-white font-semibold">{releaseLabel}</span>
                       <span className="text-gray-400">Genre:</span>
                       <span className="text-white font-semibold">{track.genre || 'Unknown'}</span>
                       <span className="text-gray-400">Access:</span>

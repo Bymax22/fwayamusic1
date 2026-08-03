@@ -107,7 +107,7 @@ export class MediaController {
   @UseGuards(FirebaseAuthGuard)
   @Post('save-metadata')
   async saveMediaMetadata(
-    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; isExplicit?: boolean; isPremium?: boolean; coverUrl?: string; releaseType?: string },
+    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate?: string; isExplicit?: boolean; isPremium?: boolean; coverUrl?: string; releaseType?: string },
     @CurrentUser() user: any
   ) {
     try {
