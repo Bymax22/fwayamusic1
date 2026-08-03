@@ -58,25 +58,28 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   // Preview video URL (if a short MP4 preview is available). Falls back to a generated preview route.
   const previewVideoUrl =
     (track as any)?.previewVideoUrl || `${baseUrl}/api/og/track/${mediaId}/video`;
-  
-  // Ensure cover URL is absolute
+
+  // Ensure cover URL is absolute. Prefer the real artwork if available; otherwise fall back to the generated OG image.
   const rawCoverUrl = track?.coverArt ||
     (track as any)?.coverUrl ||
     track?.artCoverUrl ||
     track?.thumbnailUrl;
-  const fallbackImage = rawCoverUrl
+  const previewImage = rawCoverUrl
     ? resolveMediaUrl(rawCoverUrl, baseUrl) ?? ogImage
     : ogImage;
-  
+
   const trackUrl = `${baseUrl}/track/${id}`;
 
   // eslint-disable-next-line no-console
-  console.log("[track-layout] Metadata:", { mediaId, title, description, fallbackImage, ogImage });
+  console.log("[track-layout] Metadata:", { mediaId, title, description, previewImage, ogImage, previewVideoUrl });
 
   return {
     title,
     description,
     metadataBase: new URL(baseUrl),
+    alternates: {
+      canonical: trackUrl,
+    },
     openGraph: {
       type: "music.song",
       title,
@@ -85,14 +88,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
       siteName: "Fwaya",
       images: [
         {
-          url: fallbackImage,
-          alt: `${track?.title || "Track"} cover art`,
-          width: 1200,
-          height: 630,
-          type: "image/png",
-        },
-        {
-          url: ogImage,
+          url: previewImage,
           alt: `${track?.title || "Track"} cover art`,
           width: 1200,
           height: 630,
@@ -104,7 +100,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
       card: "summary_large_image",
       title,
       description,
-      images: [fallbackImage, ogImage],
+      images: [previewImage],
       site: "@fwayamusic",
       creator: "@fwayamusic",
     },
