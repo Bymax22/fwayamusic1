@@ -24,7 +24,6 @@ import {
   FaChevronDown,
   FaCog,
   FaSignOutAlt,
-  FaStar,
   FaTimes
 } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
@@ -800,20 +799,6 @@ export default function GuestWelcome() {
                 <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
                   Get App
                 </button>
-                {!user && (
-                  <button className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400">
-                    Premium
-                  </button>
-                )}
-                {user && (
-                  <button
-                    type="button"
-                    aria-label="Premium"
-                    className="rounded-full bg-purple-500 p-2.5 text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
-                  >
-                    <FaStar className="h-4 w-4" />
-                  </button>
-                )}
                 {!user && (
                   <button
                     type="button"

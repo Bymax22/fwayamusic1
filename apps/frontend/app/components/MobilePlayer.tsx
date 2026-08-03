@@ -81,6 +81,7 @@ export default function MobilePlayer({
   const [isShuffled, setIsShuffled] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState<number | null>(null);
+  const [likeLoading, setLikeLoading] = useState(false);
   const { getToken } = useAuth();
   const isRepeatEnabled = repeatMode && repeatMode !== 'off';
   const isRepeatOne = repeatMode === 'repeat-one';
@@ -88,22 +89,40 @@ export default function MobilePlayer({
   // Realtime: update like state when other clients like/unlike the same media
   useEffect(() => {
     let unsub: (() => void) | undefined;
-    const setup = async () => {
-      unsub = await subscribe('media:liked', (payload: any) => {
-        try {
-          if (!track?.id) return;
-          const targetId = Number(track.id);
-          if (Number(payload?.mediaId) === targetId) {
-            if (typeof payload.liked === 'boolean') setIsLiked(Boolean(payload.liked));
+    const handleLikePayload = (payload: any) => {
+      try {
+        if (!track?.id) return;
+        const targetId = Number(payload?.mediaId ?? payload?.id ?? 0);
+        if (targetId === Number(track.id)) {
+          if (typeof payload?.liked === 'boolean') {
+            setIsLiked(Boolean(payload.liked));
           }
-        } catch (err) {
-          console.error('MobilePlayer realtime handler error', err);
+          if (typeof payload?.likes === 'number') {
+            setLikesCount(payload.likes);
+          }
         }
-      });
+      } catch (err) {
+        console.error('MobilePlayer realtime handler error', err);
+      }
     };
+
+    const setup = async () => {
+      unsub = await subscribe('media:liked', handleLikePayload);
+
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const bc = new BroadcastChannel('fwaya');
+        bc.addEventListener('message', (event) => handleLikePayload(event.data));
+        (window as any).__fwayaMobileLikeChannel = bc;
+      }
+    };
+
     void setup();
     return () => {
       if (unsub) unsub();
+      if (typeof window !== 'undefined' && (window as any).__fwayaMobileLikeChannel) {
+        (window as any).__fwayaMobileLikeChannel.close();
+        delete (window as any).__fwayaMobileLikeChannel;
+      }
     };
   }, [track?.id]);
 
@@ -143,13 +162,13 @@ export default function MobilePlayer({
   };
 
   const handleLike = async () => {
-    if (!track?.id) return;
+    if (!track?.id || likeLoading) return;
+
     const nextLiked = !isLiked;
+    const optimisticLikes = likesCount == null ? 0 : Math.max(0, likesCount + (nextLiked ? 1 : -1));
+    setLikeLoading(true);
     setIsLiked(nextLiked);
-    setLikesCount((prev) => {
-      if (prev == null) return prev;
-      return nextLiked ? prev + 1 : Math.max(prev - 1, 0);
-    });
+    setLikesCount(optimisticLikes);
 
     try {
       const token = await getToken();
@@ -168,22 +187,25 @@ export default function MobilePlayer({
         throw new Error('Like request failed');
       }
 
+      const data = await response.json().catch(() => null);
+      const nextCount = typeof data?.likes === 'number' ? data.likes : optimisticLikes;
+      setLikesCount(nextCount);
+
       try {
         if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
           const bc = new BroadcastChannel('fwaya');
-          bc.postMessage({ type: 'media-liked', mediaId: track.id, liked: nextLiked, likes: likesCount });
+          bc.postMessage({ type: 'media-liked', mediaId: Number(track.id), liked: nextLiked, likes: nextCount });
           bc.close();
         } else {
-          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', mediaId: track.id, liked: nextLiked, likes: likesCount, t: Date.now() }));
+          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', mediaId: Number(track.id), liked: nextLiked, likes: nextCount, t: Date.now() }));
         }
       } catch (_) {}
     } catch (err) {
       console.error('MobilePlayer: like failed', err);
       setIsLiked(!nextLiked);
-      setLikesCount((prev) => {
-        if (prev == null) return prev;
-        return nextLiked ? Math.max(prev - 1, 0) : prev + 1;
-      });
+      setLikesCount(likesCount ?? 0);
+    } finally {
+      setLikeLoading(false);
     }
   };
 
@@ -371,33 +393,9 @@ export default function MobilePlayer({
             {/* Controls */}
             <div className="flex items-center gap-1 relative z-10">
                 <button
-                  onClick={async () => {
-                    if (!track?.id) return;
-                    const next = !isLiked;
-                    setIsLiked(next);
-                    const token = await getToken();
-                    if (!token) return setIsLiked(!next);
-                    try {
-                      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${track.id}/interact/like`, {
-                        method: 'POST',
-                        headers: { Authorization: `Bearer ${token}` },
-                      });
-
-                      try {
-                        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-                          const bc = new BroadcastChannel('fwaya');
-                          bc.postMessage({ type: 'media-liked', id: track.id });
-                          bc.close();
-                        } else {
-                          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', id: track.id, t: Date.now() }));
-                        }
-                      } catch (_) {}
-                    } catch (err) {
-                      console.error('MobilePlayer: like failed', err);
-                      setIsLiked(!next);
-                    }
-                  }}
-                  className="p-1 rounded-full hover:bg-white/10 transition-colors"
+                  onClick={handleLike}
+                  disabled={likeLoading}
+                  className="p-1 rounded-full hover:bg-white/10 transition-colors disabled:opacity-60"
                   aria-label="Like track"
                 >
                   {isLiked ? (
@@ -439,13 +437,18 @@ export default function MobilePlayer({
               </button>
 
               <button
-                onClick={onNext}
-                disabled={!onNext}
-                className="p-1.5 rounded-full hover:bg-white/10 transition-colors disabled:opacity-30"
-                aria-label="Next track"
-                title="Next track"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('fwaya:open-playlist-picker', {
+                      detail: { mediaId: Number(track.id), track }
+                    }));
+                  }
+                }}
+                className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                aria-label="Add to playlist"
+                title="Add to playlist"
               >
-                <ForwardIcon className="w-4 h-4 text-white" />
+                <QueueListIcon className="w-4 h-4 text-white" />
               </button>
 
               <button
@@ -453,8 +456,8 @@ export default function MobilePlayer({
                   if (onRepeat) onRepeat();
                 }}
                 className={`p-1 rounded-full hover:bg-white/10 transition-colors ${isRepeatEnabled ? 'text-purple-400' : 'text-white/70'}`}
-                aria-label={isRepeatEnabled ? (isRepeatOne ? 'Repeat one' : 'Repeat all') : 'Repeat'}
-                title={isRepeatEnabled ? (isRepeatOne ? 'Repeat one' : 'Repeat all') : 'Repeat'}
+                aria-label={isRepeatEnabled ? (isRepeatOne ? 'Repeat one' : 'Repeat all') : 'Repeat off'}
+                title={isRepeatEnabled ? (isRepeatOne ? 'Repeat one' : 'Repeat all') : 'Repeat off'}
               >
                 <ArrowPathIcon className="w-4 h-4" />
               </button>
