@@ -67,16 +67,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const imageType = image.toLowerCase().includes('.png') ? 'image/png' : 'image/jpeg';
 
   const pageUrl = `${baseUrl}/videos/${id}`;
-  const rawVideoUrl = video?.videoUrl || video?.url || video?.audioUrl || video?.mediaUrl || video?.fileUrl;
-  const videoUrl = resolveMediaUrl(rawVideoUrl, baseUrl);
 
   console.log('[video-layout] Metadata:', {
     videoId,
     title,
     description,
     image,
-    rawVideoUrl,
-    videoUrl,
   });
 
   return {
@@ -87,7 +83,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       canonical: pageUrl,
     },
     openGraph: {
-      type: 'video.other',
+      type: 'website',
       title,
       description,
       url: pageUrl,
@@ -102,19 +98,6 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
           type: imageType,
         },
       ],
-      ...(videoUrl
-        ? {
-            videos: [
-              {
-                url: videoUrl,
-                secureUrl: videoUrl,
-                type: 'video/mp4',
-                width: 1280,
-                height: 720,
-              },
-            ],
-          }
-        : {}),
     },
     twitter: {
       card: 'summary_large_image',
