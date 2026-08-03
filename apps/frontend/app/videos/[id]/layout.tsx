@@ -60,10 +60,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const title = video?.title ? `${video.title} • ${video.user?.displayName || video.user?.username || 'Fwaya'}` : 'Fwaya Video';
   const description = video?.description || `Watch ${video?.title || 'this video'} on Fwaya`;
   
-  // Ensure image URL is absolute and always available for share previews.
+  // Prefer the generated social card for video shares because crawlers are more reliable with a stable image endpoint.
   const rawImageUrl = video?.thumbnail || video?.artCoverUrl || video?.coverArt || video?.thumbnailUrl;
   const imageUrl = rawImageUrl ? resolveMediaUrl(rawImageUrl, baseUrl) : undefined;
-  const image = imageUrl || (videoId ? `${baseUrl}/api/og/video/${videoId}` : `${baseUrl}/default-cover.jpg`);
+  const fallbackImage = imageUrl || `${baseUrl}/default-cover.jpg`;
+  const image = videoId ? `${baseUrl}/api/og/video/${videoId}` : fallbackImage;
   const imageType = image.toLowerCase().includes('.png') ? 'image/png' : 'image/jpeg';
 
   const pageUrl = `${baseUrl}/videos/${id}`;
