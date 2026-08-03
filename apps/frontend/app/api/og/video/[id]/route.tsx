@@ -60,7 +60,7 @@ export async function GET(req: Request, context: any) {
     (
       <div style={{
         width: '1200px',
-        height: '630px',
+        height: '1200px',
         display: 'flex',
         alignItems: 'stretch',
         justifyContent: 'center',
@@ -130,7 +130,7 @@ export async function GET(req: Request, context: any) {
     ),
     {
       width: 1200,
-      height: 630,
+      height: 1200,
     },
   );
 }

@@ -64,7 +64,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const rawImageUrl = video?.thumbnail || video?.artCoverUrl || video?.coverArt || video?.thumbnailUrl;
   const imageUrl = rawImageUrl ? resolveMediaUrl(rawImageUrl, baseUrl) : undefined;
   const image = imageUrl || (videoId ? `${baseUrl}/api/og/video/${videoId}` : `${baseUrl}/default-cover.jpg`);
-  
+  const imageType = image.toLowerCase().includes('.png') ? 'image/png' : 'image/jpeg';
+
   const pageUrl = `${baseUrl}/videos/${id}`;
   const rawVideoUrl = video?.videoUrl || video?.url || video?.audioUrl || video?.mediaUrl || video?.fileUrl;
   const videoUrl = resolveMediaUrl(rawVideoUrl, baseUrl);
@@ -94,10 +95,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       images: [
         {
           url: image,
+          secureUrl: image,
           alt: `${video?.title || 'Video'} cover art`,
           width: 1200,
-          height: 630,
-          type: 'image/png',
+          height: 1200,
+          type: imageType,
         },
       ],
       ...(videoUrl
