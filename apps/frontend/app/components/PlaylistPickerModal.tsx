@@ -211,7 +211,7 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4">
-      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#08090f] p-6 shadow-2xl shadow-black/40">
+      <div className="w-full max-w-md rounded-3xl bg-[#08090f] p-6 shadow-2xl shadow-black/40">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div>
             <h2 className="text-lg font-semibold text-white">Add to Playlist</h2>
@@ -293,7 +293,7 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
                 type="button"
                 onClick={() => handleAddToPlaylist(playlist.id)}
                 disabled={submitting}
-                className="w-full flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 text-left transition hover:border-purple-500/40 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full flex items-center gap-3 rounded-2xl bg-white/5 p-3 text-left transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-600 text-white">
                   <ListMusic className="h-5 w-5" />

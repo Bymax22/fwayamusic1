@@ -1,12 +1,13 @@
 "use client";
 /* eslint-disable */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "../components/Sidebar";
 import MobileMenu from "../components/MobileMenu";
 import Player from "../components/Player";
 import MobilePlayer from "../components/MobilePlayer";
+import PlaylistPickerModal from "../components/PlaylistPickerModal";
 import NowPlayingPanel from "../components/NowPlayingPanel";
 import BottomNav from "../components/BottomNav";
 import Navbar from "../components/Navbar";
@@ -23,10 +24,29 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [playlistPickerOpen, setPlaylistPickerOpen] = useState(false);
+  const [pickerMediaId, setPickerMediaId] = useState<number | null>(null);
 
   const isVideoWatchPage = currentTrack?.type === 'VIDEO'
     && pathname?.startsWith('/videos/')
     && String(currentTrack.id) === pathname.split('/videos/')[1];
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleOpenPlaylistPicker = (event: Event) => {
+      const customEvent = event as CustomEvent<Record<string, unknown>>;
+      const mediaId = Number(customEvent.detail?.mediaId ?? customEvent.detail?.id ?? 0);
+      if (!mediaId) return;
+      setPickerMediaId(mediaId);
+      setPlaylistPickerOpen(true);
+    };
+
+    window.addEventListener('fwaya:open-playlist-picker', handleOpenPlaylistPicker as EventListener);
+    return () => {
+      window.removeEventListener('fwaya:open-playlist-picker', handleOpenPlaylistPicker as EventListener);
+    };
+  }, []);
 
   return (
     <div className="w-full text-white bg-transparent lg:pt-14">
@@ -150,6 +170,19 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
       )}
 
       <VideoMiniPlayer />
+
+      <PlaylistPickerModal
+        open={playlistPickerOpen}
+        mediaId={pickerMediaId ?? 0}
+        onClose={() => {
+          setPlaylistPickerOpen(false);
+          setPickerMediaId(null);
+        }}
+        onSuccess={() => {
+          setPlaylistPickerOpen(false);
+          setPickerMediaId(null);
+        }}
+      />
     </div>
   );
 }

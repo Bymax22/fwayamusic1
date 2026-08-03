@@ -89,20 +89,38 @@ export default function MobilePlayer({
   // Realtime: update like state when other clients like/unlike the same media
   useEffect(() => {
     let unsub: (() => void) | undefined;
+    let broadcastChannel: BroadcastChannel | null = null;
+
     const handleLikePayload = (payload: any) => {
       try {
         if (!track?.id) return;
-        const targetId = Number(payload?.mediaId ?? payload?.id ?? 0);
-        if (targetId === Number(track.id)) {
-          if (typeof payload?.liked === 'boolean') {
-            setIsLiked(Boolean(payload.liked));
-          }
-          if (typeof payload?.likes === 'number') {
-            setLikesCount(payload.likes);
-          }
+        const targetId = Number(payload?.mediaId ?? payload?.id ?? payload?.trackId ?? 0);
+        if (targetId !== Number(track.id)) return;
+
+        if (typeof payload?.liked === 'boolean') {
+          setIsLiked(Boolean(payload.liked));
+        }
+        if (typeof payload?.likes === 'number') {
+          setLikesCount(payload.likes);
         }
       } catch (err) {
         console.error('MobilePlayer realtime handler error', err);
+      }
+    };
+
+    const onBroadcastMessage = (event: MessageEvent) => {
+      handleLikePayload(event.data);
+    };
+
+    const onStorageMessage = (event: StorageEvent) => {
+      if (event.key !== 'fwaya:message' || !event.newValue) return;
+      try {
+        const payload = JSON.parse(event.newValue);
+        if (payload?.type === 'media-liked') {
+          handleLikePayload(payload);
+        }
+      } catch {
+        // ignore invalid payload
       }
     };
 
@@ -110,18 +128,24 @@ export default function MobilePlayer({
       unsub = await subscribe('media:liked', handleLikePayload);
 
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        const bc = new BroadcastChannel('fwaya');
-        bc.addEventListener('message', (event) => handleLikePayload(event.data));
-        (window as any).__fwayaMobileLikeChannel = bc;
+        broadcastChannel = new BroadcastChannel('fwaya');
+        broadcastChannel.addEventListener('message', onBroadcastMessage);
+      }
+
+      if (typeof window !== 'undefined') {
+        window.addEventListener('storage', onStorageMessage);
       }
     };
 
     void setup();
     return () => {
       if (unsub) unsub();
-      if (typeof window !== 'undefined' && (window as any).__fwayaMobileLikeChannel) {
-        (window as any).__fwayaMobileLikeChannel.close();
-        delete (window as any).__fwayaMobileLikeChannel;
+      if (broadcastChannel) {
+        broadcastChannel.removeEventListener('message', onBroadcastMessage);
+        broadcastChannel.close();
+      }
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', onStorageMessage);
       }
     };
   }, [track?.id]);
@@ -192,11 +216,12 @@ export default function MobilePlayer({
       setLikesCount(nextCount);
 
       try {
-        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-          const bc = new BroadcastChannel('fwaya');
-          bc.postMessage({ type: 'media-liked', mediaId: Number(track.id), liked: nextLiked, likes: nextCount });
-          bc.close();
-        } else {
+        if (typeof window !== 'undefined') {
+          if ('BroadcastChannel' in window) {
+            const bc = new BroadcastChannel('fwaya');
+            bc.postMessage({ type: 'media-liked', mediaId: Number(track.id), liked: nextLiked, likes: nextCount });
+            bc.close();
+          }
           localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', mediaId: Number(track.id), liked: nextLiked, likes: nextCount, t: Date.now() }));
         }
       } catch (_) {}

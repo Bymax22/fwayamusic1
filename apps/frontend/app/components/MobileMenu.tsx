@@ -264,10 +264,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 30, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 240, damping: 22 }}
-                    className="w-full max-w-md overflow-hidden rounded-2xl bg-[#0a0a0f] ring-1 ring-white/10 shadow-2xl shadow-black/40"
+                    className="w-full max-w-md overflow-hidden rounded-2xl bg-[#0a0a0f] shadow-2xl shadow-black/40"
                     onClick={(event) => event.stopPropagation()}
                   >
-                    <div className="flex items-center justify-between gap-4 border-b border-white/5 bg-white/[0.02] px-4 py-3 sm:px-5">
+                    <div className="flex items-center justify-between gap-4 bg-white/[0.02] px-4 py-3 sm:px-5">
                       <div>
                         <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-purple-300">Account</p>
                         <h3 className="mt-1 text-lg font-semibold text-white">

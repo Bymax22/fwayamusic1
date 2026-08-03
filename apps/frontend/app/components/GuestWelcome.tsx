@@ -62,6 +62,7 @@ export default function GuestWelcome() {
       id: 'USER',
       title: 'Listener',
       subtitle: 'Discover music & playlists',
+      description: 'Stream tracks, save favorites, and access playlists tailored for you.',
       icon: <FaUser className="h-5 w-5" />,
       signInHref: '/auth/user/signin',
       signUpHref: '/auth/user/signup',
@@ -71,6 +72,7 @@ export default function GuestWelcome() {
       id: 'ARTIST',
       title: 'Artist',
       subtitle: 'Upload, grow & monetize',
+      description: 'Publish your music, manage releases, and build your fanbase on Fwaya.',
       icon: <FaMicrophone className="h-5 w-5" />,
       signInHref: '/auth/artist/signin',
       signUpHref: '/auth/artist/signup',
@@ -80,6 +82,7 @@ export default function GuestWelcome() {
       id: 'RESELLER',
       title: 'Reseller',
       subtitle: 'Sell music & earn commissions',
+      description: 'Offer music to your customers and grow revenue with reseller tools.',
       icon: <FaBookOpen className="h-5 w-5" />,
       signInHref: '/auth/reseller/signin',
       signUpHref: '/auth/reseller/signup',
@@ -89,6 +92,7 @@ export default function GuestWelcome() {
       id: 'PRODUCER',
       title: 'Producer',
       subtitle: 'Create beats & manage releases',
+      description: 'Manage your beats, release tracks, and connect with artists seeking production.',
       icon: <FaMusic className="h-5 w-5" />,
       signInHref: '/auth/producer/signin',
       signUpHref: '/auth/producer/signup',
@@ -692,49 +696,57 @@ export default function GuestWelcome() {
     <>
       {showRoleModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm px-4">
-          <div className="w-full max-w-3xl rounded-[28px] border border-white/10 bg-[#0f1112] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.6)] sm:p-6">
-            <div className="mb-5 flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-purple-300">Welcome</p>
-                <h2 className="mt-1 text-2xl font-bold text-white">Choose your role</h2>
+          <div className="w-full max-w-xl overflow-hidden rounded-3xl bg-[#0f1112] shadow-2xl shadow-black/60 sm:p-6">
+            <div className="px-5 py-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-purple-300">Quick start</p>
+                  <h2 className="mt-2 text-2xl font-bold text-white">Choose your experience</h2>
+                  <p className="mt-2 text-sm text-gray-400 max-w-md">
+                    Select how you want to use Fwaya and continue with the right account flow.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowRoleModal(false)}
+                  className="rounded-full bg-white/5 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
+                  aria-label="Close role selector"
+                >
+                  <FaTimes className="h-4 w-4" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowRoleModal(false)}
-                className="rounded-full bg-white/5 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
-                aria-label="Close role selector"
-              >
-                <FaTimes className="h-4 w-4" />
-              </button>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-3 px-5 py-5 sm:space-y-4">
               {roleOptions.map((role) => (
                 <div
                   key={role.id}
-                  className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-purple-500/60 hover:bg-white/[0.04]"
+                  className="rounded-3xl bg-white/5 p-4 transition hover:bg-white/10"
                 >
-                  <div className={`mb-4 inline-flex rounded-full bg-gradient-to-r ${role.accent} p-3 text-white`}>
-                    {role.icon}
+                  <div className="flex items-center gap-3">
+                    <div className={`rounded-3xl bg-gradient-to-r ${role.accent} p-3 text-white shadow-lg shadow-purple-500/10`}>
+                      {role.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-base font-semibold text-white truncate">{role.title}</p>
+                      <p className="mt-1 text-sm text-gray-400 truncate">{role.subtitle}</p>
+                    </div>
                   </div>
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-white">{role.title}</h3>
-                    <p className="mt-1 text-sm text-white/60">{role.subtitle}</p>
-                  </div>
-                  <div className="flex gap-2">
+                  <p className="mt-3 text-sm leading-6 text-gray-300">{role.description}</p>
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
                     <Link
                       href={role.signInHref}
                       onClick={() => setShowRoleModal(false)}
-                      className="flex-1 rounded-xl bg-white/5 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-white/10"
+                      className="rounded-2xl bg-white/5 px-4 py-3 text-center text-sm font-medium text-white transition hover:bg-white/10"
                     >
-                      Log in
+                      Sign in
                     </Link>
                     <Link
                       href={role.signUpHref}
                       onClick={() => setShowRoleModal(false)}
-                      className="flex-1 rounded-xl bg-purple-500 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-purple-400"
+                      className="rounded-2xl bg-purple-500 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-purple-400"
                     >
-                      Register
+                      Create account
                     </Link>
                   </div>
                 </div>
