@@ -191,7 +191,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
         media.removeEventListener('pause', handlePause);
       });
     };
-  }, [currentTrack, isMuted, volume, registeredVideoElement]);
+  }, [currentTrack, isMuted, volume, registeredVideoElement, repeatMode, queue, queueIndex]);
 
   const applyAudioQualityToUrl = (rawUrl: string) => {
     if (!rawUrl) return rawUrl;

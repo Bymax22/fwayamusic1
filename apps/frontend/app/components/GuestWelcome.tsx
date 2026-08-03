@@ -696,13 +696,13 @@ export default function GuestWelcome() {
     <>
       {showRoleModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm px-4">
-          <div className="w-full max-w-xl overflow-hidden rounded-3xl bg-[#0f1112] shadow-2xl shadow-black/60 sm:p-6">
-            <div className="px-5 py-4">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#0f1112] shadow-xl shadow-black/40 sm:p-5">
+            <div className="px-4 py-3 sm:px-5 sm:py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-purple-300">Quick start</p>
                   <h2 className="mt-2 text-2xl font-bold text-white">Choose your experience</h2>
-                  <p className="mt-2 text-sm text-gray-400 max-w-md">
+                  <p className="mt-2 text-xs text-gray-400 max-w-md">
                     Select how you want to use Fwaya and continue with the right account flow.
                   </p>
                 </div>
@@ -717,34 +717,34 @@ export default function GuestWelcome() {
               </div>
             </div>
 
-            <div className="space-y-3 px-5 py-5 sm:space-y-4">
+            <div className="grid gap-3 px-4 py-3 sm:grid-cols-2 sm:gap-3">
               {roleOptions.map((role) => (
                 <div
                   key={role.id}
-                  className="rounded-3xl bg-white/5 p-4 transition hover:bg-white/10"
+                  className="rounded-3xl bg-white/5 p-3 transition hover:bg-white/10"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`rounded-3xl bg-gradient-to-r ${role.accent} p-3 text-white shadow-lg shadow-purple-500/10`}>
+                    <div className={`rounded-3xl bg-gradient-to-r ${role.accent} p-2.5 text-white shadow-lg shadow-purple-500/10`}>
                       {role.icon}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-base font-semibold text-white truncate">{role.title}</p>
-                      <p className="mt-1 text-sm text-gray-400 truncate">{role.subtitle}</p>
+                      <p className="text-sm font-semibold text-white truncate">{role.title}</p>
+                      <p className="mt-1 text-xs text-gray-400 truncate">{role.subtitle}</p>
                     </div>
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-gray-300">{role.description}</p>
-                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <p className="mt-2 text-xs leading-5 text-gray-300">{role.description}</p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     <Link
                       href={role.signInHref}
                       onClick={() => setShowRoleModal(false)}
-                      className="rounded-2xl bg-white/5 px-4 py-3 text-center text-sm font-medium text-white transition hover:bg-white/10"
+                      className="rounded-2xl bg-white/5 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-white/10"
                     >
                       Sign in
                     </Link>
                     <Link
                       href={role.signUpHref}
                       onClick={() => setShowRoleModal(false)}
-                      className="rounded-2xl bg-purple-500 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-purple-400"
+                      className="rounded-2xl bg-purple-500 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-purple-400"
                     >
                       Create account
                     </Link>
