@@ -87,8 +87,8 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
 
       {needHelpOpen && (
         <div className="fixed inset-0 z-[9999] flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setNeedHelpOpen(false)} />
-          <div className="w-full max-w-md bg-[#07070b] rounded-t-3xl p-4 border-t border-white/6 pointer-events-auto">
+          <div className="absolute inset-0 bg-black/60 z-0" onClick={() => setNeedHelpOpen(false)} />
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md bg-[#07070b] rounded-t-3xl p-4 border-t border-white/6 pointer-events-auto z-10">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white">Need Help?</h3>
               <button onClick={() => setNeedHelpOpen(false)} className="text-gray-400">Close</button>
@@ -106,12 +106,12 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
               </form>
 
               <div className="space-y-2">
-                <button onClick={() => { setNeedHelpOpen(false); router.push('/support'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">Support</button>
-                <button onClick={() => { setNeedHelpOpen(false); router.push('/advertising'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Ads</button>
-                <button onClick={() => { setNeedHelpOpen(false); router.push('/partnership'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Partners</button>
-                <button onClick={() => { setNeedHelpOpen(false); router.push('/terms'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Terms & Conditions</button>
-                <button onClick={() => { setNeedHelpOpen(false); router.push('/privacy'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Privacy Policy</button>
-                <button onClick={() => { setNeedHelpOpen(false); router.push('/help/faq'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">FAQ</button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/support') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">Support</button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/advertising') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Ads</button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/partnership') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Partners</button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/terms') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Terms & Conditions</button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/privacy') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Privacy Policy</button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/help/faq') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">FAQ</button>
               </div>
             </div>
           </div>
