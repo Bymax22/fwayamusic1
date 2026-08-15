@@ -252,6 +252,11 @@ model Media {
   recommendations        UserRecommendation[]
   videoQualityVariants   VideoVariant[]
   watchHistory           WatchHistory[]
+  // Pricing linkage
+  priceTierId            Int?                   @map("price_tier_id")
+  acceptedPricingSnapshotId Int?                @map("accepted_pricing_snapshot_id")
+  priceTier              PriceTier?             @relation(fields: [priceTierId], references: [id])
+  pricingSnapshots       PricingSnapshot[]
 
   @@index([userId])
   @@index([accessType])
@@ -263,6 +268,112 @@ model Media {
   @@index([genre])
   @@index([playCount])
   @@map("media")
+}
+
+// Product types (Single Song, EP, Album, etc)
+model ProductType {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  priceTiers  PriceTier[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("product_types")
+}
+
+// Price tiers configured by admin for each product type
+model PriceTier {
+  id                    Int       @id @default(autoincrement())
+  productTypeId         Int       @map("product_type_id")
+  name                  String
+  directPrice           Float
+  effectiveFrom         DateTime? @map("effective_from")
+  effectiveTo           DateTime? @map("effective_to")
+  resellerDiscount      Float     @default(0)
+  minPrice              Float?    @map("min_price")
+  maxPrice              Float?    @map("max_price")
+  active                Boolean   @default(true)
+  resellerAllowed       Boolean   @default(true) @map("reseller_allowed")
+  attributionPeriodDays Int       @default(7) @map("attribution_period_days")
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  productType           ProductType @relation(fields: [productTypeId], references: [id], onDelete: Cascade)
+  media                 Media[]
+
+  @@map("price_tiers")
+}
+
+// Global business settings (VAT rate, payment provision, shares, margins)
+model BusinessSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("business_settings")
+}
+
+// Snapshot of pricing and sharing when an artist accepts an arrangement
+model PricingSnapshot {
+  id                        Int      @id @default(autoincrement())
+  mediaId                   Int      @map("media_id")
+  priceTierId               Int?     @map("price_tier_id")
+  directPrice               Float
+  resellerDiscount          Float
+  protectedArtistPayout     Float    @map("protected_artist_payout")
+  approvedResellerEarning   Float    @map("approved_reseller_earning")
+  vatRate                   Float
+  paymentProvisionPercent   Float    @map("payment_provision_percent")
+  artistSharePercent        Float    @map("artist_share_percent")
+  resellerSharePercent      Float    @map("reseller_share_percent")
+  fwayaSharePercent         Float    @map("fwaya_share_percent")
+  minFwayaMargin            Float    @map("min_fwaya_margin")
+  version                   Int      @default(1)
+  createdAt                 DateTime @default(now())
+
+  media                     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  transactions              Transaction[]
+
+  @@map("pricing_snapshots")
+}
+
+// Cover assets uploaded separately (approved before publishing)
+model Cover {
+  id                Int              @id @default(autoincrement())
+  userId            Int              @map("user_id")
+  url               String
+  publicId          String           @map("public_id")
+  format            String?
+  width             Int?
+  height            Int?
+  ogUrl             String?          @map("og_url")
+  ogPublicId        String?          @map("og_public_id")
+  moderationStatus  ModerationStatus @default(PENDING) @map("moderation_status")
+  moderationResponse String?         @map("moderation_response")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("covers")
+}
+
+// Support tickets submitted by users via mobile/footer/contact pages
+model SupportTicket {
+  id        Int      @id @default(autoincrement())
+  ticketId  String   @unique @default(cuid())
+  name      String?
+  email     String
+  message   String
+  source    String?   @map("source")
+  type      String?   @map("type")
+  metadata  Json?
+  status    String    @default("OPEN")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("support_tickets")
 }
 
 model VideoVariant {
@@ -611,6 +722,7 @@ model Transaction {
   paymentProvider    PaymentProvider     @map("payment_provider")
   providerReference  String?             @map("provider_reference")
   resellerLinkId     Int?                @map("reseller_link_id")
+  pricingSnapshotId  Int?                @map("pricing_snapshot_id")
   processedAt        DateTime?           @map("processed_at")
   receipt            String?
   receiptUrl         String?             @map("receipt_url")
@@ -621,11 +733,13 @@ model Transaction {
   queuedPayouts      QueuedPayout[]
   media              Media?              @relation(fields: [mediaId], references: [id])
   resellerLink       ResellerLink?       @relation(fields: [resellerLinkId], references: [id])
+  pricingSnapshot    PricingSnapshot?    @relation(fields: [pricingSnapshotId], references: [id])
   user               User?               @relation(fields: [userId], references: [id])
 
   @@index([userId, status])
   @@index([paymentProvider, providerReference])
   @@index([resellerLinkId])
+  @@index([pricingSnapshotId])
   @@index([createdAt])
   @@map("transactions")
 }

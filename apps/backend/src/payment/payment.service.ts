@@ -2,6 +2,7 @@
 import { Injectable, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { Currency } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { PricingService } from '../pricing/pricing.service';
 import { CreateTransactionDto, ProcessPaymentDto, CurrencyConversionDto } from './dto/create-transaction.dto';
 import { CommissionService } from '../commission/commission.service';
 import { HttpService } from '@nestjs/axios';
@@ -16,6 +17,7 @@ export class PaymentService {
     private prisma: PrismaService,
     private commissionService: CommissionService,
     private httpService: HttpService,
+    private pricingService: PricingService,
   ) {}
 
   public async bcAuthorize(
@@ -138,37 +140,134 @@ export class PaymentService {
         if (resellerLinkCode) {
           resellerLink = await tx.resellerLink.findUnique({
             where: { code: resellerLinkCode },
+            include: { media: true },
           });
 
-          if (resellerLink?.status === 'ACTIVE') {
-            isResellerSale = true;
+          if (resellerLink && resellerLink.status === 'ACTIVE') {
+            // Determine attribution window (from price tier if available)
+            let attributionDays = 7; // default
+            if (resellerLink.media?.priceTierId) {
+              const tier = await tx.priceTier.findUnique({ where: { id: resellerLink.media.priceTierId } });
+              if (tier && tier.attributionPeriodDays) attributionDays = tier.attributionPeriodDays;
+            }
 
-            const resellerUser = await tx.user.findUnique({
-              where: { id: resellerLink.resellerId },
-            });
+            const now = new Date();
+            const createdAt = resellerLink.createdAt;
+            const expiry = resellerLink.expiresAt;
+            const ageMs = now.getTime() - new Date(createdAt).getTime();
+            const ageDays = ageMs / (1000 * 60 * 60 * 24);
+            const stillAttributed = expiry ? (new Date(expiry) > now) : (ageDays <= attributionDays);
 
-            commissionRate = resellerLink.customCommissionRate ?? resellerUser?.commissionRate ?? 0.2;
+            if (stillAttributed) {
+              isResellerSale = true;
 
-            await tx.resellerLink.update({
-              where: { id: resellerLink.id },
-              data: { conversionCount: { increment: 1 } },
-            });
+              const resellerUser = await tx.user.findUnique({
+                where: { id: resellerLink.resellerId },
+              });
+
+              // commissionRate remains legacy field — actual reseller earning is derived from pricing snapshot
+              commissionRate = resellerLink.customCommissionRate ?? resellerUser?.commissionRate ?? 0.2;
+
+              await tx.resellerLink.update({
+                where: { id: resellerLink.id },
+                data: { conversionCount: { increment: 1 } },
+              });
+            } else {
+              // Link no longer attributed — do not treat as reseller sale
+              isResellerSale = false;
+            }
           }
         }
 
-        // Calculate amounts
-        const amount = createTransactionDto.amount;
-        let platformAmount = 0;
-        let artistAmount = 0;
-        let resellerAmount = 0;
+        // Server-side pricing and validation
+        // Load relevant business settings from DB
+        const vatRate = await this.pricingService.getBusinessSettingFloat('VAT_RATE', 16);
+        const paymentProvisionPercent = await this.pricingService.getBusinessSettingFloat('PAYMENT_PROVISION_PERCENT', 5);
+        const artistSharePercentReseller = await this.pricingService.getBusinessSettingFloat('ARTIST_SHARE_PERCENT_RESELLER', 65);
+        const resellerSharePercent = await this.pricingService.getBusinessSettingFloat('RESELLER_SHARE_PERCENT', 20);
+        const fwayaSharePercentReseller = await this.pricingService.getBusinessSettingFloat('FWAYA_SHARE_PERCENT', 15);
+        // Direct-sale shares
+        const artistSharePercentDirect = await this.pricingService.getBusinessSettingFloat('ARTIST_SHARE_PERCENT_DIRECT', 75);
+        const fwayaSharePercentDirect = await this.pricingService.getBusinessSettingFloat('FWAYA_SHARE_PERCENT_DIRECT', 25);
+        const minFwayaMargin = await this.pricingService.getBusinessSettingFloat('MIN_FWAYA_MARGIN', 0);
+
+        // Determine the canonical direct price (from price tier if available) or media.price
+        let canonicalDirectPrice = media.price ?? createTransactionDto.amount;
+        if (media.price == null && !createTransactionDto.amount) {
+          throw new BadRequestException('No price configured for this media');
+        }
+
+        // If reseller sale, compute resellerPrice from configured discount (if price tier exists)
+        let resellerPrice = createTransactionDto.amount;
+        let protectedArtistPayout = 0;
+        let approvedResellerEarning = 0;
+        // derive protected amounts from the canonical direct price
+        const priceTier = media.priceTierId ? await tx.priceTier.findUnique({ where: { id: media.priceTierId } }) : null;
+        const directPrice = priceTier ? priceTier.directPrice : canonicalDirectPrice;
+        const configuredResellerDiscount = priceTier ? priceTier.resellerDiscount : (media.resellerCommissionRate ?? 0);
+
+        // Protected payouts are derived from the standard reseller arrangement applied to the direct price
+        const protectedVals = this.pricingService.calculateProtectedPayouts(directPrice, vatRate, paymentProvisionPercent, artistSharePercentReseller, resellerSharePercent, fwayaSharePercentReseller);
+        protectedArtistPayout = protectedVals.protectedArtistPayout;
+        approvedResellerEarning = protectedVals.approvedResellerEarning;
+
+        // compute actual charging amount
+        const chargingAmount = createTransactionDto.amount ?? directPrice;
 
         if (isResellerSale) {
-          resellerAmount = amount * commissionRate;
-          artistAmount = amount * (media.artistCommissionRate ?? 0.5);
-          platformAmount = amount - resellerAmount - artistAmount;
+          // if a price tier discount exists, derive resellerPrice
+          if (priceTier) {
+            resellerPrice = directPrice - (priceTier.resellerDiscount || 0);
+          } else {
+            // fallback: use chargingAmount supplied
+            resellerPrice = chargingAmount;
+          }
+
+          // Validate discount against min margin
+          const validation = this.pricingService.validateResellerDiscount({
+            directPrice,
+            resellerPrice,
+            vatRate,
+            provisionPercent: paymentProvisionPercent,
+            protectedArtistPayout,
+            approvedResellerEarning,
+            minFwayaMargin,
+          });
+
+          if (!validation.valid) {
+            throw new BadRequestException('Configured reseller discount would violate minimum FWAYA margin or protected payouts');
+          }
+        }
+
+        // Compute final splits: reseller sales use protected/reseller earnings; direct sales use direct-share percentages
+        let platformAmount: number;
+        let artistAmount: number;
+        let resellerAmount: number;
+
+        let vatValue = 0;
+        let provisionValue = 0;
+        let shareableValue = 0;
+
+        if (isResellerSale) {
+          const chargeForCalc = resellerPrice;
+          const splits = this.pricingService.computeActualSplits(chargeForCalc, vatRate, paymentProvisionPercent, protectedArtistPayout, approvedResellerEarning);
+          platformAmount = splits.platform;
+          artistAmount = splits.artist;
+          resellerAmount = splits.reseller;
+          vatValue = splits.vat;
+          provisionValue = splits.provision;
+          shareableValue = splits.actualShareable;
         } else {
-          artistAmount = amount * (media.artistCommissionRate ?? 0.5);
-          platformAmount = amount - artistAmount;
+          // Direct sale: allocate from shareable using direct-share percents
+          const direct = this.pricingService.calculateShareableAmount(chargingAmount, vatRate, paymentProvisionPercent);
+          const directShareable = direct.shareable;
+          artistAmount = parseFloat((directShareable * (artistSharePercentDirect / 100)).toFixed(2));
+          // platform gets the remainder after artist (rounding rule)
+          platformAmount = parseFloat((directShareable - artistAmount).toFixed(2));
+          resellerAmount = 0;
+          vatValue = parseFloat(direct.vat.toFixed(2));
+          provisionValue = parseFloat(direct.provision.toFixed(2));
+          shareableValue = parseFloat(directShareable.toFixed(2));
         }
 
         // Build transaction payload explicitly (avoid spreading unknown fields into Prisma)
@@ -179,15 +278,30 @@ export class PaymentService {
           isResellerSale,
           status: 'PENDING',
           reference: this.generateReference(),
-          metadata: {
+            metadata: {
             deviceInfo: deviceInfo ?? null,
+            pricingSnapshot: {
+              directPrice,
+              resellerPrice: isResellerSale ? resellerPrice : null,
+              vatRate,
+              paymentProvisionPercent,
+              protectedArtistPayout,
+              approvedResellerEarning,
+              minFwayaMargin,
+              artistSharePercentDirect: artistSharePercentDirect,
+              fwayaSharePercentDirect: fwayaSharePercentDirect,
+            },
             calculatedAmounts: {
               platformAmount,
               artistAmount,
               resellerAmount,
+              vat: vatValue,
+              paymentProvision: provisionValue,
+              shareableAmount: shareableValue,
             },
           },
-          amount,
+          amount: chargingAmount,
+          pricingSnapshotId: media.acceptedPricingSnapshotId ?? undefined,
           currency: createTransactionDto.currency as any,
           paymentMethod: createTransactionDto.paymentMethod as any,
           paymentProvider: createTransactionDto.paymentProvider as any,

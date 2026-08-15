@@ -82,6 +82,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
     { title: "VIP", icon: <Icon><FaStar size={16} /></Icon>, href: "/vip" },
     { title: "Connect Device", icon: <Icon><HiOutlineDeviceMobile size={18} /></Icon>, href: "/connect-device" },
     { title: "Profile", icon: <Icon><HiUser size={18} /></Icon>, href: "/profile" },
+    { title: "Support Inbox", icon: <Icon><HiOutlineMicrophone size={18} /></Icon>, href: "/admin/support" },
   ];
 
   return (

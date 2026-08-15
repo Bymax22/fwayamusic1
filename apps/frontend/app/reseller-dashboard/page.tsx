@@ -206,6 +206,7 @@ export default function ResellerDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'links' | 'commissions' | 'payouts' | 'verification'>('overview');
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [selectedMedia, setSelectedMedia] = useState<number | null>(null);
+  const [selectedMediaDetails, setSelectedMediaDetails] = useState<any | null>(null);
   const [availableMedia, setAvailableMedia] = useState<Media[]>([]);
 
   // memoize fetch function so effect deps are stable
@@ -248,6 +249,42 @@ export default function ResellerDashboard() {
     }
     fetchDashboardData();
   }, [user, router, fetchDashboardData]);
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (!selectedMedia) return setSelectedMediaDetails(null);
+      try {
+        const headers = getAuthHeaders();
+        const res = await fetch(`/api/media/${selectedMedia}`, { headers });
+        if (res.ok) {
+          const d = await res.json();
+          setSelectedMediaDetails(d);
+        } else {
+          setSelectedMediaDetails(null);
+        }
+      } catch (e) {
+        console.error('Failed to fetch selected media', e);
+        setSelectedMediaDetails(null);
+      }
+    };
+    fetchDetails();
+  }, [selectedMedia]);
+
+  const viewPricingSnapshot = async (mediaId: number) => {
+    try {
+      const headers = getAuthHeaders();
+      const res = await fetch(`/api/media/${mediaId}/pricing-snapshot`, { headers });
+      if (!res.ok) {
+        alert('No pricing snapshot available');
+        return;
+      }
+      const data = await res.json();
+      alert('Pricing snapshot:\n' + JSON.stringify(data, null, 2));
+    } catch (err) {
+      console.error(err);
+      alert('Failed to fetch pricing snapshot');
+    }
+  };
 
   
 
@@ -758,6 +795,38 @@ export default function ResellerDashboard() {
                 Generate Link
               </button>
             </div>
+            {/* Selected media details and pricing snapshot */}
+            {selectedMediaDetails && (
+              <div className="mt-4 p-4 bg-[#071a1f]/50 rounded-lg border border-[#0a3747] text-sm text-gray-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-white">{selectedMediaDetails.title}</p>
+                    <p className="text-xs text-gray-400">by {selectedMediaDetails.user?.displayName}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white font-semibold">${selectedMediaDetails.price}</p>
+                    <p className="text-xs text-gray-400">{selectedMediaDetails.allowReselling ? 'Resellable' : 'Not resellable'}</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <div>
+                    {selectedMediaDetails.acceptedPricingSnapshotId ? (
+                      <span className="px-2 py-1 bg-green-600/20 rounded">Pricing accepted</span>
+                    ) : (
+                      <span className="px-2 py-1 bg-yellow-600/20 rounded">No accepted pricing</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedMediaDetails.acceptedPricingSnapshotId && (
+                      <button onClick={() => viewPricingSnapshot(selectedMediaDetails.id)} className="text-sm text-[#e51f48]">View snapshot</button>
+                    )}
+                    {!selectedMediaDetails.acceptedPricingSnapshotId && selectedMediaDetails.allowReselling && (
+                      <button onClick={() => generateResellerLink(selectedMediaDetails.id)} className="text-sm text-white/90 bg-white/5 px-2 py-1 rounded">Create reseller link</button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Active Links */}

@@ -1,5 +1,6 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
+import { PricingService } from '../pricing/pricing.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { MediaType, MediaAccessType, NotificationType, UserRole, ModerationStatus } from '@prisma/client';
 import { NotificationService } from '../notification/notification.service';
@@ -13,6 +14,7 @@ export class MediaService {
     private readonly prisma: PrismaService,
     private readonly notificationService: NotificationService,
     private readonly eventsGateway: EventsGateway,
+    private readonly pricingService: PricingService,
   ) {
     try {
       cloudinary.config({
@@ -24,6 +26,64 @@ export class MediaService {
     } catch (error) {
       this.logger.error('Failed to configure Cloudinary:', error);
     }
+  }
+
+  // Artist accepts a pricing arrangement for their media: create pricing snapshot and link it
+  async acceptPricingArrangement(mediaId: number, userId: number, priceTierId?: number) {
+    const media = await this.prisma.media.findUnique({ where: { id: mediaId } });
+    if (!media) throw new InternalServerErrorException('Media not found');
+    if (media.userId !== userId) throw new ForbiddenException('You can only accept pricing for your own media');
+
+    // Determine price tier and direct price
+    let priceTier = null;
+    if (priceTierId) {
+      priceTier = await this.prisma.priceTier.findUnique({ where: { id: priceTierId } });
+      if (!priceTier) throw new BadRequestException('Price tier not found');
+    } else if (media.priceTierId) {
+      priceTier = await this.prisma.priceTier.findUnique({ where: { id: media.priceTierId } });
+    }
+
+    const directPrice = priceTier ? priceTier.directPrice : (media.price ?? 0);
+    const resellerDiscount = priceTier ? priceTier.resellerDiscount : (media.resellerCommissionRate ?? 0);
+
+    // Load business settings
+    const vatRate = await this.pricingService.getBusinessSettingFloat('VAT_RATE', 16);
+    const paymentProvisionPercent = await this.pricingService.getBusinessSettingFloat('PAYMENT_PROVISION_PERCENT', 5);
+    const artistSharePercentReseller = await this.pricingService.getBusinessSettingFloat('ARTIST_SHARE_PERCENT_RESELLER', 65);
+    const resellerSharePercent = await this.pricingService.getBusinessSettingFloat('RESELLER_SHARE_PERCENT', 20);
+    const fwayaSharePercentReseller = await this.pricingService.getBusinessSettingFloat('FWAYA_SHARE_PERCENT', 15);
+    // Direct-sale shares
+    const artistSharePercentDirect = await this.pricingService.getBusinessSettingFloat('ARTIST_SHARE_PERCENT_DIRECT', 75);
+    const fwayaSharePercentDirect = await this.pricingService.getBusinessSettingFloat('FWAYA_SHARE_PERCENT_DIRECT', 25);
+    const minFwayaMargin = await this.pricingService.getBusinessSettingFloat('MIN_FWAYA_MARGIN', 0);
+
+    // Calculate protected amounts
+    // For pricing snapshot, persist both direct-sale shares and reseller arrangement shares
+    const protectedVals = this.pricingService.calculateProtectedPayouts(directPrice, vatRate, paymentProvisionPercent, artistSharePercentReseller, resellerSharePercent, fwayaSharePercentReseller);
+
+    // Create pricing snapshot
+    const snapshot = await this.prisma.pricingSnapshot.create({
+      data: {
+        mediaId: media.id,
+        priceTierId: priceTier ? priceTier.id : undefined,
+        directPrice,
+        resellerDiscount,
+        protectedArtistPayout: protectedVals.protectedArtistPayout,
+        approvedResellerEarning: protectedVals.approvedResellerEarning,
+        vatRate,
+        paymentProvisionPercent,
+        // store direct-sale shares as the main artist/fwaya shares for readability
+        artistSharePercent: artistSharePercentDirect,
+        resellerSharePercent,
+        fwayaSharePercent: fwayaSharePercentDirect,
+        minFwayaMargin,
+      }
+    });
+
+    // Update media to reference accepted pricing snapshot and price tier
+    await this.prisma.media.update({ where: { id: media.id }, data: { priceTierId: priceTier ? priceTier.id : undefined, acceptedPricingSnapshotId: snapshot.id } });
+
+    return snapshot;
   }
 
   // Upload file using base64 encoding (proven to work, simpler than streaming)
@@ -52,6 +112,168 @@ export class MediaService {
         `Cloudinary upload failed: ${error instanceof Error ? error.message : String(error)}`
       );
     }
+  }
+
+  // New: upload cover image, run moderation and generate social-sized derivative
+  async uploadCoverAndModerate(file: Express.Multer.File, userId: number) {
+    // Basic validations
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.mimetype)) {
+      throw new BadRequestException('Unsupported image format');
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      throw new BadRequestException('Cover image too large (max 5MB)');
+    }
+
+    // Upload to Cloudinary with eager transformation for OG image
+    try {
+      const uploadRes = await cloudinary.uploader.upload(
+        `data:${file.mimetype};base64,${file.buffer.toString('base64')}`,
+        {
+          folder: 'fwaya-covers',
+          resource_type: 'image',
+          quality: 'auto',
+          eager: [
+            { width: 1200, height: 630, crop: 'fill', format: 'jpg', quality: 'auto' },
+            { width: 400, height: 400, crop: 'fill', format: 'webp', quality: 'auto' }
+          ],
+          moderation: 'aws_rek',
+          allowed_formats: ['jpg','jpeg','png','webp']
+        }
+      );
+
+      // Cloudinary returns moderation info in uploadRes.moderation
+      const moderation: any = uploadRes.moderation && (Array.isArray(uploadRes.moderation) ? uploadRes.moderation[0] : uploadRes.moderation);
+      // Auto-approve unless explicit rejection; system will only mark REJECTED when provider rejects
+      const isRejected = moderation && moderation.status === 'rejected';
+
+      // Extract OG-ready derivative from eager transforms (1200x630) if present
+      const eager = uploadRes.eager || [];
+      let ogEntry: any = null;
+      if (Array.isArray(eager) && eager.length > 0) {
+        ogEntry = eager.find((e: any) => (e.width >= 1200 && e.height >= 630) || (e.format && e.format === 'jpg')) || eager[0];
+      }
+
+      const coverData: any = {
+        userId,
+        url: uploadRes.secure_url,
+        publicId: uploadRes.public_id,
+        format: uploadRes.format,
+        width: uploadRes.width,
+        height: uploadRes.height,
+        moderationStatus: isRejected ? 'REJECTED' : 'APPROVED',
+        moderationResponse: JSON.stringify(uploadRes.moderation || {}),
+      };
+
+      if (ogEntry && ogEntry.secure_url) {
+        coverData.ogUrl = ogEntry.secure_url;
+        if (ogEntry.public_id) coverData.ogPublicId = ogEntry.public_id;
+      }
+
+      // Create DB entry for the cover asset (auto-publish unless explicitly rejected)
+      const cover = await this.prisma.cover.create({ data: coverData });
+
+      if (isRejected) {
+        this.logger.warn(`Cover image explicitly rejected by moderation for user ${userId}: ${uploadRes.public_id}`);
+      }
+
+      // Return available derivatives (use eager results if present)
+      const derivatives = eager.map((e: any) => ({ url: e.secure_url, width: e.width, height: e.height, format: e.format }));
+      return { cover, derivatives };
+    } catch (err) {
+      this.logger.error('Cover upload failed', err);
+      throw new InternalServerErrorException('Cover upload failed');
+    }
+  }
+
+  // Handle Cloudinary webhook payloads (moderation/processing updates)
+  async handleCloudinaryWebhook(payload: any) {
+    try {
+      // Try extract public_id from common payload shapes
+      const publicId = payload.public_id || payload.resource && payload.resource.public_id || payload.data && payload.data.public_id;
+      if (!publicId) {
+        this.logger.warn('Cloudinary webhook received without public_id');
+        return;
+      }
+
+      // moderation info may exist at payload.moderation or payload.resource.moderation
+      const moderation = payload.moderation || (payload.resource && payload.resource.moderation) || (payload.data && payload.data.moderation);
+      let status: string | null = null;
+      if (Array.isArray(moderation) && moderation.length > 0) {
+        status = moderation[0].status;
+      } else if (moderation && moderation.status) {
+        status = moderation.status;
+      }
+
+      const cover = await this.prisma.cover.findFirst({ where: { publicId } });
+      if (!cover) {
+        this.logger.warn(`Webhook: cover not found for publicId ${publicId}`);
+        return;
+      }
+
+      if (!status) {
+        this.logger.log(`Webhook: no moderation status for ${publicId}`);
+        return;
+      }
+
+      let newStatus: any = 'PENDING';
+      if (status === 'approved') newStatus = 'APPROVED';
+      else if (status === 'rejected') newStatus = 'REJECTED';
+      else newStatus = 'UNDER_REVIEW';
+
+      // If approved, attempt to fetch eager derivatives to ensure OG URL is stored
+      const updateData: any = { moderationStatus: newStatus, moderationResponse: JSON.stringify(moderation) };
+      if (newStatus === 'APPROVED') {
+        try {
+          const resource = await (cloudinary.api as any).resource(publicId, { resource_type: 'image' });
+          const eagerList = resource.eager || resource.derived || [];
+          if (Array.isArray(eagerList) && eagerList.length > 0) {
+            const ogEntry = eagerList.find((e: any) => (e.width >= 1200 && e.height >= 630) || (e.format && e.format === 'jpg')) || eagerList[0];
+            if (ogEntry && ogEntry.secure_url) {
+              updateData.ogUrl = ogEntry.secure_url;
+              if (ogEntry.public_id) updateData.ogPublicId = ogEntry.public_id;
+            }
+          }
+        } catch (e) {
+          this.logger.warn(`Failed to fetch resource for ${publicId} to populate OG derivative: ${e instanceof Error ? e.message : String(e)}`);
+        }
+      }
+
+      await this.prisma.cover.update({ where: { id: cover.id }, data: updateData });
+      this.logger.log(`Updated cover ${cover.id} moderation status -> ${newStatus}`);
+    } catch (err) {
+      this.logger.error('Failed to handle Cloudinary webhook', err);
+      throw err;
+    }
+  }
+
+  // Admin actions for covers
+  async listPendingCovers() {
+    return this.prisma.cover.findMany({ where: { moderationStatus: 'PENDING' }, orderBy: { createdAt: 'desc' } });
+  }
+
+  async approveCover(coverId: number, reviewerId: number) {
+    const cover = await this.prisma.cover.findUnique({ where: { id: coverId } });
+    if (!cover) throw new Error('Cover not found');
+    await this.prisma.cover.update({ where: { id: coverId }, data: { moderationStatus: 'APPROVED' } });
+    // Optionally link to user's profile as default cover
+    return { ok: true };
+  }
+
+  async rejectCover(coverId: number, reviewerId: number, reason: string) {
+    const cover = await this.prisma.cover.findUnique({ where: { id: coverId } });
+    if (!cover) throw new Error('Cover not found');
+    // Try delete from Cloudinary (best-effort)
+    try {
+      await cloudinary.uploader.destroy(cover.publicId, { resource_type: 'image' });
+    } catch (e) {
+      this.logger.warn('Failed to destroy cover on Cloudinary', e);
+    }
+    await this.prisma.cover.update({ where: { id: coverId }, data: { moderationStatus: 'REJECTED' } });
+    // Note: contentModeration.create expects a mediaId (media table) which doesn't apply to covers.
+    // For now, log the rejection for audit purposes and skip creating a contentModeration record.
+    this.logger.log(`Cover ${coverId} rejected by reviewer ${reviewerId}; reason: ${reason}`);
+    return { ok: true };
   }
 
   // Check video content for inappropriate material using Cloudinary's moderation API

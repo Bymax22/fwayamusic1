@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "../components/Sidebar";
 import MobileMenu from "../components/MobileMenu";
+import MobileFooter from "../components/MobileFooter";
 import Player from "../components/Player";
 import MobilePlayer from "../components/MobilePlayer";
 import PlaylistPickerModal from "../components/PlaylistPickerModal";
@@ -115,6 +116,11 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
       />
+
+      {/* =======================
+          📱 MOBILE FOOTER LINKS
+      ======================== */}
+      <MobileFooter />
 
       {/* =======================
           ▶️ PLAYER (BOTTOM - GLASS EFFECT)

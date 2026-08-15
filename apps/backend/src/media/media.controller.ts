@@ -17,6 +17,8 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './media.service';
+import { PricingService } from '../pricing/pricing.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { CurrentUser } from '../decorators/user.decorator';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
@@ -27,7 +29,59 @@ export class MediaController {
   private readonly logger = new Logger(MediaController.name);
   private readonly MAX_FILE_SIZE = 200 * 1024 * 1024;
 
-  constructor(private readonly mediaService: MediaService) {}
+  constructor(private readonly mediaService: MediaService, private readonly pricingService: PricingService, private readonly prisma: PrismaService) {}
+
+  // Pricing preview for UI: given a price tier or direct price, return calculated values per FWAYA guide
+  @Get('pricing/preview')
+  async pricingPreview(@Req() req: any) {
+    const q = req.query || {};
+    const priceTierId = q.priceTierId ? parseInt(q.priceTierId) : undefined;
+    const directPrice = q.directPrice ? parseFloat(q.directPrice) : undefined;
+
+    let tier: any = null;
+    if (priceTierId) tier = await this.prisma.priceTier.findUnique({ where: { id: priceTierId } });
+
+    const vatRate = await this.pricingService.getBusinessSettingFloat('VAT_RATE', 16);
+    const provisionPercent = await this.pricingService.getBusinessSettingFloat('PAYMENT_PROVISION_PERCENT', 5);
+    const artistSharePercentReseller = await this.pricingService.getBusinessSettingFloat('ARTIST_SHARE_PERCENT_RESELLER', 65);
+    const resellerSharePercent = await this.pricingService.getBusinessSettingFloat('RESELLER_SHARE_PERCENT', 20);
+    const fwayaSharePercentReseller = await this.pricingService.getBusinessSettingFloat('FWAYA_SHARE_PERCENT', 15);
+    const artistSharePercentDirect = await this.pricingService.getBusinessSettingFloat('ARTIST_SHARE_PERCENT_DIRECT', 75);
+    const fwayaSharePercentDirect = await this.pricingService.getBusinessSettingFloat('FWAYA_SHARE_PERCENT_DIRECT', 25);
+    const minFwayaMargin = await this.pricingService.getBusinessSettingFloat('MIN_FWAYA_MARGIN', 0);
+
+    const price = tier ? tier.directPrice : (directPrice ?? 0);
+    const resellerDiscount = tier ? (tier.resellerDiscount ?? 0) : 0;
+    const resellerPrice = Math.max(0, price - resellerDiscount);
+
+    const standard = this.pricingService.calculateShareableAmount(price, vatRate, provisionPercent);
+    const protectedVals = this.pricingService.calculateProtectedPayouts(price, vatRate, provisionPercent, artistSharePercentReseller, resellerSharePercent, fwayaSharePercentReseller);
+
+    // resale (discounted) values
+    const resellerCalc = this.pricingService.calculateShareableAmount(resellerPrice, vatRate, provisionPercent);
+    const resellerValidation = this.pricingService.validateResellerDiscount({ directPrice: price, resellerPrice, vatRate, provisionPercent, protectedArtistPayout: protectedVals.protectedArtistPayout, approvedResellerEarning: protectedVals.approvedResellerEarning, minFwayaMargin });
+
+    return {
+      priceTier: tier || null,
+      directPrice: parseFloat(price.toFixed(2)),
+      resellerDiscount: parseFloat(resellerDiscount.toFixed(2)),
+      resellerPrice: parseFloat(resellerPrice.toFixed(2)),
+      vatRate,
+      provisionPercent,
+      standardShareable: parseFloat(standard.shareable.toFixed(2)),
+      protectedArtistPayout: parseFloat(protectedVals.protectedArtistPayout.toFixed(2)),
+      approvedResellerEarning: parseFloat(protectedVals.approvedResellerEarning.toFixed(2)),
+      resellerActualShareable: parseFloat(resellerCalc.shareable.toFixed(2)),
+      resellerValidation,
+      shares: {
+        artistResellerPercent: artistSharePercentReseller,
+        resellerPercent: resellerSharePercent,
+        fwayaResellerPercent: fwayaSharePercentReseller,
+        artistDirectPercent: artistSharePercentDirect,
+        fwayaDirectPercent: fwayaSharePercentDirect,
+      }
+    };
+  }
 
   // Convert Prisma/BigInt values to JSON-safe values
   private sanitizeForJson(value: any): any {
@@ -101,6 +155,33 @@ export class MediaController {
       avatarUrl: uploadResult.secure_url,
       publicId: uploadResult.public_id
     };
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post('upload-cover')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadCover(
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @CurrentUser() user: any
+  ) {
+    if (!file) throw new BadRequestException('No file provided');
+    if (!user || !user.id) throw new BadRequestException('User authentication required');
+    const result = await this.mediaService.uploadCoverAndModerate(file, user.id);
+    return result;
+  }
+
+  // Cloudinary webhook to receive moderation/async notifications
+  @Post('cloudinary-webhook')
+  async cloudinaryWebhook(@Req() req: Request) {
+    // Cloudinary sends JSON body; pass it to service for handling
+    try {
+      const body = req.body as any;
+      await this.mediaService.handleCloudinaryWebhook(body);
+      return { ok: true };
+    } catch (err) {
+      this.logger.error('Cloudinary webhook handling failed', err instanceof Error ? err.message : String(err));
+      throw new InternalServerErrorException('Webhook processing failed');
+    }
   }
 
   // NEW: Save metadata only (file already uploaded to Cloudinary client-side)
@@ -200,5 +281,16 @@ export class MediaController {
     const userId = user.id;
     const updated = await this.mediaService.updateMedia(parseInt(id), userId, updates);
     return this.sanitizeForJson(updated);
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post(':id/accept-pricing')
+  async acceptPricing(@Param('id') id: string, @Body() body: { priceTierId?: number }, @CurrentUser() user: any) {
+    if (!user || !user.id) {
+      throw new BadRequestException('User authentication required');
+    }
+    const userId = user.id;
+    const snapshot = await this.mediaService.acceptPricingArrangement(parseInt(id), userId, body?.priceTierId);
+    return this.sanitizeForJson(snapshot);
   }
 }

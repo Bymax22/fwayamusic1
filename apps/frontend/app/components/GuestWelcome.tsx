@@ -38,6 +38,7 @@ export default function GuestWelcome() {
   const [heroImageIndex, setHeroImageIndex] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
 
   // Data state
   const [quickPicks, setQuickPicks] = useState<any[]>([]);
@@ -151,6 +152,14 @@ export default function GuestWelcome() {
         return '/';
     }
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const check = () => setIsMobileViewport(window.innerWidth <= 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const handleUserMenuNavigation = (path: string) => {
     setShowUserMenu(false);
@@ -818,7 +827,7 @@ export default function GuestWelcome() {
                     aria-label="Register or log in"
                     className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
                   >
-                    Register
+                    {isMobileViewport ? 'Sign In' : 'Register'}
                   </button>
                 )}
                 {user && (

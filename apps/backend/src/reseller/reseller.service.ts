@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateResellerLinkDto, ResellerStatsDto } from './dto/create-reseller-link.dto';
 
@@ -35,6 +35,21 @@ export class ResellerService {
       return existingLink;
     }
 
+    // Prevent arbitrary custom commission rates — reseller earnings are derived from configured pricing.
+    if (customCommissionRate !== undefined && customCommissionRate !== null) {
+      throw new BadRequestException('Custom commission rate is not allowed. Use configured pricing settings.');
+    }
+
+    // Determine default expiry from price tier attribution period if available
+    let finalExpiresAt = expiresAt ? new Date(expiresAt) : null;
+    if (!finalExpiresAt && media.priceTierId) {
+      const tier = await this.prisma.priceTier.findUnique({ where: { id: media.priceTierId } });
+      if (tier) {
+        const days = tier.attributionPeriodDays ?? 7;
+        finalExpiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+      }
+    }
+
     // Generate unique code
     const code = this.generateResellerCode();
 
@@ -43,8 +58,7 @@ export class ResellerService {
         code,
         resellerId,
         mediaId,
-        customCommissionRate,
-        expiresAt,
+        expiresAt: finalExpiresAt,
       },
     });
   }

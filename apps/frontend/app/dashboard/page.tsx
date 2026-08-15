@@ -99,6 +99,7 @@ interface MediaFile {
   interactions?: { liked: boolean; saved: boolean }[];
   accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
   price?: number;
+  acceptedPricingSnapshotId?: string | number | null;
   isExplicit: boolean;
   downloadCount: number;
   shareCount: number;
@@ -382,6 +383,26 @@ const UserDashboard: React.FC = () => {
       }
     } catch (error) {
       console.error('Download error:', error);
+    }
+  };
+
+  const viewPricingSnapshot = async (mediaId: number) => {
+    try {
+      const auth = getAuth();
+      let token = '';
+      if (auth.currentUser) token = await auth.currentUser.getIdToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${mediaId}/pricing-snapshot`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        alert('No pricing snapshot available');
+        return;
+      }
+      const data = await res.json();
+      alert('Pricing snapshot:\n' + JSON.stringify(data, null, 2));
+    } catch (err) {
+      console.error('Error fetching pricing snapshot', err);
+      alert('Failed to fetch pricing snapshot');
     }
   };
 
@@ -756,6 +777,24 @@ const UserDashboard: React.FC = () => {
                     <div className="flex justify-between items-center text-xs text-gray-400 mobile-text-xs">
                       <span>${(((media.views || 0) * 0.001) * (media.artistCommissionRate || 0.5)).toFixed(2)}</span>
                       <span>{formatDuration(media.duration)}</span>
+                    </div>
+
+                    {/* Pricing snapshot status */}
+                    <div className="mt-3 flex items-center justify-between text-xs text-gray-300">
+                      <div>
+                        {media['acceptedPricingSnapshotId'] ? (
+                          <span className="px-2 py-1 bg-green-600/20 rounded-lg">Pricing accepted</span>
+                        ) : (
+                          <span className="px-2 py-1 bg-yellow-600/20 rounded-lg">No accepted pricing</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {media['acceptedPricingSnapshotId'] ? (
+                          <button onClick={() => viewPricingSnapshot(media.id)} className="text-sm text-[#e51f48]">View snapshot</button>
+                        ) : (
+                          <button onClick={() => router.push(`/media/${media.id}/pricing`)} className="text-sm text-white/80 bg-white/5 px-2 py-1 rounded">Request pricing</button>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 ))}

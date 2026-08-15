@@ -12,6 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PrismaService } from '../prisma/prisma.service';
 import { AnalyticsService } from '../analytics/analytics.service';
+import { PricingService } from '../pricing/pricing.service';
 
 @ApiTags('Producer Dashboard')
 @Controller('api/v1/producer/dashboard')
@@ -19,6 +20,7 @@ export class ProducerDashboardController {
   constructor(
     private prisma: PrismaService,
     private analyticsService: AnalyticsService,
+    private pricingService: PricingService,
   ) {}
 
   // Producer overview
@@ -278,6 +280,83 @@ export class ProducerDashboardController {
     return {
       portfolioItems: tracks,
       totalProductions: tracks.length,
+    };
+  }
+
+  // Get per-track expected earnings (for producers)
+  @Get('tracks/:id/earnings')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async getTrackEarnings(@Request() req: any, @Param('id') id: string) {
+    const trackId = parseInt(id);
+    const media = await this.prisma.media.findUnique({ where: { id: trackId } });
+    if (!media) throw new Error('Track not found');
+
+    // Only confirmed producer collaborators or owner can view
+    const isOwner = media.userId === req.user.id;
+    const confirmedCollab = await this.prisma.producerCollaboration.findFirst({ where: { mediaId: trackId, producerId: req.user.id, isConfirmed: true } });
+    if (!isOwner && !confirmedCollab) throw new Error('Unauthorized');
+
+    const pricingSnapshot = media.acceptedPricingSnapshotId ? await this.prisma.pricingSnapshot.findUnique({ where: { id: media.acceptedPricingSnapshotId } }) : null;
+    const vatRate = await this.pricingService.getBusinessSettingFloat('VAT_RATE', 16);
+    const provisionPercent = await this.pricingService.getBusinessSettingFloat('PAYMENT_PROVISION_PERCENT', 5);
+    const unitPrice = pricingSnapshot?.directPrice ?? media.price ?? 0;
+
+    let unitSplits: any;
+    if (pricingSnapshot) {
+      unitSplits = this.pricingService.computeActualSplits(unitPrice, vatRate, provisionPercent, pricingSnapshot.protectedArtistPayout ?? 0, pricingSnapshot.approvedResellerEarning ?? 0);
+    } else {
+      const calc = this.pricingService.calculateShareableAmount(unitPrice, vatRate, provisionPercent);
+      const artistSharePercent = await this.pricingService.getBusinessSettingFloat('ARTIST_SHARE_PERCENT_DIRECT', 75);
+      const artist = parseFloat((calc.shareable * (artistSharePercent / 100)).toFixed(2));
+      const platform = parseFloat((calc.shareable - artist).toFixed(2));
+      unitSplits = { vat: calc.vat, provision: calc.provision, actualShareable: calc.shareable, artist, reseller: 0, platform };
+    }
+
+    const completed = await this.prisma.transaction.findMany({ where: { mediaId: trackId, status: 'COMPLETED' } });
+    let salesCount = completed.length;
+    let grossRevenue = 0;
+    let totalArtist = 0;
+    let totalPlatform = 0;
+    let totalReseller = 0;
+
+    for (const tx of completed) {
+      const amount = tx.amount || 0;
+      grossRevenue += amount;
+      const calc = (tx.metadata as any)?.calculatedAmounts ?? null;
+      if (calc) {
+        totalArtist += calc.artistAmount ?? 0;
+        totalPlatform += calc.platformAmount ?? 0;
+        totalReseller += calc.resellerAmount ?? 0;
+      } else {
+        const totalShareable = unitSplits.actualShareable ?? (unitSplits.artist + unitSplits.reseller + unitSplits.platform);
+        if (totalShareable > 0) {
+          const factor = amount / (unitPrice || 1);
+          totalArtist += (unitSplits.artist || 0) * factor;
+          totalPlatform += (unitSplits.platform || 0) * factor;
+          totalReseller += (unitSplits.reseller || 0) * factor;
+        }
+      }
+    }
+
+    return {
+      track: { id: media.id, title: media.title },
+      unitPrice,
+      unitSplits: {
+        artist: parseFloat((unitSplits.artist || 0).toFixed(2)),
+        platform: parseFloat((unitSplits.platform || 0).toFixed(2)),
+        reseller: parseFloat((unitSplits.reseller || 0).toFixed(2)),
+        vat: parseFloat((unitSplits.vat || 0).toFixed(2)),
+        provision: parseFloat((unitSplits.provision || 0).toFixed(2)),
+        shareable: parseFloat((unitSplits.actualShareable || 0).toFixed(2)),
+      },
+      totals: {
+        salesCount,
+        grossRevenue: parseFloat(grossRevenue.toFixed(2)),
+        totalArtist: parseFloat(totalArtist.toFixed(2)),
+        totalPlatform: parseFloat(totalPlatform.toFixed(2)),
+        totalReseller: parseFloat(totalReseller.toFixed(2)),
+      },
     };
   }
 
