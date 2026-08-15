@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Compass, Search, Library, MoreHorizontal } from "lucide-react";
+import { Compass, Search, Library, MoreHorizontal, LifeBuoy } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface BottomNavProps {
@@ -14,11 +14,13 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
+  const [needHelpOpen, setNeedHelpOpen] = useState(false);
 
   const navItems = [
     { id: "home", label: "Home", icon: null, image: "/fwaya-lp-01.png", inactiveImage: "/fwaya white icon-01.png", href: user ? "/guestwelcome" : "/" },
     { id: "browse", label: "Browse", icon: Compass, href: "/browse" },
-    { id: "search", label: "Search", icon: Search, href: "/search" },
+    // replaced search with Need Help modal
+    { id: "needhelp", label: "Need Help?", icon: LifeBuoy },
     { id: "library", label: "Library", icon: Library, href: "/library" },
     { id: "more", label: "More", icon: MoreHorizontal },
   ];
@@ -32,6 +34,11 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
   const handleClick = (item: typeof navItems[number]) => {
     if (item.id === "more" && onMoreClick) {
       onMoreClick();
+      return;
+    }
+
+    if (item.id === "needhelp") {
+      setNeedHelpOpen(true);
       return;
     }
 
@@ -77,6 +84,39 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
           );
         })}
       </div>
+
+      {needHelpOpen && (
+        <div className="fixed inset-0 z-60 flex items-end justify-center">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setNeedHelpOpen(false)} />
+          <div className="w-full max-w-md bg-[#07070b] rounded-t-3xl p-4 border-t border-white/6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-white">Need Help?</h3>
+              <button onClick={() => setNeedHelpOpen(false)} className="text-gray-400">Close</button>
+            </div>
+
+            <div className="mt-3">
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const fd = new FormData(e.currentTarget as HTMLFormElement);
+                const q = String(fd.get('q') || '').trim();
+                if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
+                setNeedHelpOpen(false);
+              }}>
+                <input name="q" placeholder="Search" className="w-full px-3 py-2 bg-white/5 rounded mb-3 text-sm text-white" />
+              </form>
+
+              <div className="space-y-2">
+                <button onClick={() => { setNeedHelpOpen(false); router.push('/support'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">Support</button>
+                <button onClick={() => { setNeedHelpOpen(false); router.push('/advertising'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Ads</button>
+                <button onClick={() => { setNeedHelpOpen(false); router.push('/partnership'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Partners</button>
+                <button onClick={() => { setNeedHelpOpen(false); router.push('/terms'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Terms & Conditions</button>
+                <button onClick={() => { setNeedHelpOpen(false); router.push('/privacy'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Privacy Policy</button>
+                <button onClick={() => { setNeedHelpOpen(false); router.push('/help/faq'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">FAQ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
