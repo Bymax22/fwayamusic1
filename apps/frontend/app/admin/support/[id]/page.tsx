@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-export default function TicketDetail({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function TicketDetail() {
+  const params = useParams();
+  const id = (params as any)?.id as string | undefined;
   const { getToken, user } = useAuth();
   const [ticket, setTicket] = useState<any>(null);
   const [loading, setLoading] = useState(true);
