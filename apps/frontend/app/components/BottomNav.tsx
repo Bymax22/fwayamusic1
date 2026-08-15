@@ -86,9 +86,9 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
       </div>
 
       {needHelpOpen && (
-        <div className="fixed inset-0 z-60 flex items-end justify-center">
+        <div className="fixed inset-0 z-[9999] flex items-end justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setNeedHelpOpen(false)} />
-          <div className="w-full max-w-md bg-[#07070b] rounded-t-3xl p-4 border-t border-white/6">
+          <div className="w-full max-w-md bg-[#07070b] rounded-t-3xl p-4 border-t border-white/6 pointer-events-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white">Need Help?</h3>
               <button onClick={() => setNeedHelpOpen(false)} className="text-gray-400">Close</button>

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "../components/Sidebar";
 import MobileMenu from "../components/MobileMenu";
-import MobileFooter from "../components/MobileFooter";
+// MobileFooter removed — using BottomNav + Need Help modal instead
 import Player from "../components/Player";
 import MobilePlayer from "../components/MobilePlayer";
 import PlaylistPickerModal from "../components/PlaylistPickerModal";
@@ -117,10 +117,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
         onClose={() => setMobileMenuOpen(false)}
       />
 
-      {/* =======================
-          📱 MOBILE FOOTER LINKS
-      ======================== */}
-      <MobileFooter />
+        {/* Mobile footer removed — replaced by BottomNav Need Help modal */}
 
       {/* =======================
           ▶️ PLAYER (BOTTOM - GLASS EFFECT)
