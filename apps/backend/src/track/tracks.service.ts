@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../db/prisma.service';
 import { ContentStatus, MediaAccessType, DeletionReason, UserRole } from '@prisma/client';
 
 @Injectable()

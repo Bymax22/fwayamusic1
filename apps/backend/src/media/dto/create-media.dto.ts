@@ -68,6 +68,11 @@ export class CreateMediaDto {
   artistCommissionRate?: number;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  priceTierId?: number;
+
+  @IsOptional()
   @IsString()
   tags?: string;
 }

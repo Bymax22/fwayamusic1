@@ -13,7 +13,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AccountDeletionService } from './account-deletion.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../db/prisma.service';
 
 @ApiTags('Account Settings')
 @Controller('api/v1/account')

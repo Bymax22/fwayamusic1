@@ -1,7 +1,7 @@
 
 import { Injectable, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { Currency } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../db/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
 import { CreateTransactionDto, ProcessPaymentDto, CurrencyConversionDto } from './dto/create-transaction.dto';
 import { CommissionService } from '../commission/commission.service';

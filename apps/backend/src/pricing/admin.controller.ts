@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, Put, Delete, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../db/prisma.service';
 import { PricingService } from './pricing.service';
 
 @Controller('admin/pricing')
@@ -9,7 +9,7 @@ export class AdminPricingController {
   // PriceTier CRUD
   @Get('price-tiers')
   async listPriceTiers() {
-    return this.prisma.priceTier.findMany({ orderBy: { createdAt: 'desc' } });
+    return this.prisma.priceTier.findMany({ orderBy: { createdAt: 'desc' }, include: { productType: true } });
   }
 
   @Get('price-tiers/:id')

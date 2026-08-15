@@ -42,6 +42,9 @@ export default function UploadPage() {
   });
   const [error, setError] = useState<string | null>(null);
   const [success] = useState(false);
+  const [priceTiers, setPriceTiers] = useState<any[]>([]);
+  const [selectedPriceTierId, setSelectedPriceTierId] = useState<number | null>(null);
+  const [pricingPreview, setPricingPreview] = useState<any | null>(null);
 
   const { toast } = useToast();
 
@@ -220,6 +223,8 @@ export default function UploadPage() {
             isPremium: metadata.isPremium,
             isExplicit: metadata.isExplicit,
             coverUrl: coverUrl,
+            priceTierId: selectedPriceTierId,
+            price: pricingPreview ? pricingPreview.directPrice : undefined,
             originalFilename: file.name,
             fileSize: file.size,
           }),
@@ -249,6 +254,54 @@ export default function UploadPage() {
       setUploading(false);
     }
   };
+
+  // Map our frontend media type to product type names used by admin price tiers
+  const productTypeNameForMediaType = (t: string) => {
+    switch (t) {
+      case 'VIDEO': return 'Music Video';
+      case 'PODCAST': return 'Single Song';
+      case 'LIVE_STREAM': return 'Single Song';
+      default: return 'Single Song';
+    }
+  };
+
+  // Fetch price tiers on mount
+  React.useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/v1/admin/pricing/price-tiers');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        setPriceTiers(data || []);
+      } catch (err) {
+        console.warn('Failed to load price tiers', err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  // When selected price tier changes, fetch pricing preview
+  React.useEffect(() => {
+    if (!selectedPriceTierId) {
+      setPricingPreview(null);
+      return;
+    }
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch(`/api/v1/media/pricing/preview?priceTierId=${selectedPriceTierId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        setPricingPreview(data);
+      } catch (err) {
+        console.warn('Failed to fetch pricing preview', err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [selectedPriceTierId]);
 
   if (success) {
     return (
@@ -543,6 +596,35 @@ export default function UploadPage() {
               </label>
             </div>
           </div>
+
+            {/* Pricing selection for premium content */}
+            {metadata.isPremium && (
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700">Choose Price Tier</label>
+                <select
+                  value={selectedPriceTierId ?? ''}
+                  onChange={(e) => setSelectedPriceTierId(e.target.value ? Number(e.target.value) : null)}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select a price</option>
+                  {priceTiers
+                    .filter((p) => p.active)
+                    .filter((p) => p.productType && p.productType.name === productTypeNameForMediaType(metadata.type))
+                    .map((tier) => (
+                      <option key={tier.id} value={tier.id}>{`${tier.name} — ${tier.directPrice.toFixed(2)}`}</option>
+                    ))}
+                </select>
+
+                {pricingPreview && (
+                  <div className="p-3 border rounded bg-gray-50">
+                    <p className="text-sm">Price: <strong>{pricingPreview.directPrice.toFixed(2)}</strong></p>
+                    <p className="text-sm">Shareable Amount: <strong>{pricingPreview.standardShareable?.toFixed(2)}</strong></p>
+                    <p className="text-sm">Protected Artist Payout: <strong>{pricingPreview.protectedArtistPayout?.toFixed(2)}</strong></p>
+                    <p className="text-sm">Reseller Price: <strong>{pricingPreview.resellerPrice?.toFixed(2)}</strong></p>
+                  </div>
+                )}
+              </div>
+            )}
         </div>
 
         {/* Upload Button */}

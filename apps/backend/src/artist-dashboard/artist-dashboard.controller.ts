@@ -13,7 +13,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { TracksService } from '../track/tracks.service';
 import { AlbumsService } from '../albums/albums.service';
 import { AnalyticsService } from '../analytics/analytics.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../db/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
 
 @ApiTags('Artist Dashboard')

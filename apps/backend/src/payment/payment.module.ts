@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { PaymentService } from './payment.service';
 import { PaymentController } from './payment.controller';
-import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaModule } from '../db/prisma.module';
 import { CommissionModule } from '../commission/commission.module';
 import { PricingModule } from '../pricing/pricing.module';
 

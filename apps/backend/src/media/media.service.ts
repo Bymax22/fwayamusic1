@@ -436,6 +436,9 @@ export class MediaService {
             : (uploadResult.secure_url.endsWith('.jpg') || uploadResult.secure_url.endsWith('.png'))
               ? uploadResult.secure_url
               : defaultCoverUrl,
+        // only set priceTierId when defined (Prisma types don't accept null for this field in 'data')
+        ...(createMediaDto.priceTierId ? { priceTier: { connect: { id: Number(createMediaDto.priceTierId) } } } : {}),
+        // Additional fields for pricing
       };
 
       const media = await this.prisma.media.create({
@@ -464,6 +467,40 @@ export class MediaService {
           },
         });
         this.logger.log(`Created moderation record for video ${media.id}`);
+      }
+
+      // If a priceTierId was provided, create a PricingSnapshot and attach it as the accepted snapshot
+      if (createMediaDto.priceTierId) {
+        const chosenPriceTier = await this.prisma.priceTier.findUnique({ where: { id: Number(createMediaDto.priceTierId) } });
+        if (chosenPriceTier) {
+          // Load business settings for snapshot
+          const vatRate = await this.pricingService.getBusinessSettingFloat('VAT_RATE', 16);
+          const paymentProvisionPercent = await this.pricingService.getBusinessSettingFloat('PAYMENT_PROVISION_PERCENT', 5);
+          const artistSharePercentDirect = await this.pricingService.getBusinessSettingFloat('ARTIST_SHARE_PERCENT_DIRECT', 75);
+          const resellerSharePercent = await this.pricingService.getBusinessSettingFloat('RESELLER_SHARE_PERCENT', 20);
+          const fwayaSharePercentDirect = await this.pricingService.getBusinessSettingFloat('FWAYA_SHARE_PERCENT_DIRECT', 25);
+          const minFwayaMargin = await this.pricingService.getBusinessSettingFloat('MIN_FWAYA_MARGIN', 0);
+
+          const protectedVals = this.pricingService.calculateProtectedPayouts(chosenPriceTier.directPrice, vatRate, paymentProvisionPercent, artistSharePercentDirect, resellerSharePercent, fwayaSharePercentDirect);
+
+          const snapshot = await this.prisma.pricingSnapshot.create({
+            data: {
+              mediaId: media.id,
+              priceTierId: chosenPriceTier.id,
+              directPrice: chosenPriceTier.directPrice,
+              resellerDiscount: chosenPriceTier.resellerDiscount ?? 0,
+              protectedArtistPayout: protectedVals.protectedArtistPayout,
+              approvedResellerEarning: protectedVals.approvedResellerEarning,
+              vatRate,
+              paymentProvisionPercent,
+              artistSharePercent: artistSharePercentDirect,
+              resellerSharePercent: resellerSharePercent,
+              fwayaSharePercent: fwayaSharePercentDirect,
+              minFwayaMargin,
+            }
+          });
+          await this.prisma.media.update({ where: { id: media.id }, data: { acceptedPricingSnapshotId: snapshot.id } });
+        }
       }
 
       try {
@@ -498,7 +535,7 @@ export class MediaService {
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number; priceTierId?: number }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
@@ -577,6 +614,7 @@ export class MediaService {
         artCoverUrl: metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
         thumbnailUrl: metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
         ...(albumId ? { album: { connect: { id: albumId } } } : {}),
+        ...(metadata.priceTierId ? { priceTier: { connect: { id: Number(metadata.priceTierId) } } } : {}),
       };
 
       const media = await this.prisma.media.create({
@@ -631,6 +669,15 @@ export class MediaService {
       }
 
       this.logger.log(`Media created from metadata: ${media.id}`);
+      // If a priceTierId was provided in metadata, create and attach a pricing snapshot
+      try {
+        if (metadata.price && metadata.priceTierId) {
+          await this.acceptPricingArrangement(media.id, userId, Number(metadata.priceTierId));
+        }
+      } catch (err) {
+        this.logger.warn('Failed to auto-accept pricing arrangement after metadata save', err);
+      }
+
       return media;
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
