@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Compass, Search, Library, MoreHorizontal, LifeBuoy } from "lucide-react";
+import { Compass, Search, Library, MoreHorizontal, LifeBuoy, Megaphone, Handshake, FileText, ShieldCheck, HelpCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface BottomNavProps {
@@ -86,9 +86,10 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
       </div>
 
       {needHelpOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/60 z-0" onClick={() => setNeedHelpOpen(false)} />
-          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md bg-[#07070b] rounded-t-3xl p-4 border-t border-white/6 pointer-events-auto z-10">
+        <div className="fixed left-0 right-0 bottom-0 z-[9999] flex items-end justify-center pointer-events-none">
+          {/* overlay stops above the bottom nav so nav remains visible */}
+          <div className="absolute left-0 right-0 top-0 z-0" style={{ bottom: '80px', backgroundColor: 'rgba(0,0,0,0.6)' }} onClick={() => setNeedHelpOpen(false)} />
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md bg-black rounded-t-3xl p-4 pointer-events-auto z-10" style={{ marginBottom: '72px' }}>
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white">Need Help?</h3>
               <button onClick={() => setNeedHelpOpen(false)} className="text-gray-400">Close</button>
@@ -106,12 +107,30 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
               </form>
 
               <div className="space-y-2">
-                <button onClick={(e) => { e.stopPropagation(); (router.push('/support') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">Support</button>
-                <button onClick={(e) => { e.stopPropagation(); (router.push('/advertising') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Ads</button>
-                <button onClick={(e) => { e.stopPropagation(); (router.push('/partnership') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Partners</button>
-                <button onClick={(e) => { e.stopPropagation(); (router.push('/terms') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Terms & Conditions</button>
-                <button onClick={(e) => { e.stopPropagation(); (router.push('/privacy') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">Privacy Policy</button>
-                <button onClick={(e) => { e.stopPropagation(); (router.push('/help/faq') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200">FAQ</button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/support') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
+                  <LifeBuoy className="w-4 h-4 text-purple-300" />
+                  Support
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/advertising') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
+                  <Megaphone className="w-4 h-4 text-yellow-400" />
+                  Ads
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/partnership') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
+                  <Handshake className="w-4 h-4 text-cyan-300" />
+                  Partners
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/terms') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-gray-300" />
+                  Terms & Conditions
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/privacy') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-green-300" />
+                  Privacy Policy
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); (router.push('/help/faq') as any).then(() => setNeedHelpOpen(false)); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-blue-300" />
+                  FAQ
+                </button>
               </div>
             </div>
           </div>
