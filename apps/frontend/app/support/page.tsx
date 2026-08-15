@@ -1,4 +1,3 @@
-import MobileFooter from "../components/MobileFooter";
 import Link from "next/link";
 
 export default function SupportPage() {
@@ -33,7 +32,7 @@ export default function SupportPage() {
         </section>
       </main>
 
-      <MobileFooter />
+      {/* MobileFooter removed — handled by Need Help modal */}
     </div>
   );
 }

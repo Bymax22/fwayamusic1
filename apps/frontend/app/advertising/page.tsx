@@ -1,4 +1,3 @@
-import MobileFooter from "../components/MobileFooter";
 import Link from "next/link";
 
 export default function AdvertisingPage() {
@@ -24,7 +23,7 @@ export default function AdvertisingPage() {
         </section>
       </main>
 
-      <MobileFooter />
+      {/* MobileFooter removed — handled by Need Help modal */}
     </div>
   );
 }
