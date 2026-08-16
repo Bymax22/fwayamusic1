@@ -179,6 +179,9 @@ export default function ForArtistsPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [isTrackLoading, setIsTrackLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [priceTiers, setPriceTiers] = useState<any[]>([]);
+  const [selectedPriceTierId, setSelectedPriceTierId] = useState<number | null>(null);
+  const [pricingPreview, setPricingPreview] = useState<any | null>(null);
   const [editingMedia, setEditingMedia] = useState<Media | null>(null);
   const [selectedVideoForPlayer, setSelectedVideoForPlayer] = useState<Media | null>(null);
   const [selectedMediaForAnalytics, setSelectedMediaForAnalytics] = useState<Media | null>(null);
@@ -196,6 +199,15 @@ export default function ForArtistsPage() {
     });
 
   const getBackendBaseUrl = () => process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+  // Map our frontend media type to product type names used by admin price tiers
+  const productTypeNameForMediaType = (t: string) => {
+    switch (t) {
+      case 'VIDEO': return 'Music Video';
+      case 'PODCAST': return 'Single Song';
+      case 'LIVE_STREAM': return 'Single Song';
+      default: return 'Single Song';
+    }
+  };
   const videoTagOptions = ['music', 'song', 'comedy', 'tutorial', 'dance', 'gaming', 'news', 'vlog', 'fashion', 'motivation', 'shorts'];
 
   const toggleVideoTag = (tag: string) => {
@@ -213,6 +225,44 @@ export default function ForArtistsPage() {
       };
     });
   };
+
+  // Fetch price tiers on mount
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/v1/admin/pricing/price-tiers');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        setPriceTiers(data || []);
+      } catch (err) {
+        console.warn('Failed to load price tiers', err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  // When selected price tier changes, fetch pricing preview
+  useEffect(() => {
+    if (!selectedPriceTierId) {
+      setPricingPreview(null);
+      return;
+    }
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch(`/api/v1/media/pricing/preview?priceTierId=${selectedPriceTierId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        setPricingPreview(data);
+      } catch (err) {
+        console.warn('Failed to fetch pricing preview', err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [selectedPriceTierId]);
 
   const uploadToCloudinary = async (file: File, resourceType: 'image' | 'video' | 'auto' = 'auto') => {
     const cloudinaryCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dayn5vifn';
@@ -446,13 +496,8 @@ export default function ForArtistsPage() {
       return;
     }
 
-    if (newMedia.accessType !== 'FREE' && !newMedia.price.trim()) {
-      alert('Please set a price for premium or pay-per-view content');
-      return;
-    }
-
-    if (newMedia.price && isNaN(Number(newMedia.price))) {
-      alert('Please enter a valid price');
+    if (newMedia.accessType !== 'FREE' && !selectedPriceTierId) {
+      alert('Please select a price tier for premium or pay-per-view content');
       return;
     }
 
@@ -517,7 +562,8 @@ export default function ForArtistsPage() {
           };
 
           if (newMedia.accessType !== 'FREE') {
-            metadataPayload.price = Number(newMedia.price.trim());
+            if (selectedPriceTierId) metadataPayload.priceTierId = Number(selectedPriceTierId);
+            if (pricingPreview) metadataPayload.price = pricingPreview.directPrice;
           }
           if (track.artCoverFile) {
             const trackCoverData = await uploadToCloudinary(track.artCoverFile, 'image');
@@ -599,7 +645,10 @@ export default function ForArtistsPage() {
       dbFormData.append('description', newMedia.lyrics.trim());
       dbFormData.append('isExplicit', 'false');
       dbFormData.append('allowReselling', 'true');
-      if (newMedia.accessType !== 'FREE') dbFormData.append('price', newMedia.price.trim());
+      if (newMedia.accessType !== 'FREE') {
+        if (selectedPriceTierId) dbFormData.append('priceTierId', String(selectedPriceTierId));
+        if (pricingPreview) dbFormData.append('price', String(pricingPreview.directPrice));
+      }
       if (newMedia.lyrics.trim()) dbFormData.append('lyrics', newMedia.lyrics.trim());
       if (newMedia.tags.trim()) {
         const tagsArray = newMedia.tags.split(',').map(tag => tag.trim().toLowerCase());
@@ -1902,14 +1951,29 @@ export default function ForArtistsPage() {
                         <option value="PAY_PER_VIEW">Pay Per View</option>
                       </select>
                       {newMedia.accessType !== 'FREE' && (
-                        <input
-                          type="text"
-                          className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                          placeholder="Set price in ZMW"
-                          value={newMedia.price}
-                          onChange={(e) => setNewMedia({ ...newMedia, price: e.target.value })}
-                          disabled={isUploading}
-                        />
+                        <>
+                          <select
+                            className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            value={selectedPriceTierId ?? ''}
+                            onChange={(e) => setSelectedPriceTierId(e.target.value ? Number(e.target.value) : null)}
+                            disabled={isUploading}
+                          >
+                            <option value="">Select a price tier</option>
+                            {priceTiers
+                              .filter((pt) => (pt.productType?.name || pt.productTypeName) === productTypeNameForMediaType(newMedia.type))
+                              .map((pt) => (
+                                <option key={pt.id} value={pt.id}>{pt.name} — ZMW {pt.directPrice.toFixed(2)}</option>
+                              ))}
+                          </select>
+                          {pricingPreview && (
+                            <div className="mt-2 text-xs text-gray-300">
+                              <div>Price: ZMW {pricingPreview.directPrice.toFixed(2)}</div>
+                              <div>Artist payout (protected): ZMW {pricingPreview.protectedArtistPayout.toFixed(2)}</div>
+                              <div>FWAYA share (direct): {pricingPreview.shares?.fwayaDirectPercent}%</div>
+                              <div>Reseller price: ZMW {pricingPreview.resellerPrice.toFixed(2)}</div>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
