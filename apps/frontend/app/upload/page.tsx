@@ -270,7 +270,7 @@ export default function UploadPage() {
     let mounted = true;
     (async () => {
       try {
-        const res = await fetch('/api/v1/admin/pricing/price-tiers');
+        const res = await fetch('/api/admin/pricing/price-tiers');
         if (!res.ok) return;
         const data = await res.json();
         if (!mounted) return;
