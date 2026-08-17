@@ -32,6 +32,7 @@ import { useAuth } from "@/context/AuthContext";
 import MobileMenu from "./MobileMenu";
 import { createMediaSlug } from "@/lib/utils";
 import { subscribe } from '@/lib/realtime';
+import VerifiedBadge from "./VerifiedBadge";
 
 export default function GuestWelcome() {
   const [activeTab, setActiveTab] = useState<string>("for-you");
@@ -1149,11 +1150,7 @@ export default function GuestWelcome() {
                     <div className="flex items-center justify-center gap-1">
                       <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
                       {artist.isVerified && (
-                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-white" title="Verified artist">
-                          <svg viewBox="0 0 20 20" fill="currentColor" className="h-2.5 w-2.5">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
-                          </svg>
-                        </span>
+                        <VerifiedBadge size="sm" title="Verified artist" />
                       )}
                     </div>
                     <p className="text-[10px] text-gray-400">{getArtistFollowers(artist)} followers</p>
@@ -1189,11 +1186,7 @@ export default function GuestWelcome() {
                     <div className="flex items-center justify-center gap-1">
                       <p className="text-xs font-semibold truncate mb-1">{getProducerDisplayName(producer)}</p>
                       {producer.isVerified && (
-                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-white" title="Verified producer">
-                          <svg viewBox="0 0 20 20" fill="currentColor" className="h-2.5 w-2.5">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
-                          </svg>
-                        </span>
+                        <VerifiedBadge size="sm" title="Verified producer" />
                       )}
                     </div>
 
@@ -1248,11 +1241,7 @@ export default function GuestWelcome() {
                       <div className="flex items-center gap-1">
                         <p className="text-[10px] text-gray-400 truncate">{beat.user?.displayName || beat.user?.username || 'Unknown Producer'}</p>
                         {beat.user?.isVerified && (
-                          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-white" title="Verified producer">
-                            <svg viewBox="0 0 20 20" fill="currentColor" className="h-2.5 w-2.5">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
-                            </svg>
-                          </span>
+                          <VerifiedBadge size="sm" title="Verified producer" />
                         )}
                       </div>
                     </div>
@@ -1748,11 +1737,7 @@ export default function GuestWelcome() {
                         <div className="flex items-center gap-1">
                           <p className="text-sm font-semibold text-white">{artist.name || artist.username || 'Unknown Artist'}</p>
                           {artist.isVerified && (
-                            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified artist">
-                              <svg viewBox="0 0 20 20" fill="currentColor" className="h-2.5 w-2.5">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
-                              </svg>
-                            </span>
+                            <VerifiedBadge size="md" title="Verified artist" />
                           )}
                         </div>
                         <p className="text-xs text-gray-400">Latest update from your favorite artists</p>

@@ -10,6 +10,7 @@ import VideoCard from "@/components/VideoCard";
 import ShareModal from '@/components/ShareModal';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
 import { createMediaSlug } from '@/lib/utils';
+import VerifiedBadge from '@/components/VerifiedBadge';
 
 interface VideoDetail {
   id: number;
@@ -472,11 +473,7 @@ export default function VideoWatchPage() {
                       <div className="flex items-center gap-2">
                         <p className="truncate text-sm font-semibold text-white">{video.channelName}</p>
                         {video.isVerified && (
-                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified user">
-                            <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
-                            </svg>
-                          </span>
+                          <VerifiedBadge size="md" title="Verified user" />
                         )}
                       </div>
                       <p className="text-xs text-slate-400">{(video.followerCount || 0).toLocaleString()} followers</p>

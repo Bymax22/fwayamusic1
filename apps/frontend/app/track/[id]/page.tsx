@@ -27,6 +27,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import ShareModal from '@/components/ShareModal';
 import { useAuth } from '@/context/AuthContext';
 import { createMediaSlug, extractMediaIdFromSlug, formatDuration } from '@/lib/utils';
+import VerifiedBadge from '@/components/VerifiedBadge';
 
 interface Comment {
   id: number;
@@ -687,7 +688,7 @@ export default function TrackPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2 mb-1">
                             <p className="font-semibold text-white text-sm truncate">{comment.userName}</p>
-                            {comment.isVerified && <FaCheckCircle className="text-purple-400" size={12} />}
+                            {comment.isVerified && <VerifiedBadge size="sm" title="Verified user" />}
                             <span className="text-xs text-gray-500">{new Date(comment.timestamp).toLocaleDateString()}</span>
                           </div>
                           <p className="text-gray-300 text-sm leading-relaxed mb-3">{comment.content}</p>

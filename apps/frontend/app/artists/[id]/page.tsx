@@ -26,6 +26,7 @@ import PlaylistPickerModal from '@/components/PlaylistPickerModal';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import { formatDuration } from '@/lib/utils';
+import VerifiedBadge from '@/components/VerifiedBadge';
 
 interface Artist {
   id: string;
@@ -289,11 +290,7 @@ export default function ArtistPage() {
               <h1 className="flex items-center gap-2 text-4xl md:text-5xl font-semibold tracking-tight">
                 <span>{artist.name}</span>
                 {artist.isVerified && (
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-lg shadow-purple-600/30" title="Verified artist">
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
-                    </svg>
-                  </span>
+                  <VerifiedBadge size="lg" title="Verified artist" />
                 )}
               </h1>
               <p className="max-w-2xl text-gray-400">
