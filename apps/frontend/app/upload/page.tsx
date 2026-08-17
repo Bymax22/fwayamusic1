@@ -271,12 +271,16 @@ export default function UploadPage() {
     (async () => {
       try {
         const res = await fetch('/api/admin/pricing/price-tiers');
-        if (!res.ok) return;
+        if (!res.ok) {
+          console.error('Failed to fetch price tiers:', res.status, res.statusText);
+          return;
+        }
         const data = await res.json();
         if (!mounted) return;
-        setPriceTiers(data || []);
+        console.log('Price tiers fetched:', data);
+        setPriceTiers(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.warn('Failed to load price tiers', err);
+        console.error('Failed to load price tiers:', err);
       }
     })();
     return () => { mounted = false; };
@@ -601,19 +605,38 @@ export default function UploadPage() {
             {metadata.isPremium && (
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-gray-700">Choose Price Tier</label>
-                <select
-                  value={selectedPriceTierId ?? ''}
-                  onChange={(e) => setSelectedPriceTierId(e.target.value ? Number(e.target.value) : null)}
-                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select a price</option>
-                  {priceTiers
-                    .filter((p) => p.active)
-                    .filter((p) => p.productType && p.productType.name === productTypeNameForMediaType(metadata.type))
-                    .map((tier) => (
-                      <option key={tier.id} value={tier.id}>{`${tier.name} — ${tier.directPrice.toFixed(2)}`}</option>
-                    ))}
-                </select>
+                {priceTiers.length === 0 ? (
+                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                    No price tiers available. Please check if they are configured in the admin panel.
+                  </div>
+                ) : (
+                  <>
+                    <select
+                      value={selectedPriceTierId ?? ''}
+                      onChange={(e) => setSelectedPriceTierId(e.target.value ? Number(e.target.value) : null)}
+                      className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select a price</option>
+                      {priceTiers
+                        .filter((p) => p.active)
+                        .filter((p) => {
+                          const tierProductType = p.productType?.name;
+                          const expectedType = productTypeNameForMediaType(metadata.type);
+                          console.log(`Comparing tier: ${tierProductType} with expected: ${expectedType}`);
+                          return tierProductType === expectedType;
+                        })
+                        .map((tier) => (
+                          <option key={tier.id} value={tier.id}>{`${tier.name} — ${tier.directPrice.toFixed(2)}`}</option>
+                        ))}
+                    </select>
+                    {priceTiers.filter((p) => p.active).length > 0 && 
+                     priceTiers.filter((p) => p.active).filter((p) => p.productType?.name === productTypeNameForMediaType(metadata.type)).length === 0 && (
+                      <div className="p-3 bg-orange-50 border border-orange-200 rounded text-sm text-orange-800">
+                        No price tiers available for {productTypeNameForMediaType(metadata.type)}. Contact admin to create one.
+                      </div>
+                    )}
+                  </>
+                )}
 
                 {pricingPreview && (
                   <div className="p-3 border rounded bg-gray-50">

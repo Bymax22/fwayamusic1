@@ -232,12 +232,16 @@ export default function ForArtistsPage() {
     (async () => {
       try {
         const res = await fetch('/api/admin/pricing/price-tiers');
-        if (!res.ok) return;
+        if (!res.ok) {
+          console.error('Failed to fetch price tiers:', res.status, res.statusText);
+          return;
+        }
         const data = await res.json();
         if (!mounted) return;
-        setPriceTiers(data || []);
+        console.log('Price tiers fetched:', data);
+        setPriceTiers(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.warn('Failed to load price tiers', err);
+        console.error('Failed to load price tiers:', err);
       }
     })();
     return () => { mounted = false; };
@@ -1952,26 +1956,45 @@ export default function ForArtistsPage() {
                       </select>
                       {newMedia.accessType !== 'FREE' && (
                         <>
-                          <select
-                            className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            value={selectedPriceTierId ?? ''}
-                            onChange={(e) => setSelectedPriceTierId(e.target.value ? Number(e.target.value) : null)}
-                            disabled={isUploading}
-                          >
-                            <option value="">Select a price tier</option>
-                            {priceTiers
-                              .filter((pt) => (pt.productType?.name || pt.productTypeName) === productTypeNameForMediaType(newMedia.type))
-                              .map((pt) => (
-                                <option key={pt.id} value={pt.id}>{pt.name} — ZMW {pt.directPrice.toFixed(2)}</option>
-                              ))}
-                          </select>
-                          {pricingPreview && (
-                            <div className="mt-2 text-xs text-gray-300">
-                              <div>Price: ZMW {pricingPreview.directPrice.toFixed(2)}</div>
-                              <div>Artist payout (protected): ZMW {pricingPreview.protectedArtistPayout.toFixed(2)}</div>
-                              <div>FWAYA share (direct): {pricingPreview.shares?.fwayaDirectPercent}%</div>
-                              <div>Reseller price: ZMW {pricingPreview.resellerPrice.toFixed(2)}</div>
+                          {priceTiers.length === 0 ? (
+                            <div className="p-3 bg-yellow-900 border border-yellow-700 rounded text-sm text-yellow-200">
+                              No price tiers available. Please check if they are configured in the admin panel.
                             </div>
+                          ) : (
+                            <>
+                              <select
+                                className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                value={selectedPriceTierId ?? ''}
+                                onChange={(e) => setSelectedPriceTierId(e.target.value ? Number(e.target.value) : null)}
+                                disabled={isUploading}
+                              >
+                                <option value="">Select a price tier</option>
+                                {priceTiers
+                                  .filter((pt) => {
+                                    const tierProductType = pt.productType?.name || pt.productTypeName;
+                                    const expectedType = productTypeNameForMediaType(newMedia.type);
+                                    console.log(`Comparing tier: ${tierProductType} with expected: ${expectedType}`);
+                                    return tierProductType === expectedType;
+                                  })
+                                  .map((pt) => (
+                                    <option key={pt.id} value={pt.id}>{pt.name} — ZMW {pt.directPrice.toFixed(2)}</option>
+                                  ))}
+                              </select>
+                              {priceTiers.filter((pt) => pt.productType?.name || pt.productTypeName).length > 0 && 
+                               priceTiers.filter((pt) => (pt.productType?.name || pt.productTypeName) === productTypeNameForMediaType(newMedia.type)).length === 0 && (
+                                <div className="p-3 bg-orange-900 border border-orange-700 rounded text-sm text-orange-200">
+                                  No price tiers available for {productTypeNameForMediaType(newMedia.type)}. Contact admin to create one.
+                                </div>
+                              )}
+                              {pricingPreview && (
+                                <div className="mt-2 text-xs text-gray-300">
+                                  <div>Price: ZMW {pricingPreview.directPrice.toFixed(2)}</div>
+                                  <div>Artist payout (protected): ZMW {pricingPreview.protectedArtistPayout.toFixed(2)}</div>
+                                  <div>FWAYA share (direct): {pricingPreview.shares?.fwayaDirectPercent}%</div>
+                                  <div>Reseller price: ZMW {pricingPreview.resellerPrice.toFixed(2)}</div>
+                                </div>
+                              )}
+                            </>
                           )}
                         </>
                       )}
