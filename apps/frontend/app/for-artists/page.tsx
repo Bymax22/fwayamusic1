@@ -239,6 +239,21 @@ export default function ForArtistsPage() {
         const data = await res.json();
         if (!mounted) return;
         console.log('Price tiers fetched:', data);
+        console.log('Price tiers raw response:', data);
+        console.log('Number of tiers:', Array.isArray(data) ? data.length : 0);
+        if (Array.isArray(data)) {
+          data.forEach((tier, i) => {
+            console.log(`Tier ${i}:`, {
+              id: tier.id,
+              name: tier.name,
+              active: tier.active,
+              productTypeId: tier.product_type_id || tier.productTypeId,
+              productTypeName: tier.productType?.name,
+              effectiveFrom: tier.effective_from || tier.effectiveFrom,
+              effectiveTo: tier.effective_to || tier.effectiveTo,
+            });
+          });
+        }
         setPriceTiers(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Failed to load price tiers:', err);

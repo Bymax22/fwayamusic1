@@ -125,6 +125,8 @@ export default function Browse() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'grid' | 'compact'>('compact');
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
+  const [selectedMediaType, setSelectedMediaType] = useState<'all' | 'AUDIO' | 'VIDEO'>('all');
+  const [pendingLikeIds, setPendingLikeIds] = useState<Record<number, boolean>>({});
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'popular' | 'newest' | 'trending' | 'recommended'>('popular');
   const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
@@ -320,6 +322,14 @@ export default function Browse() {
       );
     }
     
+    if (selectedMediaType !== 'all') {
+      results = results.filter(file => {
+        const type = file.type || 'AUDIO';
+        if (selectedMediaType === 'VIDEO') return type === 'VIDEO';
+        return ['AUDIO', 'PODCAST', 'LIVE_STREAM'].includes(type);
+      });
+    }
+
     if (selectedGenre !== 'all') {
       results = results.filter(file => file.genre === selectedGenre);
     }
@@ -346,7 +356,7 @@ export default function Browse() {
     
     setFilteredFiles(results);
     setVisibleCount(PAGE_SIZE); // reset visible count whenever filters/search change
-  }, [searchQuery, selectedGenre, mediaFiles, activeFilter]);
+  }, [searchQuery, selectedGenre, selectedMediaType, mediaFiles, activeFilter]);
 
   // displayed slice based on visibleCount
   const displayedFiles = filteredFiles.slice(0, visibleCount);
@@ -463,6 +473,33 @@ export default function Browse() {
   };
 
   const handleLike = async (id: number) => {
+    if (pendingLikeIds[id]) return;
+
+    const targetFile = mediaFiles.find(file => file.id === id);
+    if (!targetFile) return;
+
+    const previousLiked = Boolean((targetFile.interactions || []).some((interaction) => interaction.liked));
+    const previousLikes = targetFile.likes;
+    const nextLiked = !previousLiked;
+
+    setPendingLikeIds((prev) => ({ ...prev, [id]: true }));
+    setMediaFiles((prev) =>
+      prev.map((file) => {
+        if (file.id !== id) return file;
+
+        const existingInteractions = Array.isArray(file.interactions) ? file.interactions : [];
+        const nextInteractions = existingInteractions.some((interaction) => interaction.liked)
+          ? existingInteractions.map((interaction) => ({ ...interaction, liked: false }))
+          : [...existingInteractions, { liked: true, saved: false }];
+
+        return {
+          ...file,
+          likes: Math.max(0, file.likes + (nextLiked ? 1 : -1)),
+          interactions: nextInteractions,
+        };
+      }),
+    );
+
     try {
       const token = await getToken();
       if (!token) {
@@ -470,7 +507,7 @@ export default function Browse() {
         return;
       }
 
-      const response = await fetch(`/api/media/${id}/interact/like`, { 
+      const response = await fetch(`/api/media/${id}/interact/like`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -485,28 +522,59 @@ export default function Browse() {
         throw new Error(details);
       }
 
-      setMediaFiles(mediaFiles.map(file => 
-        file.id === id ? { 
-          ...file, 
-          likes: file.likes + 1,
-          interactions: [...(file.interactions || []), { liked: true, saved: false }]
-        } : file
-      ));
+      const data = await response.json().catch(() => null);
+      const updatedLikes = typeof data?.likes === 'number' ? data.likes : Math.max(0, previousLikes + (nextLiked ? 1 : -1));
+
+      setMediaFiles((prev) =>
+        prev.map((file) => {
+          if (file.id !== id) return file;
+          const liked = typeof data?.liked === 'boolean' ? Boolean(data.liked) : nextLiked;
+          const existingInteractions = Array.isArray(file.interactions) ? file.interactions : [];
+          const nextInteractions = existingInteractions.length > 0
+            ? existingInteractions.map((interaction) => ({ ...interaction, liked }))
+            : [{ liked, saved: false }];
+
+          return {
+            ...file,
+            likes: updatedLikes,
+            interactions: nextInteractions,
+          };
+        }),
+      );
 
       try {
         if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
           const bc = new BroadcastChannel('fwaya');
-          bc.postMessage({ type: 'media-liked', id });
+          bc.postMessage({ type: 'media-liked', mediaId: id, liked: nextLiked, likes: updatedLikes });
           bc.close();
         } else {
-          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', id, t: Date.now() }));
+          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', mediaId: id, liked: nextLiked, likes: updatedLikes, t: Date.now() }));
         }
       } catch (_) {}
     } catch (err) {
+      setMediaFiles((prev) =>
+        prev.map((file) => {
+          if (file.id !== id) return file;
+          const existingInteractions = Array.isArray(file.interactions) ? file.interactions : [];
+          return {
+            ...file,
+            likes: previousLikes,
+            interactions: existingInteractions.length > 0
+              ? existingInteractions.map((interaction) => ({ ...interaction, liked: previousLiked }))
+              : [{ liked: previousLiked, saved: false }],
+          };
+        }),
+      );
       console.error('Like error:', err);
       setError({
         message: 'Failed to like media',
         details: err instanceof Error ? err.message : String(err)
+      });
+    } finally {
+      setPendingLikeIds((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
       });
     }
   };
@@ -901,7 +969,7 @@ export default function Browse() {
                   </button>
 
                   <div className="flex flex-wrap gap-2 items-center justify-start sm:justify-end">
-                    <div className="flex flex-wrap gap-2 items-center bg-[#080a13]/50 rounded-full px-2 py-1">
+                    <div className="hidden md:flex flex-wrap gap-2 items-center bg-[#080a13]/50 rounded-full px-2 py-1">
                       {getGenres().map(genre => (
                         <button
                           key={genre ?? "Other"}
@@ -915,6 +983,40 @@ export default function Browse() {
                           {(genre ?? "Other").charAt(0).toUpperCase() + (genre ?? "Other").slice(1)}
                         </button>
                       ))}
+                    </div>
+
+                    <div className="flex gap-2 md:hidden w-full">
+                      <div className="flex flex-1 rounded-full bg-[#080a13]/60 p-1">
+                        {(['all', 'AUDIO', 'VIDEO'] as const).map((type) => {
+                          const label = type === 'all' ? 'All' : type === 'AUDIO' ? 'Audios' : 'Videos';
+                          const active = selectedMediaType === type;
+                          return (
+                            <button
+                              key={type}
+                              onClick={() => setSelectedMediaType(type)}
+                              className={`flex-1 rounded-full px-3 py-2 text-xs font-medium transition-colors ${
+                                active ? 'bg-purple-600 text-white' : 'text-gray-300'
+                              }`}
+                            >
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex-1">
+                        <select
+                          value={selectedGenre}
+                          onChange={(e) => setSelectedGenre(e.target.value)}
+                          className="w-full appearance-none rounded-full border border-white/10 bg-[#080a13]/60 px-3 py-2 text-xs text-white outline-none"
+                        >
+                          {getGenres().map((genre) => (
+                            <option key={genre ?? 'Other'} value={genre ?? 'Other'}>
+                              {(genre ?? 'Other').charAt(0).toUpperCase() + (genre ?? 'Other').slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>

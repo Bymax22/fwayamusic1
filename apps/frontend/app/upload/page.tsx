@@ -277,7 +277,21 @@ export default function UploadPage() {
         }
         const data = await res.json();
         if (!mounted) return;
-        console.log('Price tiers fetched:', data);
+        console.log('Price tiers raw response:', data);
+        console.log('Number of tiers:', Array.isArray(data) ? data.length : 0);
+        if (Array.isArray(data)) {
+          data.forEach((tier, i) => {
+            console.log(`Tier ${i}:`, {
+              id: tier.id,
+              name: tier.name,
+              active: tier.active,
+              productTypeId: tier.product_type_id || tier.productTypeId,
+              productTypeName: tier.productType?.name,
+              effectiveFrom: tier.effective_from || tier.effectiveFrom,
+              effectiveTo: tier.effective_to || tier.effectiveTo,
+            });
+          });
+        }
         setPriceTiers(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Failed to load price tiers:', err);
@@ -618,12 +632,16 @@ export default function UploadPage() {
                     >
                       <option value="">Select a price</option>
                       {priceTiers
-                        .filter((p) => p.active)
+                        .filter((p) => {
+                          console.log(`Checking tier ${p.id} active status:`, p.active);
+                          return p.active;
+                        })
                         .filter((p) => {
                           const tierProductType = p.productType?.name;
                           const expectedType = productTypeNameForMediaType(metadata.type);
-                          console.log(`Comparing tier: ${tierProductType} with expected: ${expectedType}`);
-                          return tierProductType === expectedType;
+                          const matches = tierProductType === expectedType;
+                          console.log(`Tier ${p.id} product type: "${tierProductType}" vs expected "${expectedType}" = ${matches}`);
+                          return matches;
                         })
                         .map((tier) => (
                           <option key={tier.id} value={tier.id}>{`${tier.name} — ${tier.directPrice.toFixed(2)}`}</option>

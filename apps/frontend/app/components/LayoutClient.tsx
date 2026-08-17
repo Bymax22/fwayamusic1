@@ -16,6 +16,7 @@ import VideoMiniPlayer from "../components/VideoMiniPlayer";
 import { useAuth } from "../context/AuthContext";
 import AuthErrorBanner from "../components/AuthErrorBanner";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
+import { isVideoTrack } from "@/lib/utils";
 import { ServiceWorkerProvider } from "../components/ServiceWorkerProvider";
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
@@ -28,9 +29,9 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   const [playlistPickerOpen, setPlaylistPickerOpen] = useState(false);
   const [pickerMediaId, setPickerMediaId] = useState<number | null>(null);
 
-  const isVideoWatchPage = currentTrack?.type === 'VIDEO'
+  const isVideoWatchPage = currentTrack ? (isVideoTrack(currentTrack)
     && pathname?.startsWith('/videos/')
-    && String(currentTrack.id) === pathname.split('/videos/')[1];
+    && String(currentTrack.id) === pathname.split('/videos/')[1]) : false;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -125,7 +126,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
       {currentTrack && (
         <div className="fixed bottom-0 left-0 right-0 z-30">
           {/* Mobile Player - audio only on small screens */}
-          {!isVideoWatchPage && currentTrack?.type !== 'VIDEO' && (
+          {!isVideoWatchPage && currentTrack && !isVideoTrack(currentTrack) && (
             <div className="lg:hidden">
               <MobilePlayer
                 track={currentTrack}

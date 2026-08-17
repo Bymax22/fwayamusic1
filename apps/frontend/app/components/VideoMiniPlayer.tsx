@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Play, Pause, X, Maximize2 } from "lucide-react";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { isVideoTrack } from "@/lib/utils";
 
 export default function VideoMiniPlayer() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function VideoMiniPlayer() {
     const wasWatchPage = previousPathRef.current?.startsWith("/videos/");
     const isWatchPage = pathname?.startsWith("/videos/");
 
-    if (wasWatchPage && !isWatchPage && currentTrack?.type === "VIDEO" && isPlaying) {
+    if (wasWatchPage && !isWatchPage && isVideoTrack(currentTrack) && isPlaying) {
       setIsVisible(true);
     }
 

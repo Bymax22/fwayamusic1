@@ -9,7 +9,47 @@ export class AdminPricingController {
   // PriceTier CRUD
   @Get('price-tiers')
   async listPriceTiers() {
-    return this.prisma.priceTier.findMany({ orderBy: { createdAt: 'desc' }, include: { productType: true } });
+    const now = new Date();
+    const tiers = await this.prisma.priceTier.findMany({ 
+      orderBy: { createdAt: 'desc' }, 
+      include: { productType: true } 
+    });
+    
+    // Filter out expired tiers for upload selection
+    return tiers.filter(tier => {
+      // If effectiveFrom is set and it's in the future, exclude it
+      if (tier.effectiveFrom && tier.effectiveFrom > now) {
+        return false;
+      }
+      // If effectiveTo is set and it's in the past, exclude it (expired)
+      if (tier.effectiveTo && tier.effectiveTo < now) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  @Get('price-tiers/available')
+  async listAvailablePriceTiers() {
+    const now = new Date();
+    const tiers = await this.prisma.priceTier.findMany({ 
+      where: { active: true },
+      orderBy: { createdAt: 'desc' }, 
+      include: { productType: true } 
+    });
+    
+    // Filter to only currently valid tiers
+    return tiers.filter(tier => {
+      // If effectiveFrom is set and it's in the future, exclude it
+      if (tier.effectiveFrom && tier.effectiveFrom > now) {
+        return false;
+      }
+      // If effectiveTo is set and it's in the past, exclude it (expired)
+      if (tier.effectiveTo && tier.effectiveTo < now) {
+        return false;
+      }
+      return true;
+    });
   }
 
   @Get('price-tiers/:id')

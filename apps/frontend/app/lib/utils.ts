@@ -10,6 +10,88 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Media Type Detection Utilities - STRICT file format detection
+const AUDIO_EXTENSIONS = /\.(mp3|wav|aac|flac|ogg|wma|m4a|alac)(\?.*)?$/i;
+const VIDEO_EXTENSIONS = /\.(mp4|webm|mkv|mov|avi|flv|m4v|mts|m2ts|3gp|3g2|mpeg|mpg|ogv)(\?.*)?$/i;
+
+/**
+ * Strictly detects if a URL points to an audio file based on file extension.
+ * Only uses URL extension, ignores metadata.
+ * @param url URL or filename to check
+ * @returns true if it's an audio file extension
+ */
+export function isAudioUrl(url?: string | null): boolean {
+  if (!url || typeof url !== 'string') return false;
+  return AUDIO_EXTENSIONS.test(url);
+}
+
+/**
+ * Strictly detects if a URL points to a video file based on file extension.
+ * Only uses URL extension, ignores metadata.
+ * @param url URL or filename to check
+ * @returns true if it's a video file extension
+ */
+export function isVideoUrl(url?: string | null): boolean {
+  if (!url || typeof url !== 'string') return false;
+  return VIDEO_EXTENSIONS.test(url);
+}
+
+/**
+ * Determines if a track should be played as video based on actual file format.
+ * Checks playable URL in order: videoUrl → audioUrl → url
+ * Returns true ONLY if the actual file URL is a video file.
+ * @param track Track object with optional videoUrl, audioUrl, url properties
+ * @returns true if the track is a video file
+ */
+export function isVideoTrack(track?: { videoUrl?: string; audioUrl?: string; url?: string; type?: string } | null): boolean {
+  if (!track) return false;
+
+  // Check videoUrl first (if explicitly set, it should be video)
+  if (track.videoUrl && isVideoUrl(track.videoUrl)) {
+    return true;
+  }
+
+  // Check audioUrl (if it's actually a video extension, play as video)
+  if (track.audioUrl && isVideoUrl(track.audioUrl)) {
+    return true;
+  }
+
+  // Check generic url field
+  if (track.url && isVideoUrl(track.url)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Determines if a track should be played as audio based on actual file format.
+ * Checks playable URL in order: videoUrl → audioUrl → url
+ * Returns true ONLY if the actual file URL is an audio file.
+ * @param track Track object with optional videoUrl, audioUrl, url properties
+ * @returns true if the track is an audio file
+ */
+export function isAudioTrack(track?: { videoUrl?: string; audioUrl?: string; url?: string; type?: string } | null): boolean {
+  if (!track) return false;
+
+  // Check videoUrl (shouldn't be audio)
+  if (track.videoUrl && isAudioUrl(track.videoUrl)) {
+    return true;
+  }
+
+  // Check audioUrl first (primary audio field)
+  if (track.audioUrl && isAudioUrl(track.audioUrl)) {
+    return true;
+  }
+
+  // Check generic url field
+  if (track.url && isAudioUrl(track.url)) {
+    return true;
+  }
+
+  return false;
+}
+
 // Time/Date Utilities
 /**
  * Formats duration in seconds to MM:SS format
@@ -30,20 +112,26 @@ export function formatDuration(seconds: number): string {
  * @param options Intl.DateTimeFormat options
  * @returns Formatted date string (e.g. "May 15, 2023")
  */
+export function safeDate(value?: string | Date | number | null): Date | null {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 export function formatDate(
-  dateString: string, 
-  options: Intl.DateTimeFormatOptions = { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  dateString?: string | Date | number | null,
+  options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
   }
 ): string {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', options);
-  } catch {
-    return 'Invalid Date';
-  }
+  const date = safeDate(dateString);
+  if (!date) return 'Unknown date';
+  return date.toLocaleDateString('en-US', options);
 }
 
 /**

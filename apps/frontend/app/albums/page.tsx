@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { createMediaSlug } from '@/lib/utils';
+import { createMediaSlug, formatDate } from '@/lib/utils';
 import { FaHeadphones, FaRegHeart } from 'react-icons/fa';
 
 interface AlbumItem {
@@ -13,6 +13,7 @@ interface AlbumItem {
   artist: string;
   coverArt: string;
   releaseDate?: string;
+  createdAt?: string;
   trackCount: number;
   playCount: number;
   likeCount: number;
@@ -25,6 +26,7 @@ function normalizeAlbum(item: any): AlbumItem {
     artist: item.user?.displayName || item.user?.username || item.artist || 'Unknown Artist',
     coverArt: item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/default-cover.jpg',
     releaseDate: item.releaseDate || item.createdAt || item.publishedAt || item.created_at || '',
+    createdAt: item.createdAt || item.created_at || item.publishedAt || '',
     trackCount: typeof item.mediasCount === 'number'
       ? item.mediasCount
       : typeof item.trackCount === 'number'
@@ -168,7 +170,7 @@ export default function AlbumsPage() {
                       <p className="text-xs text-slate-400 truncate mb-3">{album.artist}</p>
                       <div className="flex items-center justify-between text-xs text-slate-400">
                         <span>{album.trackCount} tracks</span>
-                        <span>{album.releaseDate ? new Date(album.releaseDate).toLocaleDateString() : 'Unknown date'}</span>
+                        <span>{formatDate(album.releaseDate || album.createdAt || '')}</span>
                       </div>
                     </div>
                   </Link>

@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlayIcon,
@@ -18,6 +18,7 @@ import {
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { useAuth } from '@/context/AuthContext';
 import { subscribe } from '@/lib/realtime';
+import { isVideoUrl, isAudioUrl } from '@/lib/utils';
 
 type TrackType = {
   id: string | number;
@@ -160,7 +161,7 @@ export default function MobilePlayer({
   }, [track?.id, track?.liked, track?.likes]);
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
-  const isVideo = track.type === 'VIDEO' || Boolean((track.videoUrl || track.url || track.audioUrl)?.match(/\.(mp4|mov|m4v|webm|avi|mkv)(\?.*)?$/i));
+  const isVideo = isVideoUrl(track.videoUrl || track.url || track.audioUrl);
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!progressBarRef.current || !onSeek) return;
@@ -241,125 +242,130 @@ export default function MobilePlayer({
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Spectrum Visualizer Component - Music Visualizer Style
-  const SpectrumVisualizer = ({ isPlaying = false, progress = 0, className = "" }) => {
-    // Create frequency bars with different heights for spectrum effect
-    const bars = Array.from({ length: 60 }, (_, i) => {
-      // Create frequency-like distribution (more bars in middle frequencies)
-      const frequency = i / 60;
-      const baseHeight = Math.sin(frequency * Math.PI * 2) * 12 + Math.random() * 8 + 4;
-      const isActive = i < progress * 60;
-      const isNearActive = i < (progress * 60) + 3;
+  // Spectrum Visualizer Component - Stable Music Visualizer
+  const SpectrumVisualizer = useMemo(() => {
+    return ({ isPlaying = false, progress = 0, className = "" }: { isPlaying: boolean; progress: number; className: string }) => {
+      // Create stable frequency bars that don't change on re-render
+      const bars = useMemo(() => {
+        return Array.from({ length: 60 }, (_, i) => {
+          const frequency = i / 60;
+          // Stable height based on frequency pattern (no randomness)
+          const baseHeight = Math.abs(Math.sin(frequency * Math.PI * 3)) * 16 + 6;
+          
+          return {
+            id: i,
+            baseHeight,
+            frequency,
+            colorIndex: Math.floor(frequency * 3),
+          };
+        });
+      }, []);
 
-      // Create spectrum-like height variations
-      const spectrumHeight = Math.abs(Math.sin(frequency * Math.PI * 4)) * 20 + Math.random() * 6 + 2;
-
-      return {
-        height: isPlaying ? spectrumHeight : baseHeight,
-        isActive,
-        isNearActive,
-        delay: i * 0.005,
-        frequency: frequency,
-        // Create different colors for different frequency ranges
-        colorIndex: Math.floor(frequency * 3) // 0, 1, 2 for different color bands
-      };
-    });
-
-    const getBarColor = (bar: any) => {
-      if (bar.isActive) {
-        // Active bars: purple to pink gradient based on frequency
+      const getBarColor = (colorIndex: number) => {
         const colors = [
-          "from-purple-500 to-purple-300", // Low frequencies
-          "from-purple-400 to-pink-400",   // Mid frequencies
-          "from-pink-400 to-pink-300"      // High frequencies
+          "from-purple-500 to-purple-300",
+          "from-purple-400 to-pink-400",
+          "from-pink-400 to-pink-300"
         ];
-        return colors[bar.colorIndex] || colors[0];
-      } else if (bar.isNearActive && isPlaying) {
-        return "from-purple-600/70 to-pink-500/70";
-      } else if (isPlaying) {
-        return "from-purple-500/40 to-pink-400/40";
-      }
-      return "from-purple-400/20 to-pink-300/20";
-    };
+        return colors[colorIndex] || colors[0];
+      };
 
-    return (
-      <div className={`absolute inset-0 flex items-center justify-center pointer-events-none ${className}`}>
-        <div className="flex items-end gap-0.5 justify-center opacity-80">
-          {bars.map((bar, i) => (
+      return (
+        <div className={`absolute inset-0 flex items-center justify-center pointer-events-none ${className}`}>
+          <div className="flex items-end gap-0.5 justify-center opacity-80">
+            {bars.map((bar) => {
+              const progressIndex = progress * 60;
+              const distanceFromProgress = Math.abs(bar.id - progressIndex);
+              const isActive = distanceFromProgress < 2;
+              const isNearActive = distanceFromProgress < 5;
+
+              const heightMultiplier = isActive ? 1.4 : isNearActive ? 1.1 : 0.7;
+              const targetHeight = bar.baseHeight * heightMultiplier;
+
+              return (
+                <motion.div
+                  key={bar.id}
+                  className={`rounded-t-sm bg-gradient-to-t ${getBarColor(bar.colorIndex)}`}
+                  style={{
+                    width: '2px',
+                    minHeight: '2px',
+                    boxShadow: isActive ? `0 0 8px rgba(147, 51, 234, 0.8), 0 0 16px rgba(236, 72, 153, 0.6)` : 'none',
+                  }}
+                  animate={{
+                    height: isPlaying ? targetHeight : bar.baseHeight * 0.4,
+                  }}
+                  transition={{
+                    duration: 0.2,
+                    ease: "easeOut",
+                  }}
+                />
+              );
+            })}
+          </div>
+
+          {/* Progress indicator line */}
+          {isPlaying && (
             <motion.div
-              key={i}
-              className={`rounded-t-sm transition-all duration-200 bg-gradient-to-t ${getBarColor(bar)}`}
-              style={{
-                width: '2px',
-                minHeight: '2px',
-                boxShadow: bar.isActive ? `0 0 8px rgba(147, 51, 234, 0.8), 0 0 16px rgba(236, 72, 153, 0.6)` : 'none',
-              }}
-              animate={isPlaying ? {
-                height: [
-                  bar.height * 0.3,
-                  bar.height * (bar.isActive ? 1.8 : 1.4),
-                  bar.height * (bar.isActive ? 1.2 : 0.8),
-                  bar.height * (bar.isActive ? 1.6 : 1.1),
-                  bar.height
-                ],
-                scaleY: bar.isActive ? [0.8, 1.3, 0.9, 1.1, 1] : [0.9, 1.1, 0.95, 1.05, 1],
-              } : {
-                height: bar.height * 0.5,
-                scaleY: 1
+              className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500"
+              style={{ width: `${progress * 100}%` }}
+              animate={{
+                boxShadow: [
+                  "0 0 4px rgba(147, 51, 234, 0.6)",
+                  "0 0 8px rgba(236, 72, 153, 0.8)",
+                  "0 0 4px rgba(147, 51, 234, 0.6)"
+                ]
               }}
               transition={{
-                duration: bar.isActive ? 0.4 : 0.6,
-                delay: bar.delay,
-                repeat: isPlaying ? Infinity : 0,
-                ease: "easeInOut",
-                repeatType: "reverse"
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
               }}
             />
-          ))}
+          )}
         </div>
+      );
+    };
+  }, []);
 
-        {/* Progress indicator line */}
-        {isPlaying && (
-          <motion.div
-            className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500"
-            style={{ width: `${progress * 100}%` }}
-            animate={{
-              boxShadow: [
-                "0 0 4px rgba(147, 51, 234, 0.6)",
-                "0 0 8px rgba(236, 72, 153, 0.8)",
-                "0 0 4px rgba(147, 51, 234, 0.6)"
-              ]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        )}
-      </div>
-    );
-  };
-
-  // Scrolling Title Component
+  // Scrolling Title Component - Auto-scroll for long titles
   const ScrollingTitle = ({ title, isPlaying }: { title: string; isPlaying: boolean }) => {
-    const shouldScroll = title.length > 20 && isPlaying;
+    const titleRef = useRef<HTMLSpanElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [shouldScroll, setShouldScroll] = useState(false);
+    const [scrollDistance, setScrollDistance] = useState(0);
+
+    useEffect(() => {
+      if (!titleRef.current || !containerRef.current) return;
+
+      const textWidth = titleRef.current.offsetWidth;
+      const containerWidth = containerRef.current.offsetWidth;
+      
+      if (textWidth > containerWidth) {
+        setShouldScroll(true);
+        // Add padding for smooth loop
+        setScrollDistance(-(textWidth + 20));
+      } else {
+        setShouldScroll(false);
+      }
+    }, [title]);
 
     return (
-      <div className="overflow-hidden relative">
+      <div ref={containerRef} className="overflow-hidden w-full">
         <motion.div
-          className="whitespace-nowrap"
-          animate={shouldScroll ? {
-            x: [0, -100, 0],
-          } : {}}
-          transition={{
-            duration: 8,
-            repeat: shouldScroll ? Infinity : 0,
-            ease: "linear",
-            repeatType: "loop"
+          animate={shouldScroll && isPlaying ? {
+            x: [0, scrollDistance, scrollDistance],
+          } : {
+            x: 0,
           }}
+          transition={{
+            duration: shouldScroll ? (Math.abs(scrollDistance) / 100 + 3) : 0,
+            repeat: shouldScroll && isPlaying ? Infinity : 0,
+            repeatDelay: 1,
+            ease: "linear",
+          }}
+          className="whitespace-nowrap"
         >
-          <span className="text-white font-semibold text-sm">
+          <span ref={titleRef} className="text-white font-semibold text-sm pr-8">
             {title}
           </span>
         </motion.div>

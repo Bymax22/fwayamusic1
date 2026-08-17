@@ -34,12 +34,17 @@ function normalizeMedia(item: any): MediaFile {
 }
 
 function getReleaseTimestamp(media: MediaFile) {
-  return new Date(media.releaseDate || media.createdAt || 0).getTime();
+  const date = media.releaseDate || media.createdAt || '';
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
 }
 
 function getReleaseBadge(releaseDate: string) {
   const now = new Date();
   const release = new Date(releaseDate);
+  if (Number.isNaN(release.getTime())) {
+    return { text: 'Recently Added', color: 'bg-purple-600' };
+  }
   const diffTime = Math.abs(now.getTime() - release.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 

@@ -83,6 +83,7 @@ export default function TrackPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
+  const [likeLoading, setLikeLoading] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const { getToken } = useAuth();
@@ -205,7 +206,7 @@ export default function TrackPage() {
   };
 
   const handleLike = async () => {
-    if (!track) return;
+    if (!track || likeLoading) return;
 
     const token = await getToken();
     if (!token) {
@@ -213,13 +214,17 @@ export default function TrackPage() {
       return;
     }
 
-    const nextLikedState = !isLiked;
+    const previousLiked = isLiked;
+    const previousLikes = track.likes;
+    const nextLikedState = !previousLiked;
+
+    setLikeLoading(true);
     setIsLiked(nextLikedState);
     setTrack((prev) =>
       prev
         ? {
             ...prev,
-            likes: prev.likes + (nextLikedState ? 1 : -1),
+            likes: Math.max(0, prev.likes + (nextLikedState ? 1 : -1)),
           }
         : prev,
     );
@@ -235,26 +240,38 @@ export default function TrackPage() {
         throw new Error('Like request failed');
       }
 
+      const data = await response.json().catch(() => null);
+      if (data && typeof data.liked === 'boolean') {
+        setIsLiked(Boolean(data.liked));
+      }
+      if (data && typeof data.likes === 'number') {
+        setTrack((prev) =>
+          prev ? { ...prev, likes: data.likes } : prev,
+        );
+      }
+
       try {
         if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
           const bc = new BroadcastChannel('fwaya');
-          bc.postMessage({ type: 'media-liked', id: track.id });
+          bc.postMessage({ type: 'media-liked', mediaId: track.id, liked: nextLikedState, likes: typeof data?.likes === 'number' ? data.likes : Math.max(0, previousLikes + (nextLikedState ? 1 : -1)) });
           bc.close();
         } else {
-          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', id: track.id, t: Date.now() }));
+          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-liked', mediaId: track.id, liked: nextLikedState, likes: typeof data?.likes === 'number' ? data.likes : Math.max(0, previousLikes + (nextLikedState ? 1 : -1)), t: Date.now() }));
         }
       } catch (_) {}
     } catch (err) {
-      setIsLiked((prev) => !prev);
+      setIsLiked(previousLiked);
       setTrack((prev) =>
         prev
           ? {
               ...prev,
-              likes: prev.likes + (isLiked ? 1 : -1),
+              likes: previousLikes,
             }
           : prev,
       );
       console.error('Failed to like track', err);
+    } finally {
+      setLikeLoading(false);
     }
   };
 

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useContext, createContext, ReactNode, useRef, useEffect } from 'react';
+import { isVideoTrack, isAudioTrack, isVideoUrl, isAudioUrl } from '@/lib/utils';
 
 // Track interface
 interface Track {
@@ -70,11 +71,12 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [registeredVideoElement, setRegisteredVideoElement] = useState<HTMLVideoElement | null>(null);
 
-  const isVideoUrl = (url?: string) => Boolean(url && /\.(mp4|mov|m4v|webm|avi|mkv)(\?.*)?$/i.test(url));
-  const isVideoTrack = (track?: Track | null) => track?.type === 'VIDEO' || isVideoUrl(track?.videoUrl || track?.audioUrl || track?.url);
+  // Use strict file type detection from utils
+  const determineIsVideoTrack = (track?: Track | null) => isVideoTrack(track);
+  const determineIsAudioTrack = (track?: Track | null) => isAudioTrack(track);
 
   const getActiveMedia = (track?: Track | null) => {
-    if (isVideoTrack(track)) {
+    if (determineIsVideoTrack(track)) {
       if (registeredVideoElement) {
         return registeredVideoElement;
       }
@@ -238,7 +240,10 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const media = getActiveMedia(currentTrack);
-    const mediaUrl = currentTrack?.type === 'VIDEO' ? (currentTrack?.videoUrl || currentTrack?.audioUrl || currentTrack?.url) : (currentTrack?.audioUrl || currentTrack?.url);
+    // Use strict file type detection to select the right URL
+    const mediaUrl = determineIsVideoTrack(currentTrack) 
+      ? (currentTrack?.videoUrl || currentTrack?.audioUrl || currentTrack?.url) 
+      : (currentTrack?.audioUrl || currentTrack?.url);
     if (!mediaUrl) {
       console.error('GlobalPlayer: No media URL available in current track');
       return;
@@ -370,14 +375,17 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       audioUrl: (incoming.audioUrl as string) || (incoming.url as string) || undefined,
       videoUrl: incoming.videoUrl as string | undefined,
       duration: incoming.duration as number | undefined,
-      type: (incoming.type as Track['type']) || (isVideoUrl(incoming.videoUrl as string | undefined) ? 'VIDEO' : 'AUDIO'),
+      type: (incoming.type as Track['type']) || (isVideoUrl(incoming.videoUrl as string | undefined) || isVideoUrl(incoming.url as string | undefined) ? 'VIDEO' : 'AUDIO'),
       isDRMProtected: incoming.isDRMProtected as boolean | undefined,
       accessType: (incoming.accessType as Track['accessType']) ?? 'FREE',
       price: incoming.price as number | undefined,
       currency: (incoming.currency as string) ?? 'ZMW'
     };
 
-    const mediaUrl = newTrack.type === 'VIDEO' ? (newTrack.videoUrl || newTrack.audioUrl) : newTrack.audioUrl;
+    // Use strict file type detection to select the right URL
+    const mediaUrl = isVideoUrl(newTrack.videoUrl) || isVideoUrl(newTrack.audioUrl) 
+      ? (newTrack.videoUrl || newTrack.audioUrl) 
+      : newTrack.audioUrl;
     if (!mediaUrl) {
       console.error('GlobalPlayer: No media URL provided in track:', newTrack);
       return;
