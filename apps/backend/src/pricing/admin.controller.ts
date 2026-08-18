@@ -52,6 +52,34 @@ export class AdminPricingController {
     });
   }
 
+  // Fix endpoint for expired price tiers
+  @Post('price-tiers/fix-expired')
+  async fixExpiredPriceTiers() {
+    const now = new Date();
+    const futureDate = new Date('2026-12-31 23:59:59');
+    
+    // Update all expired tiers to extend to 2026-12-31
+    const result = await this.prisma.priceTier.updateMany({
+      where: { 
+        effectiveTo: { lt: now }
+      },
+      data: { effectiveTo: futureDate }
+    });
+
+    // Get the updated tiers
+    const updatedTiers = await this.prisma.priceTier.findMany({
+      where: { active: true },
+      include: { productType: true },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return {
+      message: `Fixed ${result.count} expired price tier(s)`,
+      count: result.count,
+      activeTiers: updatedTiers
+    };
+  }
+
   @Get('price-tiers/:id')
   async getPriceTier(@Param('id') id: string) {
     const tier = await this.prisma.priceTier.findUnique({ where: { id: Number(id) } });
