@@ -79,6 +79,7 @@ export class BeatsController {
       bpm: beatData.bpm ? Number(beatData.bpm) : null,
       key: beatData.key || null,
       price: beatData.price ? Number(beatData.price) : null,
+      priceTierId: beatData.priceTierId ? Number(beatData.priceTierId) : undefined,
       accessType: beatData.accessType || 'FREE',
       audioFile: files.file[0],
       coverFile: files.coverFile?.[0],

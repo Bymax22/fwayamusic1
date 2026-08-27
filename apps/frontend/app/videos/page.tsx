@@ -36,17 +36,17 @@ export default function VideosPage() {
     const fetchVideos = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/media");
+        const res = await fetch("/api/media?type=VIDEO");
         if (!res.ok) throw new Error("Failed to load videos");
         const json = await res.json();
-        const items = Array.isArray(json.data) ? json.data : json;
+        const items = Array.isArray(json.data) ? json.data : Array.isArray(json) ? json : [];
         const mapped: VideoItem[] = items.map((item: any) => ({
           id: item.id,
           title: item.title || item.name || "Untitled",
           artist: item.user?.displayName || item.user?.username || item.artist || "Unknown",
           duration: item.duration || item.length || 0,
           views: item.views || item.playCount || 0,
-          createdAt: item.createdAt || item.publishedAt || new Date().toISOString(),
+          createdAt: item.createdAt || item.publishedAt || item.uploadedAt || item.created_at || '',
           thumbnail: item.thumbnailUrl || item.artCoverUrl || item.coverArt || "/default-cover.jpg",
           videoUrl: item.videoUrl || item.url || item.audioUrl || undefined,
         }));

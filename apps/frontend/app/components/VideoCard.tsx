@@ -32,6 +32,10 @@ export default function VideoCard({
   href,
 }: VideoCardProps) {
   const route = href || `/videos/${id}`;
+  const parsedCreatedAt = createdAt ? new Date(createdAt) : null;
+  const formattedCreatedAt = parsedCreatedAt && !Number.isNaN(parsedCreatedAt.getTime())
+    ? parsedCreatedAt.toLocaleDateString()
+    : null;
   return (
     <Link
       href={route}
@@ -68,7 +72,7 @@ export default function VideoCard({
         <p className="mt-1 text-xs text-slate-400 truncate">{artist}</p>
         <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
           <span>{views.toLocaleString()} views</span>
-          {createdAt ? <span>{new Date(createdAt).toLocaleDateString()}</span> : null}
+          {formattedCreatedAt ? <span>{formattedCreatedAt}</span> : null}
         </div>
       </div>
     </Link>

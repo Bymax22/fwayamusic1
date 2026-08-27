@@ -14,6 +14,7 @@ import {
   InternalServerErrorException,
   ValidationPipe,
   Logger,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './media.service';
@@ -227,10 +228,10 @@ export class MediaController {
   }
 
   @Get()
-  async getAllMedia() {
+  async getAllMedia(@Query('type') type?: string) {
     try {
       // Return all public media (for browse page, landing page, etc)
-      const media = await this.mediaService.getAllMedia();
+      const media = await this.mediaService.getAllMedia(type);
       return this.sanitizeForJson(media);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown media fetch error';

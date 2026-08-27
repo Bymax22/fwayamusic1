@@ -149,6 +149,7 @@ export class BeatsService {
     bpm: number | null;
     key: string | null;
     price: number | null;
+    priceTierId?: number;
     accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
     audioFile: Express.Multer.File;
     coverFile?: Express.Multer.File;
@@ -164,6 +165,15 @@ export class BeatsService {
 
     const duration = beatData.audioFile.size; // This should be calculated properly
 
+    const priceTier = beatData.priceTierId
+      ? await this.prisma.priceTier.findFirst({
+          where: { id: beatData.priceTierId, active: true },
+        })
+      : null;
+    if (beatData.accessType !== 'FREE' && beatData.priceTierId && !priceTier) {
+      throw new BadRequestException('Selected price tier is not available');
+    }
+
     const beat = await this.prisma.media.create({
       data: {
         title: beatData.title,
@@ -175,7 +185,8 @@ export class BeatsService {
         url: audioUrl,
         artCoverUrl: coverUrl,
         thumbnailUrl: coverUrl,
-        price: beatData.price,
+        price: priceTier?.directPrice ?? beatData.price,
+        priceTierId: priceTier?.id,
         accessType: beatData.accessType,
         duration: duration,
         userId: userId,

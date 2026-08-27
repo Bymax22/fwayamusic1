@@ -755,9 +755,10 @@ export class MediaService {
     }
   }
 
-  async getAllMedia() {
+  async getAllMedia(type?: string) {
     try {
       const media = await this.prisma.media.findMany({
+        where: type ? { type: type.toUpperCase() as MediaType } : undefined,
         include: {
           user: {
             select: { id: true, username: true, displayName: true, avatarUrl: true }
@@ -851,6 +852,12 @@ export class MediaService {
     if (updates.isExplicit !== undefined) updateData.isExplicit = updates.isExplicit;
     if (updates.accessType) updateData.accessType = updates.accessType;
     if (updates.price !== undefined) updateData.price = updates.price;
+    if (updates.priceTierId !== undefined) updateData.priceTierId = updates.priceTierId;
+    if (updates.accessType === 'FREE') {
+      updateData.price = null;
+      updateData.priceTierId = null;
+      updateData.acceptedPricingSnapshotId = null;
+    }
     if (updates.allowReselling !== undefined) updateData.allowReselling = updates.allowReselling;
     if (updates.artistCommissionRate !== undefined) updateData.artistCommissionRate = updates.artistCommissionRate;
     if (updates.tags) updateData.tags = updates.tags;
@@ -1102,7 +1109,12 @@ async getHomepageSections() {
         where: { deletedAt: null },
         take: 1,
         orderBy: { createdAt: 'asc' },
-      }
+      },
+      _count: {
+        select: {
+          media: { where: { deletedAt: null } },
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
     take: 8,
@@ -1116,7 +1128,8 @@ async getHomepageSections() {
     artCoverUrl: album.coverUrl,
     coverArt: album.coverUrl,
     thumbnailUrl: album.coverUrl,
-    type: 'ALBUM',
+    type: album.type?.toUpperCase() === 'EP' ? 'EP' : 'ALBUM',
+    trackCount: album._count?.media ?? 0,
     userId: album.userId,
     user: album.user,
     createdAt: album.createdAt,

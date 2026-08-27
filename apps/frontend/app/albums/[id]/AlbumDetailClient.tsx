@@ -12,7 +12,7 @@ interface AlbumDetailClientProps {
 }
 
 export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
-  const { playTrack, togglePlay, isPlaying, currentTrack } = useAudioPlayer();
+  const { setQueue, togglePlay, isPlaying, currentTrack } = useAudioPlayer();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedMediaId, setSelectedMediaId] = useState<number>(0);
   const [albumLiked, setAlbumLiked] = useState<boolean>(Boolean(album?.isLiked));
@@ -28,11 +28,24 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
     setPickerOpen(true);
   };
 
+  const releaseTracks = () => (Array.isArray(album?.media) ? album.media : []).map((track: any) => ({
+    id: track.id,
+    title: track.title || '',
+    artist: track.user?.displayName || track.user?.username || '',
+    imageUrl: track.artCoverUrl || track.coverArt || track.thumbnailUrl,
+    audioUrl: track.audioUrl || track.url,
+    videoUrl: track.videoUrl,
+    duration: track.duration,
+    type: track.type,
+    isDRMProtected: track.isDRMProtected,
+    accessType: track.accessType,
+    price: track.price,
+    currency: track.currency,
+  }));
+
   const handlePlayAll = () => {
-    const first = Array.isArray(album?.media) && album.media.length > 0 ? album.media[0] : null;
-    if (first) {
-      playTrack(first);
-    }
+    const tracks = releaseTracks();
+    if (tracks.length > 0) setQueue(tracks, 0, true);
   };
 
   const handleShare = async () => {
@@ -155,7 +168,13 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
 
                           <button
                             type="button"
-                            onClick={() => (isCurrent && isPlaying) ? togglePlay() : playTrack(track)}
+                            onClick={() => {
+                              if (isCurrent && isPlaying) {
+                                togglePlay();
+                                return;
+                              }
+                              setQueue(releaseTracks(), idx, true);
+                            }}
                             className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10"
                           >
                             {isCurrent && isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}

@@ -33,6 +33,7 @@ interface Media {
   type: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM';
   accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
   price: number | null;
+  priceTierId?: number | null;
   duration?: number;
   isExplicit: boolean;
   playCount: number;
@@ -203,6 +204,8 @@ export default function ForArtistsPage() {
   const productTypeNameForMediaType = (t: string) => {
     switch (t) {
       case 'VIDEO': return 'Music Video';
+      case 'EP': return 'EP / Collated Songs';
+      case 'ALBUM': return 'Album';
       case 'PODCAST': return 'Single Song';
       case 'LIVE_STREAM': return 'Single Song';
       default: return 'Single Song';
@@ -498,9 +501,9 @@ export default function ForArtistsPage() {
     }
 
     const isReleaseUpload = newMedia.type === 'ALBUM' || newMedia.type === 'EP';
+    const releaseTracks = newMedia.tracks.filter((track) => track.title.trim() && track.file);
     if (isReleaseUpload) {
-      const validTracks = newMedia.tracks.filter((track) => track.title.trim() && track.file);
-      if (validTracks.length === 0) {
+      if (releaseTracks.length === 0) {
         alert('Please add at least one track with a title and audio file');
         return;
       }
@@ -561,8 +564,8 @@ export default function ForArtistsPage() {
         const uploadedTracks: Media[] = [];
         let releaseAlbumId: number | null = albumData?.id ?? null;
 
-        for (let index = 0; index < newMedia.tracks.length; index += 1) {
-          const track = newMedia.tracks[index];
+        for (let index = 0; index < releaseTracks.length; index += 1) {
+          const track = releaseTracks[index];
           const trackCloudinaryData = await uploadToCloudinary(track.file as File, 'auto');
           const metadataPayload: Record<string, any> = {
             title: track.title.trim(),
@@ -612,7 +615,7 @@ export default function ForArtistsPage() {
           }
 
           uploadedTracks.push(uploadedTrack);
-          setUploadProgress(15 + Math.round(((index + 1) / newMedia.tracks.length) * 80));
+          setUploadProgress(15 + Math.round(((index + 1) / releaseTracks.length) * 80));
         }
 
         setMedia(prev => [...uploadedTracks, ...prev]);
@@ -998,6 +1001,43 @@ export default function ForArtistsPage() {
               />
             </div>
 
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Access Type</label>
+              <select
+                value={editingMedia.accessType}
+                onChange={(e) => setEditingMedia({
+                  ...editingMedia,
+                  accessType: e.target.value as Media['accessType'],
+                  ...(e.target.value === 'FREE' ? { price: null, priceTierId: null } : {}),
+                })}
+                className="w-full bg-white/5 text-white rounded-lg px-3 py-2 border border-white/10 focus:border-purple-500 outline-none"
+              >
+                <option value="FREE">Free</option>
+                <option value="PREMIUM">Premium</option>
+                <option value="PAY_PER_VIEW">Pay Per View</option>
+              </select>
+            </div>
+
+            {editingMedia.accessType !== 'FREE' && (
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Price Tier</label>
+                <select
+                  value={editingMedia.priceTierId ?? ''}
+                  onChange={(e) => {
+                    const tierId = e.target.value ? Number(e.target.value) : null;
+                    const tier = priceTiers.find((item) => item.id === tierId);
+                    setEditingMedia({ ...editingMedia, priceTierId: tierId, price: tier?.directPrice ?? editingMedia.price });
+                  }}
+                  className="w-full bg-white/5 text-white rounded-lg px-3 py-2 border border-white/10 focus:border-purple-500 outline-none"
+                >
+                  <option value="">Select a price tier</option>
+                  {priceTiers.filter((tier) => tier.active && (tier.productType?.name || tier.productTypeName) === 'Single Song').map((tier) => (
+                    <option key={tier.id} value={tier.id}>{tier.name} — ZMW {Number(tier.directPrice).toFixed(2)}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="flex gap-3 pt-4">
               <button
                 onClick={() => setEditingMedia(null)}
@@ -1010,6 +1050,9 @@ export default function ForArtistsPage() {
                   title: editingMedia.title,
                   description: editingMedia.description,
                   genre: editingMedia.genre,
+                  accessType: editingMedia.accessType,
+                  price: editingMedia.accessType === 'FREE' ? null : editingMedia.price,
+                  priceTierId: editingMedia.accessType === 'FREE' ? null : editingMedia.priceTierId,
                 })}
                 disabled={isEditLoading}
                 className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition disabled:opacity-50"
@@ -1986,6 +2029,7 @@ export default function ForArtistsPage() {
                                 <option value="">Select a price tier</option>
                                 {priceTiers
                                   .filter((pt) => {
+                                    if (!pt.active) return false;
                                     const tierProductType = pt.productType?.name || pt.productTypeName;
                                     const expectedType = productTypeNameForMediaType(newMedia.type);
                                     console.log(`Comparing tier: ${tierProductType} with expected: ${expectedType}`);
@@ -1995,8 +2039,8 @@ export default function ForArtistsPage() {
                                     <option key={pt.id} value={pt.id}>{pt.name} — ZMW {pt.directPrice.toFixed(2)}</option>
                                   ))}
                               </select>
-                              {priceTiers.filter((pt) => pt.productType?.name || pt.productTypeName).length > 0 && 
-                               priceTiers.filter((pt) => (pt.productType?.name || pt.productTypeName) === productTypeNameForMediaType(newMedia.type)).length === 0 && (
+                              {priceTiers.filter((pt) => pt.active && (pt.productType?.name || pt.productTypeName)).length > 0 && 
+                               priceTiers.filter((pt) => pt.active && (pt.productType?.name || pt.productTypeName) === productTypeNameForMediaType(newMedia.type)).length === 0 && (
                                 <div className="p-3 bg-orange-900 border border-orange-700 rounded text-sm text-orange-200">
                                   No price tiers available for {productTypeNameForMediaType(newMedia.type)}. Contact admin to create one.
                                 </div>

@@ -4,11 +4,12 @@ function getBackendBaseUrl() {
   return process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const baseUrl = getBackendBaseUrl();
+    const type = new URL(request.url).searchParams.get('type');
     const start = Date.now();
-    const res = await fetch(`${baseUrl}/api/v1/media`, {
+    const res = await fetch(`${baseUrl}/api/v1/media${type ? `?type=${encodeURIComponent(type)}` : ''}`, {
       headers: { Accept: 'application/json' },
     });
 

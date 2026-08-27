@@ -44,6 +44,7 @@ export default function GuestWelcome() {
   // Data state
   const [quickPicks, setQuickPicks] = useState<any[]>([]);
   const [featuredAlbums, setFeaturedAlbums] = useState<any[]>([]);
+  const [featuredEPs, setFeaturedEPs] = useState<any[]>([]);
   const [featuredArtists, setFeaturedArtists] = useState<any[]>([]);
   const [featuredProducers, setFeaturedProducers] = useState<any[]>([]);
   const [beats, setBeats] = useState<any[]>([]);
@@ -112,6 +113,7 @@ export default function GuestWelcome() {
       if (data && typeof data === 'object') {
         setQuickPicks(data.quickPicks || []);
         setFeaturedAlbums(data.featuredAlbums || []);
+        setFeaturedEPs(data.featuredEPs || []);
         setFeaturedArtists(data.featuredArtists || []);
         setFeaturedProducers(data.featuredProducers || []);
         setBeats(data.beats || []);
@@ -381,14 +383,26 @@ export default function GuestWelcome() {
           }
         }
 
-        const processedFeaturedAlbums = albumItems.length > 0
-          ? albumItems.map((album: any) => ({
+        const isEP = (album: any) => {
+          const tags = Array.isArray(album.tags) ? album.tags : [];
+          return album.type?.toString().toUpperCase() === 'EP'
+            || album.releaseType?.toString().toUpperCase() === 'EP'
+            || tags.some((tag: any) => tag?.toString().toLowerCase() === 'ep');
+        };
+        const processedFeaturedAlbums = albumItems.filter((album: any) => !isEP(album)).length > 0
+          ? albumItems.filter((album: any) => !isEP(album)).map((album: any) => ({
               ...album,
               url: album.url ? resolveMediaUrl(album.url) : album.url,
               coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
               artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
             }))
           : [];
+        const processedFeaturedEPs = albumItems.filter(isEP).map((album: any) => ({
+          ...album,
+          url: album.url ? resolveMediaUrl(album.url) : album.url,
+          coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
+          artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
+        }));
 
         const processedBeats = homepageData.beats && Array.isArray(homepageData.beats)
           ? homepageData.beats
@@ -491,6 +505,7 @@ export default function GuestWelcome() {
         setTrendingNow(processedTrendingNow);
         setTopCharts(processedTopCharts);
         setFeaturedAlbums(processedFeaturedAlbums);
+        setFeaturedEPs(processedFeaturedEPs);
         setBeats(processedBeats);
         setMusicVideos(processedMusicVideos);
         setOtherVideos(processedOtherVideos);
@@ -501,6 +516,7 @@ export default function GuestWelcome() {
         saveCachedHomepageData({
           quickPicks: processedQuickPicks,
           featuredAlbums: processedFeaturedAlbums,
+          featuredEPs: processedFeaturedEPs,
           featuredArtists: processedArtists,
           featuredProducers: processedFeaturedProducers,
           beats: processedBeats,
@@ -1029,7 +1045,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('quickPicks')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {quickPicks.slice(0, 6).map((item: any, i: number) => (
+                {quickPicks.map((item: any, i: number) => (
                   <div 
                     key={i} 
                     className="w-32 flex-shrink-0 cursor-pointer"
@@ -1131,7 +1147,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('featuredArtists')}
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
+                {featuredArtists.map((artist: any, i: number) => (
                   <Link key={i} href={`/artists/${artist.id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto"
@@ -1166,7 +1182,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('featuredProducers')}
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                {featuredProducers.slice(0, 6).map((producer: any, i: number) => (
+                {featuredProducers.map((producer: any, i: number) => (
                   <Link key={i} href={`/producers/${producer.id || producer._id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto overflow-hidden"
@@ -1203,7 +1219,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('beats')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {beats.slice(0, 6).map((beat: any, i: number) => (
+                {beats.map((beat: any, i: number) => (
                   <div
                     key={i}
                     className="w-32 flex-shrink-0 cursor-pointer rounded-3xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
@@ -1257,7 +1273,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('trendingNow')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {trendingNow.slice(0, 6).map((item: any, i: number) => (
+                {trendingNow.map((item: any, i: number) => (
                   <div 
                     key={i} 
                     className="w-32 flex-shrink-0 cursor-pointer"
@@ -1310,7 +1326,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('featuredAlbums')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
+                {featuredAlbums.map((item: any, i: number) => (
                   <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                     <div 
                       className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
@@ -1330,11 +1346,35 @@ export default function GuestWelcome() {
               </div>
             </div>
 
+            {/* Featured EPs (mobile) */}
+            {featuredEPs.length > 0 && (
+              <div className="mt-3">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-semibold">Featured EPs</h3>
+                </div>
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                  {featuredEPs.map((item: any, i: number) => (
+                    <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
+                      <div
+                        className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                        style={{ backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                      />
+                      <div className="p-3 bg-transparent">
+                        <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
+                        <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                        <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Top Charts (mobile styled) */}
             <div className="mt-3">
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
-                {topCharts.slice(0, 6).map((track: any, i: number) => (
+                {topCharts.map((track: any, i: number) => (
                   <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
@@ -1383,7 +1423,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('suggestedPlaylists')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {playlists.slice(0, 6).map((item: any, i: number) => (
+                {playlists.map((item: any, i: number) => (
                   <div
                     key={i}
                     role="button"
@@ -1418,7 +1458,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('trendingNow')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {trendingNow.slice(0, 6).map((item: any, i: number) => (
+                {trendingNow.map((item: any, i: number) => (
                   <div 
                     key={i} 
                     className="w-32 flex-shrink-0 cursor-pointer"
@@ -1467,8 +1507,8 @@ export default function GuestWelcome() {
                 {renderSeeAll('featuredAlbums')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent">
+                {featuredAlbums.map((item: any, i: number) => (
+                  <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                     <div 
                       className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
                       style={{
@@ -1487,11 +1527,30 @@ export default function GuestWelcome() {
               </div>
             </div>
 
+            {/* Featured EPs (mobile) */}
+            {featuredEPs.length > 0 && (
+              <div className="mt-3">
+                <h3 className="font-semibold mb-3">Featured EPs</h3>
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                  {featuredEPs.map((item: any, i: number) => (
+                    <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
+                      <div className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`} style={{ backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                      <div className="p-3 bg-transparent">
+                        <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
+                        <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                        <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Top Charts (mobile styled) */}
             <div className="mt-3">
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
-                {topCharts.slice(0, 6).map((track: any, i: number) => (
+                {topCharts.map((track: any, i: number) => (
                   <div key={track.id || i} className="bg-[#080a13] p-3 rounded-lg hover:bg-[#11131c] transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
@@ -1542,7 +1601,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('suggestedPlaylists')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {playlists.slice(0, 6).map((item: any, i: number) => (
+                {playlists.map((item: any, i: number) => (
                   <div key={i} className="min-w-[120px] rounded-xl p-3 cursor-pointer hover:bg-[#11131c] transition-colors flex-shrink-0 bg-transparent">
                     <div 
                       className="w-full aspect-square bg-black rounded-lg mb-2"
@@ -1569,7 +1628,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('trendingNow')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {trendingNow.slice(0, 6).map((item: any, i: number) => (
+                {trendingNow.map((item: any, i: number) => (
                   <div 
                     key={i} 
                     className="w-32 flex-shrink-0 cursor-pointer"
@@ -1611,7 +1670,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('featuredArtists')}
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
+                {featuredArtists.map((artist: any, i: number) => (
                   <Link key={i} href={`/artists/${artist.id}`} className="flex-shrink-0 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
@@ -1644,7 +1703,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('featuredAlbums')}
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {featuredAlbums.slice(0, 6).map((item: any, i: number) => (
+                {featuredAlbums.map((item: any, i: number) => (
                   <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                     <div className="relative">
                       <div 
@@ -1672,7 +1731,7 @@ export default function GuestWelcome() {
             <div className="mt-3">
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
-                {topCharts.slice(0, 6).map((track: any, i: number) => (
+                {topCharts.map((track: any, i: number) => (
                   <div key={track.id || i} className="bg-[#080a13] p-3 rounded-lg hover:bg-[#11131c] transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
@@ -1851,7 +1910,7 @@ export default function GuestWelcome() {
                 {renderSeeAll('podcasts')}
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                {featuredArtists.slice(0, 6).map((artist: any, i: number) => (
+                {featuredArtists.map((artist: any, i: number) => (
                   <Link key={i} href={`/artists/${artist.id}`} className="flex-shrink-0 text-center cursor-pointer">
                     <div 
                       className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
@@ -2075,6 +2134,26 @@ export default function GuestWelcome() {
               ))}
             </div>
           </div>
+
+          {/* ===== FEATURED EPS ===== */}
+          {featuredEPs.length > 0 && (
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-lg">Featured EPs</h3>
+              </div>
+              <div className="grid grid-cols-5 gap-3">
+                {featuredEPs.slice(0, 5).map((ep: any, i: number) => (
+                  <div key={i} onClick={() => goToAlbum(ep.id, ep.title)} role="button" tabIndex={0} className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all cursor-pointer group">
+                    <div className="aspect-[4/5] bg-black group-hover:scale-105 transition-transform" style={{ backgroundImage: ep.artCoverUrl ? `url(${ep.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                    <div className="p-3 bg-[#080a13]">
+                      <p className="text-xs font-semibold truncate text-white mb-0.5">{ep.title}</p>
+                      <p className="text-xs text-gray-400 truncate">{ep.user?.displayName || ep.user?.username || 'Unknown Artist'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ===== PRODUCERS & BEAT MAKERS ===== */}
           <div className="mb-8">

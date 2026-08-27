@@ -103,6 +103,8 @@ export default function ProducerPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isCreatingPack, setIsCreatingPack] = useState(false);
   const [isCreatingResource, setIsCreatingResource] = useState(false);
+  const [priceTiers, setPriceTiers] = useState<any[]>([]);
+  const [selectedPriceTierId, setSelectedPriceTierId] = useState<number | null>(null);
   const [newBeat, setNewBeat] = useState({
     title: '',
     description: '',
@@ -146,6 +148,19 @@ export default function ProducerPage() {
   const packCoverInputRef = useRef<HTMLInputElement>(null);
   const resourceFileInputRef = useRef<HTMLInputElement>(null);
   const resourceThumbnailInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/admin/pricing/price-tiers')
+      .then((response) => response.ok ? response.json() : [])
+      .then((data) => {
+        if (mounted) setPriceTiers(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (mounted) setPriceTiers([]);
+      });
+    return () => { mounted = false; };
+  }, []);
 
   const formatZMW = (amount: number) =>
     amount.toLocaleString('en-ZM', {
@@ -256,6 +271,10 @@ export default function ProducerPage() {
       alert('Please fill in all required fields');
       return;
     }
+    if (newBeat.accessType !== 'FREE' && !selectedPriceTierId) {
+      alert('Please select a price tier for premium or pay-per-view beats');
+      return;
+    }
 
     setIsUploading(true);
     setUploadProgress(0);
@@ -269,6 +288,9 @@ export default function ProducerPage() {
       formData.append('key', newBeat.key);
       if (newBeat.price) {
         formData.append('price', newBeat.price);
+      }
+      if (newBeat.accessType !== 'FREE' && selectedPriceTierId) {
+        formData.append('priceTierId', String(selectedPriceTierId));
       }
       formData.append('accessType', newBeat.accessType);
       formData.append('file', newBeat.file);
@@ -303,6 +325,7 @@ export default function ProducerPage() {
         coverFile: null,
         coverPreview: null,
       });
+      setSelectedPriceTierId(null);
       setUploadProgress(100);
       alert('Beat uploaded successfully!');
     } catch (error) {
@@ -927,14 +950,31 @@ export default function ProducerPage() {
 
                   {newBeat.accessType !== 'FREE' && (
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">Price (ZMW)</label>
-                      <input
-                        type="number"
-                        value={newBeat.price}
-                        onChange={(e) => setNewBeat({ ...newBeat, price: e.target.value })}
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="e.g., 50000"
-                      />
+                      <label className="block text-sm font-medium text-white mb-2">Price Tier</label>
+                      {priceTiers.filter((tier) => tier.active && (tier.productType?.name || tier.productTypeName) === 'Single Song').length === 0 ? (
+                        <p className="p-3 bg-yellow-900/40 border border-yellow-700 rounded text-sm text-yellow-200">
+                          No active Single Song price tiers are available.
+                        </p>
+                      ) : (
+                        <select
+                          value={selectedPriceTierId ?? ''}
+                          onChange={(e) => {
+                            const tierId = e.target.value ? Number(e.target.value) : null;
+                            const tier = priceTiers.find((item) => item.id === tierId);
+                            setSelectedPriceTierId(tierId);
+                            setNewBeat((prev) => ({ ...prev, price: tier ? String(tier.directPrice) : '' }));
+                          }}
+                          className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          required
+                        >
+                          <option value="">Select a price tier</option>
+                          {priceTiers
+                            .filter((tier) => tier.active && (tier.productType?.name || tier.productTypeName) === 'Single Song')
+                            .map((tier) => (
+                              <option key={tier.id} value={tier.id}>{tier.name} — ZMW {Number(tier.directPrice).toFixed(2)}</option>
+                            ))}
+                        </select>
+                      )}
                     </div>
                   )}
 
