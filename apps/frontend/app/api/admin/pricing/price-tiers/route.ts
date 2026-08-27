@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+function getBackendBaseUrl() {
+  return (process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001').replace(/\/+$/, '');
+}
 
 export async function GET(request: NextRequest) {
   try {
-    const response = await fetch(`${API_URL}/admin/pricing/price-tiers`, {
+    const response = await fetch(`${getBackendBaseUrl()}/api/admin/pricing/price-tiers`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!response.ok) {

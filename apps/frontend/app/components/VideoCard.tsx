@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 type VideoCardProps = {
   id: string | number;
@@ -20,6 +21,25 @@ const formatDuration = (seconds: number) => {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
+const formatRelativeUploadTime = (value?: string) => {
+  if (!value) return null;
+  const timestamp = new Date(value).getTime();
+  if (!Number.isFinite(timestamp)) return null;
+
+  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+  if (elapsedSeconds < 10) return "Now";
+  if (elapsedSeconds < 60) return `${elapsedSeconds} seconds ago`;
+
+  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+  if (elapsedMinutes < 60) return `${elapsedMinutes} ${elapsedMinutes === 1 ? "minute" : "minutes"} ago`;
+
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) return `${elapsedHours} ${elapsedHours === 1 ? "hour" : "hours"} ago`;
+
+  const elapsedDays = Math.floor(elapsedHours / 24);
+  return `${elapsedDays} ${elapsedDays === 1 ? "day" : "days"} ago`;
+};
+
 export default function VideoCard({
   id,
   title,
@@ -32,10 +52,15 @@ export default function VideoCard({
   href,
 }: VideoCardProps) {
   const route = href || `/videos/${id}`;
-  const parsedCreatedAt = createdAt ? new Date(createdAt) : null;
-  const formattedCreatedAt = parsedCreatedAt && !Number.isNaN(parsedCreatedAt.getTime())
-    ? parsedCreatedAt.toLocaleDateString()
-    : null;
+  const [relativeUploadTime, setRelativeUploadTime] = useState(() => formatRelativeUploadTime(createdAt));
+
+  useEffect(() => {
+    const updateRelativeUploadTime = () => setRelativeUploadTime(formatRelativeUploadTime(createdAt));
+    updateRelativeUploadTime();
+    const intervalId = window.setInterval(updateRelativeUploadTime, 10000);
+    return () => window.clearInterval(intervalId);
+  }, [createdAt]);
+
   return (
     <Link
       href={route}
@@ -72,7 +97,7 @@ export default function VideoCard({
         <p className="mt-1 text-xs text-slate-400 truncate">{artist}</p>
         <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
           <span>{views.toLocaleString()} views</span>
-          {formattedCreatedAt ? <span>{formattedCreatedAt}</span> : null}
+          {relativeUploadTime ? <span title={createdAt}>{relativeUploadTime}</span> : null}
         </div>
       </div>
     </Link>

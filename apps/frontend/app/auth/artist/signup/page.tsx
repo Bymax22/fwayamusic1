@@ -162,7 +162,9 @@ export default function ArtistSignUp() {
     const checkValue = field === 'username' ? value.trim().toLowerCase() : value.trim();
     try {
       console.log('[Artist] checkAvailability ->', field, checkValue);
-      const res = await fetch(`${API_URL}/api/v1/auth/check-availability?field=${field}&value=${encodeURIComponent(checkValue)}`);
+      const res = await fetch(`/api/auth/check-availability?field=${field}&value=${encodeURIComponent(checkValue)}`, {
+        signal: AbortSignal.timeout(8000),
+      });
       if (!res.ok) {
         if (field === 'email') setEmailStatus('unknown');
         else setUsernameStatus('unknown');
