@@ -211,6 +211,10 @@ export default function ForArtistsPage() {
       default: return 'Single Song';
     }
   };
+
+  const releaseTrackCount = newMedia.type === 'ALBUM' || newMedia.type === 'EP'
+    ? newMedia.tracks.filter((track) => track.title.trim() && track.file).length
+    : 1;
   const videoTagOptions = ['music', 'song', 'comedy', 'tutorial', 'dance', 'gaming', 'news', 'vlog', 'fashion', 'motivation', 'shorts'];
 
   const toggleVideoTag = (tag: string) => {
@@ -2048,7 +2052,9 @@ export default function ForArtistsPage() {
                               {pricingPreview && (
                                 <div className="mt-2 text-xs text-gray-300">
                                   <div>Price: ZMW {pricingPreview.directPrice.toFixed(2)}</div>
-                                  <div>Artist payout (protected): ZMW {pricingPreview.protectedArtistPayout.toFixed(2)}</div>
+                                  <div>Shareable amount: ZMW {pricingPreview.standardShareable.toFixed(2)}</div>
+                                  <div>Artist payout per track: ZMW {pricingPreview.protectedArtistPayout.toFixed(2)}</div>
+                                  <div className="font-semibold text-green-300">Total artist payout: ZMW {(pricingPreview.protectedArtistPayout * releaseTrackCount).toFixed(2)}</div>
                                   <div>FWAYA share (direct): {pricingPreview.shares?.fwayaDirectPercent}%</div>
                                   <div>Reseller price: ZMW {pricingPreview.resellerPrice.toFixed(2)}</div>
                                 </div>

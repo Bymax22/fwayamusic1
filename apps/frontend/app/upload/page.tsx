@@ -265,6 +265,8 @@ export default function UploadPage() {
     }
   };
 
+  const formatAmount = (value: unknown) => Number(value || 0).toFixed(2);
+
   // Fetch price tiers on mount
   React.useEffect(() => {
     let mounted = true;
@@ -658,10 +660,10 @@ export default function UploadPage() {
 
                 {pricingPreview && (
                   <div className="p-3 border rounded bg-gray-50">
-                    <p className="text-sm">Price: <strong>{pricingPreview.directPrice.toFixed(2)}</strong></p>
-                    <p className="text-sm">Shareable Amount: <strong>{pricingPreview.standardShareable?.toFixed(2)}</strong></p>
-                    <p className="text-sm">Protected Artist Payout: <strong>{pricingPreview.protectedArtistPayout?.toFixed(2)}</strong></p>
-                    <p className="text-sm">Reseller Price: <strong>{pricingPreview.resellerPrice?.toFixed(2)}</strong></p>
+                    <p className="text-sm">Price: <strong>{formatAmount(pricingPreview.directPrice)}</strong></p>
+                    <p className="text-sm">Shareable Amount: <strong>{formatAmount(pricingPreview.standardShareable)}</strong></p>
+                    <p className="text-sm">Artist Payout: <strong>{formatAmount(pricingPreview.protectedArtistPayout)}</strong></p>
+                    <p className="text-sm">Reseller Price: <strong>{formatAmount(pricingPreview.resellerPrice)}</strong></p>
                   </div>
                 )}
               </div>
