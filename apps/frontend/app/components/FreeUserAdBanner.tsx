@@ -56,15 +56,25 @@ export default function FreeUserAdBanner() {
     try { impressions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { impressions = {}; }
     const eligible = campaigns.filter((campaign) => {
       const entry = impressions[String(campaign.id)];
-      return !entry || (entry.count < campaign.frequencyCap && now - entry.lastShown >= campaign.cooldownSeconds * 1000);
+      if (!entry) return true;
+      if (now - entry.lastShown >= campaign.cooldownSeconds * 1000) {
+        entry.count = 0;
+        return true;
+      }
+      return entry.count < campaign.frequencyCap;
     });
-    const pool = eligible.length ? eligible : campaigns.filter((campaign) => !impressions[String(campaign.id)] || impressions[String(campaign.id)].count < campaign.frequencyCap);
+    const pool = eligible;
     const selectedCampaign = pool.find((item) => item.ads.length);
     if (!selectedCampaign) return;
     const nextAd = selectedCampaign.ads[Math.floor(Math.random() * selectedCampaign.ads.length)];
     setCampaignId(selectedCampaign.id);
     setAd(nextAd);
-    impressions[String(selectedCampaign.id)] = { count: (impressions[String(selectedCampaign.id)]?.count || 0) + 1, lastShown: now };
+    const previous = impressions[String(selectedCampaign.id)];
+    const wasRecentlyCounted = previous && now - previous.lastShown < 10_000;
+    impressions[String(selectedCampaign.id)] = {
+      count: wasRecentlyCounted ? previous.count : (previous?.count || 0) + 1,
+      lastShown: wasRecentlyCounted ? previous.lastShown : now,
+    };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(impressions));
   }, [campaigns, hasActivePremium]);
 
