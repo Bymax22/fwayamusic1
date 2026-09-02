@@ -63,7 +63,8 @@ export default function FreeUserAdBanner() {
       }
       return entry.count < campaign.frequencyCap;
     });
-    const pool = eligible;
+    // Frequency limits control impression counting, not whether an active campaign is visible.
+    const pool = eligible.length ? eligible : campaigns.filter((campaign) => campaign.ads.length);
     const selectedCampaign = pool.find((item) => item.ads.length);
     if (!selectedCampaign) return;
     const nextAd = selectedCampaign.ads[Math.floor(Math.random() * selectedCampaign.ads.length)];
@@ -72,7 +73,9 @@ export default function FreeUserAdBanner() {
     const previous = impressions[String(selectedCampaign.id)];
     const wasRecentlyCounted = previous && now - previous.lastShown < 10_000;
     impressions[String(selectedCampaign.id)] = {
-      count: wasRecentlyCounted ? previous.count : (previous?.count || 0) + 1,
+      count: wasRecentlyCounted
+        ? previous.count
+        : Math.min((previous?.count || 0) + 1, selectedCampaign.frequencyCap),
       lastShown: wasRecentlyCounted ? previous.lastShown : now,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(impressions));
