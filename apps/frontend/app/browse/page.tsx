@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
+import { Fragment, useEffect, useState, useRef } from 'react';
 import { 
   Play, Pause, Heart, Share2, Clock, Search, Filter, ListMusic, Grid, 
   Download, Plus, 
@@ -17,6 +17,7 @@ import Image from "next/image";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MobileMoneyPaymentModal } from '../components/modal/MobileMoneyPaymentModal';
+import FreeUserAdBanner from '@/components/FreeUserAdBanner';
 
 interface MediaFile {
   id: number;
@@ -1102,8 +1103,8 @@ export default function Browse() {
                 {displayedFiles.length > 0 ? (
                   <div className="divide-y divide-[#080a13]">
                     {displayedFiles.map((file, index) => (
+                      <Fragment key={file.id}>
                       <div 
-                        key={file.id} 
                         className={`grid grid-cols-12 gap-4 items-center p-4 transition-colors ${
                           String(currentTrack?.id) === String(file.id) 
                             ? 'bg-[#080a13]' 
@@ -1237,7 +1238,9 @@ export default function Browse() {
                       </button>
                     </div>
                   </div>
-                </div>
+                    </div>
+                    {(index + 1) % 10 === 0 && <FreeUserAdBanner />}
+                      </Fragment>
               ))}
             </div>
           ) : (
@@ -1250,9 +1253,9 @@ export default function Browse() {
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {displayedFiles.length > 0 ? (
-            displayedFiles.map(file => (
+            displayedFiles.map((file, index) => (
+              <Fragment key={file.id}>
               <div 
-                key={file.id} 
                 className="bg-black rounded-xl overflow-hidden group"
               >
                 <div className="relative">
@@ -1381,6 +1384,8 @@ export default function Browse() {
                   </div>
                 </div>
               </div>
+              {(index + 1) % 10 === 0 && <div className="col-span-full"><FreeUserAdBanner /></div>}
+              </Fragment>
             ))
           ) : (
             <div className="col-span-full p-8 text-center text-gray-400">
@@ -1393,9 +1398,9 @@ export default function Browse() {
         // Compact view - Mobile optimized
         <div className="space-y-0.5">
           {displayedFiles.length > 0 ? (
-            displayedFiles.map(file => (
+            displayedFiles.map((file, index) => (
+              <Fragment key={file.id}>
               <div 
-                key={file.id} 
                 className={`flex items-start gap-2 px-1 py-1 rounded-xl transition-colors min-w-0 hover:bg-white/5`}
               >
                 {/* Album cover with play button on top */}
@@ -1498,6 +1503,8 @@ export default function Browse() {
                   </button>
                 </div>
               </div>
+              {(index + 1) % 10 === 0 && <FreeUserAdBanner />}
+              </Fragment>
             ))
           ) : (
             <div className="p-8 text-center text-gray-400">

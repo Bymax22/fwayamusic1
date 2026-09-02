@@ -22,7 +22,7 @@ interface PaymentContextType {
     currency?: string
   ) => Promise<PaymentTransactionResponse>;
   checkPaymentStatus: (transactionId: number) => Promise<PaymentStatusResponse>;
-  initiateSubscriptionPayment: (userId: number, plan: string, phoneNumber: string, amount: number, currency?: string) => Promise<PaymentTransactionResponse>;
+  initiateSubscriptionPayment: (userId: number, plan: string, phoneNumber: string, amount: number, currency?: string, provider?: string) => Promise<PaymentTransactionResponse>;
   processMobileMoneyPayment: (transactionId: number, phoneNumber: string, provider?: string) => Promise<PaymentTransactionResponse>;
   isProcessing: boolean;
 }
@@ -118,11 +118,12 @@ export const PaymentProvider: React.FC<PaymentProviderProps> = ({ children }) =>
     phoneNumber: string,
     amount: number,
     currency = 'ZMW',
+    provider = 'MTN_MONEY',
   ): Promise<PaymentTransactionResponse> => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/subscription-transaction`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'user-id': String(userId) },
-      body: JSON.stringify({ plan, amount, currency, provider: 'MTN_MONEY', phoneNumber }),
+      body: JSON.stringify({ plan, amount, currency, provider, phoneNumber }),
     });
     if (!response.ok) {
       const errorData: { message?: string } = await response.json().catch(() => ({}));

@@ -19,7 +19,6 @@ import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { isVideoTrack } from "@/lib/utils";
 import { ServiceWorkerProvider } from "../components/ServiceWorkerProvider";
 import SubscriptionModal from "../components/modal/SubscriptionModal";
-import FreeUserAdBanner from "../components/FreeUserAdBanner";
 import { MobileMoneyPaymentPreviewModal } from "../components/modal/MobileMoneyPaymentPreviewModal";
 import SubscriptionPromptModal from "../components/SubscriptionPromptModal";
 
@@ -115,7 +114,6 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
         >
 
           {children}
-          <FreeUserAdBanner />
         </main>
 
         {/* =======================

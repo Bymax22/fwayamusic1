@@ -1,6 +1,5 @@
 "use client";
 
-import { Megaphone, ExternalLink, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useState } from 'react';
 
@@ -11,7 +10,7 @@ type Impression = { count: number; lastShown: number };
 const STORAGE_KEY = 'fwaya-ad-impressions';
 
 export default function FreeUserAdBanner() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [ad, setAd] = useState<Ad | null>(null);
   const [campaignId, setCampaignId] = useState<number | null>(null);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -63,17 +62,14 @@ export default function FreeUserAdBanner() {
     return () => window.clearInterval(timer);
   }, [ad, campaignId, campaigns]);
 
-  if (hasActivePremium || !ad || dismissed) return null;
+  if (loading || hasActivePremium || !ad || dismissed) return null;
   const content = ad.mediaType === 'VIDEO'
-    ? <video src={ad.mediaUrl} className="h-20 w-32 flex-shrink-0 rounded-lg object-cover sm:h-24 sm:w-44" autoPlay muted loop playsInline />
-    : <img src={ad.mediaUrl} alt={ad.title} className="h-20 w-32 flex-shrink-0 rounded-lg object-cover sm:h-24 sm:w-44" />;
+    ? <video src={ad.mediaUrl} className="block h-auto max-h-96 w-full object-cover" autoPlay muted loop playsInline />
+    : <img src={ad.mediaUrl} alt={ad.title} className="block h-auto max-h-96 w-full object-cover" />;
 
   return (
-    <div className="mx-auto mb-4 flex max-w-7xl items-center gap-3 rounded-xl border border-white/10 bg-white/[.04] p-2.5 text-sm text-white/70">
+    <div className="mx-auto mb-6 w-full max-w-7xl">
       {ad.clickUrl ? <a href={ad.clickUrl} target="_blank" rel="noreferrer" aria-label={`Open sponsored ad: ${ad.title}`}>{content}</a> : content}
-      <div className="min-w-0 flex-1"><p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-purple-300"><Megaphone className="h-3 w-3" /> Sponsored</p><p className="truncate text-white/80">{ad.title}</p></div>
-      {ad.clickUrl && <ExternalLink className="h-4 w-4 flex-shrink-0 text-white/40" />}
-      <button type="button" onClick={() => setDismissed(true)} aria-label="Dismiss sponsored ad" className="rounded-full p-1.5 text-white/40 hover:bg-white/10 hover:text-white"><X className="h-4 w-4" /></button>
     </div>
   );
 }

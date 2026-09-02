@@ -29,7 +29,7 @@ export class PaymentService {
     currency: Currency,
     provider: string,
   ) {
-    if (!userId || !plan || !amount || amount <= 0) {
+    if (!userId || !plan || !amount || amount <= 0 || !['MTN_MONEY', 'AIRTEL_MONEY', 'ZAMTEL_MONEY'].includes(provider)) {
       throw new BadRequestException('A valid subscription plan and amount are required');
     }
 

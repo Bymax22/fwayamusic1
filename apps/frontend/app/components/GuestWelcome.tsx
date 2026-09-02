@@ -33,6 +33,7 @@ import MobileMenu from "./MobileMenu";
 import { createMediaSlug } from "@/lib/utils";
 import { subscribe } from '@/lib/realtime';
 import VerifiedBadge from "./VerifiedBadge";
+import FreeUserAdBanner from "./FreeUserAdBanner";
 
 export default function GuestWelcome() {
   const [activeTab, setActiveTab] = useState<string>("for-you");
@@ -1160,6 +1161,7 @@ export default function GuestWelcome() {
             </div>
 
             {/* Featured Artists (mobile) */}
+            <FreeUserAdBanner />
             <div className="mt-3">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold">Featured Artists</h3>
@@ -2286,6 +2288,8 @@ export default function GuestWelcome() {
               ))}
             </div>
           </div>
+
+            <FreeUserAdBanner />
 
           {/* ===== FEATURED ARTISTS ===== */}
           <div className="mb-8">
