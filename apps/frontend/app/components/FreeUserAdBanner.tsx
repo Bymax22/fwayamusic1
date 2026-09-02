@@ -8,12 +8,22 @@ type Campaign = { id: number; frequencyCap: number; cooldownSeconds: number; ads
 type Impression = { count: number; lastShown: number };
 
 const STORAGE_KEY = 'fwaya-ad-impressions';
+const FALLBACK_CAMPAIGN: Campaign = {
+  id: 1,
+  frequencyCap: 3,
+  cooldownSeconds: 300,
+  ads: [
+    { id: 1, title: 'Fwaya sponsored promotion 1', mediaType: 'IMAGE', mediaUrl: 'https://res.cloudinary.com/dayn5vifn/image/upload/v1788368656/ChatGPT_Image_Sep_2_2026_06_58_51_PM_2_krnf19.png' },
+    { id: 2, title: 'Fwaya sponsored promotion 2', mediaType: 'IMAGE', mediaUrl: 'https://res.cloudinary.com/dayn5vifn/image/upload/v1788368656/ChatGPT_Image_Sep_2_2026_06_48_12_PM_1_vnf9ld.png' },
+    { id: 3, title: 'Fwaya sponsored promotion 3', mediaType: 'IMAGE', mediaUrl: 'https://res.cloudinary.com/dayn5vifn/image/upload/v1788368657/ChatGPT_Image_Sep_2_2026_06_56_15_PM_1_x6mtxq.png' },
+  ],
+};
 
 export default function FreeUserAdBanner() {
   const { user, loading } = useAuth();
   const [ad, setAd] = useState<Ad | null>(null);
   const [campaignId, setCampaignId] = useState<number | null>(null);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([FALLBACK_CAMPAIGN]);
   const [dismissed, setDismissed] = useState(false);
 
   const hasActivePremium = Boolean(user?.isPremium && user.premiumUntil && new Date(user.premiumUntil) > new Date());
@@ -23,9 +33,15 @@ export default function FreeUserAdBanner() {
     const load = async () => {
       try {
         const response = await fetch('/api/advertising/active', { cache: 'no-store' });
-        if (response.ok) setCampaigns(await response.json());
+        if (response.ok) {
+          const loadedCampaigns = await response.json();
+          setCampaigns(Array.isArray(loadedCampaigns) && loadedCampaigns.length ? loadedCampaigns : [FALLBACK_CAMPAIGN]);
+        } else {
+          setCampaigns([FALLBACK_CAMPAIGN]);
+        }
       } catch (error) {
         console.warn('Unable to load sponsored ads', error);
+        setCampaigns([FALLBACK_CAMPAIGN]);
       }
     };
     void load();
