@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import AvatarImage from '@/components/AvatarImage';
 import {
   FaPlay,
   FaPause,
@@ -322,7 +323,7 @@ export default function ArtistPage() {
           {/* Artist Avatar and Bio Section */}
           <div className="flex flex-col lg:flex-row gap-8 mb-12">
             <div className="relative flex-shrink-0">
-              <Image
+              <AvatarImage
                 src={artist.avatarUrl}
                 alt={artist.name}
                 width={300}

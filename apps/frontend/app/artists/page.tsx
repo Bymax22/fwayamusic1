@@ -4,6 +4,7 @@ import { Users, Play, MapPin, Search, SortAsc, SortDesc } from 'lucide-react';
 import Image from "next/image";
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import AvatarImage from '@/components/AvatarImage';
 
 interface Artist {
   id: string;
@@ -178,15 +179,12 @@ export default function ArtistsPage() {
                 <Link href={`/artists/${artist.id}`} className="block">
                   <div className="relative p-6 text-center">
                     <div className="relative mb-4">
-                      <Image
+                      <AvatarImage
                         src={artist.avatarUrl || artist.imageUrl || '/default-avatar.jpg'}
                         alt={artist.name}
                         width={150}
                         height={150}
                         className="w-full max-w-[150px] aspect-square object-cover rounded-full mx-auto group-hover:scale-110 transition-transform duration-300"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/default-avatar.jpg';
-                        }}
                       />
                       <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>

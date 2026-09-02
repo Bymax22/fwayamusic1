@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { EventsGateway } from '../events/events.gateway';
 
@@ -45,6 +45,10 @@ export class MediaInteractionService {
   }
 
   async playMedia(mediaId: number, userId: number) {
+    const media = await this.prisma.media.findUnique({ where: { id: mediaId } });
+    if (!media) throw new Error('Media not found');
+    await this.assertMediaAccess(media, userId);
+
     await this.prisma.media.update({
       where: { id: mediaId },
       data: { playCount: { increment: 1 } },
@@ -63,9 +67,10 @@ export class MediaInteractionService {
       throw new Error('Media not found');
     }
 
-    if (media.accessType !== 'FREE') {
-      throw new Error('Only free media can be downloaded');
+    if (media.accessType === 'PAY_PER_VIEW') {
+      throw new ForbiddenException('Pay-per-view media must be purchased separately');
     }
+    await this.assertMediaAccess(media, userId);
 
     if (!media.url) {
       throw new Error('Media file not available for download');
@@ -95,6 +100,19 @@ export class MediaInteractionService {
       downloadUrl: download.media.url, // For now, return the media URL
       isDRMProtected: download.isDRMProtected,
     };
+  }
+
+  private async assertMediaAccess(media: { accessType: string }, userId: number) {
+    if (media.accessType !== 'PREMIUM') return;
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { isPremium: true, premiumUntil: true },
+    });
+    const active = Boolean(user?.isPremium && user.premiumUntil && user.premiumUntil > new Date());
+    if (!active) {
+      throw new ForbiddenException('An active premium subscription is required for this media');
+    }
   }
 
   private generateLicenseKey(): string {

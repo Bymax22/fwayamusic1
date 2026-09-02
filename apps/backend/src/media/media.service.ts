@@ -389,7 +389,7 @@ export class MediaService {
       }
 
       // 2. Create database record
-      const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';
+      const defaultCoverUrl = 'https://res.cloudinary.com/dayn5vifn/image/upload/v1777062569/fwaya-01-01_xx0lgo.jpg';
 
       // Parse tags if it's a string (JSON)
       let tags: string[] = [];
@@ -539,7 +539,7 @@ export class MediaService {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
-      const defaultCoverUrl = 'https://www.fwayainnovations.com/default-cover.jpg';
+      const defaultCoverUrl = 'https://res.cloudinary.com/dayn5vifn/image/upload/v1777062569/fwaya-01-01_xx0lgo.jpg';
       const normalizedAccessType = metadata.accessType?.toUpperCase() === 'PREMIUM' || metadata.accessType?.toUpperCase() === 'PAY_PER_VIEW'
         ? metadata.accessType.toUpperCase()
         : (metadata.isPremium ? 'PREMIUM' : 'FREE');
@@ -565,6 +565,7 @@ export class MediaService {
       const normalizedType = this.normalizeMediaType(metadata.type);
       const normalizedReleaseTags = this.buildReleaseTags(metadata.releaseType || metadata.type, tags);
       const albumId = metadata.albumId ? Number(metadata.albumId) : undefined;
+      let albumCoverUrl: string | undefined;
 
       if (albumId) {
         const album = await this.prisma.album.findUnique({ where: { id: albumId } });
@@ -574,6 +575,7 @@ export class MediaService {
         if (album.userId !== userId) {
           throw new ForbiddenException('You can only add tracks to your own album');
         }
+        albumCoverUrl = album.coverUrl || undefined;
       }
 
       // Check video moderation if this is a video
@@ -611,8 +613,8 @@ export class MediaService {
         artistCommissionRate: metadata.artistCommissionRate ? Number(metadata.artistCommissionRate) : 0.5,
         platformCommissionRate: metadata.platformCommissionRate ? Number(metadata.platformCommissionRate) : 0.5,
         user: { connect: { id: userId } },
-        artCoverUrl: metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
-        thumbnailUrl: metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
+        artCoverUrl: albumCoverUrl || metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
+        thumbnailUrl: albumCoverUrl || metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
         ...(albumId ? { album: { connect: { id: albumId } } } : {}),
         ...(metadata.priceTierId ? { priceTier: { connect: { id: Number(metadata.priceTierId) } } } : {}),
       };
@@ -778,6 +780,9 @@ export class MediaService {
     return this.prisma.media.findMany({
       where: { userId },
       include: {
+        album: {
+          select: { id: true, title: true, type: true, coverUrl: true },
+        },
         user: {
           select: { id: true, username: true, displayName: true, avatarUrl: true }
         }
@@ -790,6 +795,9 @@ export class MediaService {
     const media = await this.prisma.media.findUnique({
       where: { id: mediaId },
       include: {
+        album: {
+          select: { id: true, title: true, type: true, coverUrl: true },
+        },
         user: {
           select: { id: true, username: true, displayName: true, avatarUrl: true }
         }

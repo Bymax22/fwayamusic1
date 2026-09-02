@@ -22,6 +22,8 @@ interface PaymentContextType {
     currency?: string
   ) => Promise<PaymentTransactionResponse>;
   checkPaymentStatus: (transactionId: number) => Promise<PaymentStatusResponse>;
+  initiateSubscriptionPayment: (userId: number, plan: string, phoneNumber: string, amount: number, currency?: string) => Promise<PaymentTransactionResponse>;
+  processMobileMoneyPayment: (transactionId: number, phoneNumber: string, provider?: string) => Promise<PaymentTransactionResponse>;
   isProcessing: boolean;
 }
 
@@ -110,9 +112,47 @@ export const PaymentProvider: React.FC<PaymentProviderProps> = ({ children }) =>
     }
   };
 
+  const initiateSubscriptionPayment = async (
+    userId: number,
+    plan: string,
+    phoneNumber: string,
+    amount: number,
+    currency = 'ZMW',
+  ): Promise<PaymentTransactionResponse> => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/subscription-transaction`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'user-id': String(userId) },
+      body: JSON.stringify({ plan, amount, currency, provider: 'MTN_MONEY', phoneNumber }),
+    });
+    if (!response.ok) {
+      const errorData: { message?: string } = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Subscription payment setup failed');
+    }
+    return response.json();
+  };
+
+  const processMobileMoneyPayment = async (
+    transactionId: number,
+    phoneNumber: string,
+    provider = 'MTN_MONEY',
+  ): Promise<PaymentTransactionResponse> => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/payment/process/mobile/${provider}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transactionId, providerData: { phoneNumber } }),
+    });
+    if (!response.ok) {
+      const errorData: { message?: string } = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Mobile-money payment failed');
+    }
+    return response.json();
+  };
+
   const value: PaymentContextType = {
     initiateMobileMoneyPayment,
     checkPaymentStatus,
+    initiateSubscriptionPayment,
+    processMobileMoneyPayment,
     isProcessing,
   };
 

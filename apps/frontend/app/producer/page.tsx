@@ -17,6 +17,7 @@ import RoleGuard from '@/components/RoleGuard';
 import { DashboardCard } from '@/components/DashboardCard';
 import DashboardHeader from '@/components/DashboardHeader';
 import MobilePlayer from '@/components/MobilePlayer';
+import CoverArtImage from '@/components/CoverArtImage';
 
 // Types for Producer Dashboard
 interface Beat {
@@ -697,9 +698,9 @@ export default function ProducerPage() {
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {beats.map(beat => (
                       <div key={beat.id} className="group rounded-2xl bg-black border border-white/10 overflow-hidden hover:border-purple-500/50 transition">
-                        {beat.artCoverUrl && (
+                        {(
                           <div className="relative h-44 overflow-hidden bg-gradient-to-b from-purple-600/20 to-black">
-                            <Image src={beat.artCoverUrl} alt={beat.title} fill className="object-cover group-hover:scale-105 transition duration-300" />
+                            <CoverArtImage src={beat.artCoverUrl} alt={beat.title} fill className="object-cover group-hover:scale-105 transition duration-300" />
                             <button
                               onClick={() => handlePlayBeat(beat)}
                               className="absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/25 opacity-0 group-hover:opacity-100 transition"
@@ -1006,7 +1007,7 @@ export default function ProducerPage() {
                     >
                       {newBeat.coverPreview ? (
                         <div className="relative w-24 h-24 mx-auto">
-                          <Image src={newBeat.coverPreview} alt="Cover preview" fill className="object-cover rounded-lg" />
+                          <CoverArtImage src={newBeat.coverPreview} alt="Cover preview" fill className="object-cover rounded-lg" />
                         </div>
                       ) : (
                         <>

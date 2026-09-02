@@ -3,6 +3,7 @@ import { Injectable, Logger, BadRequestException, InternalServerErrorException }
 import { Currency } from '@prisma/client';
 import { PrismaService } from '../db/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
+import { SubscriptionService } from '../subscription/subscription.service';
 import { CreateTransactionDto, ProcessPaymentDto, CurrencyConversionDto } from './dto/create-transaction.dto';
 import { CommissionService } from '../commission/commission.service';
 import { HttpService } from '@nestjs/axios';
@@ -18,7 +19,35 @@ export class PaymentService {
     private commissionService: CommissionService,
     private httpService: HttpService,
     private pricingService: PricingService,
+    private subscriptionService: SubscriptionService,
   ) {}
+
+  async createSubscriptionTransaction(
+    userId: number,
+    plan: string,
+    amount: number,
+    currency: Currency,
+    provider: string,
+  ) {
+    if (!userId || !plan || !amount || amount <= 0) {
+      throw new BadRequestException('A valid subscription plan and amount are required');
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new BadRequestException('User not found');
+
+    return this.prisma.transaction.create({
+      data: {
+        userId,
+        amount,
+        currency,
+        paymentMethod: 'MOBILE_MONEY',
+        paymentProvider: provider as any,
+        reference: `SUB-${Date.now()}-${userId}`,
+        metadata: { type: 'SUBSCRIPTION', plan, requestedAt: new Date().toISOString() },
+      },
+    });
+  }
 
   public async bcAuthorize(
     accessToken: string,
@@ -378,7 +407,23 @@ export class PaymentService {
           },
         });
 
-        await this.processInstantPayouts(transaction);
+        const subscriptionMetadata = transaction.metadata && typeof transaction.metadata === 'object' && !Array.isArray(transaction.metadata)
+          ? transaction.metadata as { type?: string; plan?: string }
+          : null;
+        if (subscriptionMetadata?.type === 'SUBSCRIPTION') {
+          if (!transaction.userId || !subscriptionMetadata.plan) {
+            throw new BadRequestException('Subscription transaction is missing user or plan details');
+          }
+          await this.subscriptionService.upgradeSubscription(
+            transaction.userId,
+            subscriptionMetadata.plan as any,
+            transaction.amount,
+            transaction.currency,
+            transaction.paymentProvider,
+          );
+        } else {
+          await this.processInstantPayouts(transaction);
+        }
 
         return {
           success: true,

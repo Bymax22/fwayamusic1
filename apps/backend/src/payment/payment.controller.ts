@@ -27,6 +27,20 @@ async createTransaction(
     return this.paymentService.processMobileMoneyPayment(processPaymentDto, provider);
   }
 
+  @Post('subscription-transaction')
+  async createSubscriptionTransaction(
+    @Body() body: { plan: string; amount: number; currency: string; provider: string },
+    @Headers('user-id') userId: string,
+  ) {
+    return this.paymentService.createSubscriptionTransaction(
+      parseInt(userId),
+      body.plan,
+      body.amount,
+      body.currency.toUpperCase() as Currency,
+      body.provider,
+    );
+  }
+
   @Post('currency/convert')
   async convertCurrency(@Body() conversionDto: CurrencyConversionDto) {
     return this.paymentService.convertCurrency(conversionDto);

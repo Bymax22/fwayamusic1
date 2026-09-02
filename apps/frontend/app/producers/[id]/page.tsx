@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { FaPlay, FaPause, FaShare, FaEnvelope, FaGlobe, FaArrowLeft, FaCrown, FaStar } from 'react-icons/fa';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
+import AvatarImage from '@/components/AvatarImage';
 
 export default function ProducerPage() {
   const params = useParams();
@@ -63,7 +64,7 @@ export default function ProducerPage() {
       <div className="p-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-6 mb-6">
           <div className="relative w-28 h-28 rounded-xl overflow-hidden">
-            <Image src={producer.avatarUrl} alt={producer.name} fill className="object-cover rounded-xl" />
+            <AvatarImage src={producer.avatarUrl} alt={producer.name} fill className="object-cover rounded-xl" />
           </div>
           <div>
             <h1 className="text-3xl font-semibold flex items-center gap-3">

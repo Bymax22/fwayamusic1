@@ -1,6 +1,7 @@
 "use client";
 import { useState, useContext, createContext, ReactNode, useRef, useEffect } from 'react';
 import { isVideoTrack, isAudioTrack, isVideoUrl, isAudioUrl } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 // Track interface
 interface Track {
@@ -55,6 +56,7 @@ interface GlobalPlayerContextType {
 const GlobalPlayerContext = createContext<GlobalPlayerContextType | null>(null);
 
 export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuth();
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [queue, setQueueState] = useState<Track[]>([]);
   const [queueIndex, setQueueIndex] = useState(-1);
@@ -381,6 +383,16 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       price: incoming.price as number | undefined,
       currency: (incoming.currency as string) ?? 'ZMW'
     };
+
+    const hasActivePremium = Boolean(user?.isPremium && user.premiumUntil && new Date(user.premiumUntil) > new Date());
+    if (newTrack.accessType === 'PREMIUM' && !hasActivePremium) {
+      window.dispatchEvent(new CustomEvent('fwaya:open-subscription'));
+      return;
+    }
+    if (newTrack.accessType === 'PAY_PER_VIEW') {
+      window.dispatchEvent(new CustomEvent('fwaya:open-pay-per-view', { detail: newTrack }));
+      return;
+    }
 
     // Use strict file type detection to select the right URL
     const mediaUrl = isVideoUrl(newTrack.videoUrl) || isVideoUrl(newTrack.audioUrl) 

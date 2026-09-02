@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
+import AvatarImage from '@/components/AvatarImage';
 import toast from 'react-hot-toast';
 import {
   Headphones,
@@ -383,15 +384,12 @@ export default function ProfilePage() {
         <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-end">
         {/* Avatar */}
           <div className="relative">
-            <Image
+            <AvatarImage
               src={avatarPreview || profile.avatar}
               alt={profile.displayName}
               width={128}
               height={128}
               className="w-32 h-32 rounded-full object-cover shadow-2xl"
-              onError={() => {
-                setProfile((prev) => ({ ...prev, avatar: '/default-avatar.jpg' }));
-              }}
             />
             {isEditing && (
               <button

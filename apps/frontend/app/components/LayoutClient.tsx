@@ -18,16 +18,21 @@ import AuthErrorBanner from "../components/AuthErrorBanner";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { isVideoTrack } from "@/lib/utils";
 import { ServiceWorkerProvider } from "../components/ServiceWorkerProvider";
+import SubscriptionModal from "../components/modal/SubscriptionModal";
+import FreeUserAdBanner from "../components/FreeUserAdBanner";
+import { MobileMoneyPaymentPreviewModal } from "../components/modal/MobileMoneyPaymentPreviewModal";
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const { user, authError, clearAuthError, verificationError } = useAuth();
-  const { currentTrack, isPlaying, togglePlay, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute, nextTrack, previousTrack, toggleRepeat, repeatMode } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, playTrack, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute, nextTrack, previousTrack, toggleRepeat, repeatMode } = useAudioPlayer();
   const pathname = usePathname();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [playlistPickerOpen, setPlaylistPickerOpen] = useState(false);
   const [pickerMediaId, setPickerMediaId] = useState<number | null>(null);
+  const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+  const [payPerViewTrack, setPayPerViewTrack] = useState<any | null>(null);
 
   const isVideoWatchPage = currentTrack ? (isVideoTrack(currentTrack)
     && pathname?.startsWith('/videos/')
@@ -48,6 +53,18 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
     return () => {
       window.removeEventListener('fwaya:open-playlist-picker', handleOpenPlaylistPicker as EventListener);
     };
+  }, []);
+
+  useEffect(() => {
+    const openPayPerView = (event: Event) => setPayPerViewTrack((event as CustomEvent).detail ?? null);
+    window.addEventListener('fwaya:open-pay-per-view', openPayPerView);
+    return () => window.removeEventListener('fwaya:open-pay-per-view', openPayPerView);
+  }, []);
+
+  useEffect(() => {
+    const openSubscription = () => setSubscriptionOpen(true);
+    window.addEventListener('fwaya:open-subscription', openSubscription);
+    return () => window.removeEventListener('fwaya:open-subscription', openSubscription);
   }, []);
 
   return (
@@ -87,6 +104,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
           `}
         >
 
+          <FreeUserAdBanner />
           {children}
         </main>
 
@@ -117,6 +135,25 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
       />
+      <SubscriptionModal isOpen={subscriptionOpen} onClose={() => setSubscriptionOpen(false)} />
+      {payPerViewTrack && (
+        <MobileMoneyPaymentPreviewModal
+          isOpen
+          onClose={() => setPayPerViewTrack(null)}
+          media={{
+            id: Number(payPerViewTrack.id),
+            title: payPerViewTrack.title || 'Pay-per-view content',
+            artist: payPerViewTrack.artist || 'Unknown artist',
+            price: Number(payPerViewTrack.price || 0),
+            currency: payPerViewTrack.currency || 'ZMW',
+          }}
+          onSuccess={() => {
+            const purchasedTrack = payPerViewTrack;
+            setPayPerViewTrack(null);
+            if (purchasedTrack) playTrack(purchasedTrack);
+          }}
+        />
+      )}
 
         {/* Mobile footer removed — replaced by BottomNav Need Help modal */}
 

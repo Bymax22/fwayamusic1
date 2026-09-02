@@ -86,7 +86,7 @@ export default function TrackPage() {
   const [likeLoading, setLikeLoading] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
-  const { getToken } = useAuth();
+  const { getToken, user } = useAuth();
   const [showComments, setShowComments] = useState(true);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState('');
@@ -187,7 +187,10 @@ export default function TrackPage() {
       title: track.title,
       artist: track.artist || track.user?.displayName || track.user?.username || 'Unknown Artist',
       imageUrl: track.coverArt,
-      audioUrl: track.url
+      audioUrl: track.url,
+      accessType: track.accessType,
+      price: track.price,
+      currency: track.currency,
     });
 
     const token = await getToken();
@@ -278,7 +281,12 @@ export default function TrackPage() {
   const handleDownload = async () => {
     if (!track) return;
 
-    if (track.accessType === 'PREMIUM' || track.accessType === 'PAY_PER_VIEW') {
+    const hasActivePremium = Boolean(user?.isPremium && user.premiumUntil && new Date(user.premiumUntil) > new Date());
+    if (track.accessType === 'PAY_PER_VIEW') {
+      alert('This track must be purchased separately.');
+      return;
+    }
+    if (track.accessType === 'PREMIUM' && !hasActivePremium) {
       alert('This track requires premium access to download.');
       return;
     }

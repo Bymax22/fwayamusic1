@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Play, Download, Heart, MessageCircle, Trash2, Edit, Lock, Unlock } from 'lucide-react';
+import CoverArtImage from './CoverArtImage';
 
 interface Beat {
   id: number;
@@ -136,7 +137,7 @@ export default function ProducerBeatsGrid() {
                 >
                   {/* Cover Image */}
                   <div className="relative aspect-square bg-gray-200 overflow-hidden">
-                    <img
+                    <CoverArtImage
                       src={beat.artCoverUrl || '/placeholder-beat.png'}
                       alt={beat.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition duration-300"

@@ -1,6 +1,9 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+export const DEFAULT_MEDIA_COVER_URL = 'https://res.cloudinary.com/dayn5vifn/image/upload/v1777062569/fwaya-01-01_xx0lgo.jpg';
+export const DEFAULT_AVATAR_URL = 'https://res.cloudinary.com/dayn5vifn/image/upload/v1777058518/ChatGPT_Image_Apr_24_2026_09_12_34_PM_ykwnqa.png';
+
 /**
  * Merges Tailwind classes with clsx for conditional classes
  * @param inputs Class values to merge

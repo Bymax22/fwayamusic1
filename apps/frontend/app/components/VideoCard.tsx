@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import CoverArtImage from './CoverArtImage';
 
 type VideoCardProps = {
   id: string | number;
@@ -69,7 +70,7 @@ export default function VideoCard({
     >
       <div className="relative overflow-hidden rounded-2xl bg-slate-800">
         {thumbnail ? (
-          <img
+          <CoverArtImage
             src={thumbnail}
             alt={title}
             className="h-48 w-full object-cover"

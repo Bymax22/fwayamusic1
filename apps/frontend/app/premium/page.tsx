@@ -4,6 +4,7 @@ import { Crown, Play, Pause, Heart, Download, Music } from 'lucide-react';
 import Image from "next/image";
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
+import SubscriptionModal from '@/components/modal/SubscriptionModal';
 
 interface MediaFile {
   id: number;
@@ -36,6 +37,7 @@ function normalizeMedia(item: any): MediaFile {
 export default function PremiumPage() {
   const [media, setMedia] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
 
   useEffect(() => {
@@ -94,6 +96,13 @@ export default function PremiumPage() {
               <p className="mt-3 max-w-2xl text-gray-400">
                 Unlock premium and exclusive content available only to premium members.
               </p>
+              <button
+                type="button"
+                onClick={() => setIsSubscriptionOpen(true)}
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-3 font-semibold text-white transition hover:bg-purple-500"
+              >
+                <Crown className="h-4 w-4" /> Subscribe to Premium
+              </button>
             </div>
 
             {media.length > 0 ? (
@@ -166,6 +175,7 @@ export default function PremiumPage() {
           </div>
         </div>
       </div>
+      <SubscriptionModal isOpen={isSubscriptionOpen} onClose={() => setIsSubscriptionOpen(false)} />
     </div>
   );
 }

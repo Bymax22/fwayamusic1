@@ -19,6 +19,8 @@ import ShareModal from '@/components/ShareModal';
 import VideoPlayer from '@/components/VideoPlayer';
 import { createMediaSlug } from '@/lib/utils';
 import { subscribe } from '@/lib/realtime';
+import CoverArtImage from '@/components/CoverArtImage';
+import AvatarImage from '@/components/AvatarImage';
 
 
 
@@ -134,16 +136,12 @@ interface ReleaseTrack {
   id: string;
   title: string;
   file: File | null;
-  artCoverFile: File | null;
-  artCoverPreview: string | null;
 }
 
 const createEmptyTrack = (): ReleaseTrack => ({
   id: `track-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
   title: '',
   file: null,
-  artCoverFile: null,
-  artCoverPreview: null,
 });
 
 export default function ForArtistsPage() {
@@ -591,10 +589,6 @@ export default function ForArtistsPage() {
             if (selectedPriceTierId) metadataPayload.priceTierId = Number(selectedPriceTierId);
             if (pricingPreview) metadataPayload.price = pricingPreview.directPrice;
           }
-          if (track.artCoverFile) {
-            const trackCoverData = await uploadToCloudinary(track.artCoverFile, 'image');
-            metadataPayload.coverUrl = trackCoverData.secure_url;
-          }
           if (releaseAlbumId) {
             metadataPayload.albumId = releaseAlbumId;
           }
@@ -787,33 +781,6 @@ export default function ForArtistsPage() {
     };
     reader.readAsDataURL(file);
     setNewMedia(prev => ({ ...prev, artCoverFile: file }));
-  };
-
-  const handleTrackCoverSelect = (trackId: string, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      alert('Please select a valid image for the track cover art');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setNewMedia(prev => ({
-        ...prev,
-        tracks: prev.tracks.map((track) => track.id === trackId ? {
-          ...track,
-          artCoverPreview: reader.result as string,
-        } : track),
-      }));
-    };
-    reader.readAsDataURL(file);
-
-    setNewMedia(prev => ({
-      ...prev,
-      tracks: prev.tracks.map((track) => track.id === trackId ? { ...track, artCoverFile: file } : track),
-    }));
   };
 
   const generateResellerLink = async (mediaId: number) => {
@@ -1239,42 +1206,22 @@ export default function ForArtistsPage() {
                   className="group rounded-2xl overflow-hidden ring-1 ring-white/10 hover:ring-purple-400/30 transition relative"
                 >
                   {/* Background Art Cover */}
-                  {item.artCoverUrl && (
+                  {(
                     <div className="absolute inset-0 z-0">
-                      <Image
+                      <CoverArtImage
                         src={item.artCoverUrl}
                         alt={item.title}
                         fill
                         className="object-cover blur-md opacity-20"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/default-cover.jpg';
-                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950" />
                     </div>
-                  )}
-                  {!item.artCoverUrl && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950 to-slate-900 z-0" />
                   )}
                   
                   <div className="relative z-10 grid grid-cols-[auto_1fr_auto] gap-4 items-center p-4 md:p-5">
                     {/* Cover Art */}
                     <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-slate-800 flex-shrink-0">
-                      {item.artCoverUrl ? (
-                        <Image
-                          src={item.artCoverUrl}
-                          alt={item.title}
-                          fill
-                          className="object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/default-cover.jpg';
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-slate-700 flex items-center justify-center">
-                          <Music className="w-6 h-6 text-gray-400" />
-                        </div>
-                      )}
+                      <CoverArtImage src={item.artCoverUrl} alt={item.title} fill className="object-cover" />
                     </div>
 
                     {/* Title, Type, Genre Info */}
@@ -1544,15 +1491,13 @@ export default function ForArtistsPage() {
                     <tr key={follower.id} className="hover:bg-slate-900 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          {follower.follower.avatarUrl && (
-                            <Image
-                              src={follower.follower.avatarUrl}
-                              alt={follower.follower.username}
-                              width={40}
-                              height={40}
-                              className="rounded-full object-cover"
-                            />
-                          )}
+                          <AvatarImage
+                            src={follower.follower.avatarUrl}
+                            alt={follower.follower.username}
+                            width={40}
+                            height={40}
+                            className="rounded-full object-cover"
+                          />
                           <div>
                             <span className="font-medium text-white">
                               {follower.follower.displayName || follower.follower.username}
@@ -1929,24 +1874,6 @@ export default function ForArtistsPage() {
                             )}
                           </div>
 
-                          <div className="bg-[#08080e] rounded-3xl p-3 text-center">
-                            <input
-                              type="file"
-                              className="hidden"
-                              id={`track-cover-${track.id}`}
-                              onChange={(e) => handleTrackCoverSelect(track.id, e)}
-                              accept="image/*"
-                              disabled={isUploading}
-                            />
-                            <label htmlFor={`track-cover-${track.id}`} className="cursor-pointer inline-flex flex-col items-center gap-1 text-gray-400">
-                              <Upload className="w-6 h-6 text-purple-400" />
-                              <span className="text-white font-medium">{track.artCoverFile ? 'Change track cover' : 'Optional track cover'}</span>
-                              <span className="text-xs">JPG, PNG, WEBP</span>
-                            </label>
-                            {track.artCoverPreview && (
-                              <img src={track.artCoverPreview} alt="Track cover preview" className="mx-auto mt-3 h-16 w-16 rounded-2xl object-cover" />
-                            )}
-                          </div>
                         </div>
                       ))}
                     </div>
@@ -1968,9 +1895,7 @@ export default function ForArtistsPage() {
                         <span className="text-white font-medium">Upload cover art</span>
                         <span className="text-xs">JPG, PNG, WEBP · Optional</span>
                       </label>
-                      {newMedia.artCoverPreview && (
-                        <img src={newMedia.artCoverPreview} alt="Cover preview" className="mx-auto mt-3 h-20 w-20 rounded-3xl object-cover" />
-                      )}
+                      <CoverArtImage src={newMedia.artCoverPreview} alt="Cover preview" className="mx-auto mt-3 h-20 w-20 rounded-3xl object-cover" />
                     </div>
                   </div>
 

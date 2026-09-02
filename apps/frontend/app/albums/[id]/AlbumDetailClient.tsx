@@ -32,7 +32,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
     id: track.id,
     title: track.title || '',
     artist: track.user?.displayName || track.user?.username || '',
-    imageUrl: track.artCoverUrl || track.coverArt || track.thumbnailUrl,
+    imageUrl: album.coverUrl || album.artCoverUrl || album.thumbnailUrl || track.artCoverUrl || track.coverArt || track.thumbnailUrl,
     audioUrl: track.audioUrl || track.url,
     videoUrl: track.videoUrl,
     duration: track.duration,

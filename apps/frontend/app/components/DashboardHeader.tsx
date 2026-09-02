@@ -6,6 +6,7 @@ import { FaCog, FaSignOutAlt, FaShare, FaUser, FaMusic, FaHeadphones, FaStar } f
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import NotificationBell from './NotificationBell';
+import AvatarImage from './AvatarImage';
 
 interface DashboardHeaderProps {
   showLogo?: boolean;
@@ -118,23 +119,7 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 hover:border-white/40 transition-colors"
               >
-                {user?.avatarUrl ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt={user.displayName || user.username || 'User'}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/default-avatar.png';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                    <span className="text-white text-sm font-semibold">
-                      {(user?.displayName || user?.username || 'U').charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                )}
+                <AvatarImage src={user?.avatarUrl} alt={user?.displayName || user?.username || 'User'} fill className="object-cover" />
               </button>
 
               {/* User Menu Dropdown */}
@@ -144,21 +129,7 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
                   <div className="px-4 py-3 border-b border-white/10">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full overflow-hidden">
-                        {user?.avatarUrl ? (
-                          <Image
-                            src={user.avatarUrl}
-                            alt={user.displayName || user.username || 'User'}
-                            width={40}
-                            height={40}
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                            <span className="text-white font-semibold">
-                              {(user?.displayName || user?.username || 'U').charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        )}
+                        <AvatarImage src={user?.avatarUrl} alt={user?.displayName || user?.username || 'User'} width={40} height={40} className="h-full w-full object-cover" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-white font-medium truncate">

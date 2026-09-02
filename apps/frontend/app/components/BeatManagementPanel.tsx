@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Upload, Edit2, Trash2, TrendingUp, Lock, Unlock } from 'lucide-react';
+import CoverArtImage from './CoverArtImage';
 
 interface BeatAnalytics {
   beat: {
@@ -224,7 +225,7 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
         {/* Cover Art Section */}
         <div className="md:col-span-1">
           <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden mb-4">
-            <img
+            <CoverArtImage
               src={coverPreview || beat.artCoverUrl || '/placeholder-beat.png'}
               alt={beat.title}
               className="w-full h-full object-cover"
