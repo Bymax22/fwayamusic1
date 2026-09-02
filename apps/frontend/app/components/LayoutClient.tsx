@@ -72,7 +72,9 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     if (loading || pathname?.startsWith('/auth') || pathname === '/premium') return;
-    setSubscriptionPromptOpen(true);
+    setSubscriptionPromptOpen(false);
+    const timer = window.setTimeout(() => setSubscriptionPromptOpen(true), 60_000);
+    return () => window.clearTimeout(timer);
   }, [loading, pathname]);
 
   return (

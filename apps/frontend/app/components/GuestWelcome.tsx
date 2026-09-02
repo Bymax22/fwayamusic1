@@ -26,7 +26,7 @@ import {
   FaSignOutAlt,
   FaTimes
 } from "react-icons/fa";
-import { FaRegHeart } from "react-icons/fa";
+import { FaRegHeart, FaPlus } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useAuth } from "@/context/AuthContext";
 import MobileMenu from "./MobileMenu";
@@ -59,6 +59,17 @@ export default function GuestWelcome() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const cacheKey = 'fwayaGuestWelcomeHomepageData';
+
+  const handleAddToPlaylist = (event: React.MouseEvent, item: any) => {
+    event.stopPropagation();
+    if (!user) {
+      router.push('/auth/user/signin');
+      return;
+    }
+    window.dispatchEvent(new CustomEvent('fwaya:open-playlist-picker', {
+      detail: { mediaId: item.id },
+    }));
+  };
 
   const roleOptions = [
     {
@@ -1070,6 +1081,14 @@ export default function GuestWelcome() {
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500" />
                         )}
+                        <button
+                          type="button"
+                          aria-label={`Add ${item.title} to a playlist`}
+                          onClick={(event) => handleAddToPlaylist(event, item)}
+                          className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple-600"
+                        >
+                          <FaPlus className="text-xs" />
+                        </button>
                       </div>
                     </div>
                     <div className="px-1">
@@ -1298,6 +1317,14 @@ export default function GuestWelcome() {
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500" />
                         )}
+                        <button
+                          type="button"
+                          aria-label={`Add ${item.title} to a playlist`}
+                          onClick={(event) => handleAddToPlaylist(event, item)}
+                          className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple-600"
+                        >
+                          <FaPlus className="text-xs" />
+                        </button>
                       </div>
                     </div>
                     <div className="px-1">

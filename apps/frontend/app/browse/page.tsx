@@ -1295,6 +1295,18 @@ export default function Browse() {
                           <MoreHorizontal className="w-5 h-5 text-white" />
                         </div>
                       </button>
+                      <button
+                        onClick={() => {
+                          setSelectedMedia(file);
+                          setShowAddToPlaylist(true);
+                        }}
+                        aria-label={`Add ${file.title} to a playlist`}
+                        className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
+                      >
+                        <div className="w-10 h-10 rounded-full bg-[#080a13] flex items-center justify-center">
+                          <Plus className="w-5 h-5 text-white" />
+                        </div>
+                      </button>
                     </div>
                   </div>
 

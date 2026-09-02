@@ -21,7 +21,7 @@ export default function SubscriptionPromptModal({
 
   return (
     <div className="fixed inset-0 z-[65] flex items-start justify-center bg-black/45 px-4 pt-20 backdrop-blur-[2px] sm:pt-24">
-      <div className="relative w-full max-w-sm rounded-2xl border border-purple-400/20 bg-[#151522] p-5 text-white shadow-2xl shadow-black/40">
+      <div className="relative w-full max-w-sm rounded-2xl bg-black p-5 text-white shadow-2xl shadow-black/40">
         <button
           type="button"
           onClick={onClose}
@@ -62,7 +62,7 @@ export default function SubscriptionPromptModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-white/10 px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white"
+            className="rounded-xl bg-white/10 px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/15 hover:text-white"
           >
             Maybe later
           </button>
