@@ -127,6 +127,7 @@ model User {
   newsShares             NewsShare[]
   newsViews              NewsView[]
   notifications          Notification[]
+  advertisingCampaigns   AdvertisingCampaign[]
   nowPlaying             NowPlaying?
   paymentAccounts        PaymentAccount[]
   payoutRequests         PayoutRequest[]
@@ -961,6 +962,42 @@ model Subscription {
   @@map("subscriptions")
 }
 
+model AdvertisingCampaign {
+  id              Int             @id @default(autoincrement())
+  name            String
+  startAt         DateTime        @map("start_at")
+  endAt           DateTime?       @map("end_at")
+  isActive        Boolean         @default(true) @map("is_active")
+  frequencyCap    Int             @default(3) @map("frequency_cap")
+  cooldownSeconds Int             @default(300) @map("cooldown_seconds")
+  createdById     Int             @map("created_by_id")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  createdBy       User            @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  ads             Advertisement[]
+
+  @@index([isActive, startAt, endAt])
+  @@index([createdById])
+  @@map("advertising_campaigns")
+}
+
+model Advertisement {
+  id          Int                  @id @default(autoincrement())
+  campaignId  Int                  @map("campaign_id")
+  title       String
+  mediaType   AdvertisingMediaType @map("media_type")
+  mediaUrl    String               @map("media_url")
+  clickUrl    String?              @map("click_url")
+  sortOrder   Int                  @default(0) @map("sort_order")
+  isActive    Boolean              @default(true) @map("is_active")
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+  campaign    AdvertisingCampaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId, isActive, sortOrder])
+  @@map("advertisements")
+}
+
 model Notification {
   id        Int              @id @default(autoincrement())
   userId    Int?             @map("user_id")
@@ -1540,6 +1577,11 @@ enum SubscriptionStatus {
   EXPIRED
   SUSPENDED
   PENDING
+}
+
+enum AdvertisingMediaType {
+  IMAGE
+  VIDEO
 }
 
 enum CommissionStatus {

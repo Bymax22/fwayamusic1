@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, Bell, Moon, Sun, ChevronRight } from "lucide-react";
+import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, Bell, Moon, Sun, ChevronRight, Crown } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import SubscriptionModal from "./modal/SubscriptionModal";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -26,6 +27,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [authModalMode, setAuthModalMode] = useState<"signin" | "signup" | null>(null);
+  const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+  const hasActivePremium = Boolean(user?.isPremium && user.premiumUntil && new Date(user.premiumUntil) > new Date());
 
   // Only close menu if pathname changes after menu is already open
   const prevPathnameRef = useRef(pathname);
@@ -171,6 +174,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const currentSectionLabel = activeMenuTab === "menu" ? "Navigation" : activeMenuTab === "library" ? "Your Library" : activeMenuTab === "discover" ? "Discover" : "Account";
 
   return (
+    <>
     <AnimatePresence>
       {isOpen && (
         <>
@@ -318,21 +322,35 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             {/* User Info */}
             {user ? (
               <div className="flex-shrink-0 px-6 py-4 bg-black">
-                <div className="flex items-center space-x-3 bg-white/5 rounded-3xl p-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-bold">
-                    {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3 bg-white/5 rounded-3xl p-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-bold">
+                      {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white truncate">
+                        {user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username)}
+                      </p>
+                      <p className="text-xs text-purple-300 truncate">{user.email}</p>
+                    </div>
+                    <button className="p-2 rounded-full hover:bg-purple-600/20 transition-colors">
+                      <NotificationBell />
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
-                      {user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username)}
-                    </p>
-                    <p className="text-xs text-purple-300 truncate">
-                      {user.email}
-                    </p>
+                  <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                    <Crown className={`h-5 w-5 ${hasActivePremium ? 'text-amber-300' : 'text-gray-400'}`} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-white">{hasActivePremium ? 'Premium Plan' : 'Free Plan'}</p>
+                      <p className="text-xs text-gray-400">{hasActivePremium ? `Active until ${new Date(user.premiumUntil as string).toLocaleDateString()}` : 'Upgrade for premium listening'}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSubscriptionOpen(true)}
+                      className="rounded-full bg-purple-500 px-3 py-2 text-xs font-semibold text-white hover:bg-purple-400"
+                    >
+                      {hasActivePremium ? 'Change plan' : 'Subscribe'}
+                    </button>
                   </div>
-                  <button className="p-2 rounded-full hover:bg-purple-600/20 transition-colors">
-                    <NotificationBell />
-                  </button>
                 </div>
               </div>
             ) : (
@@ -353,6 +371,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       <p className="text-xs text-gray-400">Free</p>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setAuthModalMode('signin')}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-purple-500 py-2.5 text-sm font-semibold text-white hover:bg-purple-400"
+                  >
+                    <Crown className="h-4 w-4" /> Subscribe to Premium
+                  </button>
 
                   {/* Auth Actions */}
                   <div className="grid grid-cols-2 gap-2">
@@ -437,6 +462,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         </>
       )}
     </AnimatePresence>
+    <SubscriptionModal isOpen={subscriptionOpen} onClose={() => setSubscriptionOpen(false)} />
+  </>
   );
 }
 

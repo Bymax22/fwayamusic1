@@ -22,6 +22,7 @@ import { KycModule } from './kyc/kyc.module';
 import { AlbumsModule } from './albums/albums.module';
 import { PricingModule } from './pricing/pricing.module';
 import { SupportModule } from './support/support.module';
+import { AdvertisingModule } from './advertising/advertising.module';
 
 const logger = new Logger('AppModule');
 
@@ -50,6 +51,7 @@ const logger = new Logger('AppModule');
     AlbumsModule,
     PricingModule,
     SupportModule,
+    AdvertisingModule,
   ],
   controllers: [AppController],
   providers: [AppService,

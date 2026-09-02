@@ -21,9 +21,10 @@ import { ServiceWorkerProvider } from "../components/ServiceWorkerProvider";
 import SubscriptionModal from "../components/modal/SubscriptionModal";
 import FreeUserAdBanner from "../components/FreeUserAdBanner";
 import { MobileMoneyPaymentPreviewModal } from "../components/modal/MobileMoneyPaymentPreviewModal";
+import SubscriptionPromptModal from "../components/SubscriptionPromptModal";
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
-  const { user, authError, clearAuthError, verificationError } = useAuth();
+  const { user, loading, authError, clearAuthError, verificationError } = useAuth();
   const { currentTrack, isPlaying, togglePlay, playTrack, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute, nextTrack, previousTrack, toggleRepeat, repeatMode } = useAudioPlayer();
   const pathname = usePathname();
 
@@ -32,6 +33,8 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
   const [playlistPickerOpen, setPlaylistPickerOpen] = useState(false);
   const [pickerMediaId, setPickerMediaId] = useState<number | null>(null);
   const [subscriptionOpen, setSubscriptionOpen] = useState(false);
+  const [subscriptionPromptOpen, setSubscriptionPromptOpen] = useState(false);
+  const hasActivePremium = Boolean(user?.isPremium && user.premiumUntil && new Date(user.premiumUntil) > new Date());
   const [payPerViewTrack, setPayPerViewTrack] = useState<any | null>(null);
 
   const isVideoWatchPage = currentTrack ? (isVideoTrack(currentTrack)
@@ -66,6 +69,11 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
     window.addEventListener('fwaya:open-subscription', openSubscription);
     return () => window.removeEventListener('fwaya:open-subscription', openSubscription);
   }, []);
+
+  useEffect(() => {
+    if (loading || pathname?.startsWith('/auth') || pathname === '/premium') return;
+    setSubscriptionPromptOpen(true);
+  }, [loading, pathname]);
 
   return (
     <div className="w-full text-white bg-transparent lg:pt-14">
@@ -104,8 +112,8 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
           `}
         >
 
-          <FreeUserAdBanner />
           {children}
+          <FreeUserAdBanner />
         </main>
 
         {/* =======================
@@ -136,6 +144,19 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
         onClose={() => setMobileMenuOpen(false)}
       />
       <SubscriptionModal isOpen={subscriptionOpen} onClose={() => setSubscriptionOpen(false)} />
+      <SubscriptionPromptModal
+        isOpen={subscriptionPromptOpen && !hasActivePremium}
+        isLoggedIn={Boolean(user)}
+        onClose={() => setSubscriptionPromptOpen(false)}
+        onSubscribe={() => {
+          setSubscriptionPromptOpen(false);
+          setSubscriptionOpen(true);
+        }}
+        onLogin={() => {
+          setSubscriptionPromptOpen(false);
+          window.location.href = '/auth/user/signin';
+        }}
+      />
       {payPerViewTrack && (
         <MobileMoneyPaymentPreviewModal
           isOpen
