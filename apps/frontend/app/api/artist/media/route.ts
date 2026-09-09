@@ -29,9 +29,12 @@ export async function GET(request: NextRequest) {
     });
 
     if (!res.ok) {
-      // If backend endpoint doesn't exist or fails, return empty array
-      console.warn(`Backend media endpoint returned ${res.status}: ${res.statusText}`);
-      return NextResponse.json([]);
+      const errorText = await res.text().catch(() => '');
+      console.error(`Backend media endpoint returned ${res.status}: ${res.statusText}`, errorText);
+      return NextResponse.json(
+        { error: errorText || 'Failed to load artist media' },
+        { status: res.status || 502 },
+      );
     }
 
     const data = await res.json();
