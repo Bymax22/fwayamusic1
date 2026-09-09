@@ -50,6 +50,8 @@ interface Media {
   artistCommissionRate: number;
   platformCommissionRate: number;
   isDRMProtected: boolean;
+  albumId?: number | null;
+  trackOrder?: number | null;
 }
 
 interface Follower {
@@ -187,6 +189,7 @@ export default function ForArtistsPage() {
   const [selectedMediaForShare, setSelectedMediaForShare] = useState<Media | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [isEditLoading, setIsEditLoading] = useState(false);
+  const [replacementFile, setReplacementFile] = useState<File | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const formatZMW = (amount: number) =>
@@ -198,6 +201,12 @@ export default function ForArtistsPage() {
     });
 
   const getBackendBaseUrl = () => process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+  const getUploadKey = () => {
+    const files = newMedia.type === 'ALBUM' || newMedia.type === 'EP'
+      ? newMedia.tracks.map((track) => `${track.title}:${track.file?.name}:${track.file?.size}:${track.file?.lastModified}`).join('|')
+      : `${newMedia.file?.name}:${newMedia.file?.size}:${newMedia.file?.lastModified}`;
+    return `fwaya:artist-upload:${newMedia.title.trim()}:${newMedia.type}:${files}`;
+  };
   // Map our frontend media type to product type names used by admin price tiers
   const productTypeNameForMediaType = (t: string) => {
     switch (t) {
@@ -525,6 +534,14 @@ export default function ForArtistsPage() {
       return;
     }
 
+    const uploadKey = getUploadKey();
+    const uploadState = typeof window !== 'undefined' ? localStorage.getItem(uploadKey) : null;
+    if (uploadState === 'pending' || uploadState === 'complete') {
+      alert(uploadState === 'pending' ? 'This upload is already in progress. Please wait.' : 'This upload was already completed. Choose a different file or title.');
+      return;
+    }
+    if (typeof window !== 'undefined') localStorage.setItem(uploadKey, 'pending');
+
     try {
       setIsUploading(true);
       setUploadProgress(0);
@@ -578,6 +595,7 @@ export default function ForArtistsPage() {
             duration: Number(trackCloudinaryData.duration || 0),
             format: trackCloudinaryData.format,
             resourceType: trackCloudinaryData.resource_type,
+            trackOrder: index,
             accessType: newMedia.accessType,
             genre: newMedia.genre.trim() || undefined,
             description: newMedia.lyrics.trim() || undefined,
@@ -617,6 +635,7 @@ export default function ForArtistsPage() {
         }
 
         setMedia(prev => [...uploadedTracks, ...prev]);
+        localStorage.setItem(uploadKey, 'complete');
         setUploadProgress(100);
 
         setTimeout(() => {
@@ -688,6 +707,7 @@ export default function ForArtistsPage() {
       if (dbResponse.ok) {
         const uploadedMedia = await dbResponse.json() as Media;
         setMedia(prev => [uploadedMedia, ...prev]);
+        localStorage.setItem(uploadKey, 'complete');
 
         console.log('✅ Media Upload Successful:', {
           id: uploadedMedia.id,
@@ -728,6 +748,7 @@ export default function ForArtistsPage() {
       alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setUploadProgress(0);
       setIsUploading(false);
+      if (typeof window !== 'undefined') localStorage.removeItem(uploadKey);
     }
   };
 
@@ -816,10 +837,22 @@ export default function ForArtistsPage() {
         headers.Authorization = `Bearer ${token}`;
       }
 
+      let requestUpdates = updates;
+      if (replacementFile) {
+        const cloudinaryData = await uploadToCloudinary(replacementFile, 'auto');
+        requestUpdates = {
+          ...updates,
+          url: cloudinaryData.secure_url,
+          cloudinaryPublicId: cloudinaryData.public_id,
+          duration: Number(cloudinaryData.duration || 0),
+          format: cloudinaryData.format,
+        } as Partial<Media>;
+      }
+
       const response = await fetch(`/api/artist/media/${mediaId}`, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify(updates),
+        body: JSON.stringify(requestUpdates),
       });
 
       if (response.ok) {
@@ -885,6 +918,7 @@ export default function ForArtistsPage() {
         const updatedMedia = await response.json();
         setMedia(prev => prev.map(m => m.id === mediaId ? updatedMedia : m));
         setEditingMedia(null);
+        setReplacementFile(null);
         alert('Track updated successfully');
       } else {
         alert('Failed to update track');
@@ -895,6 +929,40 @@ export default function ForArtistsPage() {
     } finally {
       setIsEditLoading(false);
     }
+  };
+
+  const refreshDashboardMedia = async () => {
+    const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+    const response = await fetch('/api/artist/media', { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    if (response.ok) setMedia(await response.json());
+  };
+
+  const removeReleaseTrack = async (track: Media) => {
+    if (!track.albumId || !window.confirm(`Remove "${track.title}" from this release?`)) return;
+    const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+    const response = await fetch(`/api/albums/${track.albumId}/tracks/${track.id}`, {
+      method: 'DELETE',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!response.ok) { alert('Failed to remove track from release'); return; }
+    await refreshDashboardMedia();
+  };
+
+  const moveReleaseTrack = async (track: Media, direction: -1 | 1) => {
+    if (!track.albumId) return;
+    const tracks = media.filter((item) => item.albumId === track.albumId).sort((a, b) => (a.trackOrder ?? 999999) - (b.trackOrder ?? 999999) || a.id - b.id);
+    const index = tracks.findIndex((item) => item.id === track.id);
+    const targetIndex = index + direction;
+    if (index < 0 || targetIndex < 0 || targetIndex >= tracks.length) return;
+    [tracks[index], tracks[targetIndex]] = [tracks[targetIndex], tracks[index]];
+    const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+    const response = await fetch(`/api/albums/${track.albumId}/tracks/order`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({ mediaIds: tracks.map((item) => item.id) }),
+    });
+    if (!response.ok) { alert('Failed to reorder release tracks'); return; }
+    await refreshDashboardMedia();
   };
 
   const getTrackShareUrl = (media: Media) => `${window.location.origin}/track/${createMediaSlug(media.title, media.id)}`;
@@ -952,6 +1020,18 @@ export default function ForArtistsPage() {
                 className="w-full bg-white/5 text-white rounded-lg px-3 py-2 border border-white/10 focus:border-purple-500 outline-none"
               />
             </div>
+
+            {editingMedia.albumId && (
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Replace audio file</label>
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={(event) => setReplacementFile(event.target.files?.[0] || null)}
+                  className="w-full text-sm text-gray-300"
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-sm text-gray-400 mb-2">Description</label>
@@ -1356,6 +1436,13 @@ export default function ForArtistsPage() {
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
+                    {item.albumId && (
+                      <>
+                        <button onClick={() => moveReleaseTrack(item, -1)} className="text-gray-400 hover:text-white transition p-2" title="Move track up">↑</button>
+                        <button onClick={() => moveReleaseTrack(item, 1)} className="text-gray-400 hover:text-white transition p-2" title="Move track down">↓</button>
+                        <button onClick={() => removeReleaseTrack(item)} className="text-gray-400 hover:text-red-400 transition p-2" title="Remove from release">Remove</button>
+                      </>
+                    )}
                     <button 
                       onClick={() => setSelectedMediaForAnalytics(item)}
                       className="text-gray-400 hover:text-purple-300 transition p-2"

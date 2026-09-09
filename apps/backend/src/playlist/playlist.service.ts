@@ -76,6 +76,14 @@ export class PlaylistService {
   }
 
   async addMediaToPlaylist(playlistId: number, mediaId: number, userId: number) {
+    if (!Number.isInteger(playlistId) || playlistId <= 0) {
+      throw new Error('Invalid playlist id');
+    }
+
+    if (!Number.isInteger(mediaId) || mediaId <= 0) {
+      throw new Error('Invalid media id');
+    }
+
     // First check if the playlist exists and belongs to the user
     const playlist = await this.prisma.playlist.findFirst({
       where: {
@@ -129,12 +137,23 @@ export class PlaylistService {
       },
     });
 
+    const refreshedPlaylist = await this.prisma.playlist.findUnique({
+      where: { id: playlistId },
+      include: {
+        entries: {
+          include: {
+            media: true,
+          },
+        },
+      },
+    });
+
     // Emit realtime update
     try {
-      this.eventsGateway.emitPlaylistUpdated({ playlistId, userId, action: 'add', entry });
+      this.eventsGateway.emitPlaylistUpdated({ playlistId, userId, action: 'add', entry, playlist: refreshedPlaylist ?? undefined });
     } catch (err) {}
 
-    return entry;
+    return refreshedPlaylist ?? { ...entry, playlist, media };
   }
 
   async removeMediaFromPlaylist(playlistId: number, mediaId: number, userId: number) {

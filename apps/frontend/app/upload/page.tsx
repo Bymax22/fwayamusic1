@@ -42,6 +42,7 @@ export default function UploadPage() {
   });
   const [error, setError] = useState<string | null>(null);
   const [success] = useState(false);
+  const [pendingUploadKey, setPendingUploadKey] = useState<string | null>(null);
   const [priceTiers, setPriceTiers] = useState<any[]>([]);
   const [selectedPriceTierId, setSelectedPriceTierId] = useState<number | null>(null);
   const [pricingPreview, setPricingPreview] = useState<any | null>(null);
@@ -162,6 +163,14 @@ export default function UploadPage() {
       return;
     }
 
+    const uploadKey = `${file.name}:${file.size}:${file.lastModified}`;
+    if (pendingUploadKey && pendingUploadKey === uploadKey && uploading) {
+      setError("This upload is already in progress. Please wait for it to finish.");
+      return;
+    }
+
+    setPendingUploadKey(uploadKey);
+
     setUploading(true);
     setUploadProgress(0);
     setError(null);
@@ -252,6 +261,7 @@ export default function UploadPage() {
       });
     } finally {
       setUploading(false);
+      setPendingUploadKey(null);
     }
   };
 

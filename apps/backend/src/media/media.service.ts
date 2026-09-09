@@ -535,7 +535,7 @@ export class MediaService {
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number; priceTierId?: number }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number; trackOrder?: number; priceTierId?: number }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
@@ -616,6 +616,7 @@ export class MediaService {
         artCoverUrl: albumCoverUrl || metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
         thumbnailUrl: albumCoverUrl || metadata.coverUrl || metadata.thumbnailUrl || defaultCoverUrl,
         ...(albumId ? { album: { connect: { id: albumId } } } : {}),
+        ...(albumId && metadata.trackOrder !== undefined ? { trackOrder: Number(metadata.trackOrder) } : {}),
         ...(metadata.priceTierId ? { priceTier: { connect: { id: Number(metadata.priceTierId) } } } : {}),
       };
 
@@ -869,6 +870,10 @@ export class MediaService {
     if (updates.allowReselling !== undefined) updateData.allowReselling = updates.allowReselling;
     if (updates.artistCommissionRate !== undefined) updateData.artistCommissionRate = updates.artistCommissionRate;
     if (updates.tags) updateData.tags = updates.tags;
+    if (updates.url) updateData.url = updates.url;
+    if (updates.cloudinaryPublicId) updateData.cloudinaryPublicId = updates.cloudinaryPublicId;
+    if (updates.duration !== undefined) updateData.duration = Number(updates.duration);
+    if (updates.format) updateData.format = updates.format;
 
     try {
       const updated = await this.prisma.media.update({

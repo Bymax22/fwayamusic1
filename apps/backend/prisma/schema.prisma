@@ -198,6 +198,7 @@ model Media {
   platformCommissionRate Float                   @default(0.3) @map("platform_commission_rate")
   resellerCommissionRate Float?                  @map("reseller_commission_rate")
   albumId                Int?                    @map("album_id")
+  trackOrder             Int?                   @map("track_order")
   allowCommercialUse     Boolean                 @default(true) @map("allow_commercial_use")
   allowDerivatives       Boolean                 @default(true) @map("allow_derivatives")
   audioChannels          Int?                    @map("audio_channels")

@@ -18,6 +18,16 @@ export class SupportController {
   }
 
   @UseGuards(FirebaseAuthGuard)
+  @Get('summary')
+  async summary(@Req() req: any) {
+    const role = req.user?.role;
+    if (!['ADMIN', 'MODERATOR', 'CONTENT_MANAGER'].includes(role)) {
+      throw new ForbiddenException('Insufficient permissions');
+    }
+    return this.supportService.getTicketSummary();
+  }
+
+  @UseGuards(FirebaseAuthGuard)
   @Get()
   async list(@Query('limit') limit = '50', @Query('skip') skip = '0', @Query('q') q = '', @Query('status') status = '', @Req() req: any) {
     // Only allow staff roles

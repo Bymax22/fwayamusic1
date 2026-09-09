@@ -136,4 +136,15 @@ export class AlbumsController {
   ) {
     return this.albumsService.removeTrackFromAlbum(parseInt(id), parseInt(mediaId), req.user.id);
   }
+
+  @Patch(':id/tracks/order')
+  @UseGuards(FirebaseAuthGuard)
+  @ApiBearerAuth()
+  async reorderTracks(
+    @Param('id') id: string,
+    @Request() req: any,
+    @Body() body: { mediaIds: number[] },
+  ) {
+    return this.albumsService.reorderTracks(parseInt(id), req.user.id, body.mediaIds);
+  }
 }

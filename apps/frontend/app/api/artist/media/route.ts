@@ -138,6 +138,7 @@ export async function POST(request: NextRequest) {
       const tags = getField('tags');
       const releaseType = getField('releaseType');
       const albumId = getField('albumId');
+      const trackOrder = getField('trackOrder');
       const baseUrl = getBackendBaseUrl();
 
       const metadata = {
@@ -159,6 +160,7 @@ export async function POST(request: NextRequest) {
         tags: tags ? String(tags) : undefined,
         releaseType: releaseType ? String(releaseType) : undefined,
         albumId: albumId ? Number(albumId) : undefined,
+        trackOrder: trackOrder !== null && trackOrder !== undefined && String(trackOrder) !== '' ? Number(trackOrder) : undefined,
         coverUrl: coverUrl ? String(coverUrl) : undefined,
       };
 

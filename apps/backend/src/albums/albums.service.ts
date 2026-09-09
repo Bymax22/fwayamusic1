@@ -63,7 +63,7 @@ export class AlbumsService {
       include: {
         media: {
           where: { deletedAt: null },
-          orderBy: { createdAt: 'asc' },
+          orderBy: [{ trackOrder: 'asc' }, { createdAt: 'asc' }, { id: 'asc' }],
         },
         user: {
           select: {
@@ -87,7 +87,7 @@ export class AlbumsService {
       include: {
         media: {
           where: { deletedAt: null },
-          orderBy: { createdAt: 'asc' },
+          orderBy: [{ trackOrder: 'asc' }, { createdAt: 'asc' }, { id: 'asc' }],
         },
         user: {
           select: {
@@ -340,6 +340,14 @@ export class AlbumsService {
 
   // Add track to album
   async addTrackToAlbum(albumId: number, mediaId: number, userId: number) {
+    if (!Number.isInteger(albumId) || albumId <= 0) {
+      throw new BadRequestException('Invalid album id');
+    }
+
+    if (!Number.isInteger(mediaId) || mediaId <= 0) {
+      throw new BadRequestException('Invalid media id');
+    }
+
     const album = await this.prisma.album.findUnique({
       where: { id: albumId },
     });
@@ -362,7 +370,7 @@ export class AlbumsService {
 
     const updated = await this.prisma.media.update({
       where: { id: mediaId },
-      data: { albumId },
+      data: { albumId, trackOrder: await this.getNextTrackOrder(albumId) },
     });
 
     return updated;
@@ -370,6 +378,14 @@ export class AlbumsService {
 
   // Remove track from album
   async removeTrackFromAlbum(albumId: number, mediaId: number, userId: number) {
+    if (!Number.isInteger(albumId) || albumId <= 0) {
+      throw new BadRequestException('Invalid album id');
+    }
+
+    if (!Number.isInteger(mediaId) || mediaId <= 0) {
+      throw new BadRequestException('Invalid media id');
+    }
+
     const album = await this.prisma.album.findUnique({
       where: { id: albumId },
     });
@@ -382,11 +398,39 @@ export class AlbumsService {
       throw new ForbiddenException('You can only modify your own albums');
     }
 
+    const track = await this.prisma.media.findFirst({ where: { id: mediaId, albumId } });
+    if (!track) {
+      throw new NotFoundException('Track not found in album');
+    }
+
     const updated = await this.prisma.media.update({
       where: { id: mediaId },
-      data: { albumId: null },
+      data: { albumId: null, trackOrder: null },
     });
 
     return updated;
+  }
+
+  async reorderTracks(albumId: number, userId: number, mediaIds: number[]) {
+    const album = await this.prisma.album.findUnique({ where: { id: albumId }, include: { media: { where: { deletedAt: null } } } });
+    if (!album) throw new NotFoundException('Album not found');
+    if (album.userId !== userId) throw new ForbiddenException('You can only modify your own albums');
+
+    const existingIds = new Set(album.media.map((track) => track.id));
+    if (mediaIds.length !== album.media.length || mediaIds.some((id) => !existingIds.has(id)) || new Set(mediaIds).size !== mediaIds.length) {
+      throw new BadRequestException('Reorder must include every album track exactly once');
+    }
+
+    await this.prisma.$transaction(mediaIds.map((mediaId, index) => this.prisma.media.update({
+      where: { id: mediaId },
+      data: { trackOrder: index },
+    })));
+
+    return this.getAlbumById(albumId);
+  }
+
+  private async getNextTrackOrder(albumId: number) {
+    const result = await this.prisma.media.aggregate({ where: { albumId }, _max: { trackOrder: true } });
+    return (result._max.trackOrder ?? -1) + 1;
   }
 }

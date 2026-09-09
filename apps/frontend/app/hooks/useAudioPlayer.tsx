@@ -94,6 +94,21 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     return audioRef.current;
   };
 
+  const stopActiveMedia = () => {
+    if (typeof window === 'undefined') return;
+
+    [audioRef.current, videoRef.current, registeredVideoElement].forEach((media) => {
+      if (!media) return;
+      try {
+        media.pause();
+      } catch (_) {
+        // no-op
+      }
+      media.src = '';
+      media.load();
+    });
+  };
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -409,8 +424,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     const media = getActiveMedia(newTrack as Track);
     const src = applyAudioQualityToUrl(mediaUrl.trim());
 
-    audioRef.current?.pause();
-    videoRef.current?.pause();
+    stopActiveMedia();
     media.currentTime = 0;
     media.src = src;
     media.crossOrigin = 'anonymous';
@@ -509,11 +523,12 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const stopTrack = () => {
     if (typeof window === 'undefined') return;
-    [audioRef.current, videoRef.current].forEach((media) => {
+    [audioRef.current, videoRef.current, registeredVideoElement].forEach((media) => {
       if (media) {
         media.pause();
         media.currentTime = 0;
         media.src = '';
+        media.load();
       }
     });
     setIsPlaying(false);

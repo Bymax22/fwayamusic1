@@ -277,6 +277,14 @@ export default function ProducerPage() {
       return;
     }
 
+    const uploadKey = `fwaya:producer-beat-upload:${newBeat.title.trim()}:${newBeat.file.name}:${newBeat.file.size}:${newBeat.file.lastModified}`;
+    const previousUpload = typeof window !== 'undefined' ? localStorage.getItem(uploadKey) : null;
+    if (previousUpload === 'pending' || previousUpload === 'complete') {
+      alert(previousUpload === 'pending' ? 'This beat is already uploading. Please wait.' : 'This beat was already uploaded. Choose a different file or title.');
+      return;
+    }
+    if (typeof window !== 'undefined') localStorage.setItem(uploadKey, 'pending');
+
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -313,6 +321,7 @@ export default function ProducerPage() {
 
       const uploadedBeat = await response.json();
       setBeats([uploadedBeat, ...beats]);
+      localStorage.setItem(uploadKey, 'complete');
       setShowUploadModal(false);
       setNewBeat({
         title: '',
