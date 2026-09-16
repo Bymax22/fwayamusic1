@@ -7,6 +7,7 @@ import { Play, Pause, Heart, Share2, Plus, ExternalLink } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
 import { createMediaSlug, DEFAULT_AVATAR_URL, formatRelativeTime } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 interface AlbumDetailClientProps {
   album: any;
@@ -14,6 +15,7 @@ interface AlbumDetailClientProps {
 
 export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
   const { setQueue, togglePlay, isPlaying, currentTrack } = useAudioPlayer();
+  const { getToken } = useAuth();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedMediaId, setSelectedMediaId] = useState<number>(0);
   const [albumLiked, setAlbumLiked] = useState<boolean>(Boolean(album?.isLiked));
@@ -23,6 +25,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
     return map;
   }, [album]);
   const [trackLikes, setTrackLikes] = useState<Record<string | number, boolean>>(trackLikesInit);
+  const [trackLikeLoading, setTrackLikeLoading] = useState<Record<string | number, boolean>>({});
 
   const openPickerFor = (mediaId: number) => {
     setSelectedMediaId(mediaId);
@@ -47,6 +50,49 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
   const handlePlayAll = () => {
     const tracks = releaseTracks();
     if (tracks.length > 0) setQueue(tracks, 0, true);
+  };
+
+  const handleTrackLike = async (mediaId: string | number) => {
+    if (trackLikeLoading[mediaId]) return;
+
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to like tracks.');
+      return;
+    }
+
+    const previousLiked = Boolean(trackLikes[mediaId]);
+    setTrackLikes((previous) => ({ ...previous, [mediaId]: !previousLiked }));
+    setTrackLikeLoading((previous) => ({ ...previous, [mediaId]: true }));
+
+    try {
+      const response = await fetch(`/api/media/${mediaId}/interact/like`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error('Like request failed');
+
+      const data = await response.json().catch(() => null);
+      if (data && typeof data.liked === 'boolean') {
+        setTrackLikes((previous) => ({ ...previous, [mediaId]: data.liked }));
+      }
+
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('fwaya');
+        channel.postMessage({
+          type: 'media-liked',
+          mediaId,
+          liked: typeof data?.liked === 'boolean' ? data.liked : !previousLiked,
+          likes: data?.likes,
+        });
+        channel.close();
+      }
+    } catch (error) {
+      setTrackLikes((previous) => ({ ...previous, [mediaId]: previousLiked }));
+      console.error('Album track like failed:', error);
+    } finally {
+      setTrackLikeLoading((previous) => ({ ...previous, [mediaId]: false }));
+    }
   };
 
   const handleShare = async () => {
@@ -195,8 +241,11 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
 
                           <button
                             type="button"
-                            onClick={() => setTrackLikes((prev) => ({ ...prev, [track.id]: !prev[track.id] }))}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10"
+                            onClick={() => void handleTrackLike(track.id)}
+                            disabled={Boolean(trackLikeLoading[track.id])}
+                            aria-label={trackLikes[track.id] ? 'Unlike track' : 'Like track'}
+                            title={trackLikes[track.id] ? 'Unlike track' : 'Like track'}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10 disabled:cursor-wait disabled:opacity-50"
                           >
                             <Heart className={`h-4 w-4 ${trackLikes[track.id] ? 'text-pink-400' : 'text-white'}`} />
                           </button>
