@@ -80,16 +80,12 @@ export default function ChatwootWidget() {
 
     window.fwayaOpenChatwoot = openChatwoot;
     window.addEventListener("fwaya:open-chatwoot", openChatwoot);
-    window.addEventListener("fwaya:chatwoot-ready", openChatwoot);
-    window.addEventListener("chatwoot:ready", openChatwoot);
 
     return () => {
       if (openTimeoutRef.current !== null) {
         window.clearTimeout(openTimeoutRef.current);
       }
       window.removeEventListener("fwaya:open-chatwoot", openChatwoot);
-      window.removeEventListener("fwaya:chatwoot-ready", openChatwoot);
-      window.removeEventListener("chatwoot:ready", openChatwoot);
       delete window.fwayaOpenChatwoot;
     };
   }, []);
