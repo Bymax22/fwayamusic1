@@ -115,17 +115,24 @@ export function formatDuration(seconds: number): string {
  * @param options Intl.DateTimeFormat options
  * @returns Formatted date string (e.g. "May 15, 2023")
  */
-export function safeDate(value?: string | Date | number | null): Date | null {
+export function safeDate(value?: unknown): Date | null {
   if (value === null || value === undefined || value === '') {
     return null;
   }
 
-  const date = new Date(value);
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value;
+  }
+
+  const serializedValue = typeof value === 'object' && value !== null && '$date' in value
+    ? (value as { $date?: unknown }).$date
+    : value;
+  const date = new Date(serializedValue as string | number);
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
 export function formatDate(
-  dateString?: string | Date | number | null,
+  dateString?: unknown,
   options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short',
@@ -142,8 +149,9 @@ export function formatDate(
  * @param timestamp ISO date string or Date object
  * @returns Relative time string
  */
-export function formatRelativeTime(timestamp: string | Date): string {
-  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+export function formatRelativeTime(timestamp: unknown): string {
+  const date = safeDate(timestamp);
+  if (!date) return 'Unknown date';
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
