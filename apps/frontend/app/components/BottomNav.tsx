@@ -128,9 +128,8 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
                   onClick={(e) => {
                     e.stopPropagation();
                     closeNeedHelp();
-                    // Let the menu overlay finish closing before Chatwoot opens.
                     window.setTimeout(() => {
-                      window.dispatchEvent(new Event("fwaya:open-chatwoot"));
+                      window.fwayaOpenChatwoot?.();
                     }, 220);
                   }}
                   className="w-full text-left px-3 py-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-sm text-white flex items-center gap-2"
