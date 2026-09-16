@@ -9,28 +9,35 @@ function getBackendBaseUrl() {
 }
 
 async function fetchAlbum(albumId: string) {
-  const res = await fetch(`${getBackendBaseUrl()}/api/v1/albums/${albumId}`, {
-    next: { revalidate: 60 },
-  });
+  try {
+    const res = await fetch(`${getBackendBaseUrl()}/api/v1/albums/${albumId}`, {
+      next: { revalidate: 60 },
+    });
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return null;
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error('Album fetch failed:', error);
     return null;
   }
-
-  return res.json();
 }
 
 export default async function AlbumDetailPage(props: any) {
   const { params } = props ?? {};
-  const rawId = params?.id;
+  const resolvedParams = params instanceof Promise ? await params : params;
+  const rawId = resolvedParams?.id;
   const albumId = extractMediaIdFromSlug(rawId) ?? rawId;
+  if (!albumId) {
+    notFound();
+  }
+
   const album = await fetchAlbum(String(albumId));
   if (!album) {
     notFound();
   }
-
-  const artistName = album.user?.displayName || album.user?.username || 'Unknown Artist';
-  const releaseDate = album.releaseDate ? new Date(album.releaseDate).toLocaleDateString() : 'Unknown';
 
   return <AlbumDetailClient album={album} />;
 }
