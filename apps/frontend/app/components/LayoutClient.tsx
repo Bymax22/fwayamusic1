@@ -21,6 +21,7 @@ import { ServiceWorkerProvider } from "../components/ServiceWorkerProvider";
 import SubscriptionModal from "../components/modal/SubscriptionModal";
 import { MobileMoneyPaymentPreviewModal } from "../components/modal/MobileMoneyPaymentPreviewModal";
 import SubscriptionPromptModal from "../components/SubscriptionPromptModal";
+import ChatwootWidget from "../components/ChatwootWidget";
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const { user, loading, authError, clearAuthError, verificationError } = useAuth();
@@ -78,6 +79,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
 
   return (
     <div className="w-full text-white bg-transparent lg:pt-14">
+      <ChatwootWidget />
       <ServiceWorkerProvider />
       {/* Global auth error banner (shows verification and other auth errors) */}
       {(() => {
