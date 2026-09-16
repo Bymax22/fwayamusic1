@@ -33,15 +33,15 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: `
               default-src 'self';
-              script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'inline-speculation-rules' https://apis.google.com https://www.gstatic.com https://www.google.com https://cdn.jsdelivr.net https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live https://recaptcha.net blob:;
-              script-src-elem 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://cdn.jsdelivr.net https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live https://recaptcha.net blob:;
-              connect-src 'self' ${API_URL} https://api.cloudinary.com https://res.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://www.gstatic.com https://graph.facebook.com https://www.google.com https://www.google-analytics.com https://www.recaptcha.net https://recaptcha.net https://www.google.com/recaptcha/ https://vercel.live;
-              img-src 'self' https://res.cloudinary.com data: blob:;
+              script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'inline-speculation-rules' https://apis.google.com https://www.gstatic.com https://www.google.com https://cdn.jsdelivr.net https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live https://recaptcha.net https://app.chatwoot.com blob:;
+              script-src-elem 'self' 'unsafe-inline' https://apis.google.com https://www.gstatic.com https://www.google.com https://cdn.jsdelivr.net https://media-library.cloudinary.com https://console.cloudinary.com https://infird.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live https://recaptcha.net https://app.chatwoot.com blob:;
+              connect-src 'self' ${API_URL} https://api.cloudinary.com https://res.cloudinary.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://apis.google.com https://www.googleapis.com https://www.gstatic.com https://graph.facebook.com https://www.google.com https://www.google-analytics.com https://www.recaptcha.net https://recaptcha.net https://www.google.com/recaptcha/ https://vercel.live https://app.chatwoot.com wss://app.chatwoot.com;
+              img-src 'self' https://res.cloudinary.com https://app.chatwoot.com data: blob:;
               media-src 'self' https://res.cloudinary.com blob: data:;
-              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://recaptcha.net;
-              font-src 'self' https://fonts.gstatic.com data:;
-              frame-src 'self' https://www.google.com https://www.facebook.com https://www.recaptcha.net https://recaptcha.net https://vercel.live;
-              child-src https://www.google.com https://www.recaptcha.net https://recaptcha.net;
+              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://recaptcha.net https://app.chatwoot.com;
+              font-src 'self' https://fonts.gstatic.com https://app.chatwoot.com data:;
+              frame-src 'self' https://www.google.com https://www.facebook.com https://www.recaptcha.net https://recaptcha.net https://vercel.live https://app.chatwoot.com;
+              child-src https://www.google.com https://www.recaptcha.net https://recaptcha.net https://app.chatwoot.com;
             `.replace(/\s+/g, " ").trim(),
           },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
