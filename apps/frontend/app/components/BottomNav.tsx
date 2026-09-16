@@ -137,10 +137,6 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
                   <LifeBuoy className="w-4 h-4 text-purple-400" />
                   Chat with Support
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/support'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <LifeBuoy className="w-4 h-4 text-purple-400" />
-                  Support
-                </button>
                 <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/help/contact'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
                   <Mail className="w-4 h-4 text-purple-400" />
                   Contact Us
