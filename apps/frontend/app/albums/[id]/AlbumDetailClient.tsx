@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Play, Pause, Heart, Share2, Plus, ExternalLink } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
-import { createMediaSlug, DEFAULT_AVATAR_URL, formatRelativeTime } from '@/lib/utils';
+import { createMediaSlug, DEFAULT_AVATAR_URL, formatRelativeTime, safeDate } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
 interface AlbumDetailClientProps {
@@ -112,6 +112,9 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
     }
   };
 
+  const publishedAt = [album.releaseDate, album.publishedAt, album.createdAt, album.created_at]
+    .find((value) => Boolean(safeDate(value)));
+
   return (
     <div className="min-h-screen w-full min-w-0 overflow-x-hidden px-2 py-6 text-white lg:px-0">
       <div className="mx-auto w-full max-w-7xl space-y-6 overflow-hidden">
@@ -142,7 +145,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                 </Link>
               </div>
               <p className="text-xs text-slate-500">
-                Published {formatRelativeTime(album.releaseDate || album.publishedAt || album.createdAt)}
+                Published {formatRelativeTime(publishedAt)}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <button

@@ -30,7 +30,7 @@ import { FaRegHeart, FaPlus } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useAuth } from "@/context/AuthContext";
 import MobileMenu from "./MobileMenu";
-import { createMediaSlug } from "@/lib/utils";
+import { createMediaSlug, formatRelativeTime, safeDate } from "@/lib/utils";
 import { subscribe } from '@/lib/realtime';
 import VerifiedBadge from "./VerifiedBadge";
 import FreeUserAdBanner from "./FreeUserAdBanner";
@@ -60,6 +60,11 @@ export default function GuestWelcome() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const cacheKey = 'fwayaGuestWelcomeHomepageData';
+  const getPublishedTime = (item: any) => {
+    const timestamp = [item?.releaseDate, item?.publishedAt, item?.createdAt, item?.created_at]
+      .find((value) => Boolean(safeDate(value)));
+    return formatRelativeTime(timestamp);
+  };
 
   const handleAddToPlaylist = (event: React.MouseEvent, item: any) => {
     event.stopPropagation();
@@ -1095,6 +1100,7 @@ export default function GuestWelcome() {
                     <div className="px-1">
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-[11px] text-gray-500">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                 ))}
@@ -1421,6 +1427,7 @@ export default function GuestWelcome() {
                         <p className="text-sm font-medium">{track.title}</p>
                         <div className="flex items-center justify-between">
                           <p className="text-xs text-gray-400">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
+                          <p className="text-[11px] text-gray-500">{getPublishedTime(track)}</p>
                           <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
                             {track.duration ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` : '0:00'}
                           </span>
@@ -2155,9 +2162,7 @@ export default function GuestWelcome() {
                     <p className="text-xs text-gray-400 truncate">
                       {album.user?.displayName || album.user?.username || 'Unknown Artist'}
                     </p>
-                    <p className="text-xs text-gray-400">
-                      {album.createdAt ? new Date(album.createdAt).getFullYear() : new Date().getFullYear()}
-                    </p>
+                    <p className="text-xs text-gray-500">{getPublishedTime(album)}</p>
                   </div>
                 </div>
               ))}

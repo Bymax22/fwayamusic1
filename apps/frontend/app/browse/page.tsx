@@ -11,7 +11,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import Waveform from '@/components/Waveform';
 import ShareModal from '@/components/ShareModal';
-import { createMediaSlug, formatDuration, formatFileSize } from '@/lib/utils';
+import { createMediaSlug, formatDuration, formatFileSize, formatRelativeTime, safeDate } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
 import Link from 'next/link';
@@ -117,6 +117,11 @@ interface PlaylistAPI {
 export default function Browse() {
   const { getToken, user } = useAuth();
   const router = useRouter();
+  const getPublishedTime = (file: MediaFile) => {
+    const timestamp = [file.createdAt]
+      .find((value) => Boolean(safeDate(value)));
+    return formatRelativeTime(timestamp);
+  };
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<MediaFile[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(20); // new: how many items to show
@@ -1164,6 +1169,8 @@ export default function Browse() {
                         <span>•</span>
                         <span>{file.format.toUpperCase()}</span>
                         <span>•</span>
+                        <span>{getPublishedTime(file)}</span>
+                        <span>•</span>
 {getTypeIcon(file.type || "AUDIO")}
 <span className="text-xs">{file.type || "AUDIO"}</span>
                       </div>
@@ -1368,6 +1375,7 @@ export default function Browse() {
                     </div>
 
                     <div className="flex items-center gap-3 text-xs text-gray-400">
+                                            <span>{getPublishedTime(file)}</span>
                       <div className="flex items-center gap-1">
                         <Heart className="w-3 h-3" />
                         {file.likes}
