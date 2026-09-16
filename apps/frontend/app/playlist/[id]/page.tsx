@@ -358,7 +358,7 @@ const PlaylistDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] flex items-center justify-center">
+      <div className="min-h-screen bg-[#151515] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e51f48] mx-auto mb-3"></div>
           <p className="text-white">Loading playlist...</p>
@@ -369,7 +369,7 @@ const PlaylistDetailPage = () => {
 
   if (error || !playlist) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] flex items-center justify-center">
+      <div className="min-h-screen bg-[#151515] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Playlist Not Found</h1>
           <p className="text-gray-400 mb-6">{error}</p>
@@ -388,10 +388,10 @@ const PlaylistDetailPage = () => {
   const totalPlays = playlist.entries.reduce((total, entry) => total + (entry.media.plays || 0), 0);
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#151515]">
       {/* Header */}
       <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a1f29]/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#151515]/80" />
         <div className="relative z-10 p-4 sm:p-6">
           <button
             onClick={() => router.back()}
@@ -461,7 +461,7 @@ const PlaylistDetailPage = () => {
 
                 <button
                   onClick={handlePlaylistPrevious}
-                  className="bg-[#0a3747] text-white px-4 py-3 rounded-full hover:bg-[#0b2936] transition-colors"
+                  className="bg-[#222222] text-white px-4 py-3 rounded-full hover:bg-[#2d2d2d] transition-colors"
                   title="Previous track"
                 >
                   <FaArrowLeft size={14} />
@@ -469,7 +469,7 @@ const PlaylistDetailPage = () => {
 
                 <button
                   onClick={handlePlaylistNext}
-                  className="bg-[#0a3747] text-white px-4 py-3 rounded-full hover:bg-[#0b2936] transition-colors"
+                  className="bg-[#222222] text-white px-4 py-3 rounded-full hover:bg-[#2d2d2d] transition-colors"
                   title="Next track"
                 >
                   <FaPlay size={14} />
@@ -478,7 +478,7 @@ const PlaylistDetailPage = () => {
                 <button
                   onClick={handlePlaylistRepeatToggle}
                   className={`px-4 py-3 rounded-full transition-colors ${
-                    repeatMode !== 'off' ? 'bg-[#e51f48] text-white' : 'bg-[#0a3747] text-white hover:bg-[#0b2936]'
+                    repeatMode !== 'off' ? 'bg-[#e51f48] text-white' : 'bg-[#222222] text-white hover:bg-[#2d2d2d]'
                   }`}
                   title={repeatMode === 'repeat-all' ? 'Repeat all on' : repeatMode === 'repeat-one' ? 'Repeat one on' : 'Repeat all'}
                 >
@@ -487,14 +487,14 @@ const PlaylistDetailPage = () => {
 
                 <button
                   onClick={handleLike}
-                  className="bg-[#0a3747] text-white p-3 rounded-full hover:bg-[#0b2936] transition-colors"
+                  className="bg-[#222222] text-white p-3 rounded-full hover:bg-[#2d2d2d] transition-colors"
                 >
                   {isLiked ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
                 </button>
 
                 <button
                   onClick={handleShare}
-                  className="bg-[#0a3747] text-white p-3 rounded-full hover:bg-[#0b2936] transition-colors"
+                  className="bg-[#222222] text-white p-3 rounded-full hover:bg-[#2d2d2d] transition-colors"
                 >
                   <FaShare size={16} />
                 </button>
@@ -506,7 +506,7 @@ const PlaylistDetailPage = () => {
 
       {/* Tracks List */}
       <div className="px-2 pb-8 sm:px-6">
-        <div className="bg-[#0a3747]/50 rounded-lg overflow-hidden">
+        <div className="bg-[#222222]/80 rounded-lg overflow-hidden">
           <div className="p-4 border-b border-gray-700">
             <h2 className="text-xl font-bold text-white">Tracks</h2>
           </div>
@@ -521,8 +521,8 @@ const PlaylistDetailPage = () => {
                 return (
                   <motion.div
                     key={entry.id}
-                    className="group flex min-w-0 flex-wrap items-center gap-3 p-3 transition-colors hover:bg-[#0b2936] sm:gap-4 sm:p-4"
-                    whileHover={{ backgroundColor: 'rgba(11, 41, 54, 0.5)' }}
+                    className="group flex min-w-0 flex-wrap items-center gap-3 p-3 transition-colors hover:bg-[#2d2d2d] sm:gap-4 sm:p-4"
+                    whileHover={{ backgroundColor: 'rgba(45, 45, 45, 0.5)' }}
                   >
                     {/* Track Number / Play Button */}
                     <div className="w-8 flex justify-center">
