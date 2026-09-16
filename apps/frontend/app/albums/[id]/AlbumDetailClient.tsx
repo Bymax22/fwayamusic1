@@ -32,7 +32,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
     id: track.id,
     title: track.title || '',
     artist: track.user?.displayName || track.user?.username || '',
-    imageUrl: album.coverUrl || album.artCoverUrl || album.thumbnailUrl || track.artCoverUrl || track.coverArt || track.thumbnailUrl,
+    imageUrl: album.coverUrl || album.artCoverUrl || album.thumbnailUrl || track.artCoverUrl || track.coverArt || track.thumbnailUrl || track.imageUrl,
     audioUrl: track.audioUrl || track.url,
     videoUrl: track.videoUrl,
     duration: track.duration,
@@ -67,10 +67,10 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden px-2 py-6 lg:px-0">
-      <div className="max-w-7xl mx-auto space-y-6 overflow-hidden">
-        <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-          <div className="rounded-3xl overflow-hidden bg-[#08111f] shadow-2xl shadow-black/30">
-            <div className="relative w-full overflow-hidden bg-black aspect-square sm:aspect-[4/5] lg:h-96">
+      <div className="mx-auto w-full max-w-7xl space-y-6 overflow-hidden">
+        <div className="grid min-w-0 gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <div className="w-full min-w-0 overflow-hidden rounded-3xl bg-[#08111f] shadow-2xl shadow-black/30">
+            <div className="relative mx-auto aspect-square w-full max-w-lg overflow-hidden bg-black sm:aspect-[4/5] lg:h-96 lg:max-w-none">
               <Image
                 src={album.coverUrl || album.artCoverUrl || album.thumbnailUrl || '/default-cover.jpg'}
                 alt={album.title || 'Album cover'}
@@ -86,7 +86,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                   {album.user?.displayName || album.user?.username || 'Unknown Artist'}
                 </Link>
               </p>
-              <div className="flex items-center gap-2 mt-3">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={handlePlayAll}
@@ -145,22 +145,22 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                   {album.media.map((track: any, idx: number) => {
                     const isCurrent = Boolean(currentTrack && String(currentTrack.id) === String(track.id));
                     return (
-                      <div key={track.id ?? idx} className="flex items-center justify-between gap-4 py-3 px-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-900">
-                            {track.artCoverUrl || track.coverArt || track.thumbnailUrl ? (
-                              <Image src={track.artCoverUrl || track.coverArt || track.thumbnailUrl} alt={track.title || ''} fill className="object-cover" />
+                      <div key={track.id ?? idx} className="flex min-w-0 items-center justify-between gap-3 px-2 py-3">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-slate-900">
+                            {track.artCoverUrl || track.coverArt || track.thumbnailUrl || track.imageUrl ? (
+                              <Image src={track.artCoverUrl || track.coverArt || track.thumbnailUrl || track.imageUrl} alt={track.title || ''} fill className="object-cover" />
                             ) : (
                               <div className="h-full w-full bg-gradient-to-br from-purple-600 to-fuchsia-500" />
                             )}
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <p className="text-sm font-semibold text-white truncate">{track.title || `Track ${idx + 1}`}</p>
                             <p className="text-xs text-slate-400 truncate">{track.user?.displayName || track.user?.username || ''}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
                           <div className="text-xs text-slate-400 text-right mr-2">
                             <div>{track.duration ? `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}` : '0:00'}</div>
                             <div className="capitalize">{(track.type || 'audio').toString().toLowerCase()}</div>

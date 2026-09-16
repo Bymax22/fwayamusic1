@@ -156,8 +156,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
-      setIsPlaying(false);
-      setCurrentTime(0);
+      nextTrack();
     };
 
     const handleLoadStart = () => {

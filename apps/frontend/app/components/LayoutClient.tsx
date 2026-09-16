@@ -107,7 +107,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
         ======================== */}
         <main
           className={`
-            flex-1 overflow-y-auto scrollbar-hide
+            min-w-0 flex-1 overflow-x-hidden overflow-y-auto scrollbar-hide
             ${currentTrack ? "pb-40" : ""}
             transition-all duration-300
             ${user ? "lg:ml-[260px]" : ""}

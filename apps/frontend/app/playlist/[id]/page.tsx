@@ -388,11 +388,11 @@ const PlaylistDetailPage = () => {
   const totalPlays = playlist.entries.reduce((total, entry) => total + (entry.media.plays || 0), 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
       {/* Header */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a1f29]/80" />
-        <div className="relative z-10 p-6">
+        <div className="relative z-10 p-4 sm:p-6">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 text-white hover:text-[#e51f48] transition-colors mb-6"
@@ -428,10 +428,10 @@ const PlaylistDetailPage = () => {
                 )}
               </div>
 
-              <h1 className="text-3xl md:text-5xl font-bold mb-2">{playlist.name}</h1>
+              <h1 className="mb-2 break-words text-3xl font-bold md:text-5xl">{playlist.name}</h1>
 
               {playlist.description && (
-                <p className="text-gray-300 text-lg mb-4 max-w-2xl">{playlist.description}</p>
+                <p className="mb-4 max-w-2xl break-words text-lg text-gray-300">{playlist.description}</p>
               )}
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-6">
@@ -505,7 +505,7 @@ const PlaylistDetailPage = () => {
       </div>
 
       {/* Tracks List */}
-      <div className="px-6 pb-8">
+      <div className="px-2 pb-8 sm:px-6">
         <div className="bg-[#0a3747]/50 rounded-lg overflow-hidden">
           <div className="p-4 border-b border-gray-700">
             <h2 className="text-xl font-bold text-white">Tracks</h2>
@@ -521,7 +521,7 @@ const PlaylistDetailPage = () => {
                 return (
                   <motion.div
                     key={entry.id}
-                    className="flex items-center gap-4 p-4 hover:bg-[#0b2936] transition-colors group"
+                    className="group flex min-w-0 flex-wrap items-center gap-3 p-3 transition-colors hover:bg-[#0b2936] sm:gap-4 sm:p-4"
                     whileHover={{ backgroundColor: 'rgba(11, 41, 54, 0.5)' }}
                   >
                     {/* Track Number / Play Button */}
@@ -574,7 +574,7 @@ const PlaylistDetailPage = () => {
                     </div>
 
                     {/* Track Info */}
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <h3 className={`font-medium truncate ${isCurrent ? 'text-[#e51f48]' : 'text-white'}`}>
                         <span className="inline-flex items-center gap-2">
                           {isCurrent ? (
@@ -599,7 +599,7 @@ const PlaylistDetailPage = () => {
                     </div>
 
                     {/* Track Actions */}
-                    <div className="flex items-center gap-2">
+                    <div className="ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-2">
                       <button
                         onClick={() => openAddToPlaylist(Number(track.id))}
                         className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10"
