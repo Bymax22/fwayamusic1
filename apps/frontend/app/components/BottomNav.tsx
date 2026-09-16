@@ -124,6 +124,17 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
               </form>
 
               <div className="space-y-2 max-h-96 overflow-y-auto">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeNeedHelp();
+                    window.dispatchEvent(new Event("fwaya:open-chatwoot"));
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-sm text-white flex items-center gap-2"
+                >
+                  <LifeBuoy className="w-4 h-4 text-purple-400" />
+                  Chat with Support
+                </button>
                 <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/support'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
                   <LifeBuoy className="w-4 h-4 text-purple-400" />
                   Support

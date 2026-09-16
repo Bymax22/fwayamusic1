@@ -11,6 +11,7 @@ declare global {
     $chatwoot?: {
       setUser?: (identifier: string, attributes?: Record<string, unknown>) => void;
       reset?: () => void;
+      toggle?: (action?: "open" | "close") => void;
     };
   }
 }
@@ -34,8 +35,20 @@ export default function ChatwootWidget() {
         websiteToken: CHATWOOT_WEBSITE_TOKEN,
         baseUrl: CHATWOOT_BASE_URL,
       });
+      window.dispatchEvent(new Event("fwaya:chatwoot-ready"));
     };
     document.head.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    const openChatwoot = () => window.$chatwoot?.toggle?.("open");
+    window.addEventListener("fwaya:open-chatwoot", openChatwoot);
+    window.addEventListener("fwaya:chatwoot-ready", openChatwoot);
+
+    return () => {
+      window.removeEventListener("fwaya:open-chatwoot", openChatwoot);
+      window.removeEventListener("fwaya:chatwoot-ready", openChatwoot);
+    };
   }, []);
 
   useEffect(() => {
