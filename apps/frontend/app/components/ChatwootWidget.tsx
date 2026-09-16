@@ -5,6 +5,11 @@ import { useAuth } from "../context/AuthContext";
 
 declare global {
   interface Window {
+    chatwootSettings?: {
+      position?: "left" | "right";
+      type?: "standard" | "expanded_bubble";
+      launcherTitle?: string;
+    };
     chatwootSDK?: {
       run: (config: { websiteToken: string; baseUrl: string }) => void;
     };
@@ -18,8 +23,7 @@ declare global {
 }
 
 const CHATWOOT_BASE_URL = "https://app.chatwoot.com";
-const CHATWOOT_WEBSITE_TOKEN =
-  process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || "jzbTnuCWqwQ6zhgVWftUqTPg";
+const CHATWOOT_WEBSITE_TOKEN = "me89UzkBQrsWxLKkHD836h5e";
 
 export default function ChatwootWidget() {
   const { user, firebaseUser } = useAuth();
@@ -27,6 +31,12 @@ export default function ChatwootWidget() {
 
   useEffect(() => {
     if (!CHATWOOT_WEBSITE_TOKEN) return;
+
+    window.chatwootSettings = {
+      position: "left",
+      type: "standard",
+      launcherTitle: "Chat with us",
+    };
 
     const loadChatwoot = () => {
       window.chatwootSDK?.run({
