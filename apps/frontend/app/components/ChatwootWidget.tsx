@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 declare global {
   interface Window {
     chatwootSettings?: {
+      hideMessageBubble?: boolean;
       position?: "left" | "right";
       type?: "standard" | "expanded_bubble";
       launcherTitle?: string;
@@ -33,6 +34,7 @@ export default function ChatwootWidget() {
     if (!CHATWOOT_WEBSITE_TOKEN) return;
 
     window.chatwootSettings = {
+      hideMessageBubble: true,
       position: "left",
       type: "standard",
       launcherTitle: "Chat with us",
