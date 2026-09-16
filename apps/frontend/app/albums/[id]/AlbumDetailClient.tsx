@@ -3,9 +3,10 @@
 import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Play, Pause, Heart, Share2, Plus } from 'lucide-react';
+import { Play, Pause, Heart, Share2, Plus, ExternalLink } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
+import { createMediaSlug, DEFAULT_AVATAR_URL, formatRelativeTime } from '@/lib/utils';
 
 interface AlbumDetailClientProps {
   album: any;
@@ -81,10 +82,21 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
             <div className="p-4 space-y-3">
               <p className="text-xs uppercase tracking-[0.3em] text-purple-300">Album</p>
               <h1 className="text-2xl font-semibold">{album.title || 'Untitled Album'}</h1>
-              <p className="text-sm text-slate-400">
-                <Link href={`/artists/${album.user?.id}`} className="text-white underline-offset-2 hover:underline">
+              <div className="flex min-w-0 items-center gap-2 text-sm text-slate-400">
+                <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-slate-800">
+                  <Image
+                    src={album.user?.avatarUrl || DEFAULT_AVATAR_URL}
+                    alt={album.user?.displayName || album.user?.username || 'Artist'}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <Link href={`/artists/${album.user?.id}`} className="truncate text-white underline-offset-2 hover:underline">
                   {album.user?.displayName || album.user?.username || 'Unknown Artist'}
                 </Link>
+              </div>
+              <p className="text-xs text-slate-500">
+                Published {formatRelativeTime(album.releaseDate || album.publishedAt || album.createdAt)}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <button
@@ -164,6 +176,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                           <div className="text-xs text-slate-400 text-right mr-2">
                             <div>{track.duration ? `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}` : '0:00'}</div>
                             <div className="capitalize">{(track.type || 'audio').toString().toLowerCase()}</div>
+                            <div>{Number(track.plays ?? track.playCount ?? track.views ?? 0).toLocaleString()} plays</div>
                           </div>
 
                           <button
@@ -195,6 +208,15 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                           >
                             <Plus className="h-4 w-4" />
                           </button>
+
+                          <Link
+                            href={`/track/${createMediaSlug(track.title || `Track ${idx + 1}`, track.id)}`}
+                            aria-label={`Open ${track.title || `Track ${idx + 1}`} details`}
+                            title="Open track details"
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
                         </div>
                       </div>
                     );
