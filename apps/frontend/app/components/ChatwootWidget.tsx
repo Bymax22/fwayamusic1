@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 
 declare global {
@@ -22,6 +22,7 @@ const CHATWOOT_WEBSITE_TOKEN =
 
 export default function ChatwootWidget() {
   const { user, firebaseUser } = useAuth();
+  const openTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!CHATWOOT_WEBSITE_TOKEN || document.getElementById("chatwoot-sdk")) return;
@@ -41,13 +42,32 @@ export default function ChatwootWidget() {
   }, []);
 
   useEffect(() => {
-    const openChatwoot = () => window.$chatwoot?.toggle?.("open");
+    const openChatwoot = () => {
+      if (openTimeoutRef.current !== null) {
+        window.clearTimeout(openTimeoutRef.current);
+        openTimeoutRef.current = null;
+      }
+
+      if (window.$chatwoot?.toggle) {
+        window.$chatwoot.toggle("open");
+        return;
+      }
+
+      // The SDK script can load before Chatwoot creates its public API.
+      openTimeoutRef.current = window.setTimeout(openChatwoot, 150);
+    };
+
     window.addEventListener("fwaya:open-chatwoot", openChatwoot);
     window.addEventListener("fwaya:chatwoot-ready", openChatwoot);
+    window.addEventListener("chatwoot:ready", openChatwoot);
 
     return () => {
+      if (openTimeoutRef.current !== null) {
+        window.clearTimeout(openTimeoutRef.current);
+      }
       window.removeEventListener("fwaya:open-chatwoot", openChatwoot);
       window.removeEventListener("fwaya:chatwoot-ready", openChatwoot);
+      window.removeEventListener("chatwoot:ready", openChatwoot);
     };
   }, []);
 
