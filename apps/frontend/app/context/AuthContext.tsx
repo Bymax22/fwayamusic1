@@ -79,6 +79,7 @@ interface SignUpData {
   role: 'USER' | 'ARTIST' | 'RESELLER' | 'PRODUCER';
   phoneNumber?: string;
   dateOfBirth?: string;
+  country?: string;
   artistName?: string;
   stageName?: string;
   businessName?: string;

@@ -1389,7 +1389,7 @@ export default function GuestWelcome() {
                 </div>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                   {featuredEPs.map((item: any, i: number) => (
-                    <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
+                    <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="w-32 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                       <div
                         className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
                         style={{ backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }}
@@ -1397,6 +1397,8 @@ export default function GuestWelcome() {
                       <div className="p-3 bg-transparent">
                         <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                         <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                        <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
+                        <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
                         <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
                       </div>
                     </div>
@@ -1569,11 +1571,13 @@ export default function GuestWelcome() {
                 <h3 className="font-semibold mb-3">Featured EPs</h3>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                   {featuredEPs.map((item: any, i: number) => (
-                    <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
+                    <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="w-32 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                       <div className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`} style={{ backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                       <div className="p-3 bg-transparent">
                         <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                         <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                        <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
+                        <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
                         <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
                       </div>
                     </div>
@@ -2175,13 +2179,15 @@ export default function GuestWelcome() {
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-semibold text-lg">Featured EPs</h3>
               </div>
-              <div className="grid grid-cols-5 gap-3">
-                {featuredEPs.slice(0, 5).map((ep: any, i: number) => (
-                  <div key={i} onClick={() => goToAlbum(ep.id, ep.title)} role="button" tabIndex={0} className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all cursor-pointer group">
+              <div className="grid grid-cols-6 gap-3">
+                {featuredEPs.slice(0, 6).map((ep: any, i: number) => (
+                  <div key={i} onClick={() => goToAlbum(ep.id, ep.title)} role="button" tabIndex={0} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group">
                     <div className="aspect-[4/5] bg-black group-hover:scale-105 transition-transform" style={{ backgroundImage: ep.artCoverUrl ? `url(${ep.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                     <div className="p-3 bg-[#080a13]">
                       <p className="text-xs font-semibold truncate text-white mb-0.5">{ep.title}</p>
                       <p className="text-xs text-gray-400 truncate">{ep.user?.displayName || ep.user?.username || 'Unknown Artist'}</p>
+                      <p className="text-xs text-gray-400">{getTrackCount(ep) || 0} tracks</p>
+                      <p className="text-xs text-gray-500">{getPublishedTime(ep)}</p>
                     </div>
                   </div>
                 ))}

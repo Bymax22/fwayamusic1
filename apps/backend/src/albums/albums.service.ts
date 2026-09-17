@@ -12,6 +12,7 @@ export class AlbumsService {
     data: {
       title: string;
       description?: string;
+      type?: string;
       tags?: string[];
       releaseDate?: Date;
       recordLabel?: string;
@@ -23,6 +24,7 @@ export class AlbumsService {
     const {
       title,
       description,
+      type,
       tags,
       releaseDate,
       recordLabel,
@@ -39,6 +41,7 @@ export class AlbumsService {
         coverUrl: coverImageUrl,
         cloudinaryPublicId: cloudinaryId,
         userId: artistId,
+        type: type?.toUpperCase() === 'EP' ? 'EP' : 'ALBUM',
         contentStatus: ContentStatus.DRAFT,
       },
       include: {

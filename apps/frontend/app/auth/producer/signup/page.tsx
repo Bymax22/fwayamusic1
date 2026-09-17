@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { AvailabilityInput } from '@/components/AvailabilityInput';
 import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { CountrySelect } from '@/components/CountrySelect';
 import { AuthErrorInfo, parseAuthError } from '@/lib/auth-error-utils';
 import { Music2, Eye, EyeOff, Check, ArrowLeft, Camera } from 'lucide-react';
 import Link from 'next/link';
@@ -26,6 +27,7 @@ export default function ProducerSignUp() {
     displayName: '',
     phoneNumber: '',
     dateOfBirth: '',
+    country: 'ZM',
     producerName: '',
     stageName: '',
     bio: '',
@@ -107,6 +109,7 @@ export default function ProducerSignUp() {
       if (!formData.stageName) newErrors.stageName = 'Stage/Artist name is required';
       if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
       if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
+      if (!formData.country) newErrors.country = 'Country is required';
       if (formData.genres.length === 0) newErrors.genres = 'Please select at least one genre';
     }
 
@@ -566,6 +569,13 @@ export default function ProducerSignUp() {
                 {errors.dateOfBirth && <p className="text-red-400 text-sm mt-1">{errors.dateOfBirth}</p>}
               </div>
             </div>
+
+            <CountrySelect
+              label="Country *"
+              value={formData.country}
+              onChange={(country) => setFormData({ ...formData, country })}
+              error={errors.country}
+            />
 
             <div>
               <label className="block text-sm font-medium text-white mb-2">

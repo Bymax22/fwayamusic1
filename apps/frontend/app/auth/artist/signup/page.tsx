@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { AvailabilityInput } from '@/components/AvailabilityInput';
 import AuthErrorBanner from '@/components/AuthErrorBanner';
+import { CountrySelect } from '@/components/CountrySelect';
 import { AuthErrorInfo, parseAuthError } from '@/lib/auth-error-utils';
 import { FaMusic, FaEye, FaEyeSlash, FaCheck, FaCamera } from 'react-icons/fa';
 import Link from 'next/link';
@@ -26,6 +27,7 @@ export default function ArtistSignUp() {
     displayName: '',
     phoneNumber: '',
     dateOfBirth: '',
+    country: 'ZM',
     artistName: '',
     stageName: '',
     bio: '',
@@ -88,11 +90,13 @@ export default function ArtistSignUp() {
       if (!formData.stageName) newErrors.stageName = 'Stage/Artist name is required';
       if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
       if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
+      if (!formData.country) newErrors.country = 'Country is required';
     }
 
     if (currentStep === 'consent') {
       if (!formData.acceptedTerms) newErrors.acceptedTerms = 'You must accept the terms and conditions';
       if (!formData.acceptedPrivacy) newErrors.acceptedPrivacy = 'You must accept the privacy policy';
+      if (!formData.acceptedCookies) newErrors.acceptedCookies = 'You must accept the cookies policy';
     }
 
     setErrors(newErrors);
@@ -424,6 +428,13 @@ export default function ArtistSignUp() {
                     <input type="date" value={formData.dateOfBirth} onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })} className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                   </div>
                 </div>
+
+                <CountrySelect
+                  label="Country *"
+                  value={formData.country}
+                  onChange={(country) => setFormData({ ...formData, country })}
+                  error={errors.country}
+                />
 
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">Bio</label>
