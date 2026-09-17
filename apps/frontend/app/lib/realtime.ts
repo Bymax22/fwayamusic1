@@ -7,7 +7,7 @@ export async function initRealtime() {
   try {
     const { io } = await import('socket.io-client');
     const url = process.env.NEXT_PUBLIC_API_URL || window.location.origin;
-    socket = io(url, { path: '/socket.io', transports: ['websocket'], autoConnect: true });
+    socket = io(`${url}/realtime`, { path: '/socket.io', transports: ['websocket'], autoConnect: true });
     return socket;
   } catch (err) {
     console.warn('Realtime init failed (socket.io-client missing):', err);

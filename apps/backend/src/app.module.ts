@@ -23,6 +23,7 @@ import { AlbumsModule } from './albums/albums.module';
 import { PricingModule } from './pricing/pricing.module';
 import { SupportModule } from './support/support.module';
 import { AdvertisingModule } from './advertising/advertising.module';
+import { AdminModule } from './admin/admin.module';
 
 const logger = new Logger('AppModule');
 
@@ -52,6 +53,7 @@ const logger = new Logger('AppModule');
     PricingModule,
     SupportModule,
     AdvertisingModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService,
