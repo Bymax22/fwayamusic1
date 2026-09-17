@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, InternalServerErrorException, Logger, B
 import { PrismaService } from '../db/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
-import { MediaType, MediaAccessType, NotificationType, UserRole, ModerationStatus } from '@prisma/client';
+import { MediaType, MediaAccessType, NotificationType, UserRole, ModerationStatus, ContentStatus } from '@prisma/client';
 import { NotificationService } from '../notification/notification.service';
 import { EventsGateway } from '../events/events.gateway';
 
@@ -1104,37 +1104,47 @@ async getHomepageSections() {
   });
   otherVideos = otherVideos.filter(m => m.userId !== null);
 
-  // Fetch featured albums from Album table
-  let featuredAlbums = await this.prisma.album.findMany({
-    where: {
-      contentStatus: { in: ['PUBLISHED', 'APPROVED', 'DRAFT', 'SUBMITTED'] },
+  // Fetch albums and EPs separately so one release type cannot hide the other.
+  const releaseWhere = {
+    contentStatus: { in: [ContentStatus.PUBLISHED, ContentStatus.APPROVED, ContentStatus.DRAFT, ContentStatus.SUBMITTED] },
+  };
+  const releaseInclude = {
+    user: {
+      select: {
+        id: true,
+        username: true,
+        displayName: true,
+        avatarUrl: true
+      }
     },
-    include: {
-      user: {
-        select: {
-          id: true,
-          username: true,
-          displayName: true,
-          avatarUrl: true
-        }
-      },
-      media: {
-        where: { deletedAt: null },
-        take: 1,
-        orderBy: { createdAt: 'asc' },
-      },
-      _count: {
-        select: {
-          media: { where: { deletedAt: null } },
-        },
+    media: {
+      where: { deletedAt: null },
+      take: 1,
+      orderBy: { createdAt: 'asc' as const },
+    },
+    _count: {
+      select: {
+        media: { where: { deletedAt: null } },
       },
     },
-    orderBy: { createdAt: "desc" },
-    take: 8,
-  });
+  };
+  const [featuredAlbums, featuredEPs] = await Promise.all([
+    this.prisma.album.findMany({
+      where: { ...releaseWhere, type: { not: 'EP' } },
+      include: releaseInclude,
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+    }),
+    this.prisma.album.findMany({
+      where: { ...releaseWhere, type: 'EP' },
+      include: releaseInclude,
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+    }),
+  ]);
   
   // Transform albums to match media format for frontend compatibility
-  const transformedAlbums = featuredAlbums.map((album: any) => ({
+  const transformRelease = (album: any) => ({
     id: album.id,
     title: album.title,
     description: album.description,
@@ -1146,8 +1156,10 @@ async getHomepageSections() {
     userId: album.userId,
     user: album.user,
     createdAt: album.createdAt,
-    tags: ['album'],
-  }));
+    tags: [album.type?.toUpperCase() === 'EP' ? 'ep' : 'album'],
+  });
+  const transformedAlbums = featuredAlbums.map(transformRelease);
+  const transformedEPs = featuredEPs.map(transformRelease);
 
   return {
     featuredSongs,
@@ -1157,6 +1169,7 @@ async getHomepageSections() {
     musicVideos,
     otherVideos,
     featuredAlbums: transformedAlbums,
+    featuredEPs: transformedEPs,
   };
 }
 }

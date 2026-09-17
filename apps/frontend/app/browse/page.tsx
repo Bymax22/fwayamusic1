@@ -117,11 +117,17 @@ interface PlaylistAPI {
 export default function Browse() {
   const { getToken, user } = useAuth();
   const router = useRouter();
+  const [, setRelativeTimeTick] = useState(0);
   const getPublishedTime = (file: MediaFile) => {
     const timestamp = [file.createdAt]
       .find((value) => Boolean(safeDate(value)));
     return formatRelativeTime(timestamp);
   };
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 30000);
+    return () => window.clearInterval(interval);
+  }, []);
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<MediaFile[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(20); // new: how many items to show

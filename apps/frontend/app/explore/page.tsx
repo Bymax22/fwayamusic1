@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Play, TrendingUp, Music, Mic2 } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { formatDuration } from '@/lib/utils';
+import { formatDuration, formatRelativeTime } from '@/lib/utils';
 import Image from "next/image";
 
 interface MediaFile {
@@ -14,6 +14,7 @@ interface MediaFile {
   coverArt: string;
   views: number;
   likes: number;
+  createdAt?: string;
   genre?: string;
 }
 
@@ -31,6 +32,12 @@ export default function ExplorePage() {
   const [trendingTracks, setTrendingTracks] = useState<MediaFile[]>([]);
   const [newReleases, setNewReleases] = useState<MediaFile[]>([]);
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
+  const [, setRelativeTimeTick] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 30000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +47,7 @@ export default function ExplorePage() {
         });
         const { data } = await response.json();
         
-        const formattedData = data.map((item: MediaFile) => ({
+        const formattedData = data.map((item: any) => ({
           id: item.id,
           title: item.title || 'Untitled',
           artist: item.artist || 'Unknown Artist',
@@ -49,6 +56,7 @@ export default function ExplorePage() {
           coverArt: item.coverArt || '/default-cover.jpg',
           views: item.views || 0,
           likes: item.likes || 0,
+          createdAt: item.createdAt || item.publishedAt || item.created_at || '',
           genre: item.genre || 'Other'
         }));
 
@@ -187,6 +195,7 @@ export default function ExplorePage() {
                   <span>{file.genre}</span>
                   <span>{formatDuration(file.duration)}</span>
                 </div>
+                <p className="mt-2 text-xs text-gray-500">{formatRelativeTime(file.createdAt)}</p>
               </div>
             </div>
           ))}
@@ -237,6 +246,7 @@ export default function ExplorePage() {
               <div className="p-4">
                 <h3 className="font-medium text-white truncate mb-1">{file.title}</h3>
                 <p className="text-sm text-gray-400 truncate">{file.artist}</p>
+                <p className="mt-2 text-xs text-gray-500">{formatRelativeTime(file.createdAt)}</p>
               </div>
             </div>
           ))}

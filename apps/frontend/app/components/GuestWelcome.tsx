@@ -59,12 +59,18 @@ export default function GuestWelcome() {
   const [showRoleModal, setShowRoleModal] = useState(false);
   const router = useRouter();
   const { user, logout } = useAuth();
-  const cacheKey = 'fwayaGuestWelcomeHomepageData';
+  const cacheKey = 'fwayaGuestWelcomeHomepageData:v2';
+  const [, setRelativeTimeTick] = useState(0);
   const getPublishedTime = (item: any) => {
     const timestamp = [item?.releaseDate, item?.publishedAt, item?.createdAt, item?.created_at]
       .find((value) => Boolean(safeDate(value)));
     return formatRelativeTime(timestamp);
   };
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 30000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   const handleAddToPlaylist = (event: React.MouseEvent, item: any) => {
     event.stopPropagation();
@@ -383,10 +389,12 @@ export default function GuestWelcome() {
           : [];
 
         const albumItems: any[] = [];
+        const epItems: any[] = [];
         
         // First, try to use the dedicated featuredAlbums field from backend
         if (homepageData.featuredAlbums && Array.isArray(homepageData.featuredAlbums) && homepageData.featuredAlbums.length > 0) {
           albumItems.push(...homepageData.featuredAlbums);
+          if (Array.isArray(homepageData.featuredEPs)) epItems.push(...homepageData.featuredEPs);
         } else {
           // Fallback: filter albums from other sections
           if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {
@@ -415,6 +423,12 @@ export default function GuestWelcome() {
             }))
           : [];
         const processedFeaturedEPs = albumItems.filter(isEP).map((album: any) => ({
+          ...album,
+          url: album.url ? resolveMediaUrl(album.url) : album.url,
+          coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
+          artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
+        }));
+        const processedDedicatedEPs = epItems.map((album: any) => ({
           ...album,
           url: album.url ? resolveMediaUrl(album.url) : album.url,
           coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
@@ -522,7 +536,7 @@ export default function GuestWelcome() {
         setTrendingNow(processedTrendingNow);
         setTopCharts(processedTopCharts);
         setFeaturedAlbums(processedFeaturedAlbums);
-        setFeaturedEPs(processedFeaturedEPs);
+        setFeaturedEPs(processedDedicatedEPs.length > 0 ? processedDedicatedEPs : processedFeaturedEPs);
         setBeats(processedBeats);
         setMusicVideos(processedMusicVideos);
         setOtherVideos(processedOtherVideos);
@@ -533,7 +547,7 @@ export default function GuestWelcome() {
         saveCachedHomepageData({
           quickPicks: processedQuickPicks,
           featuredAlbums: processedFeaturedAlbums,
-          featuredEPs: processedFeaturedEPs,
+          featuredEPs: processedDedicatedEPs.length > 0 ? processedDedicatedEPs : processedFeaturedEPs,
           featuredArtists: processedArtists,
           featuredProducers: processedFeaturedProducers,
           beats: processedBeats,
@@ -1160,6 +1174,7 @@ export default function GuestWelcome() {
                         </div>
                       </div>
                       <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Producer'}</p>
+                      <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                 ))}

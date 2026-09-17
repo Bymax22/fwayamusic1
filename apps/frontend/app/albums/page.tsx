@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { createMediaSlug, formatDate } from '@/lib/utils';
+import { createMediaSlug, formatRelativeTime } from '@/lib/utils';
 import { FaHeadphones, FaRegHeart } from 'react-icons/fa';
 
 interface AlbumItem {
@@ -45,6 +45,12 @@ export default function AlbumsPage() {
   const [albums, setAlbums] = useState<AlbumItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [, setRelativeTimeTick] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 30000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchAlbums = async () => {
@@ -170,7 +176,7 @@ export default function AlbumsPage() {
                       <p className="text-xs text-slate-400 truncate mb-3">{album.artist}</p>
                       <div className="flex items-center justify-between text-xs text-slate-400">
                         <span>{album.trackCount} tracks</span>
-                        <span>{formatDate(album.releaseDate || album.createdAt || '')}</span>
+                        <span>{formatRelativeTime(album.createdAt || album.releaseDate || '')}</span>
                       </div>
                     </div>
                   </Link>

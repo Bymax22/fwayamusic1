@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Play, Pause, Heart, Calendar, Clock } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { formatDuration, formatDate } from '@/lib/utils';
+import { formatDuration, formatRelativeTime } from '@/lib/utils';
 import Image from 'next/image';
 
 interface MediaFile {
@@ -60,6 +60,12 @@ export default function NewReleasesPage() {
   const [filter, setFilter] = useState<'all' | 'this-week' | 'this-month'>('all');
   const [loading, setLoading] = useState(true);
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
+  const [, setRelativeTimeTick] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 30000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchNewReleases = async () => {
@@ -207,7 +213,7 @@ export default function NewReleasesPage() {
                   </div>
                   <div className="flex justify-between items-center mt-3">
                     <span className="text-xs text-gray-400">
-                      {formatDate(release.releaseDate || release.createdAt || '')}
+                      {formatRelativeTime(release.createdAt || release.releaseDate || '')}
                     </span>
                     <button className="text-gray-400 hover:text-purple-400 transition-colors">
                       <Heart className="w-4 h-4" />
