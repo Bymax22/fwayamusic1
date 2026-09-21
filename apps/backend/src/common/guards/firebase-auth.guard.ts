@@ -47,6 +47,17 @@ export class FirebaseAuthGuard implements CanActivate {
         console.log('FirebaseAuthGuard: User created:', user.id);
       }
       
+      const forwardedFor = request.headers['x-forwarded-for'];
+      const ipAddress = typeof forwardedFor === 'string'
+        ? forwardedFor.split(',')[0].trim()
+        : request.ip || request.socket?.remoteAddress;
+      user = await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          lastLoginAt: new Date(),
+          ...(ipAddress ? { lastLoginIp: ipAddress } : {}),
+        },
+      });
       request.user = user;
       return true;
     } catch (error) {

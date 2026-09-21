@@ -140,6 +140,7 @@ const UserDashboard: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
   const [recentPlays, setRecentPlays] = useState<MediaFile[]>([]);
   const [recommendations, setRecommendations] = useState<MediaFile[]>([]);
+  const [featuredEPs, setFeaturedEPs] = useState<any[]>([]);
   const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
   const [userMedia, setUserMedia] = useState<MediaFile[]>([]);
   const router = useRouter();
@@ -179,11 +180,12 @@ const UserDashboard: React.FC = () => {
           const homeData = await recommendationsRes.json();
           // Extract recommendations from featured/trending sections
           const allMedia = [
-            ...(homeData.featured || []),
-            ...(homeData.trending || []),
-            ...(homeData.newest || [])
+            ...(homeData.featuredSongs || []),
+            ...(homeData.trendingSongs || []),
+            ...(homeData.topCharts || [])
           ];
           setRecommendations(allMedia.slice(0, 10));
+          setFeaturedEPs(Array.isArray(homeData.featuredEPs) ? homeData.featuredEPs : []);
         }
 
         // Fetch all media for recent plays
@@ -199,6 +201,7 @@ const UserDashboard: React.FC = () => {
         console.error('Error fetching user data:', error);
         // Set default empty state instead of crashing
         setRecommendations([]);
+        setFeaturedEPs([]);
         setRecentPlays([]);
         setUserPlaylists([]);
         setUserMedia([]);
@@ -627,6 +630,46 @@ const UserDashboard: React.FC = () => {
 
           {/* Recommendations & Quick Actions Side by Side on Mobile */}
           <div className="grid grid-cols-1 gap-6">
+            {featuredEPs.length > 0 && (
+              <section className="bg-white/5 rounded-xl p-4 border border-white/10">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-bold flex items-center gap-2 mobile-text-base">
+                    <FaCompactDisc className="text-[#e51f48]" />
+                    Featured EPs
+                  </h2>
+                  <a href="/browse" className="text-[#e51f48] hover:underline text-xs mobile-text-xs">More</a>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {featuredEPs.slice(0, 4).map((ep: any, index: number) => (
+                    <motion.div
+                      key={ep.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      onClick={() => router.push(`/albums/${ep.id}`)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => { if (event.key === 'Enter') router.push(`/albums/${ep.id}`); }}
+                      className="min-w-0 cursor-pointer group"
+                    >
+                      <Image
+                        src={ep.artCoverUrl || ep.coverArt || '/default-cover.jpg'}
+                        alt={ep.title || 'EP'}
+                        width={180}
+                        height={180}
+                        className="w-full aspect-square object-cover rounded-lg group-hover:opacity-80 transition-opacity"
+                        onError={(event) => {
+                          (event.target as HTMLImageElement).src = '/default-cover.jpg';
+                        }}
+                      />
+                      <h3 className="font-medium text-sm truncate mt-2">{ep.title}</h3>
+                      <p className="text-xs text-gray-400 truncate">{ep.user?.displayName || ep.user?.username || 'Unknown Artist'}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Recommendations */}
             <section className="bg-white/5 rounded-xl p-4 border border-white/10">
               <div className="flex items-center justify-between mb-3">

@@ -3,6 +3,7 @@ import { PrismaService } from '../db/prisma.service';
 import { CreateSupportDto } from './dto/create-support.dto';
 import { NotificationService } from '../notification/notification.service';
 import axios from 'axios';
+import { EventsGateway } from '../events/events.gateway';
 
 export function normalizeSupportRequest(dto: Partial<CreateSupportDto> & { metadata?: Record<string, unknown> }) {
   const rawType = (dto.type || dto.metadata?.contactType || dto.metadata?.type || 'GENERAL') as string;
@@ -30,7 +31,7 @@ export function normalizeSupportRequest(dto: Partial<CreateSupportDto> & { metad
 @Injectable()
 export class SupportService {
   private readonly logger = new Logger(SupportService.name);
-  constructor(private readonly prisma: PrismaService, private readonly notificationService: NotificationService) {}
+  constructor(private readonly prisma: PrismaService, private readonly notificationService: NotificationService, private readonly eventsGateway: EventsGateway) {}
 
   async createTicket(dto: CreateSupportDto) {
     const normalized = normalizeSupportRequest(dto);
@@ -39,17 +40,23 @@ export class SupportService {
       throw new Error('email and message are required');
     }
 
-    const record = await this.prisma.supportTicket.create({
-      data: {
-        name: normalized.name,
-        email: normalized.email,
-        message: normalized.message,
-        source: normalized.source,
-        type: normalized.type,
-        metadata: normalized.metadata as any,
-      },
+    const record = await this.prisma.$transaction(async (tx) => {
+      const ticket = await tx.supportTicket.create({
+        data: {
+          name: normalized.name,
+          email: normalized.email,
+          message: normalized.message,
+          source: normalized.source,
+          type: normalized.type,
+          metadata: normalized.metadata as any,
+          unreadCount: 1,
+        },
+      });
+      await tx.supportMessage.create({ data: { ticketId: ticket.id, senderName: normalized.name, body: normalized.message, isStaff: false } });
+      return ticket;
     });
     this.logger.log(`Created support ticket ${record.ticketId} for ${record.email}`);
+    this.eventsGateway.emitSupportEvent('support:ticket-created', await this.getTicket(record.id));
     // Notify admins in-app
     try {
       const admins = await this.prisma.user.findMany({ where: { role: { in: ['ADMIN', 'MODERATOR', 'CONTENT_MANAGER'] } }, select: { id: true, email: true } });
@@ -91,7 +98,7 @@ export class SupportService {
         { ticketId: { contains: q, mode: 'insensitive' } },
       ];
     }
-    return this.prisma.supportTicket.findMany({ where, orderBy: { createdAt: 'desc' }, take: limit, skip });
+    return this.prisma.supportTicket.findMany({ where, orderBy: { updatedAt: 'desc' }, take: limit, skip, include: { assignedTo: { select: { id: true, displayName: true, username: true, role: true } } } });
   }
 
   async getTicketSummary() {
@@ -121,11 +128,29 @@ export class SupportService {
   }
 
   async getTicket(id: number) {
-    return this.prisma.supportTicket.findUnique({ where: { id } });
+    return this.prisma.supportTicket.findUnique({ where: { id }, include: { assignedTo: { select: { id: true, displayName: true, username: true, role: true } }, messages: { orderBy: { createdAt: 'asc' }, include: { sender: { select: { id: true, displayName: true, username: true, role: true } } } } } });
   }
 
-  async updateTicket(id: number, data: Partial<CreateSupportDto & { status?: string }>) {
-    // Prisma's JSON typing is strict; cast to any for flexible updates from DTO
-    return this.prisma.supportTicket.update({ where: { id }, data: (data as any) });
+  async listAgents() {
+    return this.prisma.user.findMany({ where: { role: { in: ['ADMIN', 'MODERATOR', 'CONTENT_MANAGER'] as any } }, select: { id: true, displayName: true, username: true, email: true, role: true }, orderBy: { displayName: 'asc' } });
+  }
+
+  async addMessage(id: number, body: string, senderId: number, senderName: string, isStaff: boolean) {
+    const message = await this.prisma.supportMessage.create({ data: { ticketId: id, senderId, senderName, body, isStaff }, include: { sender: { select: { id: true, displayName: true, username: true, role: true } } } });
+    const ticket = await this.prisma.supportTicket.update({ where: { id }, data: { status: isStaff ? 'IN_PROGRESS' : 'OPEN', ...(isStaff ? {} : { unreadCount: { increment: 1 } }) } });
+    this.eventsGateway.emitSupportEvent('support:message-created', { ticketId: id, message, ticket });
+    return message;
+  }
+
+  async markRead(id: number) {
+    const ticket = await this.prisma.supportTicket.update({ where: { id }, data: { unreadCount: 0 } });
+    this.eventsGateway.emitSupportEvent('support:ticket-updated', ticket);
+    return ticket;
+  }
+
+  async updateTicket(id: number, data: Partial<CreateSupportDto & { status?: string; assignedToId?: number | null }>, actorId?: number) {
+    const ticket = await this.prisma.supportTicket.update({ where: { id }, data: { ...(data.status !== undefined ? { status: data.status } : {}), ...(data.metadata !== undefined ? { metadata: data.metadata as any } : {}), ...(data.assignedToId !== undefined ? { assignedToId: data.assignedToId } : {}) }, include: { assignedTo: { select: { id: true, displayName: true, username: true, role: true } } } });
+    this.eventsGateway.emitSupportEvent('support:ticket-updated', { ...ticket, actorId });
+    return ticket;
   }
 }

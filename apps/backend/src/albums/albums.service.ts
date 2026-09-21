@@ -83,10 +83,36 @@ export class AlbumsService {
     return albums;
   }
 
+  async getPublicAlbums() {
+    return this.prisma.album.findMany({
+      where: {
+        contentStatus: { in: [ContentStatus.APPROVED, ContentStatus.PUBLISHED] },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            displayName: true,
+            username: true,
+            avatarUrl: true,
+          },
+        },
+        media: {
+          where: { deletedAt: null },
+          select: { id: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   // Get album by ID
   async getAlbumById(albumId: number) {
-    const album = await this.prisma.album.findUnique({
-      where: { id: albumId },
+    const album = await this.prisma.album.findFirst({
+      where: {
+        id: albumId,
+        contentStatus: { in: [ContentStatus.APPROVED, ContentStatus.PUBLISHED] },
+      },
       include: {
         media: {
           where: { deletedAt: null },

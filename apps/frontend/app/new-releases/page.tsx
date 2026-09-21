@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Play, Pause, Heart, Calendar, Clock } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { formatDuration, formatRelativeTime } from '@/lib/utils';
+import { formatDuration, formatRelativeTime, resolveDateValue } from '@/lib/utils';
 import Image from 'next/image';
 
 interface MediaFile {
@@ -34,9 +34,8 @@ function normalizeMedia(item: any): MediaFile {
 }
 
 function getReleaseTimestamp(media: MediaFile) {
-  const date = media.releaseDate || media.createdAt || '';
-  const parsed = new Date(date);
-  return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+  const date = resolveDateValue(media.releaseDate, media.createdAt, (media as any)?.publishedAt, (media as any)?.created_at);
+  return date ? date.getTime() : 0;
 }
 
 function getReleaseBadge(releaseDate: string) {

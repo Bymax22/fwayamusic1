@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import CoverArtImage from './CoverArtImage';
+import { formatRelativeTime } from '@/lib/utils';
 
 type VideoCardProps = {
   id: string | number;
@@ -24,21 +25,7 @@ const formatDuration = (seconds: number) => {
 
 const formatRelativeUploadTime = (value?: string) => {
   if (!value) return null;
-  const timestamp = new Date(value).getTime();
-  if (!Number.isFinite(timestamp)) return null;
-
-  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
-  if (elapsedSeconds < 10) return "Now";
-  if (elapsedSeconds < 60) return `${elapsedSeconds} seconds ago`;
-
-  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
-  if (elapsedMinutes < 60) return `${elapsedMinutes} ${elapsedMinutes === 1 ? "minute" : "minutes"} ago`;
-
-  const elapsedHours = Math.floor(elapsedMinutes / 60);
-  if (elapsedHours < 24) return `${elapsedHours} ${elapsedHours === 1 ? "hour" : "hours"} ago`;
-
-  const elapsedDays = Math.floor(elapsedHours / 24);
-  return `${elapsedDays} ${elapsedDays === 1 ? "day" : "days"} ago`;
+  return formatRelativeTime(value);
 };
 
 export default function VideoCard({

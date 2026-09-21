@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Play, Pause, Heart, Flame, TrendingUp, Users, Music2 } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { formatDuration } from '@/lib/utils';
+import { formatDuration, formatRelativeTime, resolveDateValue } from '@/lib/utils';
 import Image from 'next/image';
 
 interface MediaFile {
@@ -99,7 +99,11 @@ export default function PopularPage() {
     return [...media]
       .sort((a, b) => b.views - a.views)
       .slice(0, 12)
-      .map((item, index) => ({ ...item, trend: item.views > (media[index + 1]?.views ?? 0) ? 'up' : 'stable' }));
+      .map((item, index) => ({
+        ...item,
+        trend: item.views > (media[index + 1]?.views ?? 0) ? 'up' : 'stable',
+        publishedAt: formatRelativeTime(resolveDateValue(item.releaseDate, item.createdAt, (item as any)?.publishedAt, (item as any)?.published_at)),
+      }));
   }, [media]);
 
   const topArtists = useMemo(() => {

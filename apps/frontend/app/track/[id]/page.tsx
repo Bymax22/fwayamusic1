@@ -116,7 +116,7 @@ export default function TrackPage() {
           artistId: data.artistId ?? data.user?.id ?? 0,
           url: data.url || data.audioUrl || data.videoUrl || data.fileUrl || '',
           coverArt: data.coverArt || data.artCoverUrl || data.thumbnailUrl || data.thumbnail || '/default-cover.jpg',
-          releaseDate: data.releaseDate || data.publishedAt || data.createdAt || '',
+          releaseDate: data.releaseDate || data.publishedAt || data.createdAt || data.created_at || '',
         };
         setTrack(resolvedTrack);
 

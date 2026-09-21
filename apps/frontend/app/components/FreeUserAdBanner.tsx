@@ -25,6 +25,10 @@ export default function FreeUserAdBanner() {
   const [campaignId, setCampaignId] = useState<number | null>(null);
   const [campaigns, setCampaigns] = useState<Campaign[]>([FALLBACK_CAMPAIGN]);
   const [dismissed, setDismissed] = useState(false);
+  const recordEvent = (eventType: 'IMPRESSION' | 'CLICK', advertisementId: number) => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    void fetch(`${baseUrl}/api/v1/advertising/events`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ advertisementId, eventType }), keepalive: true }).catch(() => undefined);
+  };
 
   const hasActivePremium = Boolean(user?.isPremium && user.premiumUntil && new Date(user.premiumUntil) > new Date());
 
@@ -32,7 +36,7 @@ export default function FreeUserAdBanner() {
     if (hasActivePremium) return;
     const load = async () => {
       try {
-        const response = await fetch('/api/advertising/active', { cache: 'no-store' });
+        const response = await fetch('/api/advertising/active?placement=HOME_BANNER', { cache: 'no-store' });
         if (response.ok) {
           const loadedCampaigns = await response.json();
           setCampaigns(Array.isArray(loadedCampaigns) && loadedCampaigns.length ? loadedCampaigns : [FALLBACK_CAMPAIGN]);
@@ -70,6 +74,7 @@ export default function FreeUserAdBanner() {
     const nextAd = selectedCampaign.ads[Math.floor(Math.random() * selectedCampaign.ads.length)];
     setCampaignId(selectedCampaign.id);
     setAd(nextAd);
+    recordEvent('IMPRESSION', nextAd.id);
     const previous = impressions[String(selectedCampaign.id)];
     const wasRecentlyCounted = previous && now - previous.lastShown < 10_000;
     impressions[String(selectedCampaign.id)] = {
@@ -98,7 +103,7 @@ export default function FreeUserAdBanner() {
 
   return (
     <div className="mx-auto mb-6 w-full max-w-7xl">
-      {ad.clickUrl ? <a href={ad.clickUrl} target="_blank" rel="noreferrer" aria-label={`Open sponsored ad: ${ad.title}`}>{content}</a> : content}
+      {ad.clickUrl ? <a href={ad.clickUrl} onClick={() => recordEvent('CLICK', ad.id)} target="_blank" rel="noreferrer" aria-label={`Open sponsored ad: ${ad.title}`}>{content}</a> : content}
     </div>
   );
 }

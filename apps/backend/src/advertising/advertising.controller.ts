@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AdvertisingService } from './advertising.service';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
@@ -9,14 +9,25 @@ export class AdvertisingController {
   constructor(private readonly advertisingService: AdvertisingService) {}
 
   @Get('active')
-  getActiveAds() {
-    return this.advertisingService.getActiveAds();
+  getActiveAds(@Query('placement') placement?: string) {
+    return this.advertisingService.getActiveAds(placement);
+  }
+
+  @Post('events')
+  recordEvent(@Body() body: { advertisementId?: number; eventType?: string }, @Req() req: any) {
+    return this.advertisingService.recordEvent(Number(body.advertisementId), body.eventType || '', req.user?.id);
   }
 
   @UseGuards(FirebaseAuthGuard, AdminGuard)
   @Get('campaigns')
   listCampaigns() {
     return this.advertisingService.listCampaigns();
+  }
+
+  @UseGuards(FirebaseAuthGuard, AdminGuard)
+  @Get('campaigns/:id/analytics')
+  campaignAnalytics(@Param('id') id: string, @Query('days') days?: string) {
+    return this.advertisingService.getCampaignAnalytics(Number(id), Math.min(90, Math.max(1, Number(days) || 30)));
   }
 
   @UseGuards(FirebaseAuthGuard, AdminGuard)

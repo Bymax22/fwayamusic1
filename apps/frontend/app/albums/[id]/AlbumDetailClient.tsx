@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Play, Pause, Heart, Share2, Plus, ExternalLink } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
-import { createMediaSlug, DEFAULT_AVATAR_URL, formatRelativeTime, safeDate } from '@/lib/utils';
+import { createMediaSlug, DEFAULT_AVATAR_URL, formatRelativeTime, resolveDateValue } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
 interface AlbumDetailClientProps {
@@ -112,8 +112,12 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
     }
   };
 
-  const publishedAt = [album.releaseDate, album.publishedAt, album.createdAt, album.created_at]
-    .find((value) => Boolean(safeDate(value)));
+  const publishedAt = resolveDateValue(
+    album.releaseDate,
+    album.publishedAt,
+    album.createdAt,
+    album.created_at,
+  );
 
   return (
     <div className="min-h-screen w-full min-w-0 overflow-x-hidden px-2 py-6 text-white lg:px-0">
@@ -129,7 +133,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
               />
             </div>
             <div className="p-4 space-y-3">
-              <p className="text-xs uppercase tracking-[0.3em] text-purple-300">Album</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-purple-300">{album.type === 'EP' ? 'EP' : 'Album'}</p>
               <h1 className="text-2xl font-semibold">{album.title || 'Untitled Album'}</h1>
               <div className="flex min-w-0 items-center gap-2 text-sm text-slate-400">
                 <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-slate-800">

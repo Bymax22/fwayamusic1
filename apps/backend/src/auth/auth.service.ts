@@ -297,7 +297,9 @@ export class AuthService {
         provider: dto.provider,
         socialId: dto.socialId,
         role: normalizedRole,
-        status: UserStatus.ACTIVE,
+        status: normalizedRole === UserRole.ARTIST || normalizedRole === UserRole.PRODUCER || normalizedRole === UserRole.RESELLER
+          ? UserStatus.PENDING
+          : UserStatus.ACTIVE,
         isEmailVerified: true,
         passwordHash: 'SOCIAL_LOGIN',
       },

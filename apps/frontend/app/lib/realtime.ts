@@ -1,6 +1,7 @@
 let socket: any = null;
+let identifiedToken: string | null = null;
 
-export async function initRealtime() {
+export async function initRealtime(token?: string | null) {
   if (typeof window === 'undefined') return null;
   if (socket) return socket;
 
@@ -8,6 +9,8 @@ export async function initRealtime() {
     const { io } = await import('socket.io-client');
     const url = process.env.NEXT_PUBLIC_API_URL || window.location.origin;
     socket = io(`${url}/realtime`, { path: '/socket.io', transports: ['websocket'], autoConnect: true });
+    if (token) identifiedToken = token;
+    socket.on('connect', () => { if (identifiedToken) socket.emit('identify', { token: identifiedToken }); });
     return socket;
   } catch (err) {
     console.warn('Realtime init failed (socket.io-client missing):', err);
@@ -15,8 +18,8 @@ export async function initRealtime() {
   }
 }
 
-export async function subscribe(event: string, handler: (payload: any) => void) {
-  const s = await initRealtime();
+export async function subscribe(event: string, handler: (payload: any) => void, token?: string | null) {
+  const s = await initRealtime(token);
   if (!s) return () => {};
   s.on(event, handler);
   return () => s.off(event, handler);

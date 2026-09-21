@@ -124,11 +124,35 @@ export function safeDate(value?: unknown): Date | null {
     return Number.isNaN(value.getTime()) ? null : value;
   }
 
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    const date = new Date(trimmed);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
   const serializedValue = typeof value === 'object' && value !== null && '$date' in value
     ? (value as { $date?: unknown }).$date
     : value;
   const date = new Date(serializedValue as string | number);
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function resolveDateValue(...values: unknown[]): Date | null {
+  for (const value of values) {
+    const date = safeDate(value);
+    if (date) {
+      return date;
+    }
+  }
+
+  return null;
 }
 
 export function formatDate(
@@ -140,7 +164,7 @@ export function formatDate(
   }
 ): string {
   const date = safeDate(dateString);
-  if (!date) return 'Unknown date';
+  if (!date) return 'No date';
   return date.toLocaleDateString('en-US', options);
 }
 
@@ -151,27 +175,34 @@ export function formatDate(
  */
 export function formatRelativeTime(timestamp: unknown): string {
   const date = safeDate(timestamp);
-  if (!date) return 'Unknown date';
+  if (!date) return 'No date';
+
   const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const diffMs = now.getTime() - date.getTime();
 
-  const intervals = {
-    year: 31536000,
-    month: 2592000,
-    week: 604800,
-    day: 86400,
-    hour: 3600,
-    minute: 60
-  };
+  if (diffMs <= 0) return 'Just now';
 
-  for (const [unit, seconds] of Object.entries(intervals)) {
-    const interval = Math.floor(diffInSeconds / seconds);
-    if (interval >= 1) {
-      return `${interval} ${unit}${interval === 1 ? '' : 's'} ago`;
-    }
-  }
+  const diffSeconds = Math.floor(diffMs / 1000);
+  if (diffSeconds < 1) return 'Just now';
+  if (diffSeconds < 60) return `${diffSeconds} second${diffSeconds === 1 ? '' : 's'} ago`;
 
-  return 'Just now';
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (diffWeeks < 5) return `${diffWeeks} week${diffWeeks === 1 ? '' : 's'} ago`;
+
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) return `${diffMonths} month${diffMonths === 1 ? '' : 's'} ago`;
+
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears} year${diffYears === 1 ? '' : 's'} ago`;
 }
 
 // File/Data Utilities

@@ -11,7 +11,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import Waveform from '@/components/Waveform';
 import ShareModal from '@/components/ShareModal';
-import { createMediaSlug, formatDuration, formatFileSize, formatRelativeTime, safeDate } from '@/lib/utils';
+import { createMediaSlug, formatDuration, formatFileSize, formatRelativeTime, resolveDateValue } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
 import Link from 'next/link';
@@ -119,8 +119,12 @@ export default function Browse() {
   const router = useRouter();
   const [, setRelativeTimeTick] = useState(0);
   const getPublishedTime = (file: MediaFile) => {
-    const timestamp = [file.createdAt]
-      .find((value) => Boolean(safeDate(value)));
+    const timestamp = resolveDateValue(
+      (file as any)?.publishedAt,
+      (file as any)?.releaseDate,
+      file.createdAt,
+      (file as any)?.created_at,
+    );
     return formatRelativeTime(timestamp);
   };
 

@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { v2 as cloudinary } from 'cloudinary';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class AdvertisingService {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(private readonly prisma: PrismaService, private readonly eventsGateway: EventsGateway) {
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,
@@ -12,7 +13,7 @@ export class AdvertisingService {
     });
   }
 
-  async getActiveAds() {
+  async getActiveAds(placement?: string) {
     const now = new Date();
     return this.prisma.advertisingCampaign.findMany({
       where: {
@@ -25,7 +26,7 @@ export class AdvertisingService {
         frequencyCap: true,
         cooldownSeconds: true,
         ads: {
-          where: { isActive: true },
+          where: { isActive: true, ...(placement ? { placement } : {}) },
           orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
           select: { id: true, title: true, mediaType: true, mediaUrl: true, clickUrl: true },
         },
@@ -109,6 +110,7 @@ export class AdvertisingService {
         mediaType: mediaType as any,
         mediaUrl,
         clickUrl: input.clickUrl || null,
+        placement: input.placement || 'HOME_BANNER',
         sortOrder: Number(input.sortOrder) || 0,
         isActive: input.isActive !== false,
       },
@@ -121,6 +123,7 @@ export class AdvertisingService {
       data: {
         ...(input.title !== undefined ? { title: input.title } : {}),
         ...(input.clickUrl !== undefined ? { clickUrl: input.clickUrl || null } : {}),
+        ...(input.placement !== undefined ? { placement: String(input.placement) } : {}),
         ...(input.sortOrder !== undefined ? { sortOrder: Number(input.sortOrder) || 0 } : {}),
         ...(input.isActive !== undefined ? { isActive: Boolean(input.isActive) } : {}),
       },
@@ -129,5 +132,32 @@ export class AdvertisingService {
 
   async deleteAdvertisement(id: number) {
     return this.prisma.advertisement.delete({ where: { id } });
+  }
+
+  async recordEvent(advertisementId: number, eventType: string, userId?: number) {
+    if (!Number.isInteger(advertisementId) || !['IMPRESSION', 'CLICK'].includes(eventType.toUpperCase())) throw new BadRequestException('Valid advertisementId and eventType are required');
+    const advertisement = await this.prisma.advertisement.findUnique({ where: { id: advertisementId }, select: { id: true } });
+    if (!advertisement) throw new NotFoundException('Advertisement not found');
+    const event = await this.prisma.advertisementEvent.create({ data: { advertisementId, eventType: eventType.toUpperCase(), userId: userId || null } });
+    this.eventsGateway.emitSupportEvent('advertising:updated', { advertisementId, eventType: event.eventType });
+    return event;
+  }
+
+  async getCampaignAnalytics(campaignId: number, days = 30) {
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const campaign = await this.prisma.advertisingCampaign.findUnique({ where: { id: campaignId }, select: { id: true, name: true } });
+    if (!campaign) throw new NotFoundException('Campaign not found');
+    const events = await this.prisma.advertisementEvent.findMany({ where: { advertisement: { campaignId }, createdAt: { gte: since } }, select: { advertisementId: true, eventType: true, createdAt: true }, orderBy: { createdAt: 'asc' } });
+    const byDay = new Map<string, { day: string; impressions: number; clicks: number }>();
+    for (const event of events) {
+      const day = event.createdAt.toISOString().slice(0, 10);
+      const entry = byDay.get(day) || { day, impressions: 0, clicks: 0 };
+      if (event.eventType === 'CLICK') entry.clicks += 1;
+      if (event.eventType === 'IMPRESSION') entry.impressions += 1;
+      byDay.set(day, entry);
+    }
+    const impressions = events.filter((event) => event.eventType === 'IMPRESSION').length;
+    const clicks = events.filter((event) => event.eventType === 'CLICK').length;
+    return { ...campaign, impressions, clicks, clickThroughRate: impressions ? Number(((clicks / impressions) * 100).toFixed(2)) : 0, series: Array.from(byDay.values()) };
   }
 }

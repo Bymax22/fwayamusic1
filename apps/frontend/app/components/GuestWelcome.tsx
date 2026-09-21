@@ -30,7 +30,7 @@ import { FaRegHeart, FaPlus } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useAuth } from "@/context/AuthContext";
 import MobileMenu from "./MobileMenu";
-import { createMediaSlug, formatRelativeTime, safeDate } from "@/lib/utils";
+import { createMediaSlug, formatRelativeTime, resolveDateValue } from "@/lib/utils";
 import { subscribe } from '@/lib/realtime';
 import VerifiedBadge from "./VerifiedBadge";
 import FreeUserAdBanner from "./FreeUserAdBanner";
@@ -62,8 +62,12 @@ export default function GuestWelcome() {
   const cacheKey = 'fwayaGuestWelcomeHomepageData:v2';
   const [, setRelativeTimeTick] = useState(0);
   const getPublishedTime = (item: any) => {
-    const timestamp = [item?.releaseDate, item?.publishedAt, item?.createdAt, item?.created_at]
-      .find((value) => Boolean(safeDate(value)));
+    const timestamp = resolveDateValue(
+      item?.releaseDate,
+      item?.publishedAt,
+      item?.createdAt,
+      item?.created_at,
+    );
     return formatRelativeTime(timestamp);
   };
 
@@ -390,11 +394,14 @@ export default function GuestWelcome() {
 
         const albumItems: any[] = [];
         const epItems: any[] = [];
+
+        if (Array.isArray(homepageData.featuredEPs)) {
+          epItems.push(...homepageData.featuredEPs);
+        }
         
         // First, try to use the dedicated featuredAlbums field from backend
         if (homepageData.featuredAlbums && Array.isArray(homepageData.featuredAlbums) && homepageData.featuredAlbums.length > 0) {
           albumItems.push(...homepageData.featuredAlbums);
-          if (Array.isArray(homepageData.featuredEPs)) epItems.push(...homepageData.featuredEPs);
         } else {
           // Fallback: filter albums from other sections
           if (homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)) {

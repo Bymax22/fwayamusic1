@@ -6,6 +6,7 @@ import { Activity, ArrowUpRight, BarChart3, CircleDollarSign, FileAudio, LifeBuo
 import EnhancedRoleGuard from '@/components/RoleGuard';
 import { useAuth } from '@/context/AuthContext';
 import { subscribe } from '@/lib/realtime';
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 type AdminStats = {
   totalUsers: number;
@@ -28,6 +29,15 @@ type AdminStats = {
   activeUsers24h: number;
 };
 
+type AdminAnalytics = {
+  activeUsers: number;
+  activeUsers24h: number;
+  pendingApplications: number;
+  usersByCountry: Array<{ country: string; count: number }>;
+  engagement: { plays: number; downloads: number; shares: number };
+  series: Array<{ day: string; activeUsers: number; activeUsers24h: number; signups: number; approvals: number; plays: number; downloads: number; shares: number }>;
+};
+
 const emptyStats: AdminStats = {
   totalUsers: 0, totalArtists: 0, totalProducers: 0, totalResellers: 0, totalAdmins: 0, premiumUsers: 0,
   totalMedia: 0, audioCount: 0, videoCount: 0, podcastCount: 0, premiumMedia: 0, payPerViewMedia: 0,
@@ -42,6 +52,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [analytics, setAnalytics] = useState<AdminAnalytics>({ activeUsers: 0, activeUsers24h: 0, pendingApplications: 0, usersByCountry: [], engagement: { plays: 0, downloads: 0, shares: 0 }, series: [] });
 
   const loadStats = async () => {
     setError('');
@@ -53,6 +64,11 @@ function AdminDashboard() {
       });
       if (!response.ok) throw new Error(`Unable to load dashboard data (${response.status})`);
       setStats(await response.json());
+      const analyticsResponse = await fetch(`${apiBase}/api/v1/admin/analytics`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        cache: 'no-store',
+      });
+      if (analyticsResponse.ok) setAnalytics(await analyticsResponse.json());
       setLastUpdated(new Date());
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Unable to load dashboard data');
@@ -65,9 +81,12 @@ function AdminDashboard() {
     void loadStats();
     let cleanup: (() => void) | undefined;
     void subscribe('media:uploaded', () => void loadStats()).then((unsubscribe) => { cleanup = unsubscribe; });
+    let adminCleanup: (() => void) | undefined;
+    void subscribe('admin:dashboard-updated', () => void loadStats()).then((unsubscribe) => { adminCleanup = unsubscribe; });
     const interval = window.setInterval(() => void loadStats(), 60000);
     return () => {
       cleanup?.();
+      adminCleanup?.();
       window.clearInterval(interval);
     };
   }, []);
@@ -80,6 +99,8 @@ function AdminDashboard() {
   ];
 
   const links = [
+    { href: '/admin/applications', label: 'Signup approvals', detail: `${analytics.pendingApplications} applications waiting`, icon: ShieldCheck },
+    { href: '/admin/notifications', label: 'Notifications', detail: 'Message users and groups', icon: Megaphone },
     { href: '/admin/support', label: 'Support inbox', detail: 'Resolve user tickets', icon: LifeBuoy },
     { href: '/admin/covers', label: 'Cover moderation', detail: 'Approve or reject artwork', icon: ShieldCheck },
     { href: '/admin/advertising', label: 'Advertising', detail: 'Manage campaigns and creatives', icon: Megaphone },
@@ -118,7 +139,17 @@ function AdminDashboard() {
               {[['Artists', stats.totalArtists], ['Producers', stats.totalProducers], ['Premium users', stats.premiumUsers], ['Videos', stats.videoCount]].map(([label, value]) => <div key={label} className="rounded-xl bg-black/30 p-4"><p className="text-xs text-white/45">{label}</p><p className="mt-2 text-xl font-semibold">{Number(value).toLocaleString()}</p></div>)}
             </div>
           </div>
-          <div className="rounded-2xl border border-purple-400/20 bg-purple-500/[0.08] p-5"><div className="flex items-center justify-between"><div><h2 className="text-lg font-semibold">Live status</h2><p className="mt-1 text-sm text-purple-100/60">Dashboard refreshes on platform events.</p></div><span className="h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_14px_#34d399]" /></div><p className="mt-8 text-sm text-white/70">{lastUpdated ? `Last synced ${lastUpdated.toLocaleTimeString()}` : 'Connecting to data service...'}</p></div>
+          <div className="rounded-2xl border border-purple-400/20 bg-purple-500/[0.08] p-5"><div className="flex items-center justify-between"><div><h2 className="text-lg font-semibold">Live status</h2><p className="mt-1 text-sm text-purple-100/60">Realtime events plus periodic reconciliation.</p></div><span className="h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_14px_#34d399]" /></div><div className="mt-8 grid grid-cols-2 gap-3"><div><p className="text-xs text-white/45">Active now</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers}</p></div><div><p className="text-xs text-white/45">Active 24h</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers24h}</p></div></div><p className="mt-4 text-xs text-white/45">{lastUpdated ? `Last synced ${lastUpdated.toLocaleTimeString()}` : 'Connecting to data service...'}</p></div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Active users by location</h2><p className="mt-1 text-sm text-white/50">Users active in the last 24 hours.</p><div className="mt-5 space-y-3">{analytics.usersByCountry.length === 0 ? <p className="text-sm text-white/45">No location activity yet.</p> : analytics.usersByCountry.slice(0, 8).map((entry) => <div key={entry.country} className="flex items-center justify-between text-sm"><span>{entry.country}</span><span className="text-purple-200">{entry.count}</span></div>)}</div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Approval queue</h2><p className="mt-1 text-sm text-white/50">Role-based signups waiting for review.</p><p className="mt-5 text-4xl font-semibold">{analytics.pendingApplications}</p><Link href="/admin/applications" className="mt-4 inline-flex text-sm text-purple-200 hover:underline">Open approval workspace <ArrowUpRight size={14} className="ml-1" /></Link></div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Audience trends</h2><p className="mt-1 text-sm text-white/50">Daily active users and new signups captured by the control center.</p><div className="mt-5 h-64"><ResponsiveContainer width="100%" height="100%"><LineChart data={analytics.series}><CartesianGrid stroke="rgba(255,255,255,.08)" /><XAxis dataKey="day" tick={{ fill: '#94a3b8', fontSize: 11 }} /><YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} /><Tooltip contentStyle={{ background: '#111827', border: '1px solid rgba(255,255,255,.1)' }} /><Legend /><Line type="monotone" dataKey="activeUsers" stroke="#c084fc" name="Active now" /><Line type="monotone" dataKey="activeUsers24h" stroke="#34d399" name="Active 24h" /><Line type="monotone" dataKey="signups" stroke="#60a5fa" name="Signups" /></LineChart></ResponsiveContainer></div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Approvals and engagement</h2><p className="mt-1 text-sm text-white/50">Operational outcomes and platform activity over time.</p><div className="mt-5 h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={analytics.series}><CartesianGrid stroke="rgba(255,255,255,.08)" /><XAxis dataKey="day" tick={{ fill: '#94a3b8', fontSize: 11 }} /><YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} /><Tooltip contentStyle={{ background: '#111827', border: '1px solid rgba(255,255,255,.1)' }} /><Legend /><Bar dataKey="approvals" fill="#f59e0b" name="Approvals" /><Bar dataKey="downloads" fill="#38bdf8" name="Downloads" /><Bar dataKey="shares" fill="#f472b6" name="Shares" /></BarChart></ResponsiveContainer></div></div>
         </section>
 
         <section><div className="mb-4 flex items-end justify-between"><div><h2 className="text-lg font-semibold">Operations</h2><p className="mt-1 text-sm text-white/50">Jump directly into connected admin workflows.</p></div><ArrowUpRight className="text-white/35" size={20} /></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{links.map(({ href, label, detail, icon: Icon }) => <Link key={href} href={href} className="group rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition hover:border-purple-400/40 hover:bg-purple-500/[0.08]"><Icon size={20} className="text-purple-300" /><h3 className="mt-5 font-semibold">{label}</h3><p className="mt-1 text-sm text-white/50">{detail}</p><span className="mt-5 inline-flex text-xs text-purple-200 opacity-0 transition group-hover:opacity-100">Open workspace <ArrowUpRight size={14} className="ml-1" /></span></Link>)}</div></section>

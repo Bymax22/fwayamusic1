@@ -10,6 +10,7 @@ import { FaHeadphones, FaRegHeart } from 'react-icons/fa';
 interface AlbumItem {
   id: number;
   title: string;
+  type: 'ALBUM' | 'EP';
   artist: string;
   coverArt: string;
   releaseDate?: string;
@@ -23,6 +24,7 @@ function normalizeAlbum(item: any): AlbumItem {
   return {
     id: item.id,
     title: item.title || item.name || 'Untitled Album',
+    type: item.type?.toString().toUpperCase() === 'EP' ? 'EP' : 'ALBUM',
     artist: item.user?.displayName || item.user?.username || item.artist || 'Unknown Artist',
     coverArt: item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/default-cover.jpg',
     releaseDate: item.releaseDate || item.createdAt || item.publishedAt || item.created_at || '',
@@ -56,13 +58,11 @@ export default function AlbumsPage() {
     const fetchAlbums = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/media', { credentials: 'include' });
+        const response = await fetch('/api/albums', { credentials: 'include' });
         if (!response.ok) throw new Error('Failed to load albums');
         const data = await response.json();
         const items = Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : [];
-        const albumItems = items
-          .filter((item: any) => item.type?.toString().toUpperCase() === 'ALBUM')
-          .map(normalizeAlbum);
+        const albumItems = items.map(normalizeAlbum);
 
         setAlbums(albumItems);
       } catch (err) {
@@ -85,11 +85,11 @@ export default function AlbumsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Albums</p>
-            <h1 className="text-3xl font-semibold text-white">Browse albums</h1>
-            <p className="mt-2 text-sm text-slate-400">Explore featured and newly released albums from top artists.</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Releases</p>
+            <h1 className="text-3xl font-semibold text-white">Browse albums and EPs</h1>
+            <p className="mt-2 text-sm text-slate-400">Explore featured albums and EPs from top artists.</p>
           </div>
-          <div className="rounded-full bg-white/5 px-4 py-2 text-sm text-slate-300">{albums.length} albums available</div>
+          <div className="rounded-full bg-white/5 px-4 py-2 text-sm text-slate-300">{albums.length} releases available</div>
         </div>
 
         {error ? (
@@ -128,7 +128,8 @@ export default function AlbumsPage() {
                       />
                     </div>
                     <div className="p-4">
-                      <p className="text-sm font-semibold text-white truncate mb-1">{album.title}</p>
+                        <p className="text-sm font-semibold text-white truncate mb-1">{album.title}</p>
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-purple-300">{album.type}</p>
                       <p className="text-xs text-slate-400 truncate mb-3">{album.artist}</p>
                       <div className="flex items-center justify-between text-xs text-slate-400">
                         <span>{album.trackCount} tracks</span>
@@ -152,7 +153,7 @@ export default function AlbumsPage() {
             <section>
               <div className="mb-6 flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500">All Albums</p>
+                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500">All Releases</p>
                   <h2 className="text-2xl font-semibold text-white">Browse the full collection</h2>
                 </div>
               </div>
@@ -173,6 +174,7 @@ export default function AlbumsPage() {
                     </div>
                     <div className="p-4">
                       <p className="text-sm font-semibold text-white truncate mb-1">{album.title}</p>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-purple-300">{album.type}</p>
                       <p className="text-xs text-slate-400 truncate mb-3">{album.artist}</p>
                       <div className="flex items-center justify-between text-xs text-slate-400">
                         <span>{album.trackCount} tracks</span>

@@ -4,6 +4,7 @@ import { Bell, ChevronRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { subscribe } from "@/lib/realtime";
 
 type NotificationItem = {
   id: number;
@@ -39,7 +40,12 @@ export default function NotificationBell() {
       return;
     }
 
-    fetchNotifications();
+    void fetchNotifications();
+    let cleanup: (() => void) | undefined;
+    void getToken().then((token) => subscribe('notification:new', (notification) => {
+      setNotifications((current) => [notification, ...current.filter((item) => item.id !== notification.id)]);
+    }, token)).then((unsubscribe) => { cleanup = unsubscribe; });
+    return () => cleanup?.();
   }, [user]);
   
   useEffect(() => {

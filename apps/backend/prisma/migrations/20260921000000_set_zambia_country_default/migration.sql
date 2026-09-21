@@ -1,0 +1,2 @@
+ALTER TABLE "users"
+ALTER COLUMN "country" SET DEFAULT 'ZM';

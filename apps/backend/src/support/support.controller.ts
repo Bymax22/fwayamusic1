@@ -21,10 +21,17 @@ export class SupportController {
   @Get('summary')
   async summary(@Req() req: any) {
     const role = req.user?.role;
-    if (!['ADMIN', 'MODERATOR', 'CONTENT_MANAGER'].includes(role)) {
+    if (!['ADMIN', 'MODERATOR', 'CONTENT_MANAGER'].includes(role ?? '')) {
       throw new ForbiddenException('Insufficient permissions');
     }
     return this.supportService.getTicketSummary();
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Get('agents')
+  async agents(@Req() req: any) {
+    this.assertStaff(req.user?.role);
+    return this.supportService.listAgents();
   }
 
   @UseGuards(FirebaseAuthGuard)
@@ -45,22 +52,37 @@ export class SupportController {
   @UseGuards(FirebaseAuthGuard)
   @Get(':id')
   async get(@Param('id') id: string, @Req() req: any) {
-    const role = req.user?.role;
-    if (!['ADMIN', 'MODERATOR', 'CONTENT_MANAGER'].includes(role)) {
-      throw new ForbiddenException('Insufficient permissions');
-    }
+    this.assertStaff(req.user?.role);
     const ticketId = Number(id);
     return this.supportService.getTicket(ticketId);
   }
 
   @UseGuards(FirebaseAuthGuard)
+  @Post(':id/messages')
+  async message(@Param('id') id: string, @Body() body: { body?: string }, @Req() req: any) {
+    this.assertStaff(req.user?.role);
+    if (!body?.body?.trim()) throw new BadRequestException('Message body is required');
+    return this.supportService.addMessage(Number(id), body.body.trim(), req.user.id, req.user.displayName || req.user.username || 'Support agent', true);
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Patch(':id/read')
+  async read(@Param('id') id: string, @Req() req: any) {
+    this.assertStaff(req.user?.role);
+    return this.supportService.markRead(Number(id));
+  }
+
+  @UseGuards(FirebaseAuthGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() body: UpdateSupportDto, @Req() req: any) {
-    const role = req.user?.role;
-    if (!['ADMIN', 'MODERATOR', 'CONTENT_MANAGER'].includes(role)) {
+    this.assertStaff(req.user?.role);
+    const ticketId = Number(id);
+    return this.supportService.updateTicket(ticketId, body as any, req.user.id);
+  }
+
+  private assertStaff(role?: string) {
+    if (!['ADMIN', 'MODERATOR', 'CONTENT_MANAGER'].includes(role ?? '')) {
       throw new ForbiddenException('Insufficient permissions');
     }
-    const ticketId = Number(id);
-    return this.supportService.updateTicket(ticketId, body as any);
   }
 }

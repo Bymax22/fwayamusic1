@@ -1106,7 +1106,7 @@ async getHomepageSections() {
 
   // Fetch albums and EPs separately so one release type cannot hide the other.
   const releaseWhere = {
-    contentStatus: { in: [ContentStatus.PUBLISHED, ContentStatus.APPROVED, ContentStatus.DRAFT, ContentStatus.SUBMITTED] },
+    contentStatus: { in: [ContentStatus.PUBLISHED, ContentStatus.APPROVED] },
   };
   const releaseInclude = {
     user: {

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Bell } from "lucide-react";
+import { subscribe } from "@/lib/realtime";
 
 type NotificationItem = {
   id: number;
@@ -28,7 +29,12 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (!user) return;
-    fetchNotifications();
+    void fetchNotifications();
+    let cleanup: (() => void) | undefined;
+    void getToken().then((token) => subscribe('notification:new', (notification: NotificationItem) => {
+      setNotifications((current) => [notification, ...current.filter((item) => item.id !== notification.id)]);
+    }, token)).then((unsubscribe) => { cleanup = unsubscribe; });
+    return () => cleanup?.();
   }, [user]);
 
   const fetchNotifications = async () => {

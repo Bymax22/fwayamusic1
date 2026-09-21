@@ -40,6 +40,11 @@ export class AlbumsController {
     return this.albumsService.getArtistAlbums(parseInt(artistId));
   }
 
+  @Get()
+  async getPublicAlbums() {
+    return this.albumsService.getPublicAlbums();
+  }
+
   @Get(':id')
   async getAlbum(@Param('id') id: string) {
     return this.albumsService.getAlbumById(parseInt(id));
