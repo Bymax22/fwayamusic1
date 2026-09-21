@@ -7,6 +7,12 @@ import {
 } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
 
+let prisma: PrismaClient;
+
+export function configureAdminPrisma(client: PrismaClient) {
+  prisma = client;
+}
+
 // Extended Admin Stats
 export interface AdminStats {
   // User Stats

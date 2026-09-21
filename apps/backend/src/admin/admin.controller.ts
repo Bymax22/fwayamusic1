@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { AdminGuard } from '../common/guards/admin.guard';
-import { getAdminStats } from '../db/admin';
+import { configureAdminPrisma, getAdminStats } from '../db/admin';
 import { PrismaService } from '../db/prisma.service';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType, UserRole, UserStatus } from '@prisma/client';
@@ -15,7 +15,9 @@ export class AdminController {
     private readonly prisma: PrismaService,
     private readonly notificationService: NotificationService,
     private readonly eventsGateway: EventsGateway,
-  ) {}
+  ) {
+    configureAdminPrisma(this.prisma);
+  }
 
   @Get('dashboard/stats')
   async getDashboardStats() {
