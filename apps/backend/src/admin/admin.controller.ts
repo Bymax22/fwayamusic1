@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { AdminGuard } from '../common/guards/admin.guard';
 import { getAdminStats } from '../db/admin';
@@ -6,6 +6,7 @@ import { PrismaService } from '../db/prisma.service';
 import { NotificationService } from '../notification/notification.service';
 import { NotificationType, UserRole, UserStatus } from '@prisma/client';
 import { EventsGateway } from '../events/events.gateway';
+import * as bcrypt from 'bcrypt';
 
 @Controller('v1/admin')
 @UseGuards(FirebaseAuthGuard, AdminGuard)
@@ -96,6 +97,64 @@ export class AdminController {
       },
       orderBy: { createdAt: 'asc' },
     });
+  }
+
+  @Get('users')
+  async listUsers(@Body() _body: never, @Req() request: any) {
+    const query = request.query as { q?: string; role?: UserRole; status?: UserStatus; limit?: string };
+    const search = query.q?.trim();
+    return this.prisma.user.findMany({
+      where: {
+        ...(query.role ? { role: query.role } : {}),
+        ...(query.status ? { status: query.status } : {}),
+        ...(search ? { OR: [{ email: { contains: search, mode: 'insensitive' } }, { username: { contains: search, mode: 'insensitive' } }, { displayName: { contains: search, mode: 'insensitive' } }] } : {}),
+      },
+      select: { id: true, email: true, username: true, displayName: true, role: true, status: true, country: true, isPremium: true, createdAt: true, lastLoginAt: true, isArtist: true, isProducer: true, isReseller: true },
+      orderBy: { createdAt: 'desc' },
+      take: Math.min(200, Math.max(1, Number(query.limit) || 100)),
+    });
+  }
+
+  @Post('users')
+  async createUser(@Body() body: { email?: string; username?: string; password?: string; displayName?: string; role?: UserRole; country?: string; status?: UserStatus }) {
+    if (!body.email || !body.username || !body.password) throw new NotFoundException('Email, username, and password are required');
+    const passwordHash = await bcrypt.hash(body.password, 12);
+    return this.prisma.user.create({ data: { email: body.email.trim().toLowerCase(), username: body.username.trim(), passwordHash, displayName: body.displayName?.trim() || body.username.trim(), role: body.role || UserRole.USER, status: body.status || UserStatus.ACTIVE, country: body.country?.trim().toUpperCase() || 'ZM' }, select: { id: true, email: true, username: true, displayName: true, role: true, status: true, country: true, isPremium: true, createdAt: true } });
+  }
+
+  @Patch('users/:id')
+  async updateUser(@Param('id') id: string, @Body() body: { displayName?: string; username?: string; email?: string; role?: UserRole; status?: UserStatus; country?: string; isPremium?: boolean }) {
+    const updated = await this.prisma.user.update({ where: { id: Number(id) }, data: { ...(body.displayName !== undefined ? { displayName: body.displayName.trim() } : {}), ...(body.username !== undefined ? { username: body.username.trim() } : {}), ...(body.email !== undefined ? { email: body.email.trim().toLowerCase() } : {}), ...(body.role !== undefined ? { role: body.role } : {}), ...(body.status !== undefined ? { status: body.status } : {}), ...(body.country !== undefined ? { country: body.country.trim().toUpperCase() } : {}), ...(body.isPremium !== undefined ? { isPremium: body.isPremium } : {}) }, select: { id: true, email: true, username: true, displayName: true, role: true, status: true, country: true, isPremium: true, createdAt: true, lastLoginAt: true } });
+    this.eventsGateway.emitAdminDashboardUpdated({ reason: 'user-updated', resourceId: updated.id });
+    return updated;
+  }
+
+  @Delete('users/:id')
+  async deleteUser(@Param('id') id: string, @Req() request: any) {
+    const userId = Number(id);
+    if (userId === request.user.id) throw new NotFoundException('You cannot delete your own admin account');
+    await this.prisma.user.update({ where: { id: userId }, data: { status: UserStatus.SUSPENDED, accountDeactivatedAt: new Date() } });
+    this.eventsGateway.emitAdminDashboardUpdated({ reason: 'user-suspended', resourceId: userId });
+    return { ok: true, id: userId, status: UserStatus.SUSPENDED };
+  }
+
+  @Get('media')
+  async listMedia(@Req() request: any) {
+    const query = request.query as { q?: string; type?: string; limit?: string };
+    const search = query.q?.trim();
+    return this.prisma.media.findMany({ where: { ...(query.type ? { type: query.type as any } : {}), ...(search ? { title: { contains: search, mode: 'insensitive' } } : {}) }, select: { id: true, title: true, type: true, contentStatus: true, accessType: true, releaseDate: true, createdAt: true, playCount: true, downloadCount: true, user: { select: { id: true, displayName: true, username: true } } }, orderBy: { createdAt: 'desc' }, take: Math.min(200, Math.max(1, Number(query.limit) || 100)) });
+  }
+
+  @Patch('media/:id')
+  async updateMedia(@Param('id') id: string, @Body() body: { title?: string; contentStatus?: string; accessType?: string; releaseDate?: string }) {
+    return this.prisma.media.update({ where: { id: Number(id) }, data: { ...(body.title !== undefined ? { title: body.title.trim() } : {}), ...(body.contentStatus !== undefined ? { contentStatus: body.contentStatus as any } : {}), ...(body.accessType !== undefined ? { accessType: body.accessType as any } : {}), ...(body.releaseDate !== undefined ? { releaseDate: new Date(body.releaseDate) } : {}) }, select: { id: true, title: true, type: true, contentStatus: true, accessType: true, releaseDate: true, createdAt: true, playCount: true, downloadCount: true } });
+  }
+
+  @Delete('media/:id')
+  async deleteMedia(@Param('id') id: string) {
+    await this.prisma.media.update({ where: { id: Number(id) }, data: { deletedAt: new Date(), contentStatus: 'ARCHIVED' as any } });
+    this.eventsGateway.emitAdminDashboardUpdated({ reason: 'media-archived', resourceId: Number(id) });
+    return { ok: true, id: Number(id) };
   }
 
   @Patch('applications/:id')

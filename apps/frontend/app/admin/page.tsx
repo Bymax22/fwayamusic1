@@ -47,7 +47,7 @@ const emptyStats: AdminStats = {
 const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 function AdminDashboard() {
-  const { getToken } = useAuth();
+  const { getToken, firebaseUser, user } = useAuth();
   const [stats, setStats] = useState<AdminStats>(emptyStats);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -57,15 +57,21 @@ function AdminDashboard() {
   const loadStats = async () => {
     setError('');
     try {
-      const token = await getToken();
+      let token = await getToken();
+      if (!token && firebaseUser) {
+        token = await firebaseUser.getIdToken(true);
+      }
+      if (!token) {
+        throw new Error('Your admin session is still loading. Please try again.');
+      }
       const response = await fetch(`${apiBase}/api/v1/admin/dashboard/stats`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
       if (!response.ok) throw new Error(`Unable to load dashboard data (${response.status})`);
       setStats(await response.json());
       const analyticsResponse = await fetch(`${apiBase}/api/v1/admin/analytics`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
       if (analyticsResponse.ok) setAnalytics(await analyticsResponse.json());
@@ -78,6 +84,7 @@ function AdminDashboard() {
   };
 
   useEffect(() => {
+    if (!user || !firebaseUser) return;
     void loadStats();
     let cleanup: (() => void) | undefined;
     void subscribe('media:uploaded', () => void loadStats()).then((unsubscribe) => { cleanup = unsubscribe; });
@@ -89,7 +96,7 @@ function AdminDashboard() {
       adminCleanup?.();
       window.clearInterval(interval);
     };
-  }, []);
+  }, [user, firebaseUser]);
 
   const statCards = [
     { label: 'Total users', value: stats.totalUsers, detail: `${stats.activeUsers24h} active today`, icon: Users, color: 'text-purple-300' },
@@ -99,6 +106,7 @@ function AdminDashboard() {
   ];
 
   const links = [
+    { href: '/admin/users', label: 'Users & media', detail: 'Manage accounts and content', icon: Users },
     { href: '/admin/applications', label: 'Signup approvals', detail: `${analytics.pendingApplications} applications waiting`, icon: ShieldCheck },
     { href: '/admin/notifications', label: 'Notifications', detail: 'Message users and groups', icon: Megaphone },
     { href: '/admin/support', label: 'Support inbox', detail: 'Resolve user tickets', icon: LifeBuoy },
@@ -107,15 +115,15 @@ function AdminDashboard() {
   ];
 
   return (
-    <main className="min-h-screen bg-black px-4 py-6 text-white sm:px-6 lg:px-10">
+    <main className="min-h-screen bg-[#f5f6f8] px-5 py-8 text-slate-950 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl space-y-8">
-        <header className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <header className="flex flex-col gap-4 pb-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-purple-300">Fwaya control room</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-purple-700">Fwaya control room</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Admin overview</h1>
-            <p className="mt-2 text-sm text-white/55">Monitor the platform, moderate content, and keep operations moving.</p>
+            <p className="mt-2 text-sm text-slate-500">Monitor the platform, moderate content, and keep operations moving.</p>
           </div>
-          <button onClick={() => void loadStats()} className="inline-flex items-center justify-center gap-2 rounded-lg border border-purple-400/30 px-4 py-2 text-sm text-purple-200 hover:bg-purple-500/10" disabled={loading}>
+          <button onClick={() => void loadStats()} className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm text-white shadow-lg shadow-black/10 hover:bg-purple-700" disabled={loading}>
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh data
           </button>
         </header>
@@ -124,27 +132,27 @@ function AdminDashboard() {
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {statCards.map(({ label, value, detail, icon: Icon, color }) => (
-            <article key={label} className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <div className="flex items-start justify-between"><span className="text-sm text-white/55">{label}</span><Icon size={19} className={color} /></div>
-              <p className="mt-5 text-2xl font-semibold">{loading ? '...' : value}</p>
-              <p className="mt-1 text-xs text-white/45">{detail}</p>
+            <article key={label} className="rounded-2xl bg-white p-5 shadow-sm">
+              <div className="flex items-start justify-between"><span className="text-sm text-slate-500">{label}</span><Icon size={19} className="text-purple-700" /></div>
+              <p className="mt-5 text-2xl font-semibold text-slate-950">{loading ? '...' : value}</p>
+              <p className="mt-1 text-xs text-slate-500">{detail}</p>
             </article>
           ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+          <div className="rounded-2xl bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between"><div><h2 className="text-lg font-semibold">Platform mix</h2><p className="mt-1 text-sm text-white/50">Current audience and content distribution.</p></div><BarChart3 className="text-purple-300" size={21} /></div>
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[['Artists', stats.totalArtists], ['Producers', stats.totalProducers], ['Premium users', stats.premiumUsers], ['Videos', stats.videoCount]].map(([label, value]) => <div key={label} className="rounded-xl bg-black/30 p-4"><p className="text-xs text-white/45">{label}</p><p className="mt-2 text-xl font-semibold">{Number(value).toLocaleString()}</p></div>)}
+              {[['Artists', stats.totalArtists], ['Producers', stats.totalProducers], ['Premium users', stats.premiumUsers], ['Videos', stats.videoCount]].map(([label, value]) => <div key={label} className="rounded-xl bg-slate-100 p-4"><p className="text-xs text-slate-500">{label}</p><p className="mt-2 text-xl font-semibold text-slate-950">{Number(value).toLocaleString()}</p></div>)}
             </div>
           </div>
-          <div className="rounded-2xl border border-purple-400/20 bg-purple-500/[0.08] p-5"><div className="flex items-center justify-between"><div><h2 className="text-lg font-semibold">Live status</h2><p className="mt-1 text-sm text-purple-100/60">Realtime events plus periodic reconciliation.</p></div><span className="h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_14px_#34d399]" /></div><div className="mt-8 grid grid-cols-2 gap-3"><div><p className="text-xs text-white/45">Active now</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers}</p></div><div><p className="text-xs text-white/45">Active 24h</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers24h}</p></div></div><p className="mt-4 text-xs text-white/45">{lastUpdated ? `Last synced ${lastUpdated.toLocaleTimeString()}` : 'Connecting to data service...'}</p></div>
+          <div className="rounded-2xl bg-black p-5 text-white shadow-sm"><div className="flex items-center justify-between"><div><h2 className="text-lg font-semibold">Live status</h2><p className="mt-1 text-sm text-white/55">Realtime events plus periodic reconciliation.</p></div><span className="h-3 w-3 rounded-full bg-emerald-400" /></div><div className="mt-8 grid grid-cols-2 gap-3"><div><p className="text-xs text-white/45">Active now</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers}</p></div><div><p className="text-xs text-white/45">Active 24h</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers24h}</p></div></div><p className="mt-4 text-xs text-white/45">{lastUpdated ? `Last synced ${lastUpdated.toLocaleTimeString()}` : 'Connecting to data service...'}</p></div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Active users by location</h2><p className="mt-1 text-sm text-white/50">Users active in the last 24 hours.</p><div className="mt-5 space-y-3">{analytics.usersByCountry.length === 0 ? <p className="text-sm text-white/45">No location activity yet.</p> : analytics.usersByCountry.slice(0, 8).map((entry) => <div key={entry.country} className="flex items-center justify-between text-sm"><span>{entry.country}</span><span className="text-purple-200">{entry.count}</span></div>)}</div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Approval queue</h2><p className="mt-1 text-sm text-white/50">Role-based signups waiting for review.</p><p className="mt-5 text-4xl font-semibold">{analytics.pendingApplications}</p><Link href="/admin/applications" className="mt-4 inline-flex text-sm text-purple-200 hover:underline">Open approval workspace <ArrowUpRight size={14} className="ml-1" /></Link></div>
+          <div className="rounded-2xl bg-white p-5 shadow-sm"><h2 className="text-lg font-semibold">Active users by location</h2><p className="mt-1 text-sm text-slate-500">Users active in the last 24 hours.</p><div className="mt-5 space-y-3">{analytics.usersByCountry.length === 0 ? <p className="text-sm text-slate-500">No location activity yet.</p> : analytics.usersByCountry.slice(0, 8).map((entry) => <div key={entry.country} className="flex items-center justify-between text-sm"><span>{entry.country}</span><span className="font-medium text-purple-700">{entry.count}</span></div>)}</div></div>
+          <div className="rounded-2xl bg-purple-700 p-5 text-white shadow-sm"><h2 className="text-lg font-semibold">Approval queue</h2><p className="mt-1 text-sm text-purple-100/70">Role-based signups waiting for review.</p><p className="mt-5 text-4xl font-semibold">{analytics.pendingApplications}</p><Link href="/admin/applications" className="mt-4 inline-flex text-sm text-white hover:underline">Open approval workspace <ArrowUpRight size={14} className="ml-1" /></Link></div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
