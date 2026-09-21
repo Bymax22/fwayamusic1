@@ -281,6 +281,7 @@ export default function GuestWelcome() {
     if (typeof item.trackCount === 'number') return item.trackCount;
     if (typeof item.tracksCount === 'number') return item.tracksCount;
     if (typeof item.track_count === 'number') return item.track_count;
+    if (Array.isArray(item.media)) return item.media.length;
     if (Array.isArray(item.tracks)) return item.tracks.length;
     return 0;
   };
@@ -426,20 +427,20 @@ export default function GuestWelcome() {
               ...album,
               url: album.url ? resolveMediaUrl(album.url) : album.url,
               coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
-              artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
+              artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.coverUrl ? resolveMediaUrl(album.coverUrl) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined)))
             }))
           : [];
         const processedFeaturedEPs = albumItems.filter(isEP).map((album: any) => ({
           ...album,
           url: album.url ? resolveMediaUrl(album.url) : album.url,
           coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
-          artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
+          artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.coverUrl ? resolveMediaUrl(album.coverUrl) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined)))
         }));
         const processedDedicatedEPs = epItems.map((album: any) => ({
           ...album,
           url: album.url ? resolveMediaUrl(album.url) : album.url,
           coverArt: album.coverArt ? resolveMediaUrl(album.coverArt) : album.coverArt,
-          artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined))
+          artCoverUrl: album.artCoverUrl ? resolveMediaUrl(album.artCoverUrl) : (album.coverArt ? resolveMediaUrl(album.coverArt) : (album.coverUrl ? resolveMediaUrl(album.coverUrl) : (album.thumbnailUrl ? resolveMediaUrl(album.thumbnailUrl) : undefined)))
         }));
 
         const processedBeats = homepageData.beats && Array.isArray(homepageData.beats)
@@ -1309,6 +1310,7 @@ export default function GuestWelcome() {
                           <VerifiedBadge size="sm" title="Verified producer" />
                         )}
                       </div>
+                      <p className="text-[10px] text-gray-500">{getPublishedTime(beat)}</p>
                     </div>
                   </div>
                 ))}
@@ -1370,6 +1372,7 @@ export default function GuestWelcome() {
                       </div>
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-[10px] text-gray-500">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                 ))}
@@ -1397,6 +1400,7 @@ export default function GuestWelcome() {
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                       <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
+                      <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                 ))}
@@ -1421,7 +1425,6 @@ export default function GuestWelcome() {
                         <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                         <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
                         <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
-                        <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
                       </div>
                     </div>
                   ))}
@@ -1581,6 +1584,7 @@ export default function GuestWelcome() {
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
                       <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                       <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
+                      <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                 ))}
@@ -1600,7 +1604,6 @@ export default function GuestWelcome() {
                         <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                         <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
                         <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
-                        <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
                       </div>
                     </div>
                   ))}
@@ -2394,6 +2397,7 @@ export default function GuestWelcome() {
                     <p className="text-xs text-gray-400 truncate">
                       {track.user?.displayName || track.user?.username || 'Unknown Artist'}
                     </p>
+                    <p className="text-xs text-gray-500">{getPublishedTime(track)}</p>
                   </div>
                 </div>
               ))}
@@ -2598,6 +2602,7 @@ export default function GuestWelcome() {
                     <p className="text-xs text-gray-400 truncate">
                       {beat.user?.displayName || beat.user?.username || 'Unknown Producer'}
                     </p>
+                    <p className="text-xs text-gray-500">{getPublishedTime(beat)}</p>
                   </div>
                 </div>
               ))}

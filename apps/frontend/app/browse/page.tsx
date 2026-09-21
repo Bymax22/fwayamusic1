@@ -27,6 +27,9 @@ interface MediaFile {
   duration: number;
   format: string;
   createdAt: string;
+  created_at?: string;
+  publishedAt?: string;
+  releaseDate?: string;
   coverArt: string;
   views: number;
   playCount?: number;
@@ -74,6 +77,8 @@ type BackendMedia = {
   duration?: number;
   format?: string;
   createdAt: string;
+  releaseDate?: string;
+  publishedAt?: string;
   artCoverUrl?: string;
   thumbnailUrl?: string;
   playCount?: number;
@@ -250,7 +255,8 @@ export default function Browse() {
           url: item.url,
           duration: item.duration || 0,
           format: item.format || 'mp3',
-          createdAt: item.createdAt,
+          createdAt: item.createdAt || '',
+          releaseDate: item.releaseDate || item.publishedAt || item.createdAt || '',
           coverArt: item.artCoverUrl || item.thumbnailUrl || '/default-cover.jpg',
           views: item.playCount || 0,
           likes: Array.isArray(item.interactions)
@@ -355,7 +361,7 @@ export default function Browse() {
         results.sort((a, b) => b.views - a.views);
         break;
       case 'newest':
-        results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        results.sort((a, b) => new Date(b.releaseDate || b.createdAt).getTime() - new Date(a.releaseDate || a.createdAt).getTime());
         break;
       case 'trending':
         results.sort((a, b) => (b.views + b.likes * 10 + b.downloadCount * 5) - (a.views + a.likes * 10 + a.downloadCount * 5));

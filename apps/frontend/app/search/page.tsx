@@ -13,6 +13,7 @@ interface MediaFile {
   duration: number;
   format?: string;
   createdAt?: string;
+  releaseDate?: string;
   coverArt: string;
   views: number;
   likes: number;
@@ -35,7 +36,8 @@ function normalizeMedia(item: any): MediaFile {
     url: item.url,
     duration: item.duration || 0,
     format: item.format || 'mp3',
-    createdAt: item.createdAt || '',
+    createdAt: item.createdAt || item.created_at || '',
+    releaseDate: item.releaseDate || item.publishedAt || item.createdAt || item.created_at || '',
     coverArt: item.coverArt || '/default-cover.jpg',
     views: item.views || 0,
     likes: item.likes || 0,

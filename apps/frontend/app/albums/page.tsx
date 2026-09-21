@@ -26,7 +26,7 @@ function normalizeAlbum(item: any): AlbumItem {
     title: item.title || item.name || 'Untitled Album',
     type: item.type?.toString().toUpperCase() === 'EP' ? 'EP' : 'ALBUM',
     artist: item.user?.displayName || item.user?.username || item.artist || 'Unknown Artist',
-    coverArt: item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/default-cover.jpg',
+    coverArt: item.coverUrl || item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/default-cover.jpg',
     releaseDate: item.releaseDate || item.createdAt || item.publishedAt || item.created_at || '',
     createdAt: item.createdAt || item.created_at || item.publishedAt || '',
     trackCount: typeof item.mediasCount === 'number'
@@ -35,8 +35,10 @@ function normalizeAlbum(item: any): AlbumItem {
         ? item.trackCount
         : typeof item.tracksCount === 'number'
           ? item.tracksCount
-          : Array.isArray(item.tracks)
-            ? item.tracks.length
+              : Array.isArray(item.media)
+                ? item.media.length
+                : Array.isArray(item.tracks)
+                  ? item.tracks.length
             : 0,
     playCount: item.playCount || item.views || 0,
     likeCount: item.likeCount || 0,

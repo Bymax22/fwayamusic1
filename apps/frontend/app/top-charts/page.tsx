@@ -16,6 +16,7 @@ interface ChartItem {
   genre?: string;
   views: number;
   createdAt?: string;
+  releaseDate?: string;
   position: number;
   change: 'up' | 'down' | 'same';
   changeAmount: number;
@@ -32,6 +33,7 @@ function normalizeChartItem(item: any): ChartItem {
     genre: item.genre || item.type || 'Unknown',
     views: item.views || item.playCount || item.plays || 0,
     createdAt: item.createdAt || item.created_at || item.publishedAt || item.published_at || '',
+    releaseDate: item.releaseDate || item.publishedAt || item.published_at || item.createdAt || item.created_at || '',
     position: item.position || 0,
     change: item.change || 'same',
     changeAmount: item.changeAmount || 0,

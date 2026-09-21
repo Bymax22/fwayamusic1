@@ -15,6 +15,7 @@ interface MediaFile {
   views: number;
   likes: number;
   createdAt?: string;
+  releaseDate?: string;
   genre?: string;
 }
 
@@ -56,7 +57,8 @@ export default function ExplorePage() {
           coverArt: item.coverArt || '/default-cover.jpg',
           views: item.views || 0,
           likes: item.likes || 0,
-          createdAt: item.createdAt || item.publishedAt || item.created_at || '',
+          createdAt: item.createdAt || item.created_at || item.publishedAt || '',
+          releaseDate: item.releaseDate || item.publishedAt || item.createdAt || item.created_at || '',
           genre: item.genre || 'Other'
         }));
 
@@ -70,7 +72,7 @@ export default function ExplorePage() {
 
         // Get new releases (most recent)
         const newReleases = [...formattedData]
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .sort((a, b) => new Date(b.releaseDate || b.createdAt || '').getTime() - new Date(a.releaseDate || a.createdAt || '').getTime())
           .slice(0, 8);
         setNewReleases(newReleases);
 
@@ -195,7 +197,7 @@ export default function ExplorePage() {
                   <span>{file.genre}</span>
                   <span>{formatDuration(file.duration)}</span>
                 </div>
-                <p className="mt-2 text-xs text-gray-500">{formatRelativeTime(file.createdAt)}</p>
+                <p className="mt-2 text-xs text-gray-500">{formatRelativeTime(file.releaseDate || file.createdAt)}</p>
               </div>
             </div>
           ))}
@@ -246,7 +248,7 @@ export default function ExplorePage() {
               <div className="p-4">
                 <h3 className="font-medium text-white truncate mb-1">{file.title}</h3>
                 <p className="text-sm text-gray-400 truncate">{file.artist}</p>
-                <p className="mt-2 text-xs text-gray-500">{formatRelativeTime(file.createdAt)}</p>
+                <p className="mt-2 text-xs text-gray-500">{formatRelativeTime(file.releaseDate || file.createdAt)}</p>
               </div>
             </div>
           ))}
