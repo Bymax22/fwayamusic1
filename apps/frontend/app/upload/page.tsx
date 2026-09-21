@@ -13,7 +13,7 @@ interface UploadMetadata {
   title: string;
   description: string;
   genre: string;
-  releaseDate?: string;
+  releaseDate: string;
   type: "AUDIO" | "VIDEO" | "PODCAST" | "LIVE_STREAM";
   isPremium: boolean;
   isExplicit: boolean;
@@ -163,6 +163,11 @@ export default function UploadPage() {
       return;
     }
 
+    if (!metadata.releaseDate) {
+      setError("Please select a release date");
+      return;
+    }
+
     const uploadKey = `${file.name}:${file.size}:${file.lastModified}`;
     if (pendingUploadKey && pendingUploadKey === uploadKey && uploading) {
       setError("This upload is already in progress. Please wait for it to finish.");
@@ -227,7 +232,7 @@ export default function UploadPage() {
             title: metadata.title,
             description: metadata.description,
             genre: metadata.genre,
-            releaseDate: metadata.releaseDate || undefined,
+            releaseDate: metadata.releaseDate,
             type: metadata.type,
             isPremium: metadata.isPremium,
             isExplicit: metadata.isExplicit,
@@ -588,6 +593,7 @@ export default function UploadPage() {
             </label>
             <input
               type="date"
+              required
               value={metadata.releaseDate || ''}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setMetadata({ ...metadata, releaseDate: e.target.value })

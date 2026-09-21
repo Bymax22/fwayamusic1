@@ -226,7 +226,7 @@ model Media {
   lyricist               String?
   mood                   String?
   originalMediaId        Int?                    @map("original_media_id")
-  releaseDate            DateTime?               @map("release_date")
+  releaseDate            DateTime                @default(now()) @map("release_date")
   rights                 Json?
   sampleRate             Int?                    @map("sample_rate")
   thumbnailCloudinaryId  String?                 @map("thumbnail_cloudinary_id")

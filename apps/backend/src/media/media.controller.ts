@@ -189,12 +189,24 @@ export class MediaController {
   @UseGuards(FirebaseAuthGuard)
   @Post('save-metadata')
   async saveMediaMetadata(
-    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate?: string; isExplicit?: boolean; isPremium?: boolean; coverUrl?: string; releaseType?: string },
+    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate: string; isExplicit?: boolean; isPremium?: boolean; coverUrl?: string; releaseType?: string },
     @CurrentUser() user: any
   ) {
     try {
       if (!metadata.title || !metadata.type || !metadata.url) {
         throw new BadRequestException('Missing required fields: title, type, url');
+      }
+
+      const releaseDate = metadata.releaseDate ? new Date(metadata.releaseDate) : null;
+      const dateOnly = metadata.releaseDate?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      const hasValidCalendarDate = !dateOnly || (
+        releaseDate !== null &&
+        releaseDate.getUTCFullYear() === Number(dateOnly[1]) &&
+        releaseDate.getUTCMonth() + 1 === Number(dateOnly[2]) &&
+        releaseDate.getUTCDate() === Number(dateOnly[3])
+      );
+      if (!releaseDate || Number.isNaN(releaseDate.getTime()) || !hasValidCalendarDate) {
+        throw new BadRequestException('A valid release date is required');
       }
 
       if (!user || !user.id) {
