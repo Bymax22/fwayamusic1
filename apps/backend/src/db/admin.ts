@@ -5,7 +5,7 @@ import {
   MediaAccessType,
   TransactionStatus
 } from '@prisma/client';
-import prisma from './db';
+import { PrismaClient } from '@prisma/client';
 
 // Extended Admin Stats
 export interface AdminStats {
@@ -37,7 +37,7 @@ export interface AdminStats {
 }
 
 // Returns comprehensive admin dashboard statistics
-export async function getAdminStats(): Promise<AdminStats> {
+export async function getAdminStats(prisma: PrismaClient): Promise<AdminStats> {
   try {
     // Execute all queries in parallel
     const [

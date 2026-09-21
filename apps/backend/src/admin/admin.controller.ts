@@ -19,7 +19,7 @@ export class AdminController {
 
   @Get('dashboard/stats')
   async getDashboardStats() {
-    return getAdminStats();
+    return getAdminStats(this.prisma);
   }
 
   @Get('analytics')
