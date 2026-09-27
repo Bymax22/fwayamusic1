@@ -103,12 +103,19 @@ export class AdminController {
 
   @Get('users')
   async listUsers(@Body() _body: never, @Req() request: any) {
-    const query = request.query as { q?: string; role?: UserRole; status?: UserStatus; limit?: string };
+    const query = request.query as { q?: string; role?: UserRole; status?: UserStatus; limit?: string; active?: 'all' | 'now' | '24h' };
     const search = query.q?.trim();
+    const activeWindow = query.active === 'now'
+      ? { gte: new Date(Date.now() - 15 * 60 * 1000) }
+      : query.active === '24h'
+        ? { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+        : undefined;
+
     return this.prisma.user.findMany({
       where: {
         ...(query.role ? { role: query.role } : {}),
         ...(query.status ? { status: query.status } : {}),
+        ...(activeWindow ? { lastLoginAt: activeWindow } : {}),
         ...(search ? { OR: [{ email: { contains: search, mode: 'insensitive' } }, { username: { contains: search, mode: 'insensitive' } }, { displayName: { contains: search, mode: 'insensitive' } }] } : {}),
       },
       select: { id: true, email: true, username: true, displayName: true, role: true, status: true, country: true, isPremium: true, createdAt: true, lastLoginAt: true, isArtist: true, isProducer: true, isReseller: true },
