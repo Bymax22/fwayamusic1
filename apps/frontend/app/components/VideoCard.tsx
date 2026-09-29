@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import CoverArtImage from './CoverArtImage';
-import { formatRelativeTime } from '@/lib/utils';
+import { formatAddedTime } from '@/lib/utils';
 
 type VideoCardProps = {
   id: string | number;
@@ -23,11 +23,6 @@ const formatDuration = (seconds: number) => {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
-const formatRelativeUploadTime = (value?: string) => {
-  if (!value) return null;
-  return formatRelativeTime(value);
-};
-
 export default function VideoCard({
   id,
   title,
@@ -40,12 +35,12 @@ export default function VideoCard({
   href,
 }: VideoCardProps) {
   const route = href || `/videos/${id}`;
-  const [relativeUploadTime, setRelativeUploadTime] = useState(() => formatRelativeUploadTime(createdAt));
+  const [relativeAddedTime, setRelativeAddedTime] = useState(() => formatAddedTime(createdAt));
 
   useEffect(() => {
-    const updateRelativeUploadTime = () => setRelativeUploadTime(formatRelativeUploadTime(createdAt));
-    updateRelativeUploadTime();
-    const intervalId = window.setInterval(updateRelativeUploadTime, 10000);
+    const updateRelativeAddedTime = () => setRelativeAddedTime(formatAddedTime(createdAt));
+    updateRelativeAddedTime();
+    const intervalId = window.setInterval(updateRelativeAddedTime, 10000);
     return () => window.clearInterval(intervalId);
   }, [createdAt]);
 
@@ -85,7 +80,7 @@ export default function VideoCard({
         <p className="mt-1 text-xs text-slate-400 truncate">{artist}</p>
         <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
           <span>{views.toLocaleString()} views</span>
-          {relativeUploadTime ? <span title={createdAt}>{relativeUploadTime}</span> : null}
+          <span title={createdAt || undefined}>{relativeAddedTime}</span>
         </div>
       </div>
     </Link>

@@ -420,6 +420,7 @@ export class MediaService {
         description: createMediaDto.description || null,
         format: uploadResult.format,
         duration: Math.floor(uploadResult.duration || 0),
+        releaseDate: this.resolveReleaseDate(createMediaDto.releaseDate),
         type: normalizedType,
         accessType: createMediaDto.accessType || 'FREE',
         price: createMediaDto.price ? parseFloat(createMediaDto.price as any) : null,
@@ -564,6 +565,7 @@ export class MediaService {
 
       const normalizedType = this.normalizeMediaType(metadata.type);
       const normalizedReleaseTags = this.buildReleaseTags(metadata.releaseType || metadata.type, tags);
+      const releaseDateValue = this.resolveReleaseDate(metadata.releaseDate);
       const albumId = metadata.albumId ? Number(metadata.albumId) : undefined;
       let albumCoverUrl: string | undefined;
 
@@ -596,7 +598,7 @@ export class MediaService {
         description: metadata.description || null,
         format: metadata.format,
         duration: Math.floor(metadata.duration || 0),
-        releaseDate: metadata.releaseDate ? new Date(metadata.releaseDate) : undefined,
+        releaseDate: releaseDateValue,
         type: normalizedType,
         accessType: normalizedAccessType === 'PAY_PER_VIEW'
           ? MediaAccessType.PAY_PER_VIEW
@@ -717,6 +719,19 @@ export class MediaService {
     await this.notificationService.createMany(notifications);
   }
 
+  private resolveReleaseDate(date?: string | Date | null): Date {
+    if (!date) {
+      throw new BadRequestException('A valid release date is required');
+    }
+
+    const parsed = date instanceof Date ? date : new Date(date);
+    if (Number.isNaN(parsed.getTime())) {
+      throw new BadRequestException('A valid release date is required');
+    }
+
+    return parsed;
+  }
+
   private normalizeMediaType(type?: string | null): MediaType {
     switch ((type || '').toUpperCase()) {
       case 'VIDEO':
@@ -725,6 +740,10 @@ export class MediaService {
         return MediaType.PODCAST;
       case 'LIVE_STREAM':
         return MediaType.LIVE_STREAM;
+      case 'SINGLE':
+      case 'TRACK':
+      case 'AUDIO':
+        return MediaType.AUDIO;
       case 'ALBUM':
       case 'EP':
       case 'COLLECTION':
@@ -1155,6 +1174,7 @@ async getHomepageSections() {
     trackCount: album._count?.media ?? 0,
     userId: album.userId,
     user: album.user,
+    releaseDate: album.releaseDate,
     createdAt: album.createdAt,
     tags: [album.type?.toUpperCase() === 'EP' ? 'ep' : 'album'],
   });

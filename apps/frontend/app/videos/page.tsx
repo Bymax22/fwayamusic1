@@ -10,6 +10,7 @@ interface VideoItem {
   duration: number;
   views: number;
   createdAt: string;
+  releaseDate: string;
   thumbnail: string;
 }
 
@@ -19,7 +20,8 @@ const EMPTY_VIDEO: VideoItem = {
   artist: "",
   duration: 0,
   views: 0,
-  createdAt: new Date().toISOString(),
+  createdAt: '',
+  releaseDate: '',
   thumbnail: "/default-cover.jpg",
 };
 
@@ -46,14 +48,15 @@ export default function VideosPage() {
           artist: item.user?.displayName || item.user?.username || item.artist || "Unknown",
           duration: item.duration || item.length || 0,
           views: item.views || item.playCount || 0,
-          createdAt: item.createdAt || item.publishedAt || item.uploadedAt || item.created_at || '',
+          createdAt: item.createdAt || item.created_at || '',
+          releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
           thumbnail: item.thumbnailUrl || item.artCoverUrl || item.coverArt || "/default-cover.jpg",
           videoUrl: item.videoUrl || item.url || item.audioUrl || undefined,
         }));
 
         setVideos(mapped);
         setTrending(mapped.slice().sort((a, b) => b.views - a.views).slice(0, 8));
-        setNewReleases(mapped.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 8));
+        setNewReleases(mapped.slice().sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()).slice(0, 8));
         setRecommended(mapped.slice().filter((_, index) => index < 8));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unable to fetch videos");

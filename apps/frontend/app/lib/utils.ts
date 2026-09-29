@@ -179,30 +179,39 @@ export function formatRelativeTime(timestamp: unknown): string {
 
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
+  const isFuture = diffMs < 0;
+  const absoluteDiffMs = Math.abs(diffMs);
 
-  if (diffMs <= 0) return 'Just now';
+  if (absoluteDiffMs < 1000) return 'Just now';
 
-  const diffSeconds = Math.floor(diffMs / 1000);
-  if (diffSeconds < 1) return 'Just now';
-  if (diffSeconds < 60) return `${diffSeconds} second${diffSeconds === 1 ? '' : 's'} ago`;
+  const diffSeconds = Math.floor(absoluteDiffMs / 1000);
+  const relative = (amount: number, unit: string) => isFuture
+    ? `in ${amount} ${unit}${amount === 1 ? '' : 's'}`
+    : `${amount} ${unit}${amount === 1 ? '' : 's'} ago`;
+  if (diffSeconds < 60) return relative(diffSeconds, 'second');
 
   const diffMinutes = Math.floor(diffSeconds / 60);
-  if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
+  if (diffMinutes < 60) return relative(diffMinutes, 'minute');
 
   const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+  if (diffHours < 24) return relative(diffHours, 'hour');
 
   const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+  if (diffDays < 7) return relative(diffDays, 'day');
 
   const diffWeeks = Math.floor(diffDays / 7);
-  if (diffWeeks < 5) return `${diffWeeks} week${diffWeeks === 1 ? '' : 's'} ago`;
+  if (diffWeeks < 5) return relative(diffWeeks, 'week');
 
   const diffMonths = Math.floor(diffDays / 30);
-  if (diffMonths < 12) return `${diffMonths} month${diffMonths === 1 ? '' : 's'} ago`;
+  if (diffMonths < 12) return relative(diffMonths, 'month');
 
   const diffYears = Math.floor(diffDays / 365);
-  return `${diffYears} year${diffYears === 1 ? '' : 's'} ago`;
+  return relative(diffYears, 'year');
+}
+
+export function formatAddedTime(...timestamps: unknown[]): string {
+  const timestamp = resolveDateValue(...timestamps);
+  return timestamp ? `Added ${formatRelativeTime(timestamp)}` : 'Added date unavailable';
 }
 
 // File/Data Utilities

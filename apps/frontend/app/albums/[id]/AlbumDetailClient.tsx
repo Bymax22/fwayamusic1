@@ -115,8 +115,6 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
   const publishedAt = resolveDateValue(
     album.releaseDate,
     album.publishedAt,
-    album.createdAt,
-    album.created_at,
   );
 
   return (

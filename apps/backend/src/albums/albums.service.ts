@@ -14,7 +14,7 @@ export class AlbumsService {
       description?: string;
       type?: string;
       tags?: string[];
-      releaseDate?: Date;
+      releaseDate?: Date | string | null;
       recordLabel?: string;
       copyrightYear?: number;
       coverImageUrl?: string;
@@ -32,11 +32,26 @@ export class AlbumsService {
       cloudinaryId,
     } = data;
 
+    let parsedReleaseDate: Date | undefined;
+    if (releaseDate !== undefined && releaseDate !== null) {
+      const releaseDateString = typeof releaseDate === 'string' ? releaseDate.trim() : undefined;
+      parsedReleaseDate = releaseDate instanceof Date ? releaseDate : new Date(releaseDateString || '');
+      const dateOnly = releaseDateString?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      const hasValidCalendarDate = !dateOnly || (
+        parsedReleaseDate.getUTCFullYear() === Number(dateOnly[1]) &&
+        parsedReleaseDate.getUTCMonth() + 1 === Number(dateOnly[2]) &&
+        parsedReleaseDate.getUTCDate() === Number(dateOnly[3])
+      );
+      if (Number.isNaN(parsedReleaseDate.getTime()) || !hasValidCalendarDate) {
+        throw new BadRequestException('A valid release date is required');
+      }
+    }
+
     const album = await this.prisma.album.create({
       data: {
         title,
         description,
-        releaseDate,
+        releaseDate: parsedReleaseDate,
         recordLabel,
         coverUrl: coverImageUrl,
         cloudinaryPublicId: cloudinaryId,

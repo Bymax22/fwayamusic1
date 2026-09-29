@@ -122,6 +122,7 @@ interface Stats {
 
 interface NewMedia {
   title: string;
+  releaseDate: string;
   type: 'AUDIO' | 'VIDEO' | 'PODCAST' | 'LIVE_STREAM' | 'ALBUM' | 'EP';
   file: File | null;
   artCoverFile: File | null;
@@ -160,6 +161,7 @@ export default function ForArtistsPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [newMedia, setNewMedia] = useState<NewMedia>({
     title: '',
+    releaseDate: '',
     type: 'AUDIO',
     file: null,
     artCoverFile: null,
@@ -205,7 +207,7 @@ export default function ForArtistsPage() {
     const files = newMedia.type === 'ALBUM' || newMedia.type === 'EP'
       ? newMedia.tracks.map((track) => `${track.title}:${track.file?.name}:${track.file?.size}:${track.file?.lastModified}`).join('|')
       : `${newMedia.file?.name}:${newMedia.file?.size}:${newMedia.file?.lastModified}`;
-    return `fwaya:artist-upload:${newMedia.title.trim()}:${newMedia.type}:${files}`;
+    return `fwaya:artist-upload:${newMedia.title.trim()}:${newMedia.type}:${newMedia.releaseDate}:${files}`;
   };
   // Map our frontend media type to product type names used by admin price tiers
   const productTypeNameForMediaType = (t: string) => {
@@ -511,6 +513,11 @@ export default function ForArtistsPage() {
       return;
     }
 
+    if (!newMedia.releaseDate) {
+      alert('Please choose the release date');
+      return;
+    }
+
     const isReleaseUpload = newMedia.type === 'ALBUM' || newMedia.type === 'EP';
     const releaseTracks = newMedia.tracks.filter((track) => track.title.trim() && track.file);
     if (isReleaseUpload) {
@@ -568,6 +575,7 @@ export default function ForArtistsPage() {
           body: JSON.stringify({
             title: newMedia.title,
             description: newMedia.lyrics.trim() || undefined,
+            releaseDate: newMedia.releaseDate,
             coverImageUrl: releaseCoverUrl,
             cloudinaryId: releaseCoverPublicId,
             type: newMedia.type,
@@ -590,6 +598,7 @@ export default function ForArtistsPage() {
             title: track.title.trim(),
             type: 'AUDIO',
             releaseType: newMedia.type === 'EP' ? 'EP' : 'ALBUM',
+            releaseDate: newMedia.releaseDate,
             cloudinaryPublicId: trackCloudinaryData.public_id,
             url: trackCloudinaryData.secure_url,
             duration: Number(trackCloudinaryData.duration || 0),
@@ -642,6 +651,7 @@ export default function ForArtistsPage() {
           setShowUploadModal(false);
           setNewMedia({
             title: '',
+            releaseDate: '',
             type: 'AUDIO',
             file: null,
             artCoverFile: null,
@@ -673,6 +683,7 @@ export default function ForArtistsPage() {
       const dbFormData = new FormData();
       dbFormData.append('title', newMedia.title);
       dbFormData.append('type', newMedia.type);
+      dbFormData.append('releaseDate', newMedia.releaseDate);
       dbFormData.append('cloudinaryPublicId', cloudinaryData.public_id);
       dbFormData.append('url', cloudinaryData.secure_url);
       dbFormData.append('duration', cloudinaryData.duration?.toString() || '0');
@@ -724,6 +735,7 @@ export default function ForArtistsPage() {
           setShowUploadModal(false);
           setNewMedia({
             title: '',
+            releaseDate: '',
             type: 'AUDIO',
             file: null,
             artCoverFile: null,
@@ -1865,6 +1877,19 @@ export default function ForArtistsPage() {
                   </div>
 
                   <div>
+                    <label className="block text-gray-400 mb-2" htmlFor="media-release-date">Release date *</label>
+                    <input
+                      id="media-release-date"
+                      type="date"
+                      required
+                      className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      value={newMedia.releaseDate}
+                      onChange={(e) => setNewMedia({ ...newMedia, releaseDate: e.target.value })}
+                      disabled={isUploading}
+                    />
+                  </div>
+
+                  <div>
                     <label className="block text-gray-400 mb-2">Genre</label>
                     <input
                       type="text"
@@ -2094,7 +2119,7 @@ export default function ForArtistsPage() {
                     <button
                       onClick={() => {
                         setShowUploadModal(false);
-                        setNewMedia({ title: '', type: 'AUDIO', file: null, artCoverFile: null, artCoverPreview: null, accessType: 'FREE', price: '', genre: '', lyrics: '', tags: '', tracks: [createEmptyTrack()] });
+                        setNewMedia({ title: '', releaseDate: '', type: 'AUDIO', file: null, artCoverFile: null, artCoverPreview: null, accessType: 'FREE', price: '', genre: '', lyrics: '', tags: '', tracks: [createEmptyTrack()] });
                       }}
                       className="px-4 py-2 bg-[#11131c] text-white rounded-3xl hover:bg-[#161a24] transition-colors"
                       disabled={isUploading}

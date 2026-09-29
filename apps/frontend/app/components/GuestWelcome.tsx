@@ -30,7 +30,7 @@ import { FaRegHeart, FaPlus } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useAuth } from "@/context/AuthContext";
 import MobileMenu from "./MobileMenu";
-import { createMediaSlug, formatRelativeTime, resolveDateValue } from "@/lib/utils";
+import { createMediaSlug, formatAddedTime, formatRelativeTime, resolveDateValue } from "@/lib/utils";
 import { subscribe } from '@/lib/realtime';
 import VerifiedBadge from "./VerifiedBadge";
 import FreeUserAdBanner from "./FreeUserAdBanner";
@@ -59,16 +59,14 @@ export default function GuestWelcome() {
   const [showRoleModal, setShowRoleModal] = useState(false);
   const router = useRouter();
   const { user, logout } = useAuth();
-  const cacheKey = 'fwayaGuestWelcomeHomepageData:v2';
+  const cacheKey = 'fwayaGuestWelcomeHomepageData:v3';
   const [, setRelativeTimeTick] = useState(0);
   const getPublishedTime = (item: any) => {
-    const timestamp = resolveDateValue(
-      item?.releaseDate,
-      item?.publishedAt,
-      item?.createdAt,
-      item?.created_at,
-    );
-    return formatRelativeTime(timestamp);
+    return formatAddedTime(item?.createdAt, item?.created_at, item?.uploadedAt, item?.uploaded_at);
+  };
+  const getReleaseTime = (item: any) => {
+    const timestamp = resolveDateValue(item?.releaseDate, item?.publishedAt, item?.published_at);
+    return timestamp ? `Released ${formatRelativeTime(timestamp)}` : 'Release date unavailable';
   };
 
   useEffect(() => {
@@ -2191,7 +2189,7 @@ export default function GuestWelcome() {
                     <p className="text-xs text-gray-400 truncate">
                       {album.user?.displayName || album.user?.username || 'Unknown Artist'}
                     </p>
-                    <p className="text-xs text-gray-500">{getPublishedTime(album)}</p>
+                    <p className="text-xs text-gray-500">{getReleaseTime(album)}</p>
                   </div>
                 </div>
               ))}
@@ -2212,7 +2210,7 @@ export default function GuestWelcome() {
                       <p className="text-xs font-semibold truncate text-white mb-0.5">{ep.title}</p>
                       <p className="text-xs text-gray-400 truncate">{ep.user?.displayName || ep.user?.username || 'Unknown Artist'}</p>
                       <p className="text-xs text-gray-400">{getTrackCount(ep) || 0} tracks</p>
-                      <p className="text-xs text-gray-500">{getPublishedTime(ep)}</p>
+                      <p className="text-xs text-gray-500">{getReleaseTime(ep)}</p>
                     </div>
                   </div>
                 ))}

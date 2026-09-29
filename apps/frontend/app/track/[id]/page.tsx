@@ -116,7 +116,7 @@ export default function TrackPage() {
           artistId: data.artistId ?? data.user?.id ?? 0,
           url: data.url || data.audioUrl || data.videoUrl || data.fileUrl || '',
           coverArt: data.coverArt || data.artCoverUrl || data.thumbnailUrl || data.thumbnail || '/default-cover.jpg',
-          releaseDate: data.releaseDate || data.publishedAt || data.createdAt || data.created_at || '',
+          releaseDate: data.releaseDate || data.publishedAt || data.published_at || '',
         };
         setTrack(resolvedTrack);
 
@@ -410,7 +410,7 @@ export default function TrackPage() {
 
     const artistDisplay = track?.artist || track?.user?.displayName || track?.user?.username || 'Unknown Artist';
     const coverArtUrl = track?.coverArt || (track as any)?.artCoverUrl || (track as any)?.thumbnailUrl || (track as any)?.coverUrl || '/default-cover.jpg';
-  const releaseLabel = track?.releaseDate ? new Date(track.releaseDate).toLocaleDateString() : track?.createdAt ? new Date(track.createdAt).toLocaleDateString() : 'Unknown';
+  const releaseLabel = track?.releaseDate ? new Date(track.releaseDate).toLocaleDateString() : 'Unknown';
   const viewCount = typeof track?.views === 'number' ? track.views : 0;
   const likeCount = typeof track?.likes === 'number' ? track.likes : 0;
   const downloadCount = typeof track?.downloads === 'number' ? track.downloads : 0;

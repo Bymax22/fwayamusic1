@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Play, Pause, Heart, Calendar, Clock } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { formatDuration, formatRelativeTime, resolveDateValue } from '@/lib/utils';
+import { formatAddedTime, formatDuration, resolveDateValue } from '@/lib/utils';
 import Image from 'next/image';
 
 interface MediaFile {
@@ -27,14 +27,14 @@ function normalizeMedia(item: any): MediaFile {
     duration: item.duration || item.length || 0,
     coverArt: item.coverArt || item.artCoverUrl || item.coverUrl || '/default-cover.jpg',
     genre: item.genre || item.type || 'Unknown',
-    releaseDate: item.releaseDate || item.publishedAt || item.createdAt || item.created_at || '',
-    createdAt: item.createdAt || item.created_at || item.publishedAt || '',
+    releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
+    createdAt: item.createdAt || item.created_at || '',
     isExplicit: item.isExplicit || item.explicit || false,
   };
 }
 
 function getReleaseTimestamp(media: MediaFile) {
-  const date = resolveDateValue(media.releaseDate, media.createdAt, (media as any)?.publishedAt, (media as any)?.created_at);
+  const date = resolveDateValue(media.releaseDate, (media as any)?.publishedAt, (media as any)?.published_at);
   return date ? date.getTime() : 0;
 }
 
@@ -42,10 +42,11 @@ function getReleaseBadge(releaseDate: string) {
   const now = new Date();
   const release = new Date(releaseDate);
   if (Number.isNaN(release.getTime())) {
-    return { text: 'Recently Added', color: 'bg-purple-600' };
+    return { text: 'Date unavailable', color: 'bg-gray-600' };
   }
-  const diffTime = Math.abs(now.getTime() - release.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffTime = release.getTime() - now.getTime();
+  if (diffTime > 0) return { text: 'Upcoming', color: 'bg-cyan-600' };
+  const diffDays = Math.ceil(Math.abs(diffTime) / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) return { text: 'Just Released', color: 'bg-purple-600' };
   if (diffDays === 1) return { text: 'Yesterday', color: 'bg-purple-500' };
@@ -106,13 +107,13 @@ export default function NewReleasesPage() {
     return [...media]
       .sort((a, b) => getReleaseTimestamp(b) - getReleaseTimestamp(a))
       .filter((release) => {
-        if (!release.releaseDate && !release.createdAt) return true;
+        if (!release.releaseDate) return filter === 'all';
 
         const timestamp = getReleaseTimestamp(release);
         const diffDays = Math.ceil((now.getTime() - timestamp) / (1000 * 60 * 60 * 24));
 
-        if (filter === 'this-week') return diffDays <= 7;
-        if (filter === 'this-month') return diffDays <= 30;
+        if (filter === 'this-week') return diffDays >= 0 && diffDays <= 7;
+        if (filter === 'this-month') return diffDays >= 0 && diffDays <= 30;
         return true;
       });
   }, [filter, media]);
@@ -156,7 +157,7 @@ export default function NewReleasesPage() {
       ) : filteredReleases.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredReleases.map(release => {
-            const badge = getReleaseBadge(release.releaseDate || release.createdAt || '');
+            const badge = getReleaseBadge(release.releaseDate || '');
             
             return (
               <div 
@@ -212,7 +213,7 @@ export default function NewReleasesPage() {
                   </div>
                   <div className="flex justify-between items-center mt-3">
                     <span className="text-xs text-gray-400">
-                      {formatRelativeTime(release.createdAt || release.releaseDate || '')}
+                      {formatAddedTime(release.createdAt)}
                     </span>
                     <button className="text-gray-400 hover:text-purple-400 transition-colors">
                       <Heart className="w-4 h-4" />

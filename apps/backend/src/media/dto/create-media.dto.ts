@@ -15,6 +15,10 @@ export class CreateMediaDto {
   @IsString()
   genre?: string;
 
+  @IsOptional()
+  @IsString()
+  releaseDate?: string;
+
   @IsEnum(MediaType)
   @Transform(({ value }: { value: any }) => {
     if (typeof value === 'string') {

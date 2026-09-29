@@ -11,7 +11,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import Waveform from '@/components/Waveform';
 import ShareModal from '@/components/ShareModal';
-import { createMediaSlug, formatDuration, formatFileSize, formatRelativeTime, resolveDateValue } from '@/lib/utils';
+import { createMediaSlug, formatAddedTime, formatDuration, formatFileSize, formatRelativeTime, resolveDateValue } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
 import Link from 'next/link';
@@ -124,13 +124,7 @@ export default function Browse() {
   const router = useRouter();
   const [, setRelativeTimeTick] = useState(0);
   const getPublishedTime = (file: MediaFile) => {
-    const timestamp = resolveDateValue(
-      (file as any)?.publishedAt,
-      (file as any)?.releaseDate,
-      file.createdAt,
-      (file as any)?.created_at,
-    );
-    return formatRelativeTime(timestamp);
+    return formatAddedTime(file.createdAt, (file as any)?.created_at, (file as any)?.uploadedAt, (file as any)?.uploaded_at);
   };
 
   useEffect(() => {
@@ -256,7 +250,7 @@ export default function Browse() {
           duration: item.duration || 0,
           format: item.format || 'mp3',
           createdAt: item.createdAt || '',
-          releaseDate: item.releaseDate || item.publishedAt || item.createdAt || '',
+          releaseDate: item.releaseDate || item.publishedAt || '',
           coverArt: item.artCoverUrl || item.thumbnailUrl || '/default-cover.jpg',
           views: item.playCount || 0,
           likes: Array.isArray(item.interactions)

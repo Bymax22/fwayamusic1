@@ -14,7 +14,6 @@ interface AlbumItem {
   artist: string;
   coverArt: string;
   releaseDate?: string;
-  createdAt?: string;
   trackCount: number;
   playCount: number;
   likeCount: number;
@@ -27,8 +26,7 @@ function normalizeAlbum(item: any): AlbumItem {
     type: item.type?.toString().toUpperCase() === 'EP' ? 'EP' : 'ALBUM',
     artist: item.user?.displayName || item.user?.username || item.artist || 'Unknown Artist',
     coverArt: item.coverUrl || item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/default-cover.jpg',
-    releaseDate: item.releaseDate || item.createdAt || item.publishedAt || item.created_at || '',
-    createdAt: item.createdAt || item.created_at || item.publishedAt || '',
+    releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
     trackCount: typeof item.mediasCount === 'number'
       ? item.mediasCount
       : typeof item.trackCount === 'number'
@@ -180,7 +178,7 @@ export default function AlbumsPage() {
                       <p className="text-xs text-slate-400 truncate mb-3">{album.artist}</p>
                       <div className="flex items-center justify-between text-xs text-slate-400">
                         <span>{album.trackCount} tracks</span>
-                        <span>{formatRelativeTime(album.createdAt || album.releaseDate || '')}</span>
+                        <span>{formatRelativeTime(album.releaseDate || '')}</span>
                       </div>
                     </div>
                   </Link>

@@ -18,6 +18,7 @@ import { DashboardCard } from '@/components/DashboardCard';
 import DashboardHeader from '@/components/DashboardHeader';
 import MobilePlayer from '@/components/MobilePlayer';
 import CoverArtImage from '@/components/CoverArtImage';
+import { formatAddedTime } from '@/lib/utils';
 
 // Types for Producer Dashboard
 interface Beat {
@@ -26,6 +27,7 @@ interface Beat {
   artCoverUrl: string | null;
   thumbnailUrl: string | null;
   title: string;
+  releaseDate: string;
   description: string | null;
   bpm: number | null;
   key: string | null;
@@ -108,6 +110,7 @@ export default function ProducerPage() {
   const [selectedPriceTierId, setSelectedPriceTierId] = useState<number | null>(null);
   const [newBeat, setNewBeat] = useState({
     title: '',
+    releaseDate: '',
     description: '',
     genre: '',
     bpm: '',
@@ -268,8 +271,8 @@ export default function ProducerPage() {
   };
 
   const handleUploadBeat = async () => {
-    if (!newBeat.title || !newBeat.file || !newBeat.genre) {
-      alert('Please fill in all required fields');
+    if (!newBeat.title || !newBeat.releaseDate || !newBeat.file || !newBeat.genre) {
+      alert('Please fill in the required fields, including the release date');
       return;
     }
     if (newBeat.accessType !== 'FREE' && !selectedPriceTierId) {
@@ -277,7 +280,7 @@ export default function ProducerPage() {
       return;
     }
 
-    const uploadKey = `fwaya:producer-beat-upload:${newBeat.title.trim()}:${newBeat.file.name}:${newBeat.file.size}:${newBeat.file.lastModified}`;
+    const uploadKey = `fwaya:producer-beat-upload:${newBeat.title.trim()}:${newBeat.releaseDate}:${newBeat.file.name}:${newBeat.file.size}:${newBeat.file.lastModified}`;
     const previousUpload = typeof window !== 'undefined' ? localStorage.getItem(uploadKey) : null;
     if (previousUpload === 'pending' || previousUpload === 'complete') {
       alert(previousUpload === 'pending' ? 'This beat is already uploading. Please wait.' : 'This beat was already uploaded. Choose a different file or title.');
@@ -291,6 +294,7 @@ export default function ProducerPage() {
     try {
       const formData = new FormData();
       formData.append('title', newBeat.title);
+      formData.append('releaseDate', newBeat.releaseDate);
       formData.append('description', newBeat.description);
       formData.append('genre', newBeat.genre);
       formData.append('bpm', newBeat.bpm);
@@ -325,6 +329,7 @@ export default function ProducerPage() {
       setShowUploadModal(false);
       setNewBeat({
         title: '',
+        releaseDate: '',
         description: '',
         genre: '',
         bpm: '',
@@ -722,6 +727,7 @@ export default function ProducerPage() {
                           <div>
                             <h4 className="text-white font-semibold truncate">{beat.title}</h4>
                             <p className="text-sm text-gray-400">{beat.genre}</p>
+                            <p className="mt-1 text-xs text-gray-500">{formatAddedTime(beat.createdAt)}</p>
                           </div>
                           <div className="flex flex-wrap gap-2 text-xs">
                             <span className="px-2 py-1 rounded-full bg-purple-500/20 text-purple-300">{beat.bpm} BPM</span>
@@ -898,6 +904,18 @@ export default function ProducerPage() {
                       rows={3}
                       className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Describe your beat..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2" htmlFor="beat-release-date">Release date *</label>
+                    <input
+                      id="beat-release-date"
+                      type="date"
+                      required
+                      value={newBeat.releaseDate}
+                      onChange={(e) => setNewBeat({ ...newBeat, releaseDate: e.target.value })}
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
 

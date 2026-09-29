@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Play, Pause, Heart, Flame, TrendingUp, Users, Music2 } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { formatDuration, formatRelativeTime, resolveDateValue } from '@/lib/utils';
+import { formatAddedTime, formatDuration } from '@/lib/utils';
 import Image from 'next/image';
 
 interface MediaFile {
@@ -38,7 +38,7 @@ function normalizeMedia(item: any): MediaFile {
     views: item.views || item.playCount || 0,
     likes: item.likes || item.likeCount || 0,
     createdAt: item.createdAt || item.created_at || '',
-    releaseDate: item.releaseDate || item.publishedAt || item.published_at || item.createdAt || '',
+    releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
   };
 }
 
@@ -102,7 +102,6 @@ export default function PopularPage() {
       .map((item, index) => ({
         ...item,
         trend: item.views > (media[index + 1]?.views ?? 0) ? 'up' : 'stable',
-        publishedAt: formatRelativeTime(resolveDateValue(item.releaseDate, item.createdAt, (item as any)?.publishedAt, (item as any)?.published_at)),
       }));
   }, [media]);
 
@@ -260,6 +259,7 @@ export default function PopularPage() {
                           <span>{item.genre}</span>
                           <span>{formatDuration(item.duration)}</span>
                           <span>{item.views.toLocaleString()} plays</span>
+                          <span>{formatAddedTime(item.createdAt)}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">

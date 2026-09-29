@@ -27,6 +27,7 @@ interface VideoDetail {
   views: number;
   likes: number;
   createdAt: string;
+  releaseDate: string;
   thumbnail: string;
   videoUrl: string;
   related: Array<{
@@ -36,6 +37,7 @@ interface VideoDetail {
     duration: number;
     views: number;
     createdAt: string;
+    releaseDate: string;
     thumbnail: string;
   }>;
 }
@@ -108,7 +110,7 @@ export default function VideoWatchPage() {
   const [replyText, setReplyText] = useState('');
   const [likedComments, setLikedComments] = useState<number[]>([]);
   const [followLoading, setFollowLoading] = useState(false);
-  const [relativeTime, setRelativeTime] = useState('Recently uploaded');
+  const [relativeTime, setRelativeTime] = useState('Date unavailable');
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
   const [isInPlaylist, setIsInPlaylist] = useState(false);
@@ -159,14 +161,18 @@ export default function VideoWatchPage() {
   const shouldAutoplay = searchParams?.get('autoplay') === '1';
 
   useEffect(() => {
-    if (!video?.createdAt) return;
+    if (!video) return;
+    if (!video.releaseDate) {
+      setRelativeTime('Date unavailable');
+      return;
+    }
 
-    const parsedDate = new Date(video.createdAt);
+    const parsedDate = new Date(video.releaseDate);
     const isValidDate = !Number.isNaN(parsedDate.getTime());
 
     const updateRelativeTime = () => {
       if (!isValidDate) {
-        setRelativeTime('Recently uploaded');
+        setRelativeTime('Date unavailable');
         return;
       }
       setRelativeTime(formatDistanceToNow(parsedDate, { addSuffix: true }));
@@ -176,7 +182,7 @@ export default function VideoWatchPage() {
     const intervalId = window.setInterval(updateRelativeTime, 60000);
 
     return () => window.clearInterval(intervalId);
-  }, [video?.createdAt]);
+  }, [video?.releaseDate]);
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -215,7 +221,8 @@ export default function VideoWatchPage() {
           duration: item.duration || item.length || 0,
           views: item.views || item.playCount || 0,
           likes: item.likes || 0,
-          createdAt: item.createdAt || item.publishedAt || new Date().toISOString(),
+          createdAt: item.createdAt || item.created_at || '',
+          releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
           thumbnail: item.thumbnailUrl || item.artCoverUrl || item.coverArt || "/default-cover.jpg",
           videoUrl: item.videoUrl || item.url || item.audioUrl || "",
           related: (item.relatedVideos || item.related || []).map((relatedItem: any) => ({
@@ -224,7 +231,8 @@ export default function VideoWatchPage() {
             artist: relatedItem.user?.displayName || relatedItem.user?.username || relatedItem.artist || "Unknown",
             duration: relatedItem.duration || relatedItem.length || 0,
             views: relatedItem.views || relatedItem.playCount || 0,
-            createdAt: relatedItem.createdAt || relatedItem.publishedAt || new Date().toISOString(),
+            createdAt: relatedItem.createdAt || relatedItem.created_at || '',
+            releaseDate: relatedItem.releaseDate || relatedItem.publishedAt || relatedItem.published_at || '',
             thumbnail: relatedItem.thumbnailUrl || relatedItem.artCoverUrl || relatedItem.coverArt || "/default-cover.jpg",
             videoUrl: relatedItem.videoUrl || relatedItem.url || relatedItem.audioUrl || undefined,
           })),

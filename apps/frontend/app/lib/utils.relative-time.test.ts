@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { formatRelativeTime, safeDate } from './utils.ts';
+import { formatAddedTime, formatRelativeTime, safeDate } from './utils.ts';
 
 test('safeDate rejects invalid strings', () => {
   assert.equal(safeDate('not-a-date'), null);
@@ -11,6 +11,10 @@ test('formatRelativeTime returns seconds for recent timestamps', () => {
   const now = Date.now();
   assert.match(formatRelativeTime(new Date(now - 3_000)), /3 seconds ago/i);
   assert.match(formatRelativeTime(new Date(now - 60_000)), /1 minute ago/i);
+});
+
+test('formatRelativeTime identifies future release dates', () => {
+  assert.match(formatRelativeTime(new Date(Date.now() + 120_000)), /in 2 minutes/i);
 });
 
 test('formatRelativeTime returns day and month ranges correctly', () => {
@@ -23,4 +27,9 @@ test('formatRelativeTime returns day and month ranges correctly', () => {
 
 test('formatRelativeTime returns a neutral fallback for missing dates', () => {
   assert.equal(formatRelativeTime(''), 'No date');
+});
+
+test('formatAddedTime consistently uses available upload timestamps', () => {
+  assert.equal(formatAddedTime(undefined, new Date(Date.now() - 5_000)), 'Added 5 seconds ago');
+  assert.equal(formatAddedTime(undefined, ''), 'Added date unavailable');
 });
