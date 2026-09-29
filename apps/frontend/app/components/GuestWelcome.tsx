@@ -59,10 +59,10 @@ export default function GuestWelcome() {
   const [showRoleModal, setShowRoleModal] = useState(false);
   const router = useRouter();
   const { user, logout } = useAuth();
-  const cacheKey = 'fwayaGuestWelcomeHomepageData:v3';
+  const cacheKey = 'fwayaGuestWelcomeHomepageData:v5';
   const [, setRelativeTimeTick] = useState(0);
   const getPublishedTime = (item: any) => {
-    return formatAddedTime(item?.createdAt, item?.created_at, item?.uploadedAt, item?.uploaded_at);
+    return formatAddedTime(item);
   };
   const getReleaseTime = (item: any) => {
     const timestamp = resolveDateValue(item?.releaseDate, item?.publishedAt, item?.published_at);
@@ -70,7 +70,7 @@ export default function GuestWelcome() {
   };
 
   useEffect(() => {
-    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 30000);
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 1000);
     return () => window.clearInterval(interval);
   }, []);
 

@@ -26,8 +26,12 @@ interface MediaFile {
   url: string;
   duration: number;
   format: string;
-  createdAt: string;
+  addedAt?: string;
+  createdAt?: string;
   created_at?: string;
+  uploadedAt?: string;
+  uploaded_at?: string;
+  added_at?: string;
   publishedAt?: string;
   releaseDate?: string;
   coverArt: string;
@@ -76,7 +80,12 @@ type BackendMedia = {
   url: string;
   duration?: number;
   format?: string;
-  createdAt: string;
+  createdAt?: string;
+  created_at?: string;
+  uploadedAt?: string;
+  uploaded_at?: string;
+  addedAt?: string;
+  added_at?: string;
   releaseDate?: string;
   publishedAt?: string;
   artCoverUrl?: string;
@@ -124,11 +133,11 @@ export default function Browse() {
   const router = useRouter();
   const [, setRelativeTimeTick] = useState(0);
   const getPublishedTime = (file: MediaFile) => {
-    return formatAddedTime(file.createdAt, (file as any)?.created_at, (file as any)?.uploadedAt, (file as any)?.uploaded_at);
+    return formatAddedTime(file);
   };
 
   useEffect(() => {
-    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 30000);
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 1000);
     return () => window.clearInterval(interval);
   }, []);
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -249,7 +258,8 @@ export default function Browse() {
           url: item.url,
           duration: item.duration || 0,
           format: item.format || 'mp3',
-          createdAt: item.createdAt || '',
+          addedAt: item.addedAt || item.added_at || '',
+          createdAt: item.createdAt || item.created_at || item.uploadedAt || item.uploaded_at || '',
           releaseDate: item.releaseDate || item.publishedAt || '',
           coverArt: item.artCoverUrl || item.thumbnailUrl || '/default-cover.jpg',
           views: item.playCount || 0,
@@ -355,7 +365,7 @@ export default function Browse() {
         results.sort((a, b) => b.views - a.views);
         break;
       case 'newest':
-        results.sort((a, b) => new Date(b.releaseDate || b.createdAt).getTime() - new Date(a.releaseDate || a.createdAt).getTime());
+        results.sort((a, b) => new Date(b.releaseDate || b.createdAt || '').getTime() - new Date(a.releaseDate || a.createdAt || '').getTime());
         break;
       case 'trending':
         results.sort((a, b) => (b.views + b.likes * 10 + b.downloadCount * 5) - (a.views + a.likes * 10 + a.downloadCount * 5));

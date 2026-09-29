@@ -4,6 +4,47 @@ import { twMerge } from "tailwind-merge";
 export const DEFAULT_MEDIA_COVER_URL = 'https://res.cloudinary.com/dayn5vifn/image/upload/v1777062569/fwaya-01-01_xx0lgo.jpg';
 export const DEFAULT_AVATAR_URL = 'https://res.cloudinary.com/dayn5vifn/image/upload/v1777058518/ChatGPT_Image_Apr_24_2026_09_12_34_PM_ykwnqa.png';
 
+export const MUSIC_GENRE_GROUPS = [
+  {
+    label: 'Popular in Zambia',
+    genres: [
+      'Zambian Hip-Hop',
+      'Zambian Gospel',
+      'Kalindula',
+      'Zamrock',
+      'Afrobeats',
+      'Amapiano',
+      'Dancehall',
+      'Zambian Traditional',
+    ],
+  },
+  {
+    label: 'Across the world',
+    genres: [
+      'Hip-Hop/Rap',
+      'Pop',
+      'R&B/Soul',
+      'Afropop',
+      'Afro House',
+      'Reggae',
+      'Electronic/Dance',
+      'House',
+      'Drill',
+      'Trap',
+      'Rock',
+      'Alternative/Indie',
+      'Jazz',
+      'Blues',
+      'Country',
+      'Classical',
+      'Latin',
+      'K-Pop',
+      'Metal',
+      'Other',
+    ],
+  },
+] as const;
+
 /**
  * Merges Tailwind classes with clsx for conditional classes
  * @param inputs Class values to merge
@@ -182,7 +223,7 @@ export function formatRelativeTime(timestamp: unknown): string {
   const isFuture = diffMs < 0;
   const absoluteDiffMs = Math.abs(diffMs);
 
-  if (absoluteDiffMs < 1000) return 'Just now';
+  if (absoluteDiffMs < 1000) return 'Just Now';
 
   const diffSeconds = Math.floor(absoluteDiffMs / 1000);
   const relative = (amount: number, unit: string) => isFuture
@@ -210,8 +251,24 @@ export function formatRelativeTime(timestamp: unknown): string {
 }
 
 export function formatAddedTime(...timestamps: unknown[]): string {
-  const timestamp = resolveDateValue(...timestamps);
-  return timestamp ? `Added ${formatRelativeTime(timestamp)}` : 'Added date unavailable';
+  const values: unknown[] = [];
+  for (const value of timestamps) {
+    if (value && typeof value === 'object' && !(value instanceof Date)) {
+      const record = value as Record<string, unknown>;
+      values.push(
+        record.addedAt,
+        record.added_at,
+        record.createdAt,
+        record.created_at,
+        record.uploadedAt,
+        record.uploaded_at,
+      );
+    }
+    values.push(value);
+  }
+
+  const timestamp = resolveDateValue(...values);
+  return formatRelativeTime(timestamp);
 }
 
 // File/Data Utilities

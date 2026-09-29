@@ -10,6 +10,7 @@ type VideoCardProps = {
   artist: string;
   duration: number;
   views: number;
+  addedAt?: string;
   createdAt?: string;
   thumbnail?: string;
   videoUrl?: string;
@@ -29,20 +30,21 @@ export default function VideoCard({
   artist,
   duration,
   views,
+  addedAt,
   createdAt,
   thumbnail,
   videoUrl,
   href,
 }: VideoCardProps) {
   const route = href || `/videos/${id}`;
-  const [relativeAddedTime, setRelativeAddedTime] = useState(() => formatAddedTime(createdAt));
+  const [relativeAddedTime, setRelativeAddedTime] = useState(() => formatAddedTime({ addedAt, createdAt }));
 
   useEffect(() => {
-    const updateRelativeAddedTime = () => setRelativeAddedTime(formatAddedTime(createdAt));
+    const updateRelativeAddedTime = () => setRelativeAddedTime(formatAddedTime({ addedAt, createdAt }));
     updateRelativeAddedTime();
-    const intervalId = window.setInterval(updateRelativeAddedTime, 10000);
+    const intervalId = window.setInterval(updateRelativeAddedTime, 1000);
     return () => window.clearInterval(intervalId);
-  }, [createdAt]);
+  }, [addedAt, createdAt]);
 
   return (
     <Link
@@ -80,7 +82,7 @@ export default function VideoCard({
         <p className="mt-1 text-xs text-slate-400 truncate">{artist}</p>
         <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
           <span>{views.toLocaleString()} views</span>
-          <span title={createdAt || undefined}>{relativeAddedTime}</span>
+          <span title={addedAt || createdAt || undefined}>{relativeAddedTime}</span>
         </div>
       </div>
     </Link>

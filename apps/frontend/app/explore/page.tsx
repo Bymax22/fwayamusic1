@@ -14,6 +14,7 @@ interface MediaFile {
   coverArt: string;
   views: number;
   likes: number;
+  addedAt?: string;
   createdAt?: string;
   releaseDate?: string;
   genre?: string;
@@ -36,7 +37,7 @@ export default function ExplorePage() {
   const [, setRelativeTimeTick] = useState(0);
 
   useEffect(() => {
-    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 30000);
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 1000);
     return () => window.clearInterval(interval);
   }, []);
 
@@ -57,7 +58,8 @@ export default function ExplorePage() {
           coverArt: item.coverArt || '/default-cover.jpg',
           views: item.views || 0,
           likes: item.likes || 0,
-          createdAt: item.createdAt || item.created_at || '',
+          addedAt: item.addedAt || item.added_at || '',
+          createdAt: item.createdAt || item.created_at || item.uploadedAt || item.uploaded_at || '',
           releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
           genre: item.genre || 'Other'
         }));
@@ -197,7 +199,7 @@ export default function ExplorePage() {
                   <span>{file.genre}</span>
                   <span>{formatDuration(file.duration)}</span>
                 </div>
-                <p className="mt-2 text-xs text-gray-500">{formatAddedTime(file.createdAt)}</p>
+                <p className="mt-2 text-xs text-gray-500">{formatAddedTime(file)}</p>
               </div>
             </div>
           ))}
@@ -248,7 +250,7 @@ export default function ExplorePage() {
               <div className="p-4">
                 <h3 className="font-medium text-white truncate mb-1">{file.title}</h3>
                 <p className="text-sm text-gray-400 truncate">{file.artist}</p>
-                <p className="mt-2 text-xs text-gray-500">{formatAddedTime(file.createdAt)}</p>
+                <p className="mt-2 text-xs text-gray-500">{formatAddedTime(file)}</p>
               </div>
             </div>
           ))}

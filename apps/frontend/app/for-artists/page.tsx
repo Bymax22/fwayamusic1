@@ -17,7 +17,7 @@ import DashboardHeader from '@/components/DashboardHeader';
 import MobilePlayer from '@/components/MobilePlayer';
 import ShareModal from '@/components/ShareModal';
 import VideoPlayer from '@/components/VideoPlayer';
-import { createMediaSlug } from '@/lib/utils';
+import { createMediaSlug, MUSIC_GENRE_GROUPS } from '@/lib/utils';
 import { subscribe } from '@/lib/realtime';
 import CoverArtImage from '@/components/CoverArtImage';
 import AvatarImage from '@/components/AvatarImage';
@@ -44,6 +44,7 @@ interface Media {
   genre: string | null;
   tags: string[];
   createdAt: string;
+  addedAt?: string;
   updatedAt: string;
   userId: number;
   allowReselling: boolean;
@@ -207,7 +208,7 @@ export default function ForArtistsPage() {
     const files = newMedia.type === 'ALBUM' || newMedia.type === 'EP'
       ? newMedia.tracks.map((track) => `${track.title}:${track.file?.name}:${track.file?.size}:${track.file?.lastModified}`).join('|')
       : `${newMedia.file?.name}:${newMedia.file?.size}:${newMedia.file?.lastModified}`;
-    return `fwaya:artist-upload:${newMedia.title.trim()}:${newMedia.type}:${newMedia.releaseDate}:${files}`;
+    return `fwaya:artist-upload:${newMedia.title.trim()}:${newMedia.type}:${newMedia.releaseDate}:${newMedia.genre}:${files}`;
   };
   // Map our frontend media type to product type names used by admin price tiers
   const productTypeNameForMediaType = (t: string) => {
@@ -518,6 +519,11 @@ export default function ForArtistsPage() {
       return;
     }
 
+    if (!newMedia.genre) {
+      alert('Please select a genre');
+      return;
+    }
+
     const isReleaseUpload = newMedia.type === 'ALBUM' || newMedia.type === 'EP';
     const releaseTracks = newMedia.tracks.filter((track) => track.title.trim() && track.file);
     if (isReleaseUpload) {
@@ -548,6 +554,7 @@ export default function ForArtistsPage() {
       return;
     }
     if (typeof window !== 'undefined') localStorage.setItem(uploadKey, 'pending');
+    const addedAt = new Date().toISOString();
 
     try {
       setIsUploading(true);
@@ -593,9 +600,11 @@ export default function ForArtistsPage() {
 
         for (let index = 0; index < releaseTracks.length; index += 1) {
           const track = releaseTracks[index];
+          const trackAddedAt = new Date().toISOString();
           const trackCloudinaryData = await uploadToCloudinary(track.file as File, 'auto');
           const metadataPayload: Record<string, any> = {
             title: track.title.trim(),
+            addedAt: trackAddedAt,
             type: 'AUDIO',
             releaseType: newMedia.type === 'EP' ? 'EP' : 'ALBUM',
             releaseDate: newMedia.releaseDate,
@@ -682,6 +691,7 @@ export default function ForArtistsPage() {
 
       const dbFormData = new FormData();
       dbFormData.append('title', newMedia.title);
+      dbFormData.append('addedAt', addedAt);
       dbFormData.append('type', newMedia.type);
       dbFormData.append('releaseDate', newMedia.releaseDate);
       dbFormData.append('cloudinaryPublicId', cloudinaryData.public_id);
@@ -1890,15 +1900,22 @@ export default function ForArtistsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-gray-400 mb-2">Genre</label>
-                    <input
-                      type="text"
+                    <label className="block text-gray-400 mb-2" htmlFor="media-genre-select">Genre *</label>
+                    <select
+                      id="media-genre-select"
                       className="w-full bg-[#090a0f] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="Enter genre (e.g. Afrobeats, Hip Hop, Gospel)"
                       value={newMedia.genre}
                       onChange={(e) => setNewMedia({ ...newMedia, genre: e.target.value })}
                       disabled={isUploading}
-                    />
+                      required
+                    >
+                      <option value="">Choose a genre</option>
+                      {MUSIC_GENRE_GROUPS.map((group) => (
+                        <optgroup key={group.label} label={group.label}>
+                          {group.genres.map((genre) => <option key={genre} value={genre}>{genre}</option>)}
+                        </optgroup>
+                      ))}
+                    </select>
                   </div>
 
                   {newMedia.type === 'VIDEO' && (

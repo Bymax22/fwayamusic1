@@ -30,6 +30,8 @@ test('formatRelativeTime returns a neutral fallback for missing dates', () => {
 });
 
 test('formatAddedTime consistently uses available upload timestamps', () => {
-  assert.equal(formatAddedTime(undefined, new Date(Date.now() - 5_000)), 'Added 5 seconds ago');
-  assert.equal(formatAddedTime(undefined, ''), 'Added date unavailable');
+  assert.equal(formatAddedTime(new Date()), 'Just Now');
+  assert.equal(formatAddedTime(undefined, new Date(Date.now() - 5_000)), '5 seconds ago');
+  assert.equal(formatAddedTime({ created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() }), '2 days ago');
+  assert.equal(formatAddedTime(undefined, ''), 'No date');
 });

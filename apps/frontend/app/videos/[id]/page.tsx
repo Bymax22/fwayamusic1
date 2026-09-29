@@ -26,6 +26,7 @@ interface VideoDetail {
   duration: number;
   views: number;
   likes: number;
+  addedAt: string;
   createdAt: string;
   releaseDate: string;
   thumbnail: string;
@@ -36,6 +37,7 @@ interface VideoDetail {
     artist: string;
     duration: number;
     views: number;
+    addedAt: string;
     createdAt: string;
     releaseDate: string;
     thumbnail: string;
@@ -221,7 +223,8 @@ export default function VideoWatchPage() {
           duration: item.duration || item.length || 0,
           views: item.views || item.playCount || 0,
           likes: item.likes || 0,
-          createdAt: item.createdAt || item.created_at || '',
+          addedAt: item.addedAt || item.added_at || '',
+          createdAt: item.createdAt || item.created_at || item.uploadedAt || item.uploaded_at || '',
           releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
           thumbnail: item.thumbnailUrl || item.artCoverUrl || item.coverArt || "/default-cover.jpg",
           videoUrl: item.videoUrl || item.url || item.audioUrl || "",
@@ -231,7 +234,8 @@ export default function VideoWatchPage() {
             artist: relatedItem.user?.displayName || relatedItem.user?.username || relatedItem.artist || "Unknown",
             duration: relatedItem.duration || relatedItem.length || 0,
             views: relatedItem.views || relatedItem.playCount || 0,
-            createdAt: relatedItem.createdAt || relatedItem.created_at || '',
+            addedAt: relatedItem.addedAt || relatedItem.added_at || '',
+            createdAt: relatedItem.createdAt || relatedItem.created_at || relatedItem.uploadedAt || relatedItem.uploaded_at || '',
             releaseDate: relatedItem.releaseDate || relatedItem.publishedAt || relatedItem.published_at || '',
             thumbnail: relatedItem.thumbnailUrl || relatedItem.artCoverUrl || relatedItem.coverArt || "/default-cover.jpg",
             videoUrl: relatedItem.videoUrl || relatedItem.url || relatedItem.audioUrl || undefined,

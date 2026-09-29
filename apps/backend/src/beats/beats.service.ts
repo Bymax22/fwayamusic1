@@ -67,6 +67,7 @@ export class BeatsService {
         accessType: true,
         tags: true,
         releaseDate: true,
+        addedAt: true,
         createdAt: true,
         user: { select: { id: true, username: true, displayName: true, avatarUrl: true } }
       }
@@ -103,6 +104,7 @@ export class BeatsService {
         downloadCount: true,
         price: true,
         accessType: true,
+        addedAt: true,
         createdAt: true,
         user: { select: { id: true, username: true, displayName: true } }
       }
@@ -131,6 +133,7 @@ export class BeatsService {
         isExplicit: true,
         allowReselling: true,
         tags: true,
+        addedAt: true,
         createdAt: true,
         user: { select: { id: true, username: true, displayName: true, avatarUrl: true, stageName: true } }
       }
@@ -146,6 +149,7 @@ export class BeatsService {
   async createBeat(userId: number, beatData: {
     title: string;
     releaseDate: string;
+    addedAt?: string;
     description: string;
     genre: string;
     bpm: number | null;
@@ -171,6 +175,8 @@ export class BeatsService {
     if (Number.isNaN(releaseDate.getTime()) || !hasValidCalendarDate) {
       throw new BadRequestException('A valid release date is required');
     }
+    const addedAtValue = beatData.addedAt ? new Date(beatData.addedAt) : new Date();
+    const addedAt = Number.isNaN(addedAtValue.getTime()) ? new Date() : addedAtValue;
 
     // Upload files to Cloudinary (integrate with your upload service)
     // For now, we'll assume URLs are provided
@@ -191,6 +197,7 @@ export class BeatsService {
     const beat = await this.prisma.media.create({
       data: {
         title: beatData.title,
+        addedAt,
         releaseDate,
         description: beatData.description,
         genre: beatData.genre,
@@ -387,6 +394,7 @@ export class BeatsService {
         shareCount: true,
         price: true,
         accessType: true,
+        addedAt: true,
         createdAt: true
       }
     });

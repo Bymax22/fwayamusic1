@@ -36,7 +36,7 @@ function normalizeMedia(item: any): MediaFile {
     url: item.url,
     duration: item.duration || 0,
     format: item.format || 'mp3',
-    createdAt: item.createdAt || item.created_at || '',
+    createdAt: item.createdAt || item.created_at || item.uploadedAt || item.uploaded_at || item.addedAt || item.added_at || '',
     releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
     coverArt: item.coverArt || '/default-cover.jpg',
     views: item.views || 0,

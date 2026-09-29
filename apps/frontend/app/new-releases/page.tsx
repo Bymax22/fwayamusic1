@@ -14,6 +14,7 @@ interface MediaFile {
   coverArt: string;
   genre?: string;
   releaseDate?: string;
+  addedAt?: string;
   createdAt?: string;
   isExplicit?: boolean;
 }
@@ -28,7 +29,8 @@ function normalizeMedia(item: any): MediaFile {
     coverArt: item.coverArt || item.artCoverUrl || item.coverUrl || '/default-cover.jpg',
     genre: item.genre || item.type || 'Unknown',
     releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
-    createdAt: item.createdAt || item.created_at || '',
+    addedAt: item.addedAt || item.added_at || '',
+    createdAt: item.createdAt || item.created_at || item.uploadedAt || item.uploaded_at || '',
     isExplicit: item.isExplicit || item.explicit || false,
   };
 }
@@ -63,7 +65,7 @@ export default function NewReleasesPage() {
   const [, setRelativeTimeTick] = useState(0);
 
   useEffect(() => {
-    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 30000);
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 1000);
     return () => window.clearInterval(interval);
   }, []);
 
@@ -213,7 +215,7 @@ export default function NewReleasesPage() {
                   </div>
                   <div className="flex justify-between items-center mt-3">
                     <span className="text-xs text-gray-400">
-                      {formatAddedTime(release.createdAt)}
+                      {formatAddedTime(release)}
                     </span>
                     <button className="text-gray-400 hover:text-purple-400 transition-colors">
                       <Heart className="w-4 h-4" />

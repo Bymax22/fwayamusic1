@@ -7,6 +7,7 @@ import { CloudinaryUploadWidgetInfo } from "next-cloudinary";
 import { CheckCircle, Music, Video, Headphones, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { MUSIC_GENRE_GROUPS } from '@/lib/utils';
 import { useToast } from "@/components/ui/use-toast";
 
 interface UploadMetadata {
@@ -33,7 +34,7 @@ export default function UploadPage() {
   const [metadata, setMetadata] = useState<UploadMetadata>({
     title: "",
     description: "",
-    genre: "other",
+    genre: "",
     releaseDate: "",
     type: "AUDIO",
     isPremium: false,
@@ -163,6 +164,11 @@ export default function UploadPage() {
       return;
     }
 
+    if (!metadata.genre) {
+      setError("Please select a genre");
+      return;
+    }
+
     if (!metadata.releaseDate) {
       setError("Please select a release date");
       return;
@@ -179,6 +185,7 @@ export default function UploadPage() {
     setUploading(true);
     setUploadProgress(0);
     setError(null);
+    const addedAt = new Date().toISOString();
 
     try {
       // 1. Create FormData for Cloudinary upload (main media file)
@@ -232,6 +239,7 @@ export default function UploadPage() {
             title: metadata.title,
             description: metadata.description,
             genre: metadata.genre,
+            addedAt,
             releaseDate: metadata.releaseDate,
             type: metadata.type,
             isPremium: metadata.isPremium,
@@ -568,22 +576,22 @@ export default function UploadPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Genre
+              Genre *
             </label>
             <select
+              required
               value={metadata.genre}
               onChange={(e: ChangeEvent<HTMLSelectElement>) => 
                 setMetadata({...metadata, genre: e.target.value})
               }
               className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="pop">Pop</option>
-              <option value="rock">Rock</option>
-              <option value="hiphop">Hip Hop</option>
-              <option value="electronic">Electronic</option>
-              <option value="classical">Classical</option>
-              <option value="jazz">Jazz</option>
-              <option value="other">Other</option>
+              <option value="">Choose a genre</option>
+              {MUSIC_GENRE_GROUPS.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.genres.map((genre) => <option key={genre} value={genre}>{genre}</option>)}
+                </optgroup>
+              ))}
             </select>
           </div>
 

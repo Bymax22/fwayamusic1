@@ -9,6 +9,7 @@ interface VideoItem {
   artist: string;
   duration: number;
   views: number;
+  addedAt: string;
   createdAt: string;
   releaseDate: string;
   thumbnail: string;
@@ -20,6 +21,7 @@ const EMPTY_VIDEO: VideoItem = {
   artist: "",
   duration: 0,
   views: 0,
+  addedAt: '',
   createdAt: '',
   releaseDate: '',
   thumbnail: "/default-cover.jpg",
@@ -48,7 +50,8 @@ export default function VideosPage() {
           artist: item.user?.displayName || item.user?.username || item.artist || "Unknown",
           duration: item.duration || item.length || 0,
           views: item.views || item.playCount || 0,
-          createdAt: item.createdAt || item.created_at || '',
+          addedAt: item.addedAt || item.added_at || '',
+          createdAt: item.createdAt || item.created_at || item.uploadedAt || item.uploaded_at || '',
           releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
           thumbnail: item.thumbnailUrl || item.artCoverUrl || item.coverArt || "/default-cover.jpg",
           videoUrl: item.videoUrl || item.url || item.audioUrl || undefined,

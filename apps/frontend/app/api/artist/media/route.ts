@@ -140,6 +140,7 @@ export async function POST(request: NextRequest) {
       const platformCommissionRate = getField('platformCommissionRate');
       const tags = getField('tags');
       const releaseType = getField('releaseType');
+      const addedAt = getField('addedAt');
       const albumId = getField('albumId');
       const trackOrder = getField('trackOrder');
       const baseUrl = getBackendBaseUrl();
@@ -162,6 +163,7 @@ export async function POST(request: NextRequest) {
         platformCommissionRate: platformCommissionRate ? Number(platformCommissionRate) : undefined,
         tags: tags ? String(tags) : undefined,
         releaseType: releaseType ? String(releaseType) : undefined,
+        addedAt: addedAt ? String(addedAt) : undefined,
         albumId: albumId ? Number(albumId) : undefined,
         trackOrder: trackOrder !== null && trackOrder !== undefined && String(trackOrder) !== '' ? Number(trackOrder) : undefined,
         coverUrl: coverUrl ? String(coverUrl) : undefined,

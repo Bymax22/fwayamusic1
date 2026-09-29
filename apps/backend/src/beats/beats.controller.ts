@@ -75,6 +75,7 @@ export class BeatsController {
     return this.beatsService.createBeat(req.user.id, {
       title: beatData.title,
       releaseDate: beatData.releaseDate,
+      addedAt: beatData.addedAt,
       description: beatData.description || '',
       genre: beatData.genre,
       bpm: beatData.bpm ? Number(beatData.bpm) : null,

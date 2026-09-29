@@ -18,7 +18,7 @@ import { DashboardCard } from '@/components/DashboardCard';
 import DashboardHeader from '@/components/DashboardHeader';
 import MobilePlayer from '@/components/MobilePlayer';
 import CoverArtImage from '@/components/CoverArtImage';
-import { formatAddedTime } from '@/lib/utils';
+import { formatAddedTime, MUSIC_GENRE_GROUPS } from '@/lib/utils';
 
 // Types for Producer Dashboard
 interface Beat {
@@ -40,6 +40,7 @@ interface Beat {
   duration: number;
   tags: string[];
   createdAt: string;
+  addedAt?: string;
   allowReselling: boolean;
   artistCommissionRate: number;
 }
@@ -121,6 +122,7 @@ export default function ProducerPage() {
     coverFile: null as File | null,
     coverPreview: null as string | null,
   });
+  const [, setAddedTimeTick] = useState(0);
   const [newBeatPack, setNewBeatPack] = useState({
     title: '',
     description: '',
@@ -194,6 +196,11 @@ export default function ProducerPage() {
         mediaQuery.removeListener(handleMediaChange);
       }
     };
+  }, []);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setAddedTimeTick((value) => value + 1), 1000);
+    return () => window.clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -287,6 +294,7 @@ export default function ProducerPage() {
       return;
     }
     if (typeof window !== 'undefined') localStorage.setItem(uploadKey, 'pending');
+    const addedAt = new Date().toISOString();
 
     setIsUploading(true);
     setUploadProgress(0);
@@ -294,6 +302,7 @@ export default function ProducerPage() {
     try {
       const formData = new FormData();
       formData.append('title', newBeat.title);
+      formData.append('addedAt', addedAt);
       formData.append('releaseDate', newBeat.releaseDate);
       formData.append('description', newBeat.description);
       formData.append('genre', newBeat.genre);
@@ -727,7 +736,7 @@ export default function ProducerPage() {
                           <div>
                             <h4 className="text-white font-semibold truncate">{beat.title}</h4>
                             <p className="text-sm text-gray-400">{beat.genre}</p>
-                            <p className="mt-1 text-xs text-gray-500">{formatAddedTime(beat.createdAt)}</p>
+                            <p className="mt-1 text-xs text-gray-500">{formatAddedTime(beat)}</p>
                           </div>
                           <div className="flex flex-wrap gap-2 text-xs">
                             <span className="px-2 py-1 rounded-full bg-purple-500/20 text-purple-300">{beat.bpm} BPM</span>
@@ -926,15 +935,14 @@ export default function ProducerPage() {
                         value={newBeat.genre}
                         onChange={(e) => setNewBeat({ ...newBeat, genre: e.target.value })}
                         className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        required
                       >
                         <option value="">Select Genre</option>
-                        <option value="Hip-Hop">Hip-Hop</option>
-                        <option value="Trap">Trap</option>
-                        <option value="R&B">R&B</option>
-                        <option value="Drill">Drill</option>
-                        <option value="Afrobeat">Afrobeat</option>
-                        <option value="Amapiano">Amapiano</option>
-                        <option value="Electronic">Electronic</option>
+                        {MUSIC_GENRE_GROUPS.map((group) => (
+                          <optgroup key={group.label} label={group.label}>
+                            {group.genres.map((genre) => <option key={genre} value={genre}>{genre}</option>)}
+                          </optgroup>
+                        ))}
                       </select>
                     </div>
 

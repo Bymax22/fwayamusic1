@@ -32,7 +32,7 @@ function normalizeChartItem(item: any): ChartItem {
     coverArt: item.coverArt || item.artCoverUrl || item.coverUrl || '/default-cover.jpg',
     genre: item.genre || item.type || 'Unknown',
     views: item.views || item.playCount || item.plays || 0,
-    createdAt: item.createdAt || item.created_at || '',
+    createdAt: item.createdAt || item.created_at || item.uploadedAt || item.uploaded_at || item.addedAt || item.added_at || '',
     releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
     position: item.position || 0,
     change: item.change || 'same',

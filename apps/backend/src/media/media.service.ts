@@ -420,6 +420,7 @@ export class MediaService {
         description: createMediaDto.description || null,
         format: uploadResult.format,
         duration: Math.floor(uploadResult.duration || 0),
+        addedAt: this.resolveAddedAt(createMediaDto.addedAt),
         releaseDate: this.resolveReleaseDate(createMediaDto.releaseDate),
         type: normalizedType,
         accessType: createMediaDto.accessType || 'FREE',
@@ -536,7 +537,7 @@ export class MediaService {
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number; trackOrder?: number; priceTierId?: number }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate: string; addedAt?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number; trackOrder?: number; priceTierId?: number }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
@@ -598,6 +599,7 @@ export class MediaService {
         description: metadata.description || null,
         format: metadata.format,
         duration: Math.floor(metadata.duration || 0),
+        addedAt: this.resolveAddedAt(metadata.addedAt),
         releaseDate: releaseDateValue,
         type: normalizedType,
         accessType: normalizedAccessType === 'PAY_PER_VIEW'
@@ -730,6 +732,12 @@ export class MediaService {
     }
 
     return parsed;
+  }
+
+  private resolveAddedAt(date?: string | Date | null): Date {
+    if (!date) return new Date();
+    const parsed = date instanceof Date ? date : new Date(date);
+    return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
   }
 
   private normalizeMediaType(type?: string | null): MediaType {

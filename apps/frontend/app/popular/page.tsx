@@ -15,6 +15,7 @@ interface MediaFile {
   genre?: string;
   views: number;
   likes: number;
+  addedAt?: string;
   createdAt?: string;
   releaseDate?: string;
 }
@@ -37,7 +38,8 @@ function normalizeMedia(item: any): MediaFile {
     genre: item.genre || item.type || 'Unknown',
     views: item.views || item.playCount || 0,
     likes: item.likes || item.likeCount || 0,
-    createdAt: item.createdAt || item.created_at || '',
+    addedAt: item.addedAt || item.added_at || '',
+    createdAt: item.createdAt || item.created_at || item.uploadedAt || item.uploaded_at || '',
     releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
   };
 }
@@ -63,6 +65,12 @@ export default function PopularPage() {
   const [category, setCategory] = useState<'tracks' | 'artists' | 'genres'>('tracks');
   const [loading, setLoading] = useState(true);
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
+  const [, setAddedTimeTick] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setAddedTimeTick((value) => value + 1), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -259,7 +267,7 @@ export default function PopularPage() {
                           <span>{item.genre}</span>
                           <span>{formatDuration(item.duration)}</span>
                           <span>{item.views.toLocaleString()} plays</span>
-                          <span>{formatAddedTime(item.createdAt)}</span>
+                          <span>{formatAddedTime(item)}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
