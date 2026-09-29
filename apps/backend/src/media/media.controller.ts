@@ -87,6 +87,9 @@ export class MediaController {
   // Convert Prisma/BigInt values to JSON-safe values
   private sanitizeForJson(value: any): any {
     if (value === null || value === undefined) return value;
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value.toISOString();
+    }
     if (typeof value === 'bigint') {
       // Convert to number when safe, otherwise to string
       try {
