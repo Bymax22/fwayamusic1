@@ -42,7 +42,19 @@ export class PlaylistService {
       include: {
         entries: {
           include: {
-            media: true,
+            media: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    username: true,
+                    displayName: true,
+                    artistName: true,
+                    stageName: true,
+                  },
+                },
+              },
+            },
           },
         },
       },

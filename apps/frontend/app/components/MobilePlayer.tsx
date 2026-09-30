@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlayIcon,
@@ -40,6 +40,67 @@ type TrackType = {
 
 type RepeatMode = 'off' | 'repeat-all' | 'repeat-one';
 
+const SPECTRUM_BARS = Array.from({ length: 48 }, (_, index) => ({
+  id: index,
+  height: 7 + Math.abs(Math.sin((index / 48) * Math.PI * 3)) * 20,
+  duration: 0.8 + (index % 7) * 0.09,
+  delay: (index % 9) * -0.13,
+}));
+
+function SpectrumVisualizer({ isPlaying, progress, className = '' }: { isPlaying: boolean; progress: number; className?: string }) {
+  return (
+    <div className={`mobile-spectrum absolute inset-0 flex items-center justify-center pointer-events-none ${className}`} aria-hidden="true">
+      <div className="spectrum-bars flex items-end justify-center gap-[2px] opacity-80">
+        {SPECTRUM_BARS.map((bar) => (
+          <span
+            key={bar.id}
+            className={`spectrum-bar${isPlaying ? ' is-playing' : ''}`}
+            style={{
+              height: `${bar.height}px`,
+              animationDuration: `${bar.duration}s`,
+              animationDelay: `${bar.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+      {isPlaying && (
+        <div className="spectrum-progress absolute bottom-0 left-0 h-0.5" style={{ width: `${Math.max(0, Math.min(1, progress)) * 100}%` }} />
+      )}
+      <style jsx>{`
+        .spectrum-bar {
+          display: block;
+          width: 2px;
+          min-height: 2px;
+          transform: scaleY(0.35);
+          transform-origin: bottom;
+          border-radius: 2px 2px 0 0;
+          background: linear-gradient(to top, #9333ea, #f472b6);
+          opacity: 0.35;
+        }
+        .spectrum-bar.is-playing {
+          animation: spectrum-pulse 1.2s ease-in-out infinite;
+          opacity: 0.8;
+        }
+        .spectrum-progress {
+          background: linear-gradient(to right, #a855f7, #f472b6, #9333ea);
+          transition: width 250ms linear;
+          box-shadow: 0 0 8px rgba(236, 72, 153, 0.65);
+        }
+        @keyframes spectrum-pulse {
+          0%, 100% { transform: scaleY(0.3); opacity: 0.45; }
+          25% { transform: scaleY(0.72); opacity: 0.65; }
+          50% { transform: scaleY(1); opacity: 0.9; }
+          75% { transform: scaleY(0.52); opacity: 0.6; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .spectrum-bar.is-playing { animation: none; transform: none; }
+          .spectrum-progress { transition: none; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 interface MobilePlayerProps {
   track: TrackType;
   isPlaying: boolean;
@@ -58,6 +119,50 @@ interface MobilePlayerProps {
   onVolumeChange?: (volume: number) => void;
   onToggleMute?: () => void;
   className?: string;
+}
+
+function ScrollingTitle({ title, isPlaying }: { title: string; isPlaying: boolean }) {
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollDistance, setScrollDistance] = useState(0);
+
+  useEffect(() => {
+    const measureTitle = () => {
+      if (!titleRef.current || !containerRef.current) return;
+      const titleWidth = titleRef.current.getBoundingClientRect().width;
+      setScrollDistance(titleWidth > containerRef.current.clientWidth ? titleWidth : 0);
+    };
+
+    measureTitle();
+    const observer = new ResizeObserver(measureTitle);
+    if (containerRef.current) observer.observe(containerRef.current);
+    if (titleRef.current) observer.observe(titleRef.current);
+    return () => observer.disconnect();
+  }, [title]);
+
+  const shouldScroll = scrollDistance > 0;
+
+  return (
+    <div ref={containerRef} className="w-full overflow-hidden">
+      <motion.div
+        animate={shouldScroll && isPlaying ? { x: -scrollDistance } : { x: 0 }}
+        transition={{
+          duration: shouldScroll ? scrollDistance / 40 : 0,
+          repeat: shouldScroll && isPlaying ? Infinity : 0,
+          repeatType: 'loop',
+          ease: 'linear',
+        }}
+        className="flex w-max whitespace-nowrap"
+      >
+        <span ref={titleRef} className="pr-8 text-sm font-semibold text-white">
+          {title}
+        </span>
+        <span aria-hidden="true" className="pr-8 text-sm font-semibold text-white">
+          {title}
+        </span>
+      </motion.div>
+    </div>
+  );
 }
 
 export default function MobilePlayer({
@@ -242,141 +347,10 @@ export default function MobilePlayer({
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // Spectrum Visualizer Component - Stable Music Visualizer
-  const SpectrumVisualizer = useMemo(() => {
-    return ({ isPlaying = false, progress = 0, className = "" }: { isPlaying: boolean; progress: number; className: string }) => {
-      // Create stable frequency bars that don't change on re-render
-      const bars = useMemo(() => {
-        return Array.from({ length: 60 }, (_, i) => {
-          const frequency = i / 60;
-          // Stable height based on frequency pattern (no randomness)
-          const baseHeight = Math.abs(Math.sin(frequency * Math.PI * 3)) * 16 + 6;
-          
-          return {
-            id: i,
-            baseHeight,
-            frequency,
-            colorIndex: Math.floor(frequency * 3),
-          };
-        });
-      }, []);
-
-      const getBarColor = (colorIndex: number) => {
-        const colors = [
-          "from-purple-500 to-purple-300",
-          "from-purple-400 to-pink-400",
-          "from-pink-400 to-pink-300"
-        ];
-        return colors[colorIndex] || colors[0];
-      };
-
-      return (
-        <div className={`absolute inset-0 flex items-center justify-center pointer-events-none ${className}`}>
-          <div className="flex items-end gap-0.5 justify-center opacity-80">
-            {bars.map((bar) => {
-              const progressIndex = progress * 60;
-              const distanceFromProgress = Math.abs(bar.id - progressIndex);
-              const isActive = distanceFromProgress < 2;
-              const isNearActive = distanceFromProgress < 5;
-
-              const heightMultiplier = isActive ? 1.4 : isNearActive ? 1.1 : 0.7;
-              const targetHeight = bar.baseHeight * heightMultiplier;
-
-              return (
-                <motion.div
-                  key={bar.id}
-                  className={`rounded-t-sm bg-gradient-to-t ${getBarColor(bar.colorIndex)}`}
-                  style={{
-                    width: '2px',
-                    minHeight: '2px',
-                    boxShadow: isActive ? `0 0 8px rgba(147, 51, 234, 0.8), 0 0 16px rgba(236, 72, 153, 0.6)` : 'none',
-                  }}
-                  animate={{
-                    height: isPlaying ? targetHeight : bar.baseHeight * 0.4,
-                  }}
-                  transition={{
-                    duration: 0.2,
-                    ease: "easeOut",
-                  }}
-                />
-              );
-            })}
-          </div>
-
-          {/* Progress indicator line */}
-          {isPlaying && (
-            <motion.div
-              className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500"
-              style={{ width: `${progress * 100}%` }}
-              animate={{
-                boxShadow: [
-                  "0 0 4px rgba(147, 51, 234, 0.6)",
-                  "0 0 8px rgba(236, 72, 153, 0.8)",
-                  "0 0 4px rgba(147, 51, 234, 0.6)"
-                ]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          )}
-        </div>
-      );
-    };
-  }, []);
-
-  // Scrolling Title Component - Auto-scroll for long titles
-  const ScrollingTitle = ({ title, isPlaying }: { title: string; isPlaying: boolean }) => {
-    const titleRef = useRef<HTMLSpanElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [shouldScroll, setShouldScroll] = useState(false);
-    const [scrollDistance, setScrollDistance] = useState(0);
-
-    useEffect(() => {
-      if (!titleRef.current || !containerRef.current) return;
-
-      const textWidth = titleRef.current.offsetWidth;
-      const containerWidth = containerRef.current.offsetWidth;
-      
-      if (textWidth > containerWidth) {
-        setShouldScroll(true);
-        // Add padding for smooth loop
-        setScrollDistance(-(textWidth + 20));
-      } else {
-        setShouldScroll(false);
-      }
-    }, [title]);
-
-    return (
-      <div ref={containerRef} className="overflow-hidden w-full">
-        <motion.div
-          animate={shouldScroll && isPlaying ? {
-            x: [0, scrollDistance, scrollDistance],
-          } : {
-            x: 0,
-          }}
-          transition={{
-            duration: shouldScroll ? (Math.abs(scrollDistance) / 100 + 3) : 0,
-            repeat: shouldScroll && isPlaying ? Infinity : 0,
-            repeatDelay: 1,
-            ease: "linear",
-          }}
-          className="whitespace-nowrap"
-        >
-          <span ref={titleRef} className="text-white font-semibold text-sm pr-8">
-            {title}
-          </span>
-        </motion.div>
-      </div>
-    );
-  };
-
   return (
     <AnimatePresence>
       <motion.div
-        className={`fixed left-0 right-0 bottom-16 z-40 bg-black/90 backdrop-blur-2xl border-t border-white/10 shadow-2xl ${className || ""}`}
+        className={`fixed left-0 right-0 bottom-16 z-40 bg-gradient-to-t from-black via-black/90 to-transparent ${className || ""}`}
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
@@ -393,16 +367,16 @@ export default function MobilePlayer({
           {/* Compact Track Info and Controls */}
           <div className="flex items-center gap-2 relative z-10">
             {/* Track Image */}
-            <div className="relative">
+            <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
               <Image
                 src={track.imageUrl || "/default-cover.jpg"}
                 alt={track.title || "Track cover"}
                 width={40}
                 height={40}
-                className="rounded-md object-cover shadow-lg"
+                className="block h-10 w-10 aspect-square rounded-full object-cover shadow-lg"
               />
               {isLoading && (
-                <div className="absolute inset-0 bg-black/40 rounded-md flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
                   <div className="animate-spin rounded-full h-2 w-2 border-b-2 border-white"></div>
                 </div>
               )}

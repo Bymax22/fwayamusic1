@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { ListMusic, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
 
 interface PlaylistItem {
@@ -20,6 +22,7 @@ interface PlaylistPickerModalProps {
 
 export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess }: PlaylistPickerModalProps) {
   const { user, getToken } = useAuth();
+  const router = useRouter();
   const [playlists, setPlaylists] = useState<PlaylistItem[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
@@ -27,6 +30,26 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const showSuccess = (message: string, playlistId: number) => {
+    onSuccess?.();
+    onClose();
+    toast.custom((toastItem) => (
+      <div role="status" className="flex items-center gap-4 rounded-xl bg-black px-4 py-3 text-sm text-white shadow-xl ring-1 ring-white/10">
+        <span>{message}</span>
+        <button
+          type="button"
+          onClick={() => {
+            toast.dismiss(toastItem.id);
+            router.push(`/playlist/${playlistId}`);
+          }}
+          className="shrink-0 font-medium text-purple-300 transition hover:text-purple-200"
+        >
+          View playlist
+        </button>
+      </div>
+    ), { duration: 6000 });
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -63,7 +86,9 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
           items.map((playlist: any) => ({
             id: Number(playlist.id),
             name: playlist.name || playlist.title || 'Untitled Playlist',
-            mediaCount: playlist.mediaCount ?? playlist._count?.media ?? 0,
+            mediaCount: Array.isArray(playlist.entries)
+              ? playlist.entries.length
+              : playlist.mediaCount ?? playlist._count?.entries ?? playlist._count?.media ?? 0,
             coverUrl: playlist.coverUrl || playlist.coverImage || '/playlists/default.jpg',
           })),
         );
@@ -77,6 +102,24 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
     void loadPlaylists();
   }, [open, getToken]);
 
+  const addMediaToPlaylist = async (playlistId: number, token: string) => {
+    if (!user) throw new Error('Please sign in before adding media to a playlist.');
+
+    const response = await fetch(`/api/playlists/${playlistId}/media`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ mediaId, userId: user.id }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || 'Failed to add item to playlist.');
+    }
+  };
+
   const handleAddToPlaylist = async (playlistId: number) => {
     if (!user) {
       setError('Please sign in before adding media to a playlist.');
@@ -89,22 +132,9 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
     try {
       const token = await getToken();
       if (!token) throw new Error('Session expired. Please sign in again.');
-
-      const response = await fetch(`/api/playlists/${playlistId}/media`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ mediaId, userId: user.id }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || 'Failed to add item to playlist.');
-      }
-
-      onSuccess?.();
+      await addMediaToPlaylist(playlistId, token);
+      const playlistName = playlists.find((playlist) => playlist.id === playlistId)?.name;
+      showSuccess(playlistName ? `Added to ${playlistName}` : 'Added to playlist', playlistId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to add to playlist.');
     } finally {
@@ -129,31 +159,35 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
       const token = await getToken();
       if (!token) throw new Error('Session expired');
 
-      let response: Response;
+      let coverUrl: string | undefined;
       if (newCover) {
-        const fd = new FormData();
-        fd.append('name', newName.trim());
-        fd.append('isPublic', 'false');
-        fd.append('cover', newCover);
-        if (typeof window !== 'undefined') fd.append('source', 'frontend-modal');
-
-        response = await fetch('/api/playlists', {
+        const cloudinaryFormData = new FormData();
+        cloudinaryFormData.append('file', newCover);
+        cloudinaryFormData.append('upload_preset', 'bymaxdev1');
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dayn5vifn';
+        const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: fd,
+          body: cloudinaryFormData,
         });
-      } else {
-        response = await fetch('/api/playlists', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ name: newName.trim(), isPublic: false }),
-        });
+        const uploadData = await uploadResponse.json().catch(() => null);
+        if (!uploadResponse.ok || !uploadData?.secure_url) {
+          throw new Error(uploadData?.error?.message || 'Failed to upload playlist cover.');
+        }
+        coverUrl = uploadData.secure_url;
       }
+
+      const response = await fetch('/api/playlists', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: newName.trim(),
+          isPublic: false,
+          ...(coverUrl ? { coverUrl } : {}),
+        }),
+      });
 
       if (!response.ok) {
         let message = 'Failed to create playlist';
@@ -179,14 +213,18 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
       setNewName('');
       setNewCover(null);
 
-      // Optionally auto-add media to new playlist
+      let mediaAdded = false;
       try {
-        await handleAddToPlaylist(item.id);
-      } catch (err) {
-        // ignore add errors, main creation succeeded
+        await addMediaToPlaylist(item.id, token);
+        mediaAdded = true;
+      } catch {
+        // The playlist was created even if adding the selected media failed.
       }
 
-      onSuccess?.();
+      showSuccess(
+        mediaAdded ? 'Playlist created and track added' : 'Playlist created, but the track could not be added',
+        item.id,
+      );
       // Broadcast update so other open pages can refresh
       try {
         if (typeof BroadcastChannel !== 'undefined') {
@@ -211,7 +249,7 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4">
-      <div className="w-full max-w-md rounded-3xl bg-[#08090f] p-6 shadow-2xl shadow-black/40">
+      <div className="w-full max-w-md rounded-3xl bg-black p-6 shadow-2xl shadow-black/40">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div>
             <h2 className="text-lg font-semibold text-white">Add to Playlist</h2>
@@ -237,7 +275,7 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
               <button
                 type="button"
                 onClick={() => setShowCreate((s) => !s)}
-                className="w-full flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 text-left transition hover:border-purple-500/40 hover:bg-white/10"
+                className="w-full flex items-center gap-3 rounded-2xl bg-white/5 p-3 text-left transition hover:bg-white/10"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-600 text-white">+</div>
                 <div className="min-w-0">

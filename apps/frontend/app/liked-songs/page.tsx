@@ -4,6 +4,7 @@ import { Play, Pause, Heart, Share2, Clock, Shuffle, Music } from 'lucide-react'
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from "next/image";
+import Waveform from '@/components/Waveform';
 import Protected from '@/components/Protected';
 import { useAuth } from '@/context/AuthContext';
 
@@ -229,10 +230,9 @@ export default function LikedSongsPage() {
                   >
                     <div className="col-span-1 text-gray-400">
                       {currentTrack?.id === song.id && isPlaying ? (
-                        <Pause 
-                          className="w-5 h-5 text-purple-500 cursor-pointer" 
-                          onClick={() => handlePlay(song)}
-                        />
+                        <button onClick={() => handlePlay(song)} aria-label={`Pause ${song.title}`}>
+                          <Waveform playing className="h-5 w-5" />
+                        </button>
                       ) : (
                         <span 
                           className="cursor-pointer hover:text-purple-500 transition-colors"

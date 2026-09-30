@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Play, Pause, Heart, Share2, Plus, ExternalLink } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import Waveform from '@/components/Waveform';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
 import { createMediaSlug, DEFAULT_AVATAR_URL, formatRelativeTime, resolveDateValue } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
@@ -241,7 +242,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                             }}
                             className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10"
                           >
-                            {isCurrent && isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                            {isCurrent && isPlaying ? <Waveform playing className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                           </button>
 
                           <button

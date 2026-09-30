@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Download, Music, Headphones, HardDrive, ArrowDown, Check, Crown, Clock, Sparkles, Play, Shield, Lock, Wifi, WifiOff } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import Waveform from '@/components/Waveform';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { formatFileSize, formatDuration } from '@/lib/utils';
 import Image from "next/image";
@@ -50,7 +51,7 @@ export default function DownloadPage() {
   const [db, setDb] = useState<IDBDatabase | null>(null);
   const [downloadedFiles, setDownloadedFiles] = useState<DownloadItem[]>([]);
   const [showNetworkNotification, setShowNetworkNotification] = useState(false);
-  const { currentTrack, playTrack } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
   const { isOnline, connectionQuality } = useNetworkStatus();
 
@@ -538,12 +539,12 @@ const handleDownload = async (item: DownloadItem) => {
                       }}
                     />
                     <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all ${
-                      currentTrack?.id === item.id ? 'bg-opacity-30' : ''
+                      String(currentTrack?.id) === String(item.id) && isPlaying ? 'bg-opacity-30' : ''
                     }`}>
                       <div className="flex gap-2 sm:gap-3">
                         <button 
                           onClick={() => handlePlay(item)}
-                          className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
+                          className={`transform transition-all ${String(currentTrack?.id) === String(item.id) && isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 group-hover:opacity-100 group-hover:translate-y-0'}`}
                           disabled={item.isDRMProtected && !drmStatus}
                         >
                           <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg ${
@@ -551,7 +552,11 @@ const handleDownload = async (item: DownloadItem) => {
                               ? 'bg-gray-600 cursor-not-allowed' 
                               : 'bg-purple-500'
                           }`}>
-                            <Play className="w-4 h-4 sm:h-5 sm:w-5 text-white" />
+                            {String(currentTrack?.id) === String(item.id) && isPlaying ? (
+                              <Waveform playing className="h-5 w-5" />
+                            ) : (
+                              <Play className="w-4 h-4 sm:h-5 sm:w-5 text-white" />
+                            )}
                           </div>
                         </button>
                         {item.downloadStatus === 'pending' && (

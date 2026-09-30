@@ -4,6 +4,7 @@ import { Play, Pause, Heart, Calendar, Clock } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatAddedTime, formatDuration, resolveDateValue } from '@/lib/utils';
 import Image from 'next/image';
+import Waveform from '@/components/Waveform';
 
 interface MediaFile {
   id: number;
@@ -178,11 +179,11 @@ export default function NewReleasesPage() {
                   <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all">
                     <button 
                       onClick={() => handlePlay(release)}
-                      className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
+                      className={`transform transition-all ${currentTrack?.id === release.id && isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 group-hover:opacity-100 group-hover:translate-y-0'}`}
                     >
                       <div className="w-12 h-12 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
                         {currentTrack?.id === release.id && isPlaying ? (
-                          <Pause className="w-5 h-5 text-white" />
+                          <Waveform playing className="h-5 w-5" />
                         ) : (
                           <Play className="w-5 h-5 text-white" />
                         )}

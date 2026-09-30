@@ -19,6 +19,7 @@ import DashboardHeader from '@/components/DashboardHeader';
 import MobilePlayer from '@/components/MobilePlayer';
 import CoverArtImage from '@/components/CoverArtImage';
 import { formatAddedTime, MUSIC_GENRE_GROUPS } from '@/lib/utils';
+import Waveform from '@/components/Waveform';
 
 // Types for Producer Dashboard
 interface Beat {
@@ -726,9 +727,9 @@ export default function ProducerPage() {
                             <CoverArtImage src={beat.artCoverUrl} alt={beat.title} fill className="object-cover group-hover:scale-105 transition duration-300" />
                             <button
                               onClick={() => handlePlayBeat(beat)}
-                              className="absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/25 opacity-0 group-hover:opacity-100 transition"
+                              className={`absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/25 transition ${currentTrack?.id === beat.id && isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                             >
-                              {currentTrack?.id === beat.id && isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                              {currentTrack?.id === beat.id && isPlaying ? <Waveform playing className="h-5 w-5" /> : <Play className="w-5 h-5" />}
                             </button>
                           </div>
                         )}

@@ -4,33 +4,36 @@ import React from 'react';
 type Props = {
   playing?: boolean;
   className?: string;
+  accentColor?: string;
 };
 
-export default function Waveform({ playing = false, className = '' }: Props) {
+export default function Waveform({ playing = false, className = '', accentColor = '#e51f48' }: Props) {
   return (
-    <div className={`waveform inline-flex items-end gap-0.5 ${className}`} aria-hidden>
-      {[0,1,2,3,4].map((i) => (
+    <div className={`waveform inline-flex items-end gap-0.5 ${playing ? 'is-playing' : ''} ${className}`} aria-hidden="true">
+      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
         <span
           key={i}
-          className={`block w-0.5 bg-[#e51f48] rounded-sm transform-origin-bottom ${playing ? `animate-wave delay-${i}` : 'opacity-40'}`}
-          style={{ height: `${6 + i * 3}px` }}
+          className="waveform-bar block w-0.5 rounded-sm"
+          style={{
+            backgroundColor: accentColor,
+            height: `${7 + (i % 4) * 3}px`,
+            animationDelay: `${i * -0.12}s`,
+            animationDuration: `${0.72 + (i % 4) * 0.1}s`,
+          }}
         />
       ))}
       <style jsx>{`
-        .waveform span { transition: height 120ms linear; }
-        .animate-wave { animation: wave 900ms linear infinite; }
+        .waveform-bar { transform-origin: bottom; opacity: 0.45; }
+        .is-playing .waveform-bar { animation: wave 800ms ease-in-out infinite; opacity: 1; }
         @keyframes wave {
-          0% { transform: scaleY(1); opacity: 1 }
-          25% { transform: scaleY(1.6); opacity: 0.9 }
-          50% { transform: scaleY(0.8); opacity: 0.7 }
-          75% { transform: scaleY(1.3); opacity: 0.9 }
-          100% { transform: scaleY(1); opacity: 1 }
+          0%, 100% { transform: scaleY(0.35); }
+          25% { transform: scaleY(0.8); }
+          50% { transform: scaleY(1); }
+          75% { transform: scaleY(0.55); }
         }
-        .delay-0 { animation-delay: 0ms; }
-        .delay-1 { animation-delay: 80ms; }
-        .delay-2 { animation-delay: 160ms; }
-        .delay-3 { animation-delay: 240ms; }
-        .delay-4 { animation-delay: 320ms; }
+        @media (prefers-reduced-motion: reduce) {
+          .is-playing .waveform-bar { animation: none; transform: none; }
+        }
       `}</style>
     </div>
   );

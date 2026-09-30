@@ -4,6 +4,7 @@ import { Pause, Play, Search, Disc } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from 'next/image';
+import Waveform from '@/components/Waveform';
 
 interface MediaFile {
   id: number;
@@ -253,7 +254,7 @@ export default function SearchPage() {
                                 className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500"
                               >
                                 {currentTrack?.id === file.id && isPlaying ? (
-                                  <Pause className="w-5 h-5" />
+                                  <Waveform playing className="h-5 w-5" />
                                 ) : (
                                   <Play className="w-5 h-5" />
                                 )}

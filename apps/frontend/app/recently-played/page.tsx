@@ -4,6 +4,7 @@ import { Pause, Heart, Clock, MoreHorizontal } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration} from '@/lib/utils';
 import Image from "next/image";
+import Waveform from '@/components/Waveform';
 import Protected from '@/components/Protected';
 import { useAuth } from '@/context/AuthContext';
 
@@ -162,10 +163,9 @@ export default function RecentlyPlayedPage() {
               >
                 <div className="col-span-1 text-gray-400">
                   {currentTrack?.id === track.id && isPlaying ? (
-                    <Pause 
-                      className="w-5 h-5 text-[#e51f48] cursor-pointer" 
-                      onClick={() => handlePlay(track)}
-                    />
+                    <button onClick={() => handlePlay(track)} aria-label={`Pause ${track.title}`}>
+                      <Waveform playing className="h-5 w-5" />
+                    </button>
                   ) : (
                     <span 
                       className="cursor-pointer hover:text-[#e51f48] transition-colors"

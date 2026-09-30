@@ -28,6 +28,7 @@ import ShareModal from '@/components/ShareModal';
 import { useAuth } from '@/context/AuthContext';
 import { createMediaSlug, extractMediaIdFromSlug, formatDuration } from '@/lib/utils';
 import VerifiedBadge from '@/components/VerifiedBadge';
+import Waveform from '@/components/Waveform';
 
 interface Comment {
   id: number;
@@ -510,7 +511,7 @@ export default function TrackPage() {
                 >
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-600 text-white shadow-sm transition hover:bg-purple-500">
                     {currentTrack?.id === track.id && isPlaying ? (
-                      <FaPause size={28} />
+                      <Waveform playing className="h-7 w-7" />
                     ) : (
                       <FaPlay size={28} />
                     )}

@@ -5,6 +5,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 
 import Image from "next/image";
+import Waveform from '@/components/Waveform';
 
 interface ChartItem {
   id: number;
@@ -171,7 +172,7 @@ export default function TopChartsPage() {
                           className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500 flex-shrink-0"
                         >
                           {currentTrack?.id === track.id && isPlaying ? (
-                            <Pause className="w-5 h-5" />
+                            <Waveform playing className="h-5 w-5" />
                           ) : (
                             <Play className="w-5 h-5" />
                           )}

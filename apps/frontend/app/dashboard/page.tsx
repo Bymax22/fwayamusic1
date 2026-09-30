@@ -52,6 +52,7 @@ import {
 } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import RoleGuard from '@/components/RoleGuard';
+import Waveform from '@/components/Waveform';
 import { useAuth } from "../context/AuthContext";
 
 export interface User {
@@ -536,7 +537,7 @@ const UserDashboard: React.FC = () => {
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center rounded-lg transition-all">
                         {currentTrack?.id === track.id && isPlaying ? (
-                          <FaPause className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-3 h-3" />
+                          <Waveform playing className="h-3 w-3" />
                         ) : (
                           <FaPlay className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-3 h-3" />
                         )}
@@ -594,7 +595,7 @@ const UserDashboard: React.FC = () => {
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all">
                         {currentTrack?.id === track.id && isPlaying ? (
                           <button className="w-8 h-8 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
-                            <FaPause className="text-white w-3 h-3" />
+                            <Waveform playing className="h-3 w-3" />
                           </button>
                         ) : (
                           <button className="w-8 h-8 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">

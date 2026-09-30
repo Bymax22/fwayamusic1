@@ -24,6 +24,7 @@ import {
   FaStar
 } from 'react-icons/fa';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
+import Waveform from '@/components/Waveform';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import { formatDuration } from '@/lib/utils';
@@ -410,10 +411,10 @@ export default function ArtistPage() {
                     />
                     <button
                       onClick={() => handlePlaySong(song)}
-                      className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"
+                      className={`absolute inset-0 flex items-center justify-center bg-black/60 transition-opacity rounded-xl ${currentTrack?.id === song.id.toString() && isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                     >
                       {currentTrack?.id === song.id.toString() && isPlaying ? (
-                        <FaPause size={20} className="text-white" />
+                        <Waveform playing className="h-5 w-5" />
                       ) : (
                         <FaPlay size={20} className="text-white" />
                       )}

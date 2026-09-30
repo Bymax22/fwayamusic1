@@ -21,7 +21,7 @@ interface QueueItem {
 export default function QueuePage() {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [upNext, setUpNext] = useState<QueueItem[]>([]);
-  const { currentTrack, playTrack, togglePlay } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudioPlayer();
 
   useEffect(() => {
     // Mock queue data
@@ -217,7 +217,7 @@ export default function QueuePage() {
                       <p className="font-medium text-white truncate">
                         <span className="inline-flex items-center gap-2">
                           {currentTrack?.id === track.id ? (
-                            <Waveform playing={true} />
+                            <Waveform playing={isPlaying} />
                           ) : null}
                           <span>{track.title}</span>
                         </span>

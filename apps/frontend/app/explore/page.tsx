@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { Play, TrendingUp, Music, Mic2 } from 'lucide-react';
+import Waveform from '@/components/Waveform';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatAddedTime, formatDuration } from '@/lib/utils';
 import Image from "next/image";
@@ -177,11 +178,11 @@ export default function ExplorePage() {
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all">
                   <button 
                     onClick={() => handlePlay(file)}
-                    className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
+                    className={`transform transition-all ${currentTrack?.id === file.id && isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 group-hover:opacity-100 group-hover:translate-y-0'}`}
                   >
                     <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center shadow-lg">
                       {currentTrack?.id === file.id && isPlaying ? (
-                        <div className="w-5 h-5 bg-white rounded-sm"></div>
+                        <Waveform playing className="h-5 w-5" />
                       ) : (
                         <Play className="w-5 h-5 text-white" />
                       )}

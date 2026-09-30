@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Play, Heart, Plus, Download, Disc, ListMusic, History, Folder, Trash2, Edit2, MoreVertical } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import Waveform from '@/components/Waveform';
 import { formatDuration } from '@/lib/utils';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
@@ -74,7 +75,7 @@ export default function LibraryPage() {
   const [createDescription, setCreateDescription] = useState('');
   const [createCover, setCreateCover] = useState<File | null>(null);
   const [creating, setCreating] = useState(false);
-  const { currentTrack, togglePlay, playTrack } = useAudioPlayer();
+  const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
   const { getToken } = useAuth();
   const router = useRouter();
 
@@ -606,7 +607,11 @@ export default function LibraryPage() {
                         onClick={() => handlePlay(file)}
                         className="absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/25 transition hover:bg-purple-500"
                       >
-                        <Play className="w-5 h-5" />
+                        {String(currentTrack?.id) === String(file.id) && isPlaying ? (
+                          <Waveform playing className="h-5 w-5" />
+                        ) : (
+                          <Play className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
                     <div className="space-y-2">
@@ -664,7 +669,7 @@ export default function LibraryPage() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[#0a0a0d] rounded-2xl p-6 w-full max-w-md"
+              className="bg-black rounded-2xl p-6 w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-semibold text-white mb-6">Edit Playlist</h2>
@@ -676,7 +681,7 @@ export default function LibraryPage() {
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-4 py-2 bg-[#15121f] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 bg-[#262626] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="Enter playlist name"
                   />
                 </div>
@@ -686,7 +691,7 @@ export default function LibraryPage() {
                   <textarea
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
-                    className="w-full px-4 py-2 bg-[#15121f] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none h-24"
+                    className="w-full px-4 py-2 bg-[#262626] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none h-24"
                     placeholder="Enter playlist description"
                   />
                 </div>

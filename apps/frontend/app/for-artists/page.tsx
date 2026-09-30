@@ -19,6 +19,7 @@ import ShareModal from '@/components/ShareModal';
 import VideoPlayer from '@/components/VideoPlayer';
 import { createMediaSlug, MUSIC_GENRE_GROUPS } from '@/lib/utils';
 import { subscribe } from '@/lib/realtime';
+import Waveform from '@/components/Waveform';
 import CoverArtImage from '@/components/CoverArtImage';
 import AvatarImage from '@/components/AvatarImage';
 
@@ -1381,7 +1382,7 @@ export default function ForArtistsPage() {
                         title={currentTrack?.id === item.id && isPlaying ? 'Pause track' : 'Play track'}
                       >
                         {currentTrack?.id === item.id && isPlaying ? (
-                          <Pause className="w-4 h-4" />
+                          <Waveform playing className="h-4 w-4" />
                         ) : (
                           <Play className="w-4 h-4" />
                         )}

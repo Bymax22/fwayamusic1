@@ -68,12 +68,15 @@ interface Playlist {
       downloadCount: number;
       shareCount: number;
       tags: string[];
+      artist?: string | { name?: string; artistName?: string; displayName?: string };
       thumbnailUrl?: string;
       artCoverUrl?: string;
       user?: {
         id: number;
         username?: string;
         displayName?: string;
+        artistName?: string;
+        stageName?: string;
         avatarUrl?: string;
         isVerified?: boolean;
       };
@@ -89,6 +92,21 @@ interface Playlist {
     };
   }[];
 }
+
+const getTrackArtist = (media: Playlist['entries'][number]['media']) => {
+  const artist = media.artist;
+  if (typeof artist === 'string' && artist.trim()) return artist.trim();
+  if (artist && typeof artist === 'object') {
+    const artistName = artist.artistName || artist.name || artist.displayName;
+    if (artistName?.trim()) return artistName.trim();
+  }
+
+  return media.user?.artistName?.trim()
+    || media.user?.stageName?.trim()
+    || media.user?.displayName?.trim()
+    || media.user?.username
+    || 'Unknown Artist';
+};
 
 const PlaylistDetailPage = () => {
   const params = useParams();
@@ -199,7 +217,7 @@ const PlaylistDetailPage = () => {
         const track: Track = {
           id: media.id.toString(),
           title: media.title,
-          artist: (media as any).artist || media.user?.displayName || media.user?.username || 'Unknown Artist',
+          artist: getTrackArtist(media),
           imageUrl: media.coverArt || media.artCoverUrl || media.imageUrl || '/default-cover.png',
           audioUrl: media.audioUrl || media.url,
           duration: media.duration,
@@ -291,7 +309,7 @@ const PlaylistDetailPage = () => {
     if (navigator.share) {
       navigator.share({
         title: media.title,
-        text: `Check out ${media.title} by ${media.artist || media.user?.displayName || media.user?.username}`,
+        text: `Check out ${media.title} by ${getTrackArtist(media)}`,
         url: `${window.location.origin}/songs/${media.id}`,
       });
     } else {
@@ -360,7 +378,7 @@ const PlaylistDetailPage = () => {
     return (
       <div className="min-h-screen bg-[#151515] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e51f48] mx-auto mb-3"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a855f7] mx-auto mb-3"></div>
           <p className="text-white">Loading playlist...</p>
         </div>
       </div>
@@ -375,7 +393,7 @@ const PlaylistDetailPage = () => {
           <p className="text-gray-400 mb-6">{error}</p>
           <button
             onClick={() => router.back()}
-            className="bg-[#e51f48] text-white px-6 py-2 rounded-lg hover:bg-[#d1183a] transition-colors"
+            className="bg-[#a855f7] text-white px-6 py-2 rounded-lg hover:bg-[#9333ea] transition-colors"
           >
             Go Back
           </button>
@@ -395,7 +413,7 @@ const PlaylistDetailPage = () => {
         <div className="relative z-10 p-4 sm:p-6">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-white hover:text-[#e51f48] transition-colors mb-6"
+            className="flex items-center gap-2 text-white hover:text-[#a855f7] transition-colors mb-6"
           >
             <FaArrowLeft size={20} />
             Back
@@ -418,7 +436,7 @@ const PlaylistDetailPage = () => {
             {/* Playlist Info */}
             <div className="flex-1 text-white">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm font-medium px-2 py-1 bg-[#e51f48] rounded-full">
+                <span className="text-sm font-medium px-2 py-1 bg-[#a855f7] rounded-full">
                   {playlist.type}
                 </span>
                 {!playlist.isPublic && (
@@ -453,7 +471,7 @@ const PlaylistDetailPage = () => {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={handlePlayAll}
-                  className="bg-[#e51f48] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#d1183a] transition-colors flex items-center gap-2"
+                  className="bg-[#a855f7] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#9333ea] transition-colors flex items-center gap-2"
                 >
                   <FaPlay size={16} />
                   Play All
@@ -478,7 +496,7 @@ const PlaylistDetailPage = () => {
                 <button
                   onClick={handlePlaylistRepeatToggle}
                   className={`px-4 py-3 rounded-full transition-colors ${
-                    repeatMode !== 'off' ? 'bg-[#e51f48] text-white' : 'bg-[#222222] text-white hover:bg-[#2d2d2d]'
+                    repeatMode !== 'off' ? 'bg-[#a855f7] text-white' : 'bg-[#222222] text-white hover:bg-[#2d2d2d]'
                   }`}
                   title={repeatMode === 'repeat-all' ? 'Repeat all on' : repeatMode === 'repeat-one' ? 'Repeat one on' : 'Repeat all'}
                 >
@@ -529,11 +547,11 @@ const PlaylistDetailPage = () => {
                       {isCurrent && isPlaying ? (
                         <FaPause
                           size={16}
-                          className="text-[#e51f48] cursor-pointer"
+                          className="text-[#a855f7] cursor-pointer"
                           onClick={() => handlePlay({
                             id: track.id.toString(),
                             title: track.title,
-                            artist: (track as any).artist || track.user?.displayName || track.user?.username || "Unknown Artist",
+                            artist: getTrackArtist(track),
                             imageUrl: track.coverArt || track.artCoverUrl || track.imageUrl || "/default-cover.png",
                             audioUrl: track.audioUrl || track.url,
                             duration: track.duration,
@@ -545,11 +563,11 @@ const PlaylistDetailPage = () => {
                           <span className="text-gray-400 group-hover:hidden">{index + 1}</span>
                           <FaPlay
                             size={12}
-                            className="text-white hidden group-hover:block cursor-pointer hover:text-[#e51f48]"
+                            className="text-white hidden group-hover:block cursor-pointer hover:text-[#a855f7]"
                             onClick={() => handlePlay({
                               id: track.id.toString(),
                               title: track.title,
-                              artist: (track as any).artist || track.user?.displayName || track.user?.username || "Unknown Artist",
+                              artist: getTrackArtist(track),
                               imageUrl: track.coverArt || track.artCoverUrl || track.imageUrl || "/default-cover.png",
                               audioUrl: track.audioUrl || track.url,
                               duration: track.duration,
@@ -575,17 +593,17 @@ const PlaylistDetailPage = () => {
 
                     {/* Track Info */}
                     <div className="min-w-0 flex-1">
-                      <h3 className={`font-medium truncate ${isCurrent ? 'text-[#e51f48]' : 'text-white'}`}>
+                      <h3 className={`font-medium truncate ${isCurrent ? 'text-[#a855f7]' : 'text-white'}`}>
                         <span className="inline-flex items-center gap-2">
                           {isCurrent ? (
                             // show waveform when this is the playing track
-                            <Waveform playing={isCurrent && isPlaying} />
+                            <Waveform playing={isCurrent && isPlaying} accentColor="#a855f7" />
                           ) : null}
                           <span>{track.title}</span>
                         </span>
                       </h3>
                       <p className="text-sm text-gray-400 truncate">
-                        {(track as any).artist || track.user?.displayName || track.user?.username || "Unknown Artist"}
+                        {getTrackArtist(track)}
                       </p>
                     </div>
 

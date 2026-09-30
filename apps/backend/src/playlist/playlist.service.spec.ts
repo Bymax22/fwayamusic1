@@ -10,6 +10,7 @@ describe('PlaylistService privacy rules', () => {
       playlist: {
         findMany: jest.fn(),
         findUnique: jest.fn(),
+        findFirst: jest.fn(),
       },
     };
 
@@ -38,6 +39,27 @@ describe('PlaylistService privacy rules', () => {
       .mockResolvedValueOnce(null);
 
     await expect(service.findOne(7, 42)).resolves.toMatchObject({ id: 7, userId: 42 });
+    expect(prisma.playlist.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+      include: {
+        entries: {
+          include: {
+            media: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    username: true,
+                    displayName: true,
+                    artistName: true,
+                    stageName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    }));
     await expect(service.findOne(7, 99)).rejects.toThrow('Playlist not found or access denied');
   });
 });

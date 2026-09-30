@@ -18,6 +18,7 @@ import AuthErrorBanner from "../components/AuthErrorBanner";
 import { useAudioPlayer } from "../hooks/useAudioPlayer";
 import { isVideoTrack } from "@/lib/utils";
 import { ServiceWorkerProvider } from "../components/ServiceWorkerProvider";
+import { Toaster } from "react-hot-toast";
 import SubscriptionModal from "../components/modal/SubscriptionModal";
 import { MobileMoneyPaymentPreviewModal } from "../components/modal/MobileMoneyPaymentPreviewModal";
 import SubscriptionPromptModal from "../components/SubscriptionPromptModal";
@@ -79,6 +80,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
 
   return (
     <div className="w-full text-white bg-transparent lg:pt-14">
+      <Toaster position="top-center" containerStyle={{ top: 76 }} />
       <ChatwootWidget />
       <ServiceWorkerProvider />
       {/* Global auth error banner (shows verification and other auth errors) */}
