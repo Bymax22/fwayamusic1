@@ -53,6 +53,7 @@ import {
 import { useRouter } from "next/navigation";
 import RoleGuard from '@/components/RoleGuard';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { useAuth } from "../context/AuthContext";
 
 export interface User {
@@ -545,12 +546,12 @@ const UserDashboard: React.FC = () => {
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold truncate mobile-text-sm flex items-center gap-1">
+                      <ScrollingTrackTitle isPlaying={currentTrack?.id === track.id && isPlaying} className="font-semibold mobile-text-sm flex items-center gap-1">
                         {track.title}
                         {track.isExplicit && (
                           <span className="px-1 py-0.5 bg-gray-600 text-gray-300 rounded text-xs mobile-text-xs">E</span>
                         )}
-                      </h3>
+                      </ScrollingTrackTitle>
                       <p className="text-gray-400 truncate mobile-text-xs">{track.artist}</p>
                       <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5 mobile-text-xs">
                         <span>{formatDuration(track.duration)}</span>
@@ -606,7 +607,7 @@ const UserDashboard: React.FC = () => {
                     </div>
                     
                     <div className="p-3">
-                      <h3 className="font-semibold truncate mobile-text-sm mb-1">{track.title}</h3>
+                      <ScrollingTrackTitle isPlaying={currentTrack?.id === track.id && isPlaying} className="mb-1 font-semibold mobile-text-sm">{track.title}</ScrollingTrackTitle>
                       <p className="text-gray-400 truncate mobile-text-xs mb-2">{track.artist}</p>
                       <div className="flex justify-between items-center text-xs text-gray-500">
                         <div className="flex items-center gap-1">

@@ -5,6 +5,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatAddedTime, formatDuration } from '@/lib/utils';
 import Image from 'next/image';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 
 interface MediaFile {
   id: number;
@@ -262,7 +263,7 @@ export default function PopularPage() {
                         />
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-lg font-semibold text-white">{item.title}</p>
+                        <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(item.id) && isPlaying} className="text-lg font-semibold text-white">{item.title}</ScrollingTrackTitle>
                         <p className="truncate text-sm text-gray-400">{item.artist}</p>
                         <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-500">
                           <span>{item.genre}</span>

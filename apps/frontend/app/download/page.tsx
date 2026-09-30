@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Download, Music, Headphones, HardDrive, ArrowDown, Check, Crown, Clock, Sparkles, Play, Shield, Lock, Wifi, WifiOff } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { formatFileSize, formatDuration } from '@/lib/utils';
 import Image from "next/image";
@@ -599,7 +600,7 @@ const handleDownload = async (item: DownloadItem) => {
                   </div>
                   
                   <div className="p-3 sm:p-4">
-                    <h3 className="font-medium text-white truncate text-sm sm:text-base">{item.title}</h3>
+                    <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(item.id) && isPlaying} className="text-sm font-medium text-white sm:text-base">{item.title}</ScrollingTrackTitle>
                     <p className="text-xs sm:text-sm text-gray-400 truncate">{item.artist}</p>
                     
                     {/* DRM Status */}

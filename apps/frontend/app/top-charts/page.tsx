@@ -6,6 +6,7 @@ import { formatDuration } from '@/lib/utils';
 
 import Image from "next/image";
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 
 interface ChartItem {
   id: number;
@@ -156,7 +157,7 @@ export default function TopChartsPage() {
                             />
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate text-lg font-semibold text-white">{track.title}</p>
+                            <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className="text-lg font-semibold text-white">{track.title}</ScrollingTrackTitle>
                             <p className="truncate text-sm text-gray-400">{track.artist}</p>
                             <p className="text-xs text-gray-500 mt-1">{track.views.toLocaleString()} plays</p>
                           </div>

@@ -21,6 +21,7 @@ import {
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { useAuth } from '@/context/AuthContext';
 import { subscribe } from '@/lib/realtime';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
@@ -408,8 +409,19 @@ const PlaylistDetailPage = () => {
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#151515]">
       {/* Header */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#151515]/80" />
+      <div className="relative overflow-hidden bg-[#151515]">
+        <div className="absolute inset-x-0 top-0 h-[420px] md:hidden">
+          <Image
+            src={playlist.coverUrl || "/default-playlist.png"}
+            alt=""
+            fill
+            sizes="100vw"
+            priority
+            className="object-cover object-top"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-[#151515]/35 to-[#151515]" />
+        </div>
+        <div className="absolute inset-0 hidden bg-gradient-to-b from-transparent to-[#151515]/80 md:block" />
         <div className="relative z-10 p-4 sm:p-6">
           <button
             onClick={() => router.back()}
@@ -421,7 +433,7 @@ const PlaylistDetailPage = () => {
 
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-end">
             {/* Playlist Cover */}
-            <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-lg overflow-hidden shadow-2xl">
+            <div className="relative hidden h-64 w-64 overflow-hidden rounded-lg shadow-2xl md:block">
               <Image
                 src={playlist.coverUrl || "/default-playlist.png"}
                 alt={playlist.name}
@@ -593,7 +605,7 @@ const PlaylistDetailPage = () => {
 
                     {/* Track Info */}
                     <div className="min-w-0 flex-1">
-                      <h3 className={`font-medium truncate ${isCurrent ? 'text-[#a855f7]' : 'text-white'}`}>
+                      <ScrollingTrackTitle isPlaying={isCurrent && isPlaying} className={`font-medium ${isCurrent ? 'text-[#a855f7]' : 'text-white'}`}>
                         <span className="inline-flex items-center gap-2">
                           {isCurrent ? (
                             // show waveform when this is the playing track
@@ -601,7 +613,7 @@ const PlaylistDetailPage = () => {
                           ) : null}
                           <span>{track.title}</span>
                         </span>
-                      </h3>
+                      </ScrollingTrackTitle>
                       <p className="text-sm text-gray-400 truncate">
                         {getTrackArtist(track)}
                       </p>

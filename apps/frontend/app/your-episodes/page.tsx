@@ -6,6 +6,7 @@ import { History, Play, Heart, Download, Clock } from 'lucide-react';
 import Image from "next/image";
 import { motion } from 'framer-motion';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 
 interface MediaFile {
   id: number;
@@ -22,7 +23,7 @@ export default function YourEpisodesPage() {
   const { user } = useAuth();
   const [episodes, setEpisodes] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const { playTrack } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack } = useAudioPlayer();
 
   useEffect(() => {
     const fetchEpisodes = async () => {
@@ -99,7 +100,7 @@ export default function YourEpisodesPage() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-white truncate mb-1">{episode.title}</h3>
+                  <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(episode.id) && isPlaying} className="mb-1 font-semibold text-white">{episode.title}</ScrollingTrackTitle>
                   <p className="text-sm text-gray-400 truncate mb-2">{episode.artist}</p>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     <Clock className="w-3 h-3" />

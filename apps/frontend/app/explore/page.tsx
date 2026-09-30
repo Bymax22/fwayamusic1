@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Play, TrendingUp, Music, Mic2 } from 'lucide-react';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatAddedTime, formatDuration } from '@/lib/utils';
 import Image from "next/image";
@@ -194,7 +195,7 @@ export default function ExplorePage() {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-medium text-white truncate mb-1">{file.title}</h3>
+                <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="mb-1 font-medium text-white">{file.title}</ScrollingTrackTitle>
                 <p className="text-sm text-gray-400 truncate mb-2">{file.artist}</p>
                 <div className="flex justify-between items-center text-xs text-gray-500">
                   <span>{file.genre}</span>

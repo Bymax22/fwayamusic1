@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import SubscriptionModal from '@/components/modal/SubscriptionModal';
 
 interface MediaFile {
@@ -136,7 +137,7 @@ export default function PremiumPage() {
                     <div className="p-5">
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <div>
-                          <p className="text-lg font-semibold text-white truncate">{track.title}</p>
+                          <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className="text-lg font-semibold text-white">{track.title}</ScrollingTrackTitle>
                           <p className="text-sm text-gray-400 truncate">{track.artist}</p>
                         </div>
                         <button

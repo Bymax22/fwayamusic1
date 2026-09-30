@@ -5,6 +5,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from "next/image";
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import Protected from '@/components/Protected';
 import { useAuth } from '@/context/AuthContext';
 
@@ -255,11 +256,11 @@ export default function LikedSongsPage() {
                         }}
                       />
                       <div>
-                        <p className={`font-medium ${
+                        <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(song.id) && isPlaying} className={`font-medium ${
                           currentTrack?.id === song.id ? 'text-purple-400' : 'text-white'
                         }`}>
                           {song.title}
-                        </p>
+                        </ScrollingTrackTitle>
                         <p className="text-sm text-gray-400">{song.genre}</p>
                       </div>
                     </div>

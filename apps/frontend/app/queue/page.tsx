@@ -5,6 +5,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatDuration } from '@/lib/utils';
 import Image from "next/image";
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { subscribe } from '@/lib/realtime';
 
 interface QueueItem {
@@ -214,14 +215,14 @@ export default function QueuePage() {
                     />
                     
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white truncate">
+                      <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className="font-medium text-white">
                         <span className="inline-flex items-center gap-2">
                           {currentTrack?.id === track.id ? (
                             <Waveform playing={isPlaying} />
                           ) : null}
                           <span>{track.title}</span>
                         </span>
-                      </p>
+                      </ScrollingTrackTitle>
                       <p className="text-sm text-gray-400 truncate">{track.artist}</p>
                     </div>
                     

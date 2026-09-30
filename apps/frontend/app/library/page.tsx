@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Play, Heart, Plus, Download, Disc, ListMusic, History, Folder, Trash2, Edit2, MoreVertical } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { formatDuration } from '@/lib/utils';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
@@ -617,7 +618,7 @@ export default function LibraryPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <div>
-                          <h3 className="text-lg font-semibold text-white truncate">{file.title}</h3>
+                          <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="text-lg font-semibold text-white">{file.title}</ScrollingTrackTitle>
                           <p className="text-sm text-gray-400 truncate">{file.artist}</p>
                         </div>
                         <button className="rounded-full bg-[#15121f] px-3 py-2 text-sm text-white/90 transition hover:bg-purple-600/20">

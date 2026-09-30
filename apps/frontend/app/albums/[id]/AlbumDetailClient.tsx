@@ -3,9 +3,11 @@
 import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Play, Pause, Heart, Share2, Plus, ExternalLink } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Play, Pause, Heart, Share2, Plus, ExternalLink } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
 import { createMediaSlug, DEFAULT_AVATAR_URL, formatRelativeTime, resolveDateValue } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
@@ -15,6 +17,7 @@ interface AlbumDetailClientProps {
 }
 
 export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
+  const router = useRouter();
   const { setQueue, togglePlay, isPlaying, currentTrack } = useAudioPlayer();
   const { getToken } = useAuth();
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -121,6 +124,15 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
   return (
     <div className="min-h-screen w-full min-w-0 overflow-x-hidden px-2 py-6 text-white lg:px-0">
       <div className="mx-auto w-full max-w-7xl space-y-6 overflow-hidden">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-sm text-white transition hover:bg-white/10"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+
         <div className="grid min-w-0 gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
           <div className="w-full min-w-0 overflow-hidden rounded-3xl bg-[#151515] shadow-2xl shadow-black/30">
             <div className="relative mx-auto aspect-square w-full max-w-lg overflow-hidden bg-black sm:aspect-[4/5] lg:h-96 lg:max-w-none">
@@ -209,9 +221,9 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                   {album.media.map((track: any, idx: number) => {
                     const isCurrent = Boolean(currentTrack && String(currentTrack.id) === String(track.id));
                     return (
-                      <div key={track.id ?? idx} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-2 px-2 py-3 sm:flex sm:justify-between sm:gap-3">
-                        <div className="flex min-w-0 items-center gap-3">
-                          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-slate-900">
+                      <div key={track.id ?? idx} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 px-1.5 py-2 sm:flex sm:justify-between sm:gap-3 sm:px-2 sm:py-3">
+                        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-slate-900 sm:h-14 sm:w-14 sm:rounded-2xl">
                             {track.artCoverUrl || track.coverArt || track.thumbnailUrl || track.imageUrl ? (
                               <Image src={track.artCoverUrl || track.coverArt || track.thumbnailUrl || track.imageUrl} alt={track.title || ''} fill className="object-cover" />
                             ) : (
@@ -219,16 +231,16 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-white truncate">{track.title || `Track ${idx + 1}`}</p>
+                            <ScrollingTrackTitle isPlaying={isCurrent && isPlaying} className="text-sm font-semibold text-white">{track.title || `Track ${idx + 1}`}</ScrollingTrackTitle>
                             <p className="text-xs text-slate-400 truncate">{track.user?.displayName || track.user?.username || ''}</p>
                           </div>
                         </div>
 
                         <div className="col-span-2 flex min-w-0 justify-end gap-2 sm:col-auto sm:shrink-0 sm:gap-3">
-                          <div className="text-xs text-slate-400 text-right mr-2">
+                          <div className="mr-1 text-right text-[10px] leading-tight text-slate-400 sm:mr-2 sm:text-xs">
                             <div>{track.duration ? `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}` : '0:00'}</div>
-                            <div className="capitalize">{(track.type || 'audio').toString().toLowerCase()}</div>
-                            <div>{Number(track.plays ?? track.playCount ?? track.views ?? 0).toLocaleString()} plays</div>
+                            <div className="hidden capitalize sm:block">{(track.type || 'audio').toString().toLowerCase()}</div>
+                            <div className="hidden sm:block">{Number(track.plays ?? track.playCount ?? track.views ?? 0).toLocaleString()} plays</div>
                           </div>
 
                           <button
@@ -240,7 +252,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                               }
                               setQueue(releaseTracks(), idx, true);
                             }}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10 sm:h-9 sm:w-9"
                           >
                             {isCurrent && isPlaying ? <Waveform playing className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                           </button>
@@ -251,7 +263,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                             disabled={Boolean(trackLikeLoading[track.id])}
                             aria-label={trackLikes[track.id] ? 'Unlike track' : 'Like track'}
                             title={trackLikes[track.id] ? 'Unlike track' : 'Like track'}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10 disabled:cursor-wait disabled:opacity-50"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10 disabled:cursor-wait disabled:opacity-50 sm:h-9 sm:w-9"
                           >
                             <Heart className={`h-4 w-4 ${trackLikes[track.id] ? 'text-pink-400' : 'text-white'}`} />
                           </button>

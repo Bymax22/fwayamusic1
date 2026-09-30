@@ -20,6 +20,7 @@ import VideoPlayer from '@/components/VideoPlayer';
 import { createMediaSlug, MUSIC_GENRE_GROUPS } from '@/lib/utils';
 import { subscribe } from '@/lib/realtime';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import CoverArtImage from '@/components/CoverArtImage';
 import AvatarImage from '@/components/AvatarImage';
 
@@ -1330,7 +1331,7 @@ export default function ForArtistsPage() {
                     {/* Title, Type, Genre Info */}
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="truncate text-base font-semibold text-white">{item.title}</p>
+                        <ScrollingTrackTitle isPlaying={currentTrack?.id === item.id && isPlaying} className="text-base font-semibold text-white">{item.title}</ScrollingTrackTitle>
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs flex-shrink-0 ${
                           item.type === 'AUDIO' ? 'bg-blue-600/30 text-blue-400' :
                           item.type === 'VIDEO' ? 'bg-purple-600/30 text-purple-400' :

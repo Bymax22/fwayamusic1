@@ -5,6 +5,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatAddedTime, formatDuration, resolveDateValue } from '@/lib/utils';
 import Image from 'next/image';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 
 interface MediaFile {
   id: number;
@@ -205,7 +206,7 @@ export default function NewReleasesPage() {
                 </div>
                 
                 <div className="p-4">
-                  <h3 className="font-medium text-white truncate mb-1">{release.title}</h3>
+                  <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(release.id) && isPlaying} className="mb-1 font-medium text-white">{release.title}</ScrollingTrackTitle>
                   <p className="text-sm text-gray-400 truncate mb-2">{release.artist}</p>
                   <div className="flex justify-between items-center text-xs text-gray-500">
                     <span>{release.genre}</span>

@@ -4,6 +4,7 @@ import { Radio, Play, Heart, Download } from 'lucide-react';
 import Image from "next/image";
 import { motion } from 'framer-motion';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 
 interface MediaFile {
   id: number;
@@ -20,7 +21,7 @@ interface MediaFile {
 export default function RadioPage() {
   const [media, setMedia] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const { playTrack } = useAudioPlayer();
+  const { currentTrack, isPlaying, playTrack } = useAudioPlayer();
 
   useEffect(() => {
     const fetchRadioMedia = async () => {
@@ -82,7 +83,7 @@ export default function RadioPage() {
               </div>
 
               <div className="p-4">
-                <h3 className="font-semibold text-white truncate mb-1">{track.title}</h3>
+                <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className="mb-1 font-semibold text-white">{track.title}</ScrollingTrackTitle>
                 <p className="text-sm text-gray-400 truncate mb-3">{track.artist}</p>
                 
                 <div className="flex items-center justify-between text-xs text-gray-400 mb-3">

@@ -6,6 +6,7 @@ import { FaPlay, FaPause, FaShare, FaEnvelope, FaGlobe, FaArrowLeft, FaCrown, Fa
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import AvatarImage from '@/components/AvatarImage';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 
 export default function ProducerPage() {
   const params = useParams();
@@ -91,7 +92,7 @@ export default function ProducerPage() {
             {producer.media.map((m: any, idx: number) => (
               <div key={m.id || idx} className="bg-white/5 rounded-lg p-3">
                 <div className="aspect-[4/3] bg-black rounded-md" style={{backgroundImage: m.coverArt ? `url(${m.coverArt})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center'}} />
-                <p className="mt-2 text-sm font-medium truncate">{m.title}</p>
+                <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(m.id) && isPlaying} className="mt-2 text-sm font-medium">{m.title}</ScrollingTrackTitle>
               </div>
             ))}
           </div>

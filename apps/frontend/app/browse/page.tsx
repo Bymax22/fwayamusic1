@@ -10,6 +10,7 @@ import {
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import ShareModal from '@/components/ShareModal';
 import { createMediaSlug, formatAddedTime, formatDuration, formatFileSize, formatRelativeTime, resolveDateValue } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -1170,7 +1171,7 @@ export default function Browse() {
                     />
                     <div className="flex-1 min-w-0">
                       <Link href={`/track/${createMediaSlug(file.title, file.id)}`}>
-                        <p className={`font-medium flex items-center gap-2 cursor-pointer hover:text-green-400 transition-colors ${
+                        <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className={`font-medium flex items-center gap-2 cursor-pointer hover:text-green-400 transition-colors ${
                           String(currentTrack?.id) === String(file.id) 
                             ? 'text-[#a855f7]' 
                             : 'text-white'
@@ -1182,7 +1183,7 @@ export default function Browse() {
                           {file.isDRMProtected && (
                             <Lock className="w-3 h-3 text-gray-600" />
                           )}
-                        </p>
+                        </ScrollingTrackTitle>
                       </Link>
                       <div className="flex items-center gap-3 text-sm text-gray-400">
                         <span>{file.views} plays</span>
@@ -1369,7 +1370,7 @@ export default function Browse() {
 
                 <div className="p-4">
                   <Link href={`/track/${createMediaSlug(file.title, file.id)}`}>
-                    <h3 className="font-medium text-white truncate mb-1 hover:text-green-400 transition-colors cursor-pointer">{file.title}</h3>
+                    <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="mb-1 font-medium text-white hover:text-green-400 cursor-pointer">{file.title}</ScrollingTrackTitle>
                   </Link>
                   <div className="flex items-center gap-2 mb-2">
                     {file.user?.avatarUrl && (
@@ -1457,23 +1458,9 @@ export default function Browse() {
                   {/* Line 1: Title - Artist (with horizontal scroll animation when playing) */}
                   <Link href={`/track/${createMediaSlug(file.title, file.id)}`}>
                     <div className="overflow-hidden cursor-pointer hover:text-green-400 transition-colors">
-                      <p 
-                        className={`font-medium text-white text-sm whitespace-nowrap ${
-                          String(currentTrack?.id) === String(file.id) && isPlaying
-                            ? 'animate-scroll'
-                            : ''
-                        }`}
-                        style={
-                          String(currentTrack?.id) === String(file.id) && isPlaying
-                            ? {
-                                animation: 'scroll-left 8s linear infinite',
-                                paddingRight: '2rem'
-                              }
-                            : {}
-                        }
-                      >
+                      <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="text-sm font-medium text-white">
                         {file.title} <span className="text-gray-400">• {file.artist}</span>
-                      </p>
+                      </ScrollingTrackTitle>
                     </div>
                   </Link>
 

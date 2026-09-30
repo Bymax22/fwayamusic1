@@ -25,6 +25,7 @@ import {
 } from 'react-icons/fa';
 import PlaylistPickerModal from '@/components/PlaylistPickerModal';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
 import { formatDuration } from '@/lib/utils';
@@ -422,7 +423,7 @@ export default function ArtistPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-white truncate mb-1">{song.title}</h3>
+                    <ScrollingTrackTitle isPlaying={currentTrack?.id === song.id.toString() && isPlaying} className="mb-1 font-medium text-white">{song.title}</ScrollingTrackTitle>
                     <div className="flex items-center gap-4 text-sm text-gray-400">
                       <span>{formatDuration(song.duration)}</span>
                       <span className="flex items-center gap-1">

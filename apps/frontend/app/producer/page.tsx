@@ -20,6 +20,7 @@ import MobilePlayer from '@/components/MobilePlayer';
 import CoverArtImage from '@/components/CoverArtImage';
 import { formatAddedTime, MUSIC_GENRE_GROUPS } from '@/lib/utils';
 import Waveform from '@/components/Waveform';
+import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 
 // Types for Producer Dashboard
 interface Beat {
@@ -735,7 +736,7 @@ export default function ProducerPage() {
                         )}
                         <div className="p-4 space-y-3">
                           <div>
-                            <h4 className="text-white font-semibold truncate">{beat.title}</h4>
+                            <ScrollingTrackTitle isPlaying={currentTrack?.id === beat.id && isPlaying} className="font-semibold text-white">{beat.title}</ScrollingTrackTitle>
                             <p className="text-sm text-gray-400">{beat.genre}</p>
                             <p className="mt-1 text-xs text-gray-500">{formatAddedTime(beat)}</p>
                           </div>
