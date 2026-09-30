@@ -105,7 +105,11 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
                 <FaStar className="h-4 w-4" />
               </button>
             ) : (
-              <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
+              <button
+                type="button"
+                onClick={() => router.push('/get-app')}
+                className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15"
+              >
                 Get App
               </button>
             )}

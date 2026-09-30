@@ -871,7 +871,11 @@ export default function GuestWelcome() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <button className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15">
+                <button
+                  type="button"
+                  onClick={() => router.push('/get-app')}
+                  className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/15"
+                >
                   Get App
                 </button>
                 {!user && (
