@@ -141,6 +141,7 @@ export async function POST(request: NextRequest) {
       const tags = getField('tags');
       const releaseType = getField('releaseType');
       const addedAt = getField('addedAt');
+      const releaseDate = getField('releaseDate');
       const albumId = getField('albumId');
       const trackOrder = getField('trackOrder');
       const baseUrl = getBackendBaseUrl();
@@ -157,6 +158,7 @@ export async function POST(request: NextRequest) {
         genre: genre ? String(genre) : undefined,
         accessType: accessType ? String(accessType) : undefined,
         price: price ? Number(price) : undefined,
+        releaseDate: releaseDate ? String(releaseDate) : undefined,
         isExplicit: isJson ? Boolean(isExplicit) : String(isExplicit) === 'true',
         allowReselling: isJson ? Boolean(allowReselling) : String(allowReselling) === 'true',
         artistCommissionRate: artistCommissionRate ? Number(artistCommissionRate) : undefined,
