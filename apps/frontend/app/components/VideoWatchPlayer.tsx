@@ -10,6 +10,8 @@ import { getVideoQualityOptions, resolveVideoQualityUrl, type VideoQualityValue 
 interface VideoWatchPlayerProps {
   trackId?: string | number;
   videoUrl: string;
+  accessType?: "FREE" | "PREMIUM" | "PAY_PER_VIEW";
+  price?: number;
   poster?: string;
   title?: string;
   artist?: string;
@@ -27,6 +29,8 @@ const formatTime = (seconds: number) => {
 export default function VideoWatchPlayer({
   trackId,
   videoUrl,
+  accessType = "FREE",
+  price,
   poster,
   title = "Video",
   artist = "Unknown",
@@ -43,6 +47,7 @@ export default function VideoWatchPlayer({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<VideoQualityValue>("auto");
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [showQualityMenu, setShowQualityMenu] = useState(false);
   const [showQualityBadge, setShowQualityBadge] = useState(false);
   const [qualityRefreshKey, setQualityRefreshKey] = useState(0);
@@ -72,6 +77,8 @@ export default function VideoWatchPlayer({
       videoUrl,
       duration,
       type: "VIDEO",
+      accessType,
+      price,
     });
   };
 
@@ -191,21 +198,79 @@ export default function VideoWatchPlayer({
   }, [trackId]);
 
   useEffect(() => {
-    if (!videoRef.current) return;
+    let cancelled = false;
+    const video = videoRef.current;
+    if (!video) return;
 
-    const nextSrc = resolveVideoQualityUrl(videoUrl, selectedQuality);
-    if (videoRef.current.currentSrc && videoRef.current.currentSrc === nextSrc) {
-      return;
-    }
+    const loadVideo = async () => {
+      setPlaybackError(null);
+      let sourceUrl = videoUrl;
+      if (!videoUrl) return;
+      if (accessType !== "FREE" || videoUrl.includes("/authenticated/")) {
+        if (trackId == null) throw new Error("A media ID is required to authorize this video.");
+        const token = await getToken();
+        if (!token) {
+          if (accessType === "PAY_PER_VIEW") {
+            window.dispatchEvent(new CustomEvent("fwaya:open-pay-per-view", {
+              detail: { id: trackId, title, artist, videoUrl, type: "VIDEO", accessType, price },
+            }));
+          } else if (accessType === "PREMIUM") {
+            window.dispatchEvent(new CustomEvent("fwaya:open-subscription"));
+          }
+          throw new Error("Sign in to play this protected video.");
+        }
+        const response = await fetch(`/api/media/${trackId}/playback`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+          cache: "no-store",
+        });
+        const payload: unknown = await response.json().catch(() => null);
+        if (!response.ok) {
+          if (response.status === 403 && accessType === "PAY_PER_VIEW") {
+            window.dispatchEvent(new CustomEvent("fwaya:open-pay-per-view", {
+              detail: { id: trackId, title, artist, videoUrl, type: "VIDEO", accessType, price },
+            }));
+          } else if (response.status === 403 && accessType === "PREMIUM") {
+            window.dispatchEvent(new CustomEvent("fwaya:open-subscription"));
+          }
+          const message =
+            payload && typeof payload === "object" && "message" in payload &&
+            typeof payload.message === "string"
+              ? payload.message
+              : `Playback authorization failed (${response.status}).`;
+          throw new Error(message);
+        }
+        if (
+          !payload ||
+          typeof payload !== "object" ||
+          !("url" in payload) ||
+          typeof payload.url !== "string"
+        ) {
+          throw new Error("The playback service returned an invalid URL.");
+        }
+        sourceUrl = payload.url;
+      }
 
-    videoRef.current.src = nextSrc;
-    videoRef.current.load();
-    if (autoPlay) {
-      void videoRef.current.play().catch(() => {
-        setIsPlaying(false);
-      });
-    }
-  }, [selectedQuality, videoUrl, autoPlay, qualityRefreshKey]);
+      if (cancelled) return;
+      const nextSrc = resolveVideoQualityUrl(sourceUrl, selectedQuality);
+      if (video.currentSrc && video.currentSrc === nextSrc) return;
+      video.src = nextSrc;
+      video.load();
+      if (autoPlay) {
+        void video.play().catch(() => setIsPlaying(false));
+      }
+    };
+
+    void loadVideo().catch((error: unknown) => {
+      if (cancelled) return;
+      const message = error instanceof Error ? error.message : "Could not authorize video playback.";
+      setPlaybackError(message);
+      setIsPlaying(false);
+      console.error("VideoWatchPlayer: failed to load video", error);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedQuality, videoUrl, trackId, accessType, price, title, artist, autoPlay, qualityRefreshKey, getToken]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -373,7 +438,6 @@ export default function VideoWatchPlayer({
           )}
           <video
             ref={videoRef}
-            src={resolveVideoQualityUrl(videoUrl, selectedQuality)}
             poster={poster}
             className="h-full w-full object-contain bg-black"
             onClick={togglePlayPause}
@@ -382,6 +446,11 @@ export default function VideoWatchPlayer({
             preload="metadata"
             disablePictureInPicture
           />
+          {playbackError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-6 text-center text-sm text-red-200">
+              {playbackError}
+            </div>
+          )}
         </div>
 
         <div className={`absolute inset-x-0 bottom-0 px-4 pb-3 transition-all duration-200 ${showProgress ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>

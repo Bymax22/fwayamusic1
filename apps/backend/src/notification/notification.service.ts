@@ -6,7 +6,7 @@ import { EventsGateway } from '../events/events.gateway';
 @Injectable()
 export class NotificationService implements OnModuleInit {
   private readonly logger = new Logger(NotificationService.name);
-  private scheduler?: NodeJS.Timeout;
+  private scheduler?: ReturnType<typeof setInterval>;
 
   constructor(private prisma: PrismaService, private eventsGateway: EventsGateway) {}
 

@@ -1,24 +1,53 @@
 {
   "expo": {
-    "name": "Fwaya Mobile",
-    "slug": "fwaya-music-mobile",
+    "name": "Fwaya",
+    "slug": "fwaya",
     "version": "1.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "scheme": "fwaya",
     "orientation": "portrait",
-    "sdkVersion": "49.0.0",
-    "assetBundlePatterns": ["**/*"],
+    "icon": "./assets/icon.png",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      "./withKotlinJvmTarget",
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true,
+          "enableBackgroundRecording": false,
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ]
+    ],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "fwaya.app",
+      "supportsTablet": true,
+      "buildNumber": "1"
     },
     "android": {
+      "package": "fwaya.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
-      }
+        "backgroundColor": "#FFFFFF"
+      },
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "owner": "fwaya",
+    "extra": {
+      "eas": {
+        "projectId": "80863b0a-df19-4fc3-98b9-6c0c20e0560c"
+      }
     }
   }
 }

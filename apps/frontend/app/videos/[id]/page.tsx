@@ -31,6 +31,8 @@ interface VideoDetail {
   releaseDate: string;
   thumbnail: string;
   videoUrl: string;
+  accessType: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
+  price?: number;
   related: Array<{
     id: number;
     title: string;
@@ -228,6 +230,8 @@ export default function VideoWatchPage() {
           releaseDate: item.releaseDate || item.publishedAt || item.published_at || '',
           thumbnail: item.thumbnailUrl || item.artCoverUrl || item.coverArt || "/default-cover.jpg",
           videoUrl: item.videoUrl || item.url || item.audioUrl || "",
+          accessType: item.accessType || 'FREE',
+          price: item.price == null ? undefined : Number(item.price),
           related: (item.relatedVideos || item.related || []).map((relatedItem: any) => ({
             id: relatedItem.id,
             title: relatedItem.title || relatedItem.name || "Untitled",
@@ -455,6 +459,8 @@ export default function VideoWatchPage() {
                 <VideoWatchPlayer
                   trackId={video.id}
                   videoUrl={video.videoUrl}
+                  accessType={video.accessType}
+                  price={video.price}
                   poster={video.thumbnail}
                   title={video.title}
                   artist={video.artist}

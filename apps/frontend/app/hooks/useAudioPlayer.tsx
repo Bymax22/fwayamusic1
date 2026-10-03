@@ -56,7 +56,7 @@ interface GlobalPlayerContextType {
 const GlobalPlayerContext = createContext<GlobalPlayerContextType | null>(null);
 
 export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  const { user, getToken } = useAuth();
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [queue, setQueueState] = useState<Track[]>([]);
   const [queueIndex, setQueueIndex] = useState(-1);
@@ -71,6 +71,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playRequestIdRef = useRef(0);
   const [registeredVideoElement, setRegisteredVideoElement] = useState<HTMLVideoElement | null>(null);
 
   // Use strict file type detection from utils
@@ -376,12 +377,13 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const playTrack = (track: Track | Record<string, unknown>) => {
+  const playTrack = async (track: Track | Record<string, unknown>) => {
     if (typeof window === 'undefined') {
       console.error('GlobalPlayer: playTrack called on server side');
       return;
     }
 
+    const playRequestId = ++playRequestIdRef.current;
     const incoming = track as Partial<Track> & Record<string, unknown>;
     const newTrack = {
       id: incoming.id as string | number,
@@ -403,46 +405,90 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       window.dispatchEvent(new CustomEvent('fwaya:open-subscription'));
       return;
     }
-    if (newTrack.accessType === 'PAY_PER_VIEW') {
-      window.dispatchEvent(new CustomEvent('fwaya:open-pay-per-view', { detail: newTrack }));
-      return;
-    }
-
     // Use strict file type detection to select the right URL
     const mediaUrl = isVideoUrl(newTrack.videoUrl) || isVideoUrl(newTrack.audioUrl) 
       ? (newTrack.videoUrl || newTrack.audioUrl) 
       : newTrack.audioUrl;
-    if (!mediaUrl) {
+    if (!mediaUrl && newTrack.accessType === 'FREE') {
       console.error('GlobalPlayer: No media URL provided in track:', newTrack);
       return;
     }
 
-    setCurrentTrack(newTrack as Track);
     setIsLoading(true);
 
-    const media = getActiveMedia(newTrack as Track);
-    const src = applyAudioQualityToUrl(mediaUrl.trim());
+    try {
+      let authorizedUrl = mediaUrl;
+      if (newTrack.accessType !== 'FREE') {
+        const token = await getToken();
+        if (!token) {
+          if (newTrack.accessType === 'PAY_PER_VIEW') {
+            window.dispatchEvent(new CustomEvent('fwaya:open-pay-per-view', { detail: newTrack }));
+          }
+          setIsLoading(false);
+          return;
+        }
 
-    stopActiveMedia();
-    media.currentTime = 0;
-    media.src = src;
-    media.crossOrigin = 'anonymous';
-    media.preload = 'auto';
-    media.muted = isMuted;
-    media.volume = isMuted ? 0 : volume;
-    media.load();
+        const response = await fetch(`/api/media/${newTrack.id}/playback`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+          cache: 'no-store',
+        });
+        const payload: unknown = await response.json().catch(() => null);
+        if (!response.ok) {
+          if (response.status === 403 && newTrack.accessType === 'PAY_PER_VIEW') {
+            window.dispatchEvent(new CustomEvent('fwaya:open-pay-per-view', { detail: newTrack }));
+            setIsLoading(false);
+            return;
+          }
+          if (response.status === 403 && newTrack.accessType === 'PREMIUM') {
+            window.dispatchEvent(new CustomEvent('fwaya:open-subscription'));
+            setIsLoading(false);
+            return;
+          }
+          const message =
+            payload && typeof payload === 'object' && 'message' in payload &&
+            typeof payload.message === 'string'
+              ? payload.message
+              : `Playback authorization failed (${response.status}).`;
+          throw new Error(message);
+        }
+        if (
+          !payload ||
+          typeof payload !== 'object' ||
+          !('url' in payload) ||
+          typeof payload.url !== 'string'
+        ) {
+          throw new Error('The playback service returned an invalid URL.');
+        }
+        authorizedUrl = payload.url;
+      }
 
-    setCurrentTime(0);
-    setDuration(0);
+      if (!authorizedUrl) throw new Error('No media URL is available for this track.');
+      if (playRequestId !== playRequestIdRef.current) return;
 
-    media.play().then(() => {
+      const playableTrack = { ...newTrack, audioUrl: authorizedUrl } as Track;
+      setCurrentTrack(playableTrack);
+      const media = getActiveMedia(playableTrack);
+      const src = applyAudioQualityToUrl(authorizedUrl.trim());
+
+      stopActiveMedia();
+      media.currentTime = 0;
+      media.src = src;
+      media.crossOrigin = 'anonymous';
+      media.preload = 'auto';
+      media.muted = isMuted;
+      media.volume = isMuted ? 0 : volume;
+      media.load();
+
+      setCurrentTime(0);
+      setDuration(0);
+      await media.play();
       setIsPlaying(true);
       setIsLoading(false);
-    }).catch((err) => {
+    } catch (err) {
       console.error('GlobalPlayer: Play failed:', err);
       setIsPlaying(false);
       setIsLoading(false);
-    });
+    }
   };
 
   const seekTo = (time: number) => {

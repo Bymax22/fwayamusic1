@@ -84,6 +84,18 @@ export class MediaController {
     };
   }
 
+  @UseGuards(FirebaseAuthGuard)
+  @Post('upload-signature')
+  async createUploadSignature(
+    @CurrentUser() user: any,
+    @Body() body: { protectContent?: boolean },
+  ) {
+    if (typeof body?.protectContent !== 'boolean') {
+      throw new BadRequestException('protectContent must be a boolean');
+    }
+    return this.mediaService.createCloudinaryUploadSignature(user.id, body.protectContent);
+  }
+
   // Convert Prisma/BigInt values to JSON-safe values
   private sanitizeForJson(value: any): any {
     if (value === null || value === undefined) return value;
@@ -214,7 +226,7 @@ export class MediaController {
   @UseGuards(FirebaseAuthGuard)
   @Post('save-metadata')
   async saveMediaMetadata(
-    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate?: string; isExplicit?: boolean; isPremium?: boolean; coverUrl?: string; releaseType?: string },
+    @Body() metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; resourceVersion?: number; deliveryType?: string; description?: string; genre?: string; releaseDate?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; coverUrl?: string; releaseType?: string },
     @CurrentUser() user: any
   ) {
     try {
@@ -284,6 +296,16 @@ export class MediaController {
   async getMediaById(@Param('id') id: string) {
     const media = await this.mediaService.getMediaById(parseInt(id));
     return this.sanitizeForJson(media);
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Get(':id/playback')
+  async getPlaybackUrl(@Param('id') id: string, @CurrentUser() user: any) {
+    const mediaId = Number(id);
+    if (!Number.isInteger(mediaId) || mediaId <= 0) {
+      throw new BadRequestException('A valid media ID is required');
+    }
+    return this.mediaService.getPlaybackUrl(mediaId, user.id);
   }
 
   @UseGuards(FirebaseAuthGuard)

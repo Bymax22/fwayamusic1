@@ -84,4 +84,16 @@ export class AuthController {
     // FirebaseAuthGuard populates req.user
     return this.authService.findOrCreateUser(req.user);
   }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Get('mobile/me')
+  async getMobileCurrentUser(@Req() req: any) {
+    const user = req.user;
+    return {
+      id: user.id,
+      email: user.email,
+      isPremium: user.isPremium,
+      premiumUntil: user.premiumUntil,
+    };
+  }
 }

@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "ebc6b10b-3771-4e4d-ac80-6b7185fc582e"
+      }
+    },
+    "android": {
+      "package": "com.kwibisa12.fwayamusic"
+    }
+  }
+}

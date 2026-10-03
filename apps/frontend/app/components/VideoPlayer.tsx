@@ -3,10 +3,13 @@ import { useState, useRef, useEffect, type MouseEvent, type TouchEvent } from 'r
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Volume2, VolumeX, Maximize2, Play, Pause, Minimize2, Settings2 } from 'lucide-react';
 import { getVideoQualityOptions, resolveVideoQualityUrl, type VideoQualityValue } from '@/lib/video-quality';
+import { useAuth } from '@/context/AuthContext';
 
 interface VideoPlayerProps {
   isOpen: boolean;
   onClose: () => void;
+  trackId?: string | number;
+  accessType?: 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW';
   videoUrl: string;
   title?: string;
   artist?: string;
@@ -19,6 +22,8 @@ interface VideoPlayerProps {
 export default function VideoPlayer({
   isOpen,
   onClose,
+  trackId,
+  accessType = 'FREE',
   videoUrl,
   title = 'Video',
   artist = 'Unknown',
@@ -28,6 +33,9 @@ export default function VideoPlayer({
   onSelectVideo,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { getToken } = useAuth();
+  const [resolvedVideoUrl, setResolvedVideoUrl] = useState('');
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(duration || 0);
@@ -41,6 +49,56 @@ export default function VideoPlayer({
   const [showQualityMenu, setShowQualityMenu] = useState(false);
   const [qualityRefreshKey, setQualityRefreshKey] = useState(0);
   const controlsTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setResolvedVideoUrl('');
+    setPlaybackError(null);
+    if (!isOpen || !videoUrl) return;
+
+    const resolvePlaybackUrl = async () => {
+      if (accessType === 'FREE' && !videoUrl.includes('/authenticated/')) {
+        setResolvedVideoUrl(videoUrl);
+        return;
+      }
+      if (trackId == null) throw new Error('A media ID is required to authorize this video.');
+      const token = await getToken();
+      if (!token) throw new Error('Sign in to play this protected video.');
+      const response = await fetch(`/api/media/${trackId}/playback`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        cache: 'no-store',
+      });
+      const payload: unknown = await response.json().catch(() => null);
+      if (!response.ok) {
+        const message =
+          payload && typeof payload === 'object' && 'message' in payload &&
+          typeof payload.message === 'string'
+            ? payload.message
+            : `Playback authorization failed (${response.status}).`;
+        throw new Error(message);
+      }
+      if (
+        !payload ||
+        typeof payload !== 'object' ||
+        !('url' in payload) ||
+        typeof payload.url !== 'string'
+      ) {
+        throw new Error('The playback service returned an invalid URL.');
+      }
+      if (!cancelled) setResolvedVideoUrl(payload.url);
+    };
+
+    void resolvePlaybackUrl().catch((error: unknown) => {
+      if (cancelled) return;
+      const message = error instanceof Error ? error.message : 'Could not authorize video playback.';
+      setPlaybackError(message);
+      console.error('VideoPlayer: failed to authorize video playback', error);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, trackId, accessType, videoUrl, getToken]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -61,14 +119,16 @@ export default function VideoPlayer({
   }, []);
 
   useEffect(() => {
-    if (!isOpen) {
-      setIsPlaying(false);
-      setCurrentTime(0);
-      setVideoDuration(duration || 0);
-      setIsMinimized(false);
-      setShowControls(true);
-      setSelectedQuality('auto');
-      setShowQualityMenu(false);
+    if (!isOpen || !resolvedVideoUrl) {
+      if (!isOpen) {
+        setIsPlaying(false);
+        setCurrentTime(0);
+        setVideoDuration(duration || 0);
+        setIsMinimized(false);
+        setShowControls(true);
+        setSelectedQuality('auto');
+        setShowQualityMenu(false);
+      }
       return;
     }
 
@@ -94,7 +154,7 @@ export default function VideoPlayer({
     };
 
     void playVideo();
-  }, [isOpen, videoUrl, duration]);
+  }, [isOpen, resolvedVideoUrl, duration]);
 
   const togglePlayPause = async () => {
     if (!videoRef.current) return;
@@ -166,7 +226,7 @@ export default function VideoPlayer({
   useEffect(() => {
     if (!videoRef.current || !isOpen) return;
 
-    const nextSrc = resolveVideoQualityUrl(videoUrl, selectedQuality);
+    const nextSrc = resolveVideoQualityUrl(resolvedVideoUrl, selectedQuality);
     if (videoRef.current.currentSrc && videoRef.current.currentSrc === nextSrc) {
       return;
     }
@@ -176,7 +236,7 @@ export default function VideoPlayer({
     void videoRef.current.play().catch(() => {
       setIsPlaying(false);
     });
-  }, [isOpen, selectedQuality, videoUrl, qualityRefreshKey]);
+  }, [isOpen, selectedQuality, resolvedVideoUrl, qualityRefreshKey]);
 
   const toggleFullscreen = async () => {
     if (!videoRef.current) return;
@@ -273,7 +333,7 @@ export default function VideoPlayer({
             >
               <video
                 ref={videoRef}
-                src={resolveVideoQualityUrl(videoUrl, selectedQuality)}
+                src={resolvedVideoUrl ? resolveVideoQualityUrl(resolvedVideoUrl, selectedQuality) : undefined}
                 poster={coverUrl ?? undefined}
                 className={isMinimized && isMobile ? 'aspect-video w-full object-cover' : 'aspect-video w-full object-contain bg-black'}
                 onTouchEnd={handleMediaTap}
@@ -288,6 +348,11 @@ export default function VideoPlayer({
                 preload="metadata"
                 webkit-playsinline="true"
               />
+              {playbackError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-6 text-center text-sm text-red-200">
+                  {playbackError}
+                </div>
+              )}
 
               <div className={`absolute inset-0 pointer-events-none ${isMinimized && isMobile ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent' : 'bg-gradient-to-t from-black/90 via-black/20 to-transparent'}`} />
 
@@ -353,7 +418,7 @@ export default function VideoPlayer({
                           </button>
                           {showQualityMenu && (
                             <div className="absolute bottom-12 right-0 min-w-[120px] rounded-2xl border border-white/10 bg-black/90 p-2 text-sm shadow-xl">
-                              {getVideoQualityOptions(videoUrl).map((option) => (
+                              {getVideoQualityOptions(resolvedVideoUrl).map((option) => (
                                 <button
                                   key={option.value}
                                   onClick={() => {

@@ -1,7 +1,18 @@
-import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { Currency, NotificationType, PaymentProvider, SubscriptionPlan, SubscriptionStatus, UserRole } from '@prisma/client';
 import { NotificationService } from '../notification/notification.service';
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
 @Injectable()
 export class SubscriptionService {
@@ -39,6 +50,178 @@ export class SubscriptionService {
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  async syncRevenueCatEntitlement(userId: number) {
+    const apiKey = process.env.REVENUECAT_SECRET_API_KEY;
+    if (!apiKey) {
+      throw new ServiceUnavailableException('Mobile purchases are not configured on the server');
+    }
+
+    const entitlementId = process.env.REVENUECAT_PREMIUM_ENTITLEMENT || 'fwaya_premium';
+    let response: Response;
+    try {
+      response = await fetch(
+        `https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(String(userId))}`,
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            Accept: 'application/json',
+          },
+          signal: AbortSignal.timeout(10_000),
+        },
+      );
+    } catch (error) {
+      this.logger.error(
+        `RevenueCat entitlement lookup failed for user ${userId}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      throw new BadGatewayException('Could not verify the mobile purchase with RevenueCat');
+    }
+
+    if (!response.ok && response.status !== 404) {
+      this.logger.error(`RevenueCat entitlement lookup returned ${response.status} for user ${userId}`);
+      throw new BadGatewayException('Could not verify the mobile purchase with RevenueCat');
+    }
+
+    const payload: unknown = response.status === 404 ? null : await response.json().catch(() => null);
+    if (response.status !== 404 && (!isRecord(payload) || !isRecord(payload.subscriber))) {
+      throw new BadGatewayException('RevenueCat returned an invalid subscriber response');
+    }
+
+    const subscriber = isRecord(payload) ? payload.subscriber : null;
+    const entitlements =
+      isRecord(subscriber) && isRecord(subscriber.entitlements)
+        ? subscriber.entitlements
+        : null;
+    const entitlement = entitlements?.[entitlementId] ?? null;
+    const now = new Date();
+    const expirationValue =
+      entitlement && typeof entitlement === 'object' && 'expires_date' in entitlement
+        ? entitlement.expires_date
+        : null;
+    const entitlementExpiry = typeof expirationValue === 'string'
+      ? new Date(expirationValue)
+      : null;
+    if (entitlementExpiry && Number.isNaN(entitlementExpiry.getTime())) {
+      throw new BadGatewayException('RevenueCat returned an invalid entitlement expiration');
+    }
+    const revenueCatActive = Boolean(
+      entitlement && (!entitlementExpiry || entitlementExpiry > now),
+    );
+
+    const providerSubscriptionId = `revenuecat:${userId}:${entitlementId}`;
+    const existingRevenueCatSubscription = await this.prisma.subscription.findFirst({
+      where: { userId, providerSubscriptionId },
+      select: { id: true, startedAt: true },
+    });
+
+    if (revenueCatActive) {
+      const productValue =
+        entitlement && typeof entitlement === 'object' && 'product_identifier' in entitlement
+          ? entitlement.product_identifier
+          : null;
+      const productId = typeof productValue === 'string' ? productValue.toLowerCase() : '';
+      const plan = productId.includes('lifetime')
+        ? SubscriptionPlan.LIFETIME
+        : productId.includes('year') || productId.includes('annual')
+          ? SubscriptionPlan.YEARLY
+          : productId.includes('week')
+            ? SubscriptionPlan.WEEKLY
+            : productId.includes('day')
+              ? SubscriptionPlan.DAILY
+              : SubscriptionPlan.MONTHLY;
+      const expiry = entitlementExpiry || new Date('9999-12-31T23:59:59.999Z');
+      const purchaseValue =
+        entitlement && typeof entitlement === 'object' && 'purchase_date' in entitlement
+          ? entitlement.purchase_date
+          : null;
+      const purchaseDate =
+        typeof purchaseValue === 'string' ? new Date(purchaseValue) : now;
+      const startedAt = Number.isNaN(purchaseDate.getTime()) ? now : purchaseDate;
+      const metadata = {
+        source: 'revenuecat',
+        entitlementId,
+        productId,
+        verifiedAt: now.toISOString(),
+      };
+
+      if (existingRevenueCatSubscription) {
+        await this.prisma.subscription.update({
+          where: { id: existingRevenueCatSubscription.id },
+          data: {
+            plan,
+            status: SubscriptionStatus.ACTIVE,
+            currency: Currency.USD,
+            expiresAt: expiry,
+            metadata,
+          },
+        });
+      } else {
+        await this.prisma.subscription.create({
+          data: {
+            user: { connect: { id: userId } },
+            plan,
+            status: SubscriptionStatus.ACTIVE,
+            price: 0,
+            currency: Currency.USD,
+            provider: PaymentProvider.OTHER,
+            providerSubscriptionId,
+            autoRenew: false,
+            startedAt,
+            expiresAt: expiry,
+            metadata,
+          },
+        });
+      }
+    } else if (existingRevenueCatSubscription) {
+      await this.prisma.subscription.update({
+        where: { id: existingRevenueCatSubscription.id },
+        data: { status: SubscriptionStatus.EXPIRED, updatedAt: now },
+      });
+    }
+
+    const activeSubscriptions = await this.prisma.subscription.findMany({
+      where: {
+        userId,
+        status: SubscriptionStatus.ACTIVE,
+        expiresAt: { gt: now },
+      },
+      select: { expiresAt: true },
+    });
+    const subscriptionPremiumUntil = activeSubscriptions.reduce<Date | null>(
+      (latest, subscription) =>
+        !latest || subscription.expiresAt > latest ? subscription.expiresAt : latest,
+      null,
+    );
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { isPremium: true, premiumUntil: true },
+    });
+    const preservedManualPremiumUntil =
+      !revenueCatActive &&
+      !existingRevenueCatSubscription &&
+      existingUser?.isPremium &&
+      existingUser.premiumUntil &&
+      existingUser.premiumUntil > now
+        ? existingUser.premiumUntil
+        : null;
+    const premiumUntil =
+      subscriptionPremiumUntil &&
+      (!preservedManualPremiumUntil || subscriptionPremiumUntil > preservedManualPremiumUntil)
+        ? subscriptionPremiumUntil
+        : preservedManualPremiumUntil || subscriptionPremiumUntil;
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        isPremium: premiumUntil !== null,
+        premiumUntil,
+      },
+      select: { id: true, isPremium: true, premiumUntil: true },
+    });
+
+    return user;
   }
 
   async upgradeSubscription(

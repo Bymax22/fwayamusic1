@@ -1,7 +1,8 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, Logger, BadRequestException } from '@nestjs/common';
+import { ForbiddenException, HttpException, Injectable, InternalServerErrorException, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import { randomUUID } from 'crypto';
 import { MediaType, MediaAccessType, NotificationType, UserRole, ModerationStatus, ContentStatus } from '@prisma/client';
 import { NotificationService } from '../notification/notification.service';
 import { EventsGateway } from '../events/events.gateway';
@@ -26,6 +27,97 @@ export class MediaService {
     } catch (error) {
       this.logger.error('Failed to configure Cloudinary:', error);
     }
+  }
+
+  async createCloudinaryUploadSignature(userId: number, protectContent: boolean) {
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+    if (!cloudName || !apiKey || !apiSecret) {
+      throw new InternalServerErrorException('Cloudinary upload signing is not configured');
+    }
+
+    if (protectContent) {
+      const uploader = await this.prisma.user.findUnique({ where: { id: userId } });
+      const allowedRoles: UserRole[] = [UserRole.ARTIST, UserRole.PRODUCER];
+      if (
+        !uploader ||
+        !uploader.isPremium ||
+        !uploader.premiumUntil ||
+        uploader.premiumUntil < new Date() ||
+        !allowedRoles.includes(uploader.role)
+      ) {
+        throw new ForbiddenException('Only active premium artists and producers can upload premium content');
+      }
+    }
+
+    const timestamp = Math.floor(Date.now() / 1000);
+    const paramsToSign = {
+      folder: 'fwaya-media',
+      timestamp,
+      type: protectContent ? 'authenticated' : 'upload',
+    };
+
+    return {
+      apiKey,
+      cloudName,
+      folder: paramsToSign.folder,
+      timestamp,
+      type: paramsToSign.type,
+      signature: cloudinary.utils.api_sign_request(paramsToSign, apiSecret),
+    };
+  }
+
+  async getPlaybackUrl(mediaId: number, userId: number): Promise<{ url: string }> {
+    const media = await this.prisma.media.findUnique({ where: { id: mediaId } });
+    if (!media) throw new BadRequestException('Media not found');
+
+    if (media.userId !== userId && media.accessType === MediaAccessType.PREMIUM) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { isPremium: true, premiumUntil: true },
+      });
+      if (!user?.isPremium || !user.premiumUntil || user.premiumUntil <= new Date()) {
+        throw new ForbiddenException('An active Fwaya Premium subscription is required');
+      }
+    } else if (media.userId !== userId && media.accessType === MediaAccessType.PAY_PER_VIEW) {
+      const purchase = await this.prisma.transaction.findFirst({
+        where: { userId, mediaId, status: 'COMPLETED' },
+        select: { id: true },
+      });
+      if (!purchase) throw new ForbiddenException('Purchase this track to listen');
+    } else if (
+      media.accessType !== MediaAccessType.PREMIUM &&
+      media.accessType !== MediaAccessType.PAY_PER_VIEW
+    ) {
+      throw new BadRequestException('Playback URLs are only issued for protected tracks');
+    }
+
+    if (!media.cloudinaryPublicId) {
+      throw new InternalServerErrorException('Protected media is missing its Cloudinary asset ID');
+    }
+
+    const resourceType = this.getCloudinaryResourceType(media.url, media.type);
+    return {
+      url: cloudinary.url(media.cloudinaryPublicId, {
+        resource_type: resourceType,
+        type: 'authenticated',
+        secure: true,
+        sign_url: true,
+        ...(media.format ? { format: media.format } : {}),
+      }),
+    };
+  }
+
+  private getCloudinaryResourceType(url: string, mediaType?: MediaType): 'image' | 'video' | 'raw' {
+    const match = url.match(/\/(image|video|raw)\/(?:upload|authenticated|private)\//);
+    if (match) return match[1] as 'image' | 'video' | 'raw';
+    return mediaType === MediaType.PODCAST ? 'raw' : 'video';
+  }
+
+  private getCloudinaryDeliveryType(url: string): 'upload' | 'authenticated' | 'private' {
+    const match = url.match(/\/(?:image|video|raw)\/(upload|authenticated|private)\//);
+    return match ? match[1] as 'upload' | 'authenticated' | 'private' : 'upload';
   }
 
   // Artist accepts a pricing arrangement for their media: create pricing snapshot and link it
@@ -277,12 +369,17 @@ export class MediaService {
   }
 
   // Check video content for inappropriate material using Cloudinary's moderation API
-  async checkVideoModeration(publicId: string): Promise<{ flagged: boolean; flags: string[] }> {
+  async checkVideoModeration(
+    publicId: string,
+    deliveryType: 'upload' | 'authenticated' = 'upload',
+  ): Promise<{ flagged: boolean; flags: string[] }> {
     try {
       this.logger.log(`Starting content moderation check for: ${publicId}`);
       
       // Use Cloudinary's moderation API to check the video
-      const response = await (cloudinary.api as any).call("get", `/resources/video/${publicId}`, {
+      const response = await cloudinary.api.resource(publicId, {
+        resource_type: 'video',
+        type: deliveryType,
         moderation_status: true,
         tags: true,
       });
@@ -347,6 +444,23 @@ export class MediaService {
         throw new Error('CLOUDINARY_CLOUD_NAME not configured');
       }
 
+      const accessType = String(createMediaDto.accessType || 'FREE').toUpperCase();
+      const protectContent =
+        accessType === MediaAccessType.PREMIUM || accessType === MediaAccessType.PAY_PER_VIEW;
+      if (protectContent) {
+        const uploader = await this.prisma.user.findUnique({ where: { id: userId } });
+        const allowedRoles: UserRole[] = [UserRole.ARTIST, UserRole.PRODUCER];
+        if (
+          !uploader ||
+          !uploader.isPremium ||
+          !uploader.premiumUntil ||
+          uploader.premiumUntil < new Date() ||
+          !allowedRoles.includes(uploader.role)
+        ) {
+          throw new ForbiddenException('Only active premium artists and producers can upload premium content');
+        }
+      }
+
       // 1. Upload to Cloudinary using base64 with timeout
       this.logger.log(`Starting Cloudinary base64 encoding...`);
       const startTime = Date.now();
@@ -360,6 +474,7 @@ export class MediaService {
         {
           folder: 'fwaya-media',
           resource_type: 'auto',
+          type: protectContent ? 'authenticated' : 'upload',
           public_id: file.originalname.replace(/\.[^/.]+$/, ""),
           quality: 'auto',
         }
@@ -381,7 +496,10 @@ export class MediaService {
       let videoModerationFlags: string[] = [];
       const isVideo = uploadResult.resource_type === 'video';
       if (isVideo) {
-        const moderationResult = await this.checkVideoModeration(uploadResult.public_id);
+        const moderationResult = await this.checkVideoModeration(
+          uploadResult.public_id,
+          uploadResult.type === 'authenticated' ? 'authenticated' : 'upload',
+        );
         videoModerationFlags = moderationResult.flags;
         if (moderationResult.flagged) {
           this.logger.warn(`Video ${uploadResult.public_id} flagged for moderation: ${videoModerationFlags.join(', ')}`);
@@ -402,19 +520,20 @@ export class MediaService {
         }
       }
 
-      if (createMediaDto.accessType === 'PREMIUM') {
-        const uploader = await this.prisma.user.findUnique({ where: { id: userId } });
-        const allowedRoles: UserRole[] = [UserRole.ARTIST, UserRole.PRODUCER];
-        if (!uploader || !uploader.isPremium || !uploader.premiumUntil || uploader.premiumUntil < new Date() || !allowedRoles.includes(uploader.role)) {
-          throw new ForbiddenException('Only active premium artists and producers can upload premium content');
-        }
-      }
-
       const normalizedType = this.normalizeMediaType(createMediaDto.type || this.determineMediaType(uploadResult.resource_type));
       const normalizedReleaseTags = this.buildReleaseTags(createMediaDto.releaseType, tags);
+      const mediaUrl = protectContent
+        ? cloudinary.url(uploadResult.public_id, {
+            resource_type: uploadResult.resource_type,
+            type: 'authenticated',
+            secure: true,
+            version: uploadResult.version,
+            ...(uploadResult.format ? { format: uploadResult.format } : {}),
+          })
+        : uploadResult.secure_url;
 
       const mediaData = {
-        url: uploadResult.secure_url,
+        url: mediaUrl,
         cloudinaryPublicId: uploadResult.public_id,
         title: createMediaDto.title || file.originalname.replace(/\.[^/.]+$/, ""),
         description: createMediaDto.description || null,
@@ -533,11 +652,12 @@ export class MediaService {
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Media creation failed: ${errorMsg}`, error);
+      if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(`Failed to create media: ${errorMsg}`);
     }
   }
 
-  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; description?: string; genre?: string; releaseDate: string; addedAt?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number; trackOrder?: number; priceTierId?: number }) {
+  async createMediaFromMetadata(userId: number, metadata: { title: string; type: string; url: string; cloudinaryPublicId: string; duration: number; format: string; resourceType: string; resourceVersion?: number; deliveryType?: string; description?: string; genre?: string; releaseDate: string; addedAt?: string; isExplicit?: boolean; isPremium?: boolean; accessType?: string; price?: number; allowReselling?: boolean; artistCommissionRate?: number; platformCommissionRate?: number; tags?: string[] | string; coverUrl?: string; thumbnailUrl?: string; releaseType?: string; albumId?: number; trackOrder?: number; priceTierId?: number }) {
     try {
       this.logger.log(`Creating media from metadata for user ${userId}, title: ${metadata.title}`);
 
@@ -545,6 +665,8 @@ export class MediaService {
       const normalizedAccessType = metadata.accessType?.toUpperCase() === 'PREMIUM' || metadata.accessType?.toUpperCase() === 'PAY_PER_VIEW'
         ? metadata.accessType.toUpperCase()
         : (metadata.isPremium ? 'PREMIUM' : 'FREE');
+      const normalizedType = this.normalizeMediaType(metadata.type);
+      const isProtected = normalizedAccessType !== 'FREE';
 
       if (metadata.isPremium || normalizedAccessType === 'PREMIUM' || normalizedAccessType === 'PAY_PER_VIEW') {
         const uploader = await this.prisma.user.findUnique({ where: { id: userId } });
@@ -552,6 +674,10 @@ export class MediaService {
         if (!uploader || !uploader.isPremium || !uploader.premiumUntil || uploader.premiumUntil < new Date() || !allowedRoles.includes(uploader.role)) {
           throw new ForbiddenException('Only active premium artists and producers can upload premium content');
         }
+      }
+
+      if (isProtected && !metadata.cloudinaryPublicId) {
+        throw new BadRequestException('Protected media requires a Cloudinary asset ID');
       }
 
       let tags: string[] = [];
@@ -564,7 +690,6 @@ export class MediaService {
         }
       }
 
-      const normalizedType = this.normalizeMediaType(metadata.type);
       const normalizedReleaseTags = this.buildReleaseTags(metadata.releaseType || metadata.type, tags);
       const releaseDateValue = this.resolveReleaseDate(metadata.releaseDate);
       const albumId = metadata.albumId ? Number(metadata.albumId) : undefined;
@@ -581,20 +706,71 @@ export class MediaService {
         albumCoverUrl = album.coverUrl || undefined;
       }
 
+      let cloudinaryPublicId = metadata.cloudinaryPublicId;
+      let cloudinaryVersion = metadata.resourceVersion;
+      const targetDeliveryType = normalizedAccessType === 'FREE' ? 'upload' : 'authenticated';
+      const currentDeliveryType = metadata.deliveryType || 'upload';
+      if (currentDeliveryType !== 'upload' && currentDeliveryType !== 'authenticated') {
+        throw new BadRequestException('Unsupported Cloudinary media delivery type');
+      }
+      if (isProtected) {
+        try {
+          await cloudinary.api.resource(metadata.cloudinaryPublicId, {
+            resource_type: metadata.resourceType,
+            type: currentDeliveryType,
+          });
+        } catch (error) {
+          if (
+            error &&
+            typeof error === 'object' &&
+            'http_code' in error &&
+            error.http_code === 404
+          ) {
+            throw new BadRequestException('Cloudinary asset does not exist with the declared delivery type');
+          }
+          throw error;
+        }
+      }
+      if (metadata.cloudinaryPublicId && currentDeliveryType !== targetDeliveryType) {
+        const renamed = await cloudinary.uploader.rename(
+          metadata.cloudinaryPublicId,
+          `fwaya-protected/${userId}-${randomUUID()}`,
+          {
+            resource_type: metadata.resourceType,
+            type: currentDeliveryType,
+            to_type: targetDeliveryType,
+            invalidate: true,
+          }
+        );
+        cloudinaryPublicId = renamed.public_id;
+        cloudinaryVersion = renamed.version;
+      }
+
       // Check video moderation if this is a video
       let videoModerationFlags: string[] = [];
       const isVideo = metadata.resourceType === 'video' || normalizedType === MediaType.VIDEO;
       if (isVideo && metadata.cloudinaryPublicId) {
-        const moderationResult = await this.checkVideoModeration(metadata.cloudinaryPublicId);
+        const moderationResult = await this.checkVideoModeration(
+          cloudinaryPublicId,
+          targetDeliveryType,
+        );
         videoModerationFlags = moderationResult.flags;
         if (moderationResult.flagged) {
-          this.logger.warn(`Video ${metadata.cloudinaryPublicId} flagged for moderation: ${videoModerationFlags.join(', ')}`);
+          this.logger.warn(`Video ${cloudinaryPublicId} flagged for moderation: ${videoModerationFlags.join(', ')}`);
         }
       }
 
       const mediaData = {
-        url: metadata.url,
-        cloudinaryPublicId: metadata.cloudinaryPublicId,
+        url: targetDeliveryType === 'authenticated' && cloudinaryPublicId
+          ? cloudinary.url(cloudinaryPublicId, {
+              resource_type: metadata.resourceType,
+              type: 'authenticated',
+              secure: true,
+              ...(cloudinaryVersion ? { version: cloudinaryVersion } : {}),
+              ...(metadata.format ? { format: metadata.format } : {}),
+            })
+          : metadata.url,
+        cloudinaryPublicId,
         title: metadata.title,
         description: metadata.description || null,
         format: metadata.format,
@@ -689,6 +865,7 @@ export class MediaService {
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Media metadata creation failed: ${errorMsg}`, error);
+      if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(`Failed to create media from metadata: ${errorMsg}`);
     }
   }
@@ -855,7 +1032,10 @@ export class MediaService {
 
     try {
       if (media.cloudinaryPublicId) {
-        await cloudinary.uploader.destroy(media.cloudinaryPublicId);
+        await cloudinary.uploader.destroy(media.cloudinaryPublicId, {
+          resource_type: this.getCloudinaryResourceType(media.url, media.type),
+          type: this.getCloudinaryDeliveryType(media.url),
+        });
       }
       return await this.prisma.media.delete({ where: { id: mediaId } });
     } catch (error) {

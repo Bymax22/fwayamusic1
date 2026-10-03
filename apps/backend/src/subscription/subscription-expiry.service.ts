@@ -4,7 +4,7 @@ import { SubscriptionService } from './subscription.service';
 @Injectable()
 export class SubscriptionExpiryService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(SubscriptionExpiryService.name);
-  private intervalId?: NodeJS.Timeout;
+  private intervalId?: ReturnType<typeof setInterval>;
 
   constructor(private subscriptionService: SubscriptionService) {}
 

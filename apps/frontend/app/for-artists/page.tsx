@@ -2252,6 +2252,8 @@ export default function ForArtistsPage() {
               <VideoPlayer
                 isOpen={!!selectedVideoForPlayer}
                 onClose={() => setSelectedVideoForPlayer(null)}
+                trackId={selectedVideoForPlayer?.id}
+                accessType={selectedVideoForPlayer?.accessType || 'FREE'}
                 videoUrl={selectedVideoForPlayer?.url || ''}
                 title={selectedVideoForPlayer?.title}
                 artist={user?.displayName || user?.email || 'Unknown'}
@@ -2282,7 +2284,6 @@ export default function ForArtistsPage() {
     </RoleGuard>
   );
 }
-
 
 
 

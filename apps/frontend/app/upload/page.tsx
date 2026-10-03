@@ -188,15 +188,37 @@ export default function UploadPage() {
     const addedAt = new Date().toISOString();
 
     try {
-      // 1. Create FormData for Cloudinary upload (main media file)
+      const authToken = localStorage.getItem("access_token");
+      if (!authToken) {
+        throw new Error("Please sign in again before uploading media.");
+      }
+
+      // 1. Ask the backend to sign the upload type; the Cloudinary API secret stays server-side.
+      const signatureResponse = await fetch("/api/v1/media/upload-signature", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `******`,
+        },
+        body: JSON.stringify({ protectContent: metadata.isPremium }),
+      });
+      const signaturePayload = await signatureResponse.json();
+      if (!signatureResponse.ok) {
+        throw new Error(signaturePayload.message || "Could not prepare secure media upload.");
+      }
+
+      // 2. Upload the main file using the server-signed delivery type.
       const cloudinaryFormData = new FormData();
       cloudinaryFormData.append("file", file);
-      cloudinaryFormData.append("upload_preset", "bymaxdev1");
-      cloudinaryFormData.append("resource_type", metadata.type === "VIDEO" ? "video" : "auto");
+      cloudinaryFormData.append("api_key", signaturePayload.apiKey);
+      cloudinaryFormData.append("timestamp", String(signaturePayload.timestamp));
+      cloudinaryFormData.append("folder", signaturePayload.folder);
+      cloudinaryFormData.append("type", signaturePayload.type);
+      cloudinaryFormData.append("signature", signaturePayload.signature);
+      const cloudinaryResourceType = metadata.type === "VIDEO" ? "video" : "auto";
 
-      // 2. Upload main media to Cloudinary
       const cloudinaryResponse = await fetch(
-        "https://api.cloudinary.com/v1_1/dayn5vifn/upload",
+        `https://api.cloudinary.com/v1_1/${signaturePayload.cloudName}/${cloudinaryResourceType}/upload`,
         {
           method: "POST",
           body: cloudinaryFormData,
@@ -209,7 +231,7 @@ export default function UploadPage() {
 
       const cloudinaryData = await cloudinaryResponse.json();
 
-      // 3. Upload cover image if provided
+      // 3. Upload cover image if provided.
       let coverUrl: string | undefined = undefined;
       if (coverFile) {
         try {
@@ -221,7 +243,7 @@ export default function UploadPage() {
         }
       }
 
-      // 4. Save to backend
+      // 4. Save metadata and the verified Cloudinary asset identifiers.
       const backendResponse = await fetch(
         `/api/v1/media/save-metadata`,
         {
@@ -234,6 +256,8 @@ export default function UploadPage() {
             url: cloudinaryData.secure_url,
             cloudinaryPublicId: cloudinaryData.public_id,
             format: cloudinaryData.format,
+            resourceVersion: cloudinaryData.version,
+            deliveryType: cloudinaryData.type,
             duration: cloudinaryData.duration ? Math.round(Number(cloudinaryData.duration)) : null,
             resourceType: cloudinaryData.resource_type,
             title: metadata.title,
@@ -732,7 +756,6 @@ export default function UploadPage() {
     </div>
   );
 }
-
 
 
 
