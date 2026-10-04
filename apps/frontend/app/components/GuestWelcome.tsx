@@ -34,6 +34,7 @@ import { createMediaSlug, formatAddedTime, formatRelativeTime, resolveDateValue 
 import { subscribe } from '@/lib/realtime';
 import VerifiedBadge from "./VerifiedBadge";
 import FreeUserAdBanner from "./FreeUserAdBanner";
+import HeroBannerCarousel from "./HeroBannerCarousel";
 
 export default function GuestWelcome() {
   const [activeTab, setActiveTab] = useState<string>("for-you");
@@ -1231,49 +1232,13 @@ export default function GuestWelcome() {
 
             {renderHomepageSearch('mb-4')}
 
-        {/* HERO SECTION - Mobile-friendly hero banner */}
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => handleHeroSlideClick(activeHeroSlide)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              handleHeroSlideClick(activeHeroSlide);
-            }
-          }}
-          className="relative mb-3 overflow-hidden rounded-3xl bg-[#0d0f18] min-h-[140px] sm:min-h-[260px] cursor-pointer"
-        >
-          <motion.div
-            key={safeHeroIndex}
-            className="absolute inset-0"
-            initial={{ opacity: 0, scale: 1.03 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: 'easeInOut' }}
-          >
-            <Image
-              src={activeHeroSlide?.image || '/featured5.jpg'}
-              alt={activeHeroSlide?.title || 'Featured hero banner'}
-              fill
-              className="object-cover object-center"
-            />
-          </motion.div>
-
-          <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-3 py-3">
-            {heroSlides.map((_, idx) => (
-              <button
-                key={idx}
-                type="button"
-                aria-label={`Go to slide ${idx + 1}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setHeroImageIndex(idx);
-                }}
-                className={`h-2 w-2 rounded-full transition ${idx === heroImageIndex ? 'bg-white' : 'bg-white/30'}`}
-              />
-            ))}
-          </div>
-        </div>
+        <HeroBannerCarousel
+          slides={heroSlides}
+          activeIndex={safeHeroIndex}
+          onChange={setHeroImageIndex}
+          onActivate={handleHeroSlideClick}
+          className="mb-3 rounded-2xl sm:rounded-3xl"
+        />
 
         {/* Tabs */}
         <div className="flex gap-2 mt-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -2265,49 +2230,13 @@ export default function GuestWelcome() {
 
           {renderHomepageSearch('mb-6')}
 
-          {/* ===== HERO ===== */}
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => handleHeroSlideClick(activeHeroSlide)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                handleHeroSlideClick(activeHeroSlide);
-              }
-            }}
-            className="relative rounded-3xl mb-10 overflow-hidden h-80 cursor-pointer"
-          >
-            <motion.div
-              key={safeHeroIndex}
-              className="absolute inset-0"
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, ease: 'easeInOut' }}
-            >
-              <Image
-                src={activeHeroSlide?.image || '/featured5.jpg'}
-                alt={activeHeroSlide?.title || 'Featured hero banner'}
-                fill
-                className="object-cover"
-              />
-            </motion.div>
-
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/60 via-black/20 to-transparent px-4 py-4">
-              {heroSlides.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  aria-label={`Go to slide ${idx + 1}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setHeroImageIndex(idx);
-                  }}
-                  className={`h-2.5 w-2.5 rounded-full transition ${idx === heroImageIndex ? 'bg-white' : 'bg-white/40'}`}
-                />
-              ))}
-            </div>
-          </div>
+          <HeroBannerCarousel
+            slides={heroSlides}
+            activeIndex={safeHeroIndex}
+            onChange={setHeroImageIndex}
+            onActivate={handleHeroSlideClick}
+            className="mb-10 rounded-3xl"
+          />
 
           {/* ===== QUICK PICKS ===== */}
           <div className="mb-8">
