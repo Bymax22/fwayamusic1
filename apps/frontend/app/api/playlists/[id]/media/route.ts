@@ -6,15 +6,15 @@ function getBackendBaseUrl() {
 
 export async function POST(
   request: NextRequest,
-  context: any
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const baseUrl = getBackendBaseUrl();
-    const playlistId = context?.params?.id;
+    const { id: playlistId } = await context.params;
     const token = request.headers.get('Authorization');
 
-    if (!playlistId) {
-      return NextResponse.json({ error: 'Missing playlist id' }, { status: 400 });
+    if (!/^\d+$/.test(playlistId)) {
+      return NextResponse.json({ error: 'Invalid playlist id' }, { status: 400 });
     }
 
     const body = await request.json().catch(() => ({}));
@@ -51,15 +51,15 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  context: any
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const baseUrl = getBackendBaseUrl();
-    const playlistId = context?.params?.id;
+    const { id: playlistId } = await context.params;
     const token = request.headers.get('Authorization');
 
-    if (!playlistId) {
-      return NextResponse.json({ error: 'Missing playlist id' }, { status: 400 });
+    if (!/^\d+$/.test(playlistId)) {
+      return NextResponse.json({ error: 'Invalid playlist id' }, { status: 400 });
     }
 
     const body = await request.json().catch(() => ({}));

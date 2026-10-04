@@ -220,7 +220,6 @@ export default function MobilePlayer({
   const [comments, setComments] = useState<PlayerComment[]>([]);
   const [commentDraft, setCommentDraft] = useState('');
   const [commentSending, setCommentSending] = useState(false);
-  const lyricContainerRef = useRef<HTMLDivElement>(null);
   const { getToken } = useAuth();
   const isRepeatEnabled = repeatMode && repeatMode !== 'off';
   const isRepeatOne = repeatMode === 'repeat-one';
@@ -366,15 +365,6 @@ export default function MobilePlayer({
     void loadExpandedTrackData();
     return () => controller.abort();
   }, [isExpanded, track.id, track.lyrics]);
-
-  useEffect(() => {
-    if (isExpanded) {
-      lyricContainerRef.current?.querySelector<HTMLElement>('[data-active-lyric="true"]')?.scrollIntoView({
-        block: 'center',
-        behavior: 'smooth',
-      });
-    }
-  }, [activeLyricIndex, isExpanded]);
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const isVideo = isVideoUrl(track.videoUrl || track.url || track.audioUrl);
@@ -688,7 +678,7 @@ export default function MobilePlayer({
             onClick={() => setIsExpanded(false)}
           />
           <motion.section
-            className="fixed inset-x-0 bottom-16 z-[60] flex h-[58dvh] min-h-[360px] max-h-[620px] flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-[#090914] shadow-2xl"
+            className="fixed inset-x-0 bottom-16 z-[60] flex h-[58dvh] min-h-[360px] max-h-[620px] flex-col overflow-hidden rounded-t-3xl bg-[#9b5de5] shadow-2xl"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -702,9 +692,9 @@ export default function MobilePlayer({
                 alt=""
                 fill
                 sizes="100vw"
-                className="object-cover opacity-25 blur-2xl scale-110"
+                className="scale-110 object-cover opacity-50 blur-xl"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-[#080812]/90 to-[#080812]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#5b0ea6]/20 via-[#5b0ea6]/50 to-[#5b0ea6]/85" />
             </div>
 
             <div className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-3 pt-2 text-white">
@@ -800,16 +790,10 @@ export default function MobilePlayer({
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain pt-2">
                 <section>
                   <h2 className="mb-1 text-xs font-semibold uppercase tracking-widest text-purple-200">Lyrics</h2>
-                  <div ref={lyricContainerRef} className="max-h-24 overflow-y-auto rounded-xl bg-black/25 px-3 py-2">
-                    {lyricLines.map((line, index) => (
-                      <p
-                        key={`${line.time ?? 'plain'}-${index}`}
-                        data-active-lyric={index === activeLyricIndex}
-                        className={`py-0.5 text-sm leading-5 transition-colors ${index === activeLyricIndex ? 'font-semibold text-white' : 'text-white/45'}`}
-                      >
-                        {line.text}
-                      </p>
-                    ))}
+                  <div className="rounded-xl bg-[#5b0ea6] px-3 py-2">
+                    <p className="min-h-5 text-sm font-semibold leading-5 text-white" aria-live="polite">
+                      {lyricLines[activeLyricIndex]?.text || 'No lyrics are available for this track.'}
+                    </p>
                   </div>
                 </section>
 
@@ -854,14 +838,14 @@ export default function MobilePlayer({
                   {comments.length > 0 ? (
                     <div className="space-y-2">
                       {comments.map((comment) => (
-                        <article key={comment.id} className="rounded-xl bg-black/25 px-3 py-2">
+                        <article key={comment.id} className="rounded-xl bg-[#5b0ea6]/70 px-3 py-2">
                           <p className="text-[11px] font-semibold text-white/80">{comment.userName}</p>
                           <p className="text-xs leading-5 text-white/65">{comment.content}</p>
                         </article>
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-xl bg-black/25 px-3 py-2 text-xs text-white/50">No comments yet.</p>
+                    <p className="rounded-xl bg-[#5b0ea6]/70 px-3 py-2 text-xs text-white/70">No comments yet.</p>
                   )}
                   <Link href={`/track/${track.id}`} className="mt-2 inline-block text-xs font-semibold text-purple-200">
                     Open track discussion
@@ -873,12 +857,12 @@ export default function MobilePlayer({
                       maxLength={1000}
                       placeholder="Add a comment..."
                       aria-label="Add a comment"
-                      className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white placeholder:text-white/40 focus:border-purple-400 focus:outline-none"
+                      className="min-w-0 flex-1 rounded-xl bg-[#5b0ea6] px-3 py-2 text-xs text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
                     />
                     <button
                       type="submit"
                       disabled={commentSending || !commentDraft.trim()}
-                      className="rounded-xl bg-purple-600 px-3 text-xs font-semibold text-white disabled:opacity-50"
+                      className="rounded-xl bg-black px-3 text-xs font-semibold text-white disabled:opacity-50"
                     >
                       {commentSending ? 'Sending' : 'Post'}
                     </button>
