@@ -6,7 +6,7 @@ function getBackendBaseUrl() {
 
 export async function GET(
   request: Request,
-  context: { params: Promise<{ id: string }> | { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   const authorization = request.headers.get('authorization');
   if (!authorization) {
