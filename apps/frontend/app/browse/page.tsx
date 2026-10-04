@@ -19,6 +19,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MobileMoneyPaymentModal } from '../components/modal/MobileMoneyPaymentModal';
 import FreeUserAdBanner from '@/components/FreeUserAdBanner';
+import toast from 'react-hot-toast';
+import { savePrivateDownload } from '@/lib/privateDownloads';
 
 interface MediaFile {
   id: number;
@@ -160,11 +162,15 @@ export default function Browse() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
+  const [downloadDialog, setDownloadDialog] = useState<{
+    title: string;
+    progress: number;
+    status: 'downloading' | 'complete';
+  } | null>(null);
   const [showMobileMoneyModal, setShowMobileMoneyModal] = useState(false);
   const [selectedMediaForPayment, setSelectedMediaForPayment] = useState<MediaFile | null>(null);
-  const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
+  const { currentTrack, queue: playerQueue, isPlaying, togglePlay, playTrack, setQueue } = useAudioPlayer();
   const menuRef = useRef<HTMLDivElement>(null);
-  const [db, setDb] = useState<IDBDatabase | null>(null);
 
   useEffect(() => {
     // Set device ID if not exists
@@ -172,24 +178,6 @@ export default function Browse() {
       const deviceId = 'web-' + Math.random().toString(36).substring(2, 15);
       localStorage.setItem('deviceId', deviceId);
     }
-  }, []);
-
-  useEffect(() => {
-    const request = indexedDB.open("fwayaMusic", 2);
-    request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
-      const db = (e.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains("downloads")) {
-        db.createObjectStore("downloads");
-      }
-      if (!db.objectStoreNames.contains("downloadMetadata")) {
-        const store = db.createObjectStore("downloadMetadata", { keyPath: "id" });
-        store.createIndex("title", "title", { unique: false });
-        store.createIndex("artist", "artist", { unique: false });
-      }
-    };
-    request.onsuccess = (e: Event) => {
-      setDb((e.target as IDBOpenDBRequest).result);
-    };
   }, []);
 
   useEffect(() => {
@@ -405,84 +393,29 @@ export default function Browse() {
   };
 
   const handlePlay = async (file: MediaFile) => {
+    const selectedIndex = filteredFiles.findIndex((item) => item.id === file.id);
+    const nextQueue = filteredFiles.map((item) => ({
+      id: item.id,
+      title: item.title,
+      artist: item.artist,
+      imageUrl: item.coverArt,
+      audioUrl: item.url,
+      url: item.url,
+      duration: item.duration,
+      type: item.type,
+      accessType: item.accessType,
+      price: item.price,
+      currency: item.currency,
+      isDRMProtected: item.isDRMProtected,
+    }));
     if (String(currentTrack?.id) === String(file.id)) {
+      if (selectedIndex >= 0 && !playerQueue.some((track) => String(track.id) === String(file.id))) {
+        setQueue(nextQueue, selectedIndex, false);
+      }
       togglePlay();
     } else {
-      // Check for encrypted download first
-      if (db) {
-        const transaction = db.transaction(["downloads"], "readonly");
-        const store = transaction.objectStore("downloads");
-        const request = store.get(file.id);
-        request.onsuccess = async (e: Event) => {
-          if ((e.target as IDBRequest).result) {
-            const data = (e.target as IDBRequest).result;
-            const { encrypted, iv } = data;
-            const deviceId = localStorage.getItem('deviceId') || 'web-browser';
-            const key = await getKey(deviceId);
-            try {
-              const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, encrypted);
-              const decryptedBlob = new Blob([decrypted], { type: 'audio/mpeg' });
-              const url = URL.createObjectURL(decryptedBlob);
-              playTrack({
-                id: file.id,
-                title: file.title,
-                artist: file.artist,
-                audioUrl: url,
-                url: url,
-                coverArt: file.coverArt,
-                duration: file.duration,
-                isDRMProtected: file.isDRMProtected,
-                accessType: file.accessType,
-                price: file.price,
-                currency: file.currency
-              });
-            } catch (error) {
-              console.error('Decryption failed', error);
-              // Fallback to original URL
-              playTrack({
-                id: file.id,
-                title: file.title,
-                artist: file.artist,
-                audioUrl: file.url,
-                url: file.url,
-                coverArt: file.coverArt,
-                duration: file.duration,
-                isDRMProtected: file.isDRMProtected,
-                accessType: file.accessType,
-                price: file.price,
-                currency: file.currency
-              });
-            }
-          } else {
-            // No encrypted download, use original URL
-            playTrack({
-              id: file.id,
-              title: file.title,
-              artist: file.artist,
-              audioUrl: file.url,
-              url: file.url,
-              coverArt: file.coverArt,
-              duration: file.duration,
-              isDRMProtected: file.isDRMProtected,
-              accessType: file.accessType,
-              price: file.price,
-              currency: file.currency
-            });
-          }
-        };
-      } else {
-        // No IndexedDB, use original URL
-        playTrack({
-          id: file.id,
-          title: file.title,
-          artist: file.artist,
-          audioUrl: file.url,
-          url: file.url,
-          coverArt: file.coverArt,
-          duration: file.duration,
-          isDRMProtected: file.isDRMProtected
-        });
-      }
+      if (selectedIndex >= 0) setQueue(nextQueue, selectedIndex, true);
+      else playTrack(nextQueue[0]);
 
       // Track play interaction
       (async () => {
@@ -660,10 +593,18 @@ export default function Browse() {
     try {
       const token = await getToken();
       if (!token) {
-        alert('Please sign in to download this file.');
+        router.push('/auth/user/signup');
         return;
       }
+      if (!user?.id) {
+        router.push('/auth/user/signup');
+        return;
+      }
+      if (file.accessType !== 'FREE') {
+        throw new Error('Only free tracks can be downloaded from Browse.');
+      }
 
+      setDownloadDialog({ title: file.title, progress: 0, status: 'downloading' });
       const response = await fetch(`/api/media/${file.id}/interact/download`, {
         method: 'POST',
         credentials: 'include',
@@ -677,130 +618,63 @@ export default function Browse() {
       });
 
       if (!response.ok) throw new Error('Download failed');
-
       const downloadData = await response.json();
-      
-      // Update download count
-      setMediaFiles(mediaFiles.map(f => 
-        f.id === file.id ? { ...f, downloadCount: f.downloadCount + 1 } : f
-      ));
-
-      try {
-        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-          const bc = new BroadcastChannel('fwaya');
-          bc.postMessage({ type: 'media-downloaded', id: file.id });
-          bc.close();
-        } else {
-          localStorage.setItem('fwaya:message', JSON.stringify({ type: 'media-downloaded', id: file.id, t: Date.now() }));
-        }
-      } catch (_) {}
-
-      // Encrypt and download the file
-      const downloadResponse = await fetch(downloadData.downloadUrl);
-      const blob = await downloadResponse.blob();
-      const deviceId = localStorage.getItem('deviceId') || 'web-browser';
-      const key = await getKey(deviceId);
-      const arrayBuffer = await blob.arrayBuffer();
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, arrayBuffer);
-      const encryptedBlob = new Blob([encrypted]);
-
-      // Store decryption data in IndexedDB
-      if (db) {
-        const transaction = db.transaction(["downloads"], "readwrite");
-        const store = transaction.objectStore("downloads");
-        const data = { encrypted: new Uint8Array(encrypted), iv };
-        store.put(data, file.id);
-
-        // Also store metadata
-        if (!db.objectStoreNames.contains("downloadMetadata")) {
-          // Create the store if it doesn't exist
-          const version = db.version + 1;
-          db.close();
-          const upgradeRequest = indexedDB.open("fwayaMusic", version);
-          upgradeRequest.onupgradeneeded = (e: IDBVersionChangeEvent) => {
-            const db = (e.target as IDBOpenDBRequest).result;
-            if (!db.objectStoreNames.contains("downloadMetadata")) {
-              const store = db.createObjectStore("downloadMetadata", { keyPath: "id" });
-              store.createIndex("title", "title", { unique: false });
-              store.createIndex("artist", "artist", { unique: false });
-            }
-          };
-          upgradeRequest.onsuccess = (e: Event) => {
-            const newDb = (e.target as IDBOpenDBRequest).result;
-            const metaTransaction = newDb.transaction(["downloadMetadata"], "readwrite");
-            const metaStore = metaTransaction.objectStore("downloadMetadata");
-            const metadata = {
-              id: file.id,
+      const audioResponse = await fetch(downloadData.downloadUrl);
+      if (!audioResponse.ok) throw new Error('The audio file could not be downloaded.');
+      const contentLength = Number(audioResponse.headers.get('content-length')) || 0;
+      let audio: Blob;
+      if (audioResponse.body) {
+        const reader = audioResponse.body.getReader();
+        const chunks: ArrayBuffer[] = [];
+        let receivedLength = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = new Uint8Array(value.byteLength);
+          chunk.set(value);
+          chunks.push(chunk.buffer);
+          receivedLength += value.byteLength;
+          if (contentLength > 0) {
+            setDownloadDialog({
               title: file.title,
-              artist: file.artist,
-              coverArt: file.coverArt,
-              duration: file.duration,
-              fileSize: blob.size,
-              quality: 'HD',
-              downloadDate: new Date().toISOString(),
-              accessType: file.accessType,
-              isDRMProtected: file.isDRMProtected,
-              downloadStatus: 'completed'
-            };
-            metaStore.put(metadata);
-          };
-        } else {
-          const metaTransaction = db.transaction(["downloadMetadata"], "readwrite");
-          const metaStore = metaTransaction.objectStore("downloadMetadata");
-          const metadata = {
-            id: file.id,
-            title: file.title,
-            artist: file.artist,
-            coverArt: file.coverArt,
-            duration: file.duration,
-            fileSize: blob.size,
-            quality: 'HD',
-            downloadDate: new Date().toISOString(),
-            accessType: file.accessType,
-            isDRMProtected: file.isDRMProtected,
-            downloadStatus: 'completed'
-          };
-          metaStore.put(metadata);
+              progress: Math.min(99, Math.round((receivedLength / contentLength) * 100)),
+              status: 'downloading',
+            });
+          }
         }
+        audio = new Blob(chunks, { type: audioResponse.headers.get('content-type') || 'audio/mpeg' });
+      } else {
+        audio = await audioResponse.blob();
       }
+      await savePrivateDownload({
+        mediaId: String(file.id),
+        userId: user.id,
+        title: file.title,
+        artist: file.artist,
+        coverArt: file.coverArt,
+        duration: file.duration,
+        accessType: 'FREE',
+        expiresAt: null,
+        contentType: audio.type || 'audio/mpeg',
+      }, audio);
 
-      // Download the encrypted file (looks like normal audio but is encrypted)
-      const url = window.URL.createObjectURL(encryptedBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${file.title}.${file.format}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      setMediaFiles((existing) => existing.map((item) =>
+        item.id === file.id ? { ...item, downloadCount: item.downloadCount + 1 } : item
+      ));
+      setDownloadDialog({ title: file.title, progress: 100, status: 'complete' });
+      try {
+        const channel = new BroadcastChannel('fwaya');
+        channel.postMessage({ type: 'media-downloaded', id: file.id });
+        channel.close();
+      } catch (error) {
+        console.warn('Could not notify other Fwaya tabs about the download:', error);
+      }
 
     } catch (err) {
       console.error('Download error:', err);
-      setError({
-        message: 'Failed to download media',
-        details: err instanceof Error ? err.message : String(err)
-      });
+      setDownloadDialog(null);
+      alert(err instanceof Error ? err.message : 'The track could not be downloaded.');
     }
-  };
-
-  const getKey = async (deviceId: string) => {
-    const keyMaterial = await crypto.subtle.importKey(
-      "raw", 
-      new TextEncoder().encode(deviceId), 
-      "PBKDF2", 
-      false, 
-      ["deriveBits", "deriveKey"]
-    );
-    const salt = new Uint8Array(16);
-    salt.fill(0);
-    const key = await crypto.subtle.deriveKey({
-      name: "PBKDF2",
-      salt: salt,
-      iterations: 100000,
-      hash: "SHA-256"
-    }, keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
-    return key;
   };
 
 
@@ -857,9 +731,34 @@ export default function Browse() {
         throw new Error(details);
       }
 
+      const addedTrackTitle = selectedMedia?.title || 'Track';
       setShowAddToPlaylist(false);
       setSelectedMedia(null);
-      alert('Added to playlist successfully!');
+      toast.custom((toastItem) => (
+        <div role="status" className="flex items-center gap-3 rounded-xl bg-[#111] px-4 py-3 text-sm text-white shadow-xl ring-1 ring-purple-400/30">
+          <span>{addedTrackTitle} added to playlist.</span>
+          <button
+            type="button"
+            onClick={() => {
+              toast.dismiss(toastItem.id);
+              router.push(`/track/${mediaId}`);
+            }}
+            className="shrink-0 font-semibold text-purple-300 hover:text-purple-200"
+          >
+            View track
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              toast.dismiss(toastItem.id);
+              router.push(`/playlist/${playlistId}`);
+            }}
+            className="shrink-0 font-semibold text-purple-300 hover:text-purple-200"
+          >
+            View playlist
+          </button>
+        </div>
+      ), { duration: 7000 });
     } catch (err) {
       console.error('Playlist error:', err);
       setError({
@@ -1753,6 +1652,71 @@ export default function Browse() {
               </button>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {downloadDialog && (
+          <motion.div
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="download-dialog-title"
+              className="w-full max-w-sm rounded-2xl bg-[#111] p-5 text-white shadow-2xl ring-1 ring-purple-400/30"
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+            >
+              <h2 id="download-dialog-title" className="text-lg font-semibold">
+                {downloadDialog.status === 'complete' ? 'Saved to Fwaya Downloads' : 'Downloading track'}
+              </h2>
+              <p className="mt-1 truncate text-sm text-white/65">{downloadDialog.title}</p>
+              {downloadDialog.status === 'downloading' ? (
+                <div className="mt-4">
+                  <div className="h-2 overflow-hidden rounded-full bg-white/15">
+                    <div
+                      className={`h-full rounded-full bg-purple-400 transition-all ${downloadDialog.progress === 0 ? 'w-1/3 animate-pulse' : ''}`}
+                      style={downloadDialog.progress > 0 ? { width: `${downloadDialog.progress}%` } : undefined}
+                    />
+                  </div>
+                  <p className="mt-2 text-right text-xs text-white/60">
+                    {downloadDialog.progress > 0 ? `${downloadDialog.progress}%` : 'Saving privately…'}
+                  </p>
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-white/70">
+                  This track is stored privately in Fwaya, not in your device’s public Downloads folder.
+                </p>
+              )}
+              <div className="mt-5 flex justify-end gap-2">
+                {downloadDialog.status === 'complete' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDownloadDialog(null);
+                      router.push('/download');
+                    }}
+                    className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold hover:bg-purple-500"
+                  >
+                    View Downloads
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setDownloadDialog(null)}
+                  disabled={downloadDialog.status === 'downloading'}
+                  className="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/15 disabled:opacity-50"
+                >
+                  {downloadDialog.status === 'complete' ? 'Close' : 'Downloading'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 

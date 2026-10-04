@@ -81,7 +81,8 @@ async function responseError(response: Response, fallback: string): Promise<Erro
 export async function downloadTrackToPrivateStorage(
   track: DownloadableTrack,
   userId: number,
-  token: string
+  token: string,
+  onProgress?: (progress: number) => void
 ): Promise<PrivateDownload> {
   const mediaId = String(track.id);
   const normalizedAccess = (track.accessType || 'FREE').toUpperCase();
@@ -135,7 +136,28 @@ export async function downloadTrackToPrivateStorage(
   if (!audioResponse.ok) {
     throw await responseError(audioResponse, 'The media file could not be downloaded');
   }
-  const audio = await audioResponse.blob();
+  const contentLength = Number(audioResponse.headers.get('content-length')) || 0;
+  let audio: Blob;
+  if (audioResponse.body) {
+    const reader = audioResponse.body.getReader();
+    const chunks: ArrayBuffer[] = [];
+    let receivedLength = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = new Uint8Array(value.byteLength);
+      chunk.set(value);
+      chunks.push(chunk.buffer);
+      receivedLength += value.byteLength;
+      if (contentLength > 0) {
+        onProgress?.(Math.min(99, Math.round((receivedLength / contentLength) * 100)));
+      }
+    }
+    audio = new Blob(chunks, { type: audioResponse.headers.get('content-type') || 'audio/mpeg' });
+  } else {
+    audio = await audioResponse.blob();
+  }
+  onProgress?.(100);
   return savePrivateDownload(
     {
       mediaId,
@@ -225,7 +247,9 @@ export async function listPrivateDownloads(userId: number): Promise<PrivateDownl
     const records = await requestResult(
       transaction.objectStore(DOWNLOADS_STORE).getAll() as IDBRequest<PrivateDownload[]>
     );
-    return records.filter((record) => record.userId === userId);
+    return records
+      .filter((record) => record.userId === userId)
+      .sort((a, b) => Date.parse(b.downloadedAt) - Date.parse(a.downloadedAt));
   } finally {
     database.close();
   }

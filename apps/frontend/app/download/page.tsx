@@ -388,7 +388,7 @@ const handleDownload = async (item: DownloadItem) => {
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+        <div className="flex flex-col gap-3">
           {getFilteredDownloads().length > 0 ? (
             getFilteredDownloads().map(item => {
               const drmStatus = getDRMStatus(item);
@@ -396,15 +396,15 @@ const handleDownload = async (item: DownloadItem) => {
               return (
                 <div 
                   key={item.id} 
-                  className="bg-[#0a3747]/70 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all"
+                  className="flex overflow-hidden rounded-xl bg-[#0a3747]/70 shadow-sm transition-all hover:shadow-md"
                 >
-                  <div className="relative group">
+                  <div className="relative w-24 shrink-0 group sm:w-32">
                     <Image
                       src={item.coverArt} 
                       alt={item.title} 
                       width={200}
                       height={200}
-                      className="w-full h-40 sm:h-48 object-cover"
+                      className="h-full min-h-28 w-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/default-cover.jpg';
                       }}
@@ -469,7 +469,7 @@ const handleDownload = async (item: DownloadItem) => {
                     )}
                   </div>
                   
-                  <div className="p-3 sm:p-4">
+                  <div className="min-w-0 flex-1 p-3 sm:p-4">
                     <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(item.id) && isPlaying} className="text-sm font-medium text-white sm:text-base">{item.title}</ScrollingTrackTitle>
                     <p className="text-xs sm:text-sm text-gray-400 truncate">{item.artist}</p>
                     
@@ -493,6 +493,16 @@ const handleDownload = async (item: DownloadItem) => {
                       </div>
                       
                       <div className="flex gap-1 sm:gap-2 items-center">
+                        <button
+                          type="button"
+                          onClick={() => handlePlay(item)}
+                          disabled={item.isDRMProtected && !drmStatus}
+                          className="inline-flex items-center gap-1 rounded-md bg-purple-600 px-2 py-1 text-xs font-medium text-white hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+                          aria-label={`Play ${item.title}`}
+                        >
+                          <Play className="h-3 w-3" />
+                          Play
+                        </button>
                         {item.downloadStatus === 'completed' ? (
                           <>
                             <span className="text-xs text-purple-300 flex items-center gap-1">

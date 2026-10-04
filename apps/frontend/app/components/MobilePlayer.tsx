@@ -142,6 +142,7 @@ interface MobilePlayerProps {
   onVolumeChange?: (volume: number) => void;
   onToggleMute?: () => void;
   queue?: TrackType[];
+  queueIndex?: number;
   onSelectTrack?: (trackId: string | number) => void;
   className?: string;
 }
@@ -208,6 +209,7 @@ export default function MobilePlayer({
   onVolumeChange,
   onToggleMute,
   queue = [],
+  queueIndex = -1,
   onSelectTrack,
   className,
 }: MobilePlayerProps) {
@@ -223,6 +225,10 @@ export default function MobilePlayer({
   const { getToken } = useAuth();
   const isRepeatEnabled = repeatMode && repeatMode !== 'off';
   const isRepeatOne = repeatMode === 'repeat-one';
+  const upcomingTracks = useMemo(
+    () => queueIndex >= 0 ? queue.slice(queueIndex + 1) : queue.filter((queuedTrack) => String(queuedTrack.id) !== String(track.id)),
+    [queue, queueIndex, track.id],
+  );
   const lyricLines = useMemo(() => parseLyrics(lyrics), [lyrics]);
   const activeLyricIndex = useMemo(() => {
     const timedLines = lyricLines.filter((line) => line.time !== null);
@@ -678,7 +684,7 @@ export default function MobilePlayer({
             onClick={() => setIsExpanded(false)}
           />
           <motion.section
-            className="fixed inset-x-0 bottom-16 z-[60] flex h-[58dvh] min-h-[360px] max-h-[620px] flex-col overflow-hidden rounded-t-3xl bg-[#9b5de5] shadow-2xl"
+            className="fixed inset-x-0 bottom-16 z-[60] flex h-[58dvh] min-h-[360px] max-h-[620px] flex-col overflow-hidden rounded-t-3xl bg-black shadow-2xl"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -686,15 +692,17 @@ export default function MobilePlayer({
             aria-label="Expanded audio player"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-black">
               <Image
                 src={track.imageUrl || '/default-cover.jpg'}
                 alt=""
                 fill
                 sizes="100vw"
-                className="scale-110 object-cover opacity-50 blur-xl"
+                priority
+                className="scale-105 object-cover opacity-75"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#5b0ea6]/20 via-[#5b0ea6]/50 to-[#5b0ea6]/85" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/45 to-black/95" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#5b0ea6]/45 via-transparent to-transparent" />
             </div>
 
             <div className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-3 pt-2 text-white">
@@ -802,9 +810,9 @@ export default function MobilePlayer({
                     <QueueListIcon className="h-4 w-4" />
                     Up next
                   </div>
-                  {queue.length > 0 ? (
+                  {upcomingTracks.length > 0 ? (
                     <div className="flex gap-2 overflow-x-auto pb-1">
-                      {queue.map((queuedTrack) => (
+                      {upcomingTracks.map((queuedTrack) => (
                         <button
                           key={queuedTrack.id}
                           type="button"
