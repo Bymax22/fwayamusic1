@@ -27,6 +27,7 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import ShareModal from '@/components/ShareModal';
 import { useAuth } from '@/context/AuthContext';
 import { createMediaSlug, extractMediaIdFromSlug, formatDuration } from '@/lib/utils';
+import { downloadTrackToPrivateStorage } from '@/lib/privateDownloads';
 import VerifiedBadge from '@/components/VerifiedBadge';
 import Waveform from '@/components/Waveform';
 
@@ -95,6 +96,7 @@ export default function TrackPage() {
   const [showDetails, setShowDetails] = useState(true);
   const [relatedTracks, setRelatedTracks] = useState<MediaItem[]>([]);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [downloadBusy, setDownloadBusy] = useState(false);
 
   useEffect(() => {
     const fetchTrack = async () => {
@@ -280,48 +282,22 @@ export default function TrackPage() {
   };
 
   const handleDownload = async () => {
-    if (!track) return;
-
-    const hasActivePremium = Boolean(user?.isPremium && user.premiumUntil && new Date(user.premiumUntil) > new Date());
-    if (track.accessType === 'PAY_PER_VIEW') {
-      alert('This track must be purchased separately.');
-      return;
-    }
-    if (track.accessType === 'PREMIUM' && !hasActivePremium) {
-      alert('This track requires premium access to download.');
-      return;
-    }
-
+    if (!track || downloadBusy) return;
     const token = await getToken();
-    if (!token) {
-      alert('Please sign in to download tracks.');
+    if (!token || !user) {
+      window.location.assign('/auth/user/signup');
       return;
     }
 
+    setDownloadBusy(true);
     try {
-      const response = await fetch(`/api/media/${track.id}/interact/download`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ deviceId: 'web' }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Download request failed');
-      }
-
-      const downloadUrl = track.url;
-      const anchor = document.createElement('a');
-      anchor.href = downloadUrl;
-      anchor.download = `${track.title}.mp3`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
+      await downloadTrackToPrivateStorage(track, user.id, token);
+      alert('Track saved privately in Fwaya Downloads. It is not placed in the public Music or Downloads folder.');
     } catch (err) {
-      console.error('Failed to record download', err);
-      alert('Download failed. Please try again.');
+      console.error('Failed to save a private track download:', err);
+      alert(err instanceof Error ? err.message : 'Download failed. Please try again.');
+    } finally {
+      setDownloadBusy(false);
     }
   };
 
@@ -532,9 +508,11 @@ export default function TrackPage() {
                   </button>
                   <button
                     onClick={handleDownload}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+                    disabled={downloadBusy}
+                    aria-label={downloadBusy ? 'Saving download' : 'Download privately to Fwaya'}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition disabled:opacity-50"
                   >
-                    <FaDownload size={16} />
+                    {downloadBusy ? <span className="text-xs">…</span> : <FaDownload size={16} />}
                   </button>
                   <button
                     onClick={handleShare}

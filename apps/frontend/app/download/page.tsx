@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Download, Music, Headphones, HardDrive, ArrowDown, Check, Crown, Clock, Sparkles, Play, Shield, Lock, Wifi, WifiOff } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import Waveform from '@/components/Waveform';
@@ -7,8 +7,14 @@ import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { formatFileSize, formatDuration } from '@/lib/utils';
 import Image from "next/image";
-import Protected from '@/components/Protected';
 import { useAuth } from '@/context/AuthContext';
+import {
+  deletePrivateDownload,
+  downloadTrackToPrivateStorage,
+  listPrivateDownloads,
+  readPrivateDownload,
+  type PrivateDownload,
+} from '@/lib/privateDownloads';
 
 interface DownloadItem {
   id: string;
@@ -27,16 +33,7 @@ interface DownloadItem {
   deviceId?: string;
   expiresAt?: string;
   url?: string;
-}
-
-interface DeviceLicense {
-  id: number;
-  deviceId: string;
-  licenseKey: string;
-  mediaId: number;
-  expiresAt: string | null;
-  isActive: boolean;
-  restrictionLevel: 'NONE' | 'BASIC' | 'STRICT' | 'ENCRYPTED';
+  privateRecord?: PrivateDownload;
 }
 
 export default function DownloadPage() {
@@ -45,93 +42,85 @@ export default function DownloadPage() {
   const [freeDownloads, setFreeDownloads] = useState<DownloadItem[]>([]);
   const [premiumDownloads, setPremiumDownloads] = useState<DownloadItem[]>([]);
   const [activeTab, setActiveTab] = useState<'all' | 'downloaded' | 'suggested' | 'free' | 'premium'>('all');
-  const [storageUsage, setStorageUsage] = useState({ used: 0, total: 10000 });
+  const [storageUsage, setStorageUsage] = useState({ used: 0, total: 10 * 1024 * 1024 * 1024 });
   const [isOfflineMode, setIsOfflineMode] = useState(false);
-  const [deviceLicenses, setDeviceLicenses] = useState<DeviceLicense[]>([]);
-  const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
-  const [db, setDb] = useState<IDBDatabase | null>(null);
   const [downloadedFiles, setDownloadedFiles] = useState<DownloadItem[]>([]);
   const [showNetworkNotification, setShowNetworkNotification] = useState(false);
   const { currentTrack, isPlaying, playTrack } = useAudioPlayer();
-  const { getToken } = useAuth();
+  const { getToken, user } = useAuth();
   const { isOnline, connectionQuality } = useNetworkStatus();
+  const currentObjectUrl = useRef<string | null>(null);
+
+  useEffect(() => () => {
+    if (currentObjectUrl.current) URL.revokeObjectURL(currentObjectUrl.current);
+  }, []);
 
 useEffect(() => {
-  const generateDeviceId = () => {
-    let deviceId = localStorage.getItem('deviceId');
-    if (!deviceId) {
-      deviceId = `device-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem('deviceId', deviceId);
-    }
-    setCurrentDeviceId(deviceId);
-  };
+  let mounted = true;
 
-  // Initialize IndexedDB
-  const initDB = () => {
-    const request = indexedDB.open("fwayaMusic", 2);
-    request.onupgradeneeded = (e: IDBVersionChangeEvent) => {
-      const db = (e.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains("downloads")) {
-        db.createObjectStore("downloads");
-      }
-      if (!db.objectStoreNames.contains("downloadMetadata")) {
-        const store = db.createObjectStore("downloadMetadata", { keyPath: "id" });
-        store.createIndex("title", "title", { unique: false });
-        store.createIndex("artist", "artist", { unique: false });
-      }
-    };
-    request.onsuccess = (e: Event) => {
-      setDb((e.target as IDBOpenDBRequest).result);
-      loadDownloadedFiles((e.target as IDBOpenDBRequest).result);
-    };
-  };
-
-  const loadDownloadedFiles = (database: IDBDatabase) => {
-    const transaction = database.transaction(["downloadMetadata"], "readonly");
-    const store = transaction.objectStore("downloadMetadata");
-    const request = store.getAll();
-    request.onsuccess = () => {
-      const files = request.result as DownloadItem[];
-      setDownloadedFiles(files);
-    };
-  };
-
-  const fetchDownloadData = async () => {
+  const loadData = async () => {
     try {
       const token = await getToken();
-      if (!token) return;
-
-      const [downloadsRes, suggestionsRes, licensesRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/downloads`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/suggestions?type=downloadable`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/device-licenses`, { headers: { Authorization: `Bearer ${token}` } })
-      ]);
-
-      if (downloadsRes.ok) {
-        const d = await downloadsRes.json();
-        setDownloads(Array.isArray(d) ? d : (d.data ?? d));
+      if (user && token) {
+        const localItems = await listPrivateDownloads(user.id);
+        if (mounted) {
+          setDownloadedFiles(localItems.map((record) => ({
+            id: record.id,
+            title: record.title,
+            artist: record.artist,
+            coverArt: record.coverArt,
+            duration: record.duration,
+            fileSize: record.data.size,
+            quality: 'HD',
+            downloadDate: record.downloadedAt,
+            accessType: record.accessType,
+            downloadStatus: 'completed',
+            isDRMProtected: record.encrypted,
+            expiresAt: record.expiresAt ?? undefined,
+            privateRecord: record,
+          })));
       }
-      if (suggestionsRes.ok) {
-        const suggested = await suggestionsRes.json();
-        const s = Array.isArray(suggested) ? suggested : (suggested.data ?? suggested);
-        setSuggestions(s);
-        setFreeDownloads(s.filter((item: DownloadItem) => item.accessType === 'FREE'));
-        setPremiumDownloads(s.filter((item: DownloadItem) => item.accessType === 'PREMIUM'));
-      }
-      if (licensesRes.ok) {
-        const lic = await licensesRes.json();
-        setDeviceLicenses(Array.isArray(lic) ? lic : (lic.data ?? lic));
       }
 
+      const backend = process.env.NEXT_PUBLIC_API_URL || 'https://fwayamusic1-backend.vercel.app';
+      const suggestionsResponse = await fetch(`${backend}/api/v1/media/suggestions?type=downloadable`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (suggestionsResponse.ok) {
+        const suggested = await suggestionsResponse.json();
+        const items: DownloadItem[] = (Array.isArray(suggested) ? suggested : (suggested.data ?? []))
+          .filter((item: unknown): item is DownloadItem => Boolean(item && typeof item === 'object'))
+          .map((item: DownloadItem) => ({
+            ...item,
+            id: String(item.id),
+            title: item.title || 'Untitled track',
+            artist: item.artist || 'Fwaya artist',
+            coverArt: item.coverArt || (item as DownloadItem & { artCoverUrl?: string }).artCoverUrl || '/default-cover.jpg',
+            duration: Number(item.duration) || 0,
+            fileSize: Number(item.fileSize) || 0,
+            quality: item.quality || 'HD',
+            downloadDate: item.downloadDate || '',
+            accessType: item.accessType || 'FREE',
+            downloadStatus: 'pending',
+            isDRMProtected: item.accessType !== 'FREE',
+            url: item.url || (item as DownloadItem & { audioUrl?: string }).audioUrl,
+          }));
+        if (mounted) {
+          setSuggestions(items);
+          setFreeDownloads(items.filter((item) => item.accessType === 'FREE'));
+          setPremiumDownloads(items.filter((item) => item.accessType === 'PREMIUM'));
+        }
+      }
     } catch (error) {
-      console.error('Error fetching download data:', error);
+      console.error('Error loading private download library:', error);
     }
   };
 
-  fetchDownloadData();
-  generateDeviceId();
-  initDB();
-}, []);
+  void loadData();
+  return () => {
+    mounted = false;
+  };
+}, [getToken, user?.id]);
 
 // Add this effect for storage usage calculation
 useEffect(() => {
@@ -159,94 +148,69 @@ useEffect(() => {
 }, [isOnline, connectionQuality]);
 
 const handleDownload = async (item: DownloadItem) => {
-  // Prevent downloading when offline
-    if (!isOnline || connectionQuality === 'offline' || isOfflineMode) {
-      alert('Cannot download while offline. Please check your internet connection and try again.');
-      return;
-    }
+  if (!isOnline || connectionQuality === 'offline' || isOfflineMode) {
+    alert('Connect to the internet before downloading a track.');
+    return;
+  }
+  if (!user) {
+    window.location.assign('/auth/user/signup');
+    return;
+  }
+  if (!item.url) {
+    alert('This track does not have a downloadable audio file.');
+    return;
+  }
+  const token = await getToken();
+  if (!token) {
+    window.location.assign('/auth/user/signup');
+    return;
+  }
 
-    try {
-      // For DRM protected content, generate license first
-      if (item.isDRMProtected) {
-        const licenseResponse = await fetch('/api/drm/license', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            mediaId: item.id,
-            deviceId: currentDeviceId,
-            deviceInfo: {
-              deviceId: currentDeviceId,
-              deviceName: 'Web Browser',
-              deviceType: 'desktop',
-              os: navigator.platform,
-              fingerprint: currentDeviceId
-            }
-          }),
-        });
-
-        if (!licenseResponse.ok) {
-          throw new Error('Failed to generate license');
-        }
-
-        const license = await licenseResponse.json();
-        item.licenseKey = license.licenseKey;
-        item.deviceId = currentDeviceId;
-      }
-
-      // Start download
-      setDownloads(prev => [...prev, { 
-        ...item, 
-        downloadStatus: 'downloading', 
-        progress: 0,
-        deviceId: currentDeviceId
-      }]);
-
-      // Simulate download progress
-      const interval = setInterval(() => {
-        setDownloads(prev => prev.map(dl => {
-          if (dl.id === item.id && dl.downloadStatus === 'downloading') {
-            const newProgress = (dl.progress || 0) + 10;
-            if (newProgress >= 100) {
-              clearInterval(interval);
-              return { 
-                ...dl, 
-                progress: 100, 
-                downloadStatus: 'completed', 
-                downloadDate: new Date().toISOString() 
-              };
-            }
-            return { ...dl, progress: newProgress };
-          }
-          return dl;
-        }));
-      }, 300);
-
-    } catch (error) {
-      console.error('Download failed:', error);
-      setDownloads(prev => prev.map(dl => 
-        dl.id === item.id ? { ...dl, downloadStatus: 'failed' } : dl
-      ));
-    }
-  };
+  setDownloads((existing) => [
+    ...existing.filter((download) => download.id !== item.id),
+    { ...item, downloadStatus: 'downloading', progress: 0 },
+  ]);
+  try {
+    const record = await downloadTrackToPrivateStorage(
+      { ...item, url: item.url },
+      user.id,
+      token
+    );
+    const completed: DownloadItem = {
+      ...item,
+      id: record.id,
+      coverArt: record.coverArt,
+      duration: record.duration,
+      fileSize: record.data.size,
+      downloadDate: record.downloadedAt,
+      accessType: record.accessType,
+      downloadStatus: 'completed',
+      progress: 100,
+      isDRMProtected: record.encrypted,
+      expiresAt: record.expiresAt ?? undefined,
+      privateRecord: record,
+    };
+    setDownloadedFiles((existing) => [
+      ...existing.filter((download) => download.id !== completed.id),
+      completed,
+    ]);
+    setDownloads((existing) => existing.filter((download) => download.id !== item.id));
+  } catch (error) {
+    console.error('Private download failed:', error);
+    setDownloads((existing) => existing.filter((download) => download.id !== item.id));
+    alert(error instanceof Error ? error.message : 'Download failed. Please try again.');
+  }
+};
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/user/downloads/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setDownloads(prev => {
-          const updated = prev.filter(item => item.id !== id);
-          const used = updated.reduce((sum, item) => sum + item.fileSize, 0);
-          setStorageUsage(prev => ({ ...prev, used }));
-          return updated;
-        });
-      }
+      const item = downloadedFiles.find((download) => download.id === id);
+      if (!item?.privateRecord) throw new Error('This private download is not available in browser storage.');
+      await deletePrivateDownload(item.privateRecord.id);
+      setDownloadedFiles((existing) => existing.filter((download) => download.id !== id));
     } catch (error) {
-      console.error('Error deleting download:', error);
+      console.error('Error deleting private download:', error);
+      alert(error instanceof Error ? error.message : 'Download could not be deleted.');
     }
   };
 
@@ -256,148 +220,55 @@ const handleDownload = async (item: DownloadItem) => {
 
   const handlePlay = async (item: DownloadItem) => {
     try {
-      // Check if this is a downloaded track that needs DRM decryption
-      if (db && item.downloadStatus === 'completed') {
-        const transaction = db.transaction(["downloads"], "readonly");
-        const store = transaction.objectStore("downloads");
-        const request = store.get(item.id);
-
-        request.onsuccess = async () => {
-          if (request.result) {
-            // Track is downloaded, decrypt it
-            try {
-              const deviceKey = localStorage.getItem('deviceKey');
-              if (!deviceKey) {
-                console.error('No device key found for DRM decryption');
-                // Fallback to streaming
-                playTrack({
-                  id: item.id,
-                  title: item.title,
-                  artist: item.artist,
-                  imageUrl: item.coverArt,
-                  audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
-                });
-                return;
-              }
-
-              const key = await crypto.subtle.importKey(
-                'jwk',
-                JSON.parse(deviceKey),
-                { name: 'AES-GCM', length: 256 },
-                false,
-                ['decrypt']
-              );
-
-              const encryptedData = request.result.encryptedData;
-              const iv = new Uint8Array(encryptedData.slice(0, 12));
-              const encrypted = new Uint8Array(encryptedData.slice(12));
-
-              const decrypted = await crypto.subtle.decrypt(
-                { name: 'AES-GCM', iv: iv },
-                key,
-                encrypted
-              );
-
-              const blob = new Blob([decrypted], { type: 'audio/mpeg' });
-              const url = URL.createObjectURL(blob);
-
-              playTrack({
-                id: item.id,
-                title: item.title,
-                artist: item.artist,
-                imageUrl: item.coverArt,
-                audioUrl: url
-              });
-            } catch (error) {
-              console.error('DRM decryption failed:', error);
-              // Fallback to streaming
-              playTrack({
-                id: item.id,
-                title: item.title,
-                artist: item.artist,
-                imageUrl: item.coverArt,
-                audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
-              });
-            }
-          } else {
-            // Track not downloaded, use streaming URL
-            playTrack({
-              id: item.id,
-              title: item.title,
-              artist: item.artist,
-              imageUrl: item.coverArt,
-              audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
-            });
-          }
-        };
-
-        request.onerror = () => {
-          console.error('Failed to check download status');
-          // Fallback to streaming
-          playTrack({
-            id: item.id,
-            title: item.title,
-            artist: item.artist,
-            imageUrl: item.coverArt,
-            audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
-          });
-        };
-      } else {
-        // Not downloaded or no DB, use streaming URL
+      if (item.privateRecord) {
+        const audio = await readPrivateDownload(item.privateRecord);
+        if (currentObjectUrl.current) URL.revokeObjectURL(currentObjectUrl.current);
+        const objectUrl = URL.createObjectURL(audio);
+        currentObjectUrl.current = objectUrl;
         playTrack({
           id: item.id,
           title: item.title,
           artist: item.artist,
           imageUrl: item.coverArt,
-          audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
+          audioUrl: objectUrl,
+          accessType: 'FREE',
         });
+        return;
       }
-    } catch (error) {
-      console.error('Error in handlePlay:', error);
-      // Fallback to streaming
+      if (!item.url) throw new Error('This item does not have a playable audio URL.');
       playTrack({
         id: item.id,
         title: item.title,
         artist: item.artist,
         imageUrl: item.coverArt,
-        audioUrl: item.url || `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media/${item.id}/stream`
+        audioUrl: item.url,
+        accessType: item.accessType,
       });
+    } catch (error) {
+      console.error('Unable to play a private download:', error);
+      alert(error instanceof Error ? error.message : 'This download cannot be played in this browser.');
     }
   };
 
   const getFilteredDownloads = () => {
     switch (activeTab) {
-      case 'downloaded': return [...downloads.filter(d => d.downloadStatus === 'completed'), ...downloadedFiles];
+      case 'downloaded': return [...downloads.filter(d => d.downloadStatus === 'downloading'), ...downloadedFiles];
       case 'suggested': return suggestions;
       case 'free': return freeDownloads;
       case 'premium': return premiumDownloads;
-      default: return [...downloads, ...suggestions, ...freeDownloads, ...downloadedFiles];
+      default: return [...downloads, ...downloadedFiles, ...suggestions];
     }
   };
 
   const getDRMStatus = (item: DownloadItem) => {
     if (!item.isDRMProtected) return null;
-    
-    const license = deviceLicenses.find(lic => 
-      lic.mediaId === parseInt(item.id) && lic.deviceId === currentDeviceId && lic.isActive
-    );
-
-    if (!license) {
-      return { status: 'unlicensed', color: 'text-red-400' };
-    }
-
-    if (license.expiresAt && new Date(license.expiresAt) < new Date()) {
+    if (item.expiresAt && new Date(item.expiresAt) < new Date()) {
       return { status: 'expired', color: 'text-purple-300' };
     }
-
-    return { 
-      status: license.restrictionLevel.toLowerCase(), 
-      color: 'text-purple-300' 
-    };
+    return { status: item.privateRecord ? 'device protected' : 'authorized on download', color: 'text-purple-300' };
   };
 
   return (
-    <Protected>
       <div className="bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen p-4 sm:p-6">
       
       {/* Network Status Notification */}
@@ -441,7 +312,7 @@ const handleDownload = async (item: DownloadItem) => {
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <HardDrive className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
               <span className="text-xs sm:text-sm text-gray-300">
-                {formatFileSize(storageUsage.used * 1024)} / {formatFileSize(storageUsage.total * 1024)}
+                {formatFileSize(storageUsage.used)} / {formatFileSize(storageUsage.total)}
               </span>
             </div>
             <div className="w-full sm:w-32 h-2 bg-[#0a3747] rounded-full overflow-hidden">
@@ -476,20 +347,19 @@ const handleDownload = async (item: DownloadItem) => {
           </div>
         </div>
 
-        {/* Device ID & DRM Status */}
-        <div className="bg-[#0a3747]/50 rounded-lg p-3 sm:p-4 mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-purple-300" />
-              <span className="text-xs sm:text-sm text-gray-300">
-                Device: {currentDeviceId.substring(0, 8)}...
-              </span>
-            </div>
-            <div className="flex items-center gap-4 text-xs text-gray-400">
-              <span>Active Licenses: {deviceLicenses.filter(l => l.isActive).length}</span>
-              <span>DRM Protected: {downloads.filter(d => d.isDRMProtected).length}</span>
-            </div>
+        {!user && (
+          <div className="mb-6 rounded-lg border border-purple-400/30 bg-purple-500/10 p-4 text-sm text-purple-100">
+            Create a Fwaya listener account to save tracks privately for offline playback.{' '}
+            <a href="/auth/user/signup" className="font-semibold underline">Create account</a>
           </div>
+        )}
+
+        <div className="mb-6 rounded-lg bg-[#0a3747]/50 p-3 text-xs text-gray-300">
+          <Shield className="mr-2 inline h-4 w-4 text-purple-300" />
+          Downloads stay in this browser’s private Fwaya storage. Protected files are encrypted for this browser; they are not exported to the phone’s public Music or Downloads folder.
+          {downloadedFiles.length > 0 && (
+            <span className="ml-2 text-purple-200">{downloadedFiles.filter((item) => item.isDRMProtected).length} protected downloads</span>
+          )}
         </div>
 
         {/* Tabs */}
@@ -725,7 +595,7 @@ const handleDownload = async (item: DownloadItem) => {
                   <p className="text-xs text-gray-400 truncate">{item.artist}</p>
                   <div className="mt-1 sm:mt-2 flex justify-between items-center text-xs text-gray-500">
                     <span>{formatDuration(item.duration)}</span>
-                    <span>{formatFileSize(item.fileSize * 1024)}</span>
+                    <span>{formatFileSize(item.fileSize)}</span>
                   </div>
                 </div>
               ))}
@@ -788,10 +658,5 @@ const handleDownload = async (item: DownloadItem) => {
         )}
       </div>
       </div>
-    </Protected>
   );
 }
-
-
-
-

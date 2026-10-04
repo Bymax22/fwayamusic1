@@ -61,19 +61,63 @@ export class MediaInteractionService {
   }
 
   async downloadMedia(mediaId: number, userId: number, deviceId?: string) {
-    // Check if media exists
-    const media = await this.prisma.media.findUnique({ where: { id: mediaId } });
-    if (!media) {
-      throw new Error('Media not found');
+    const normalizedDeviceId = deviceId?.trim();
+    if (!normalizedDeviceId || normalizedDeviceId.length > 160) {
+      throw new ForbiddenException('A valid device identifier is required to download media');
     }
 
-    if (media.accessType === 'PAY_PER_VIEW') {
-      throw new ForbiddenException('Pay-per-view media must be purchased separately');
+    const media = await this.prisma.media.findUnique({ where: { id: mediaId } });
+    if (!media) throw new Error('Media not found');
+
+    let premiumExpiresAt: Date | null = null;
+    if (media.userId !== userId && media.accessType === 'PREMIUM') {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { isPremium: true, premiumUntil: true },
+      });
+      if (!user?.isPremium || !user.premiumUntil || user.premiumUntil <= new Date()) {
+        throw new ForbiddenException('An active Fwaya Premium subscription is required to download this track');
+      }
+      premiumExpiresAt = user.premiumUntil;
+    } else if (media.userId !== userId && media.accessType === 'PAY_PER_VIEW') {
+      const purchase = await this.prisma.transaction.findFirst({
+        where: { userId, mediaId, status: 'COMPLETED' },
+        select: { id: true },
+      });
+      if (!purchase) throw new ForbiddenException('Purchase this track before downloading it');
+    } else if (!['FREE', 'PREMIUM', 'PAY_PER_VIEW'].includes(media.accessType)) {
+      throw new ForbiddenException('This media type cannot be downloaded');
     }
-    await this.assertMediaAccess(media, userId);
 
     if (!media.url) {
       throw new Error('Media file not available for download');
+    }
+
+    const deviceBound = media.accessType !== 'FREE';
+    if (deviceBound) {
+      const deviceFamily = normalizedDeviceId.startsWith('native-') ? 'native' : 'web';
+      const priorDownloads = await this.prisma.download.findMany({
+        where: { mediaId, userId, accessType: 'OFFLINE' },
+        select: { deviceId: true, extraData: true },
+      });
+      const priorDevices = priorDownloads.filter((download) => {
+        const metadata = download.extraData;
+        return Boolean(
+          metadata &&
+          typeof metadata === 'object' &&
+          !Array.isArray(metadata) &&
+          'deviceBound' in metadata &&
+          metadata.deviceBound === true
+        );
+      }).map((download) => download.deviceId).filter((id): id is string => Boolean(id));
+      const priorDeviceInFamily = priorDevices.find((id) =>
+        (id.startsWith('native-') ? 'native' : 'web') === deviceFamily
+      );
+      if (priorDeviceInFamily && priorDeviceInFamily !== normalizedDeviceId) {
+        throw new ForbiddenException(
+          `This protected download is already bound to another ${deviceFamily === 'native' ? 'app installation' : 'browser'}`
+        );
+      }
     }
 
     await this.prisma.media.update({
@@ -86,18 +130,24 @@ export class MediaInteractionService {
       data: { 
         mediaId, 
         userId,
-        deviceId: deviceId || 'web',
+        deviceId: normalizedDeviceId,
         accessType: 'OFFLINE',
-        isDRMProtected: true,
-        licenseKey: this.generateLicenseKey(),
-        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+        isDRMProtected: deviceBound,
+        expiresAt: premiumExpiresAt,
+        extraData: {
+          deviceBound,
+          storage: 'private-platform',
+          version: 1,
+        },
       },
       include: { media: true }
     });
 
     return {
       downloadId: download.id,
-      downloadUrl: download.media.url, // For now, return the media URL
+      deviceId: normalizedDeviceId,
+      accessType: media.accessType,
+      expiresAt: premiumExpiresAt?.toISOString() ?? null,
       isDRMProtected: download.isDRMProtected,
     };
   }
@@ -115,7 +165,4 @@ export class MediaInteractionService {
     }
   }
 
-  private generateLicenseKey(): string {
-    return 'DRM-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  }
 }

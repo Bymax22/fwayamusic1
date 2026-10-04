@@ -75,7 +75,21 @@ Installed builds fetch the live audio catalog from the production backend by
 default. `EXPO_PUBLIC_API_URL` can override that URL for a separately configured
 environment. The app caches catalog metadata on the device so previously seen
 tracks remain listed offline; streaming still requires an internet connection.
-Saved tracks are bookmarks, not offline audio downloads.
+Saved tracks are bookmarks. Offline audio downloads are stored in Fwaya's
+private app directory, not the device's public Music or Downloads folder. Free
+audio remains private to the app; Premium and purchased audio is encrypted with
+a key kept in OS secure storage, so copying the downloaded file alone does not
+make it playable on another app installation. The backend binds protected
+downloads to one native app installation and one website browser per account
+and track. Premium offline access ends at the subscription expiration time;
+one-time purchased downloads do not expire. Guests are sent to listener
+registration before a download can be authorized.
+
+Browser downloads use private site storage and a non-exportable browser key,
+not the phone's public file system. Clearing browser/site data removes the
+browser's offline library. These controls protect the ordinary download/share
+path; they are not a substitute for tamper-resistant hardware DRM on a rooted,
+jailbroken, or actively debugged device.
 
 Protected assets require Cloudinary authenticated delivery. Deploy the
 backend/frontend playback changes before applying the migration so authorized

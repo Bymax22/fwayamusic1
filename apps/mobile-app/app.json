@@ -9,12 +9,22 @@
     ],
     "scheme": "fwaya",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/fwaya-01-01.jpg",
     "assetBundlePatterns": [
       "**/*"
     ],
     "plugins": [
       "./withKotlinJvmTarget",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": false,
+          "savePhotosPermission": false,
+          "granularPermissions": [
+            "audio"
+          ]
+        }
+      ],
       [
         "expo-audio",
         {
@@ -23,7 +33,9 @@
           "microphonePermission": false,
           "recordAudioAndroid": false
         }
-      ]
+      ],
+      "expo-font",
+      "expo-secure-store"
     ],
     "ios": {
       "bundleIdentifier": "fwaya.app",
@@ -32,10 +44,10 @@
     },
     "android": {
       "package": "fwaya.app",
-      "versionCode": 1,
+      "versionCode": 4,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/adaptive-icon-fwaya.png",
+        "backgroundColor": "#08082B"
       },
       "permissions": [
         "android.permission.MODIFY_AUDIO_SETTINGS",

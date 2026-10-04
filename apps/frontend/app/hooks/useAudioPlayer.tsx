@@ -196,6 +196,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       media.muted = isMuted;
       media.preload = 'auto';
       media.crossOrigin = 'anonymous';
+      media.loop = repeatMode === 'repeat-one';
     });
 
     return () => {
@@ -475,6 +476,7 @@ export const GlobalPlayerProvider = ({ children }: { children: ReactNode }) => {
       media.src = src;
       media.crossOrigin = 'anonymous';
       media.preload = 'auto';
+      media.loop = repeatMode === 'repeat-one';
       media.muted = isMuted;
       media.volume = isMuted ? 0 : volume;
       media.load();
