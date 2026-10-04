@@ -1,18 +1,23 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Download, Music, HardDrive, ArrowDown, Clock, Sparkles, Play, Shield, Wifi, WifiOff } from 'lucide-react';
+import { Download, Music, HardDrive, ArrowDown, Clock, Sparkles, Play, Shield, Wifi, WifiOff, Heart, Share2, ListPlus, ArrowLeft } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { useRouter } from 'next/navigation';
 import Waveform from '@/components/Waveform';
 import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { formatFileSize, formatDuration } from '@/lib/utils';
 import Image from "next/image";
 import { useAuth } from '@/context/AuthContext';
+import ShareModal from '@/components/ShareModal';
+import DownloadStatusToast from '@/components/DownloadStatusToast';
+import { createMediaSlug } from '@/lib/utils';
 import {
   deletePrivateDownload,
   downloadTrackToPrivateStorage,
   listPrivateDownloads,
   readPrivateDownload,
+  updatePrivateDownloadMetadata,
   type PrivateDownload,
 } from '@/lib/privateDownloads';
 
@@ -37,6 +42,10 @@ interface DownloadItem {
   expiresAt?: string;
   url?: string;
   privateRecord?: PrivateDownload;
+  likes?: number;
+  playCount?: number;
+  shareCount?: number;
+  liked?: boolean;
 }
 
 export default function DownloadPage() {
@@ -49,7 +58,10 @@ export default function DownloadPage() {
   const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [downloadedFiles, setDownloadedFiles] = useState<DownloadItem[]>([]);
   const [showNetworkNotification, setShowNetworkNotification] = useState(false);
+  const [shareItem, setShareItem] = useState<DownloadItem | null>(null);
+  const [downloadStatus, setDownloadStatus] = useState<{ title: string; status: 'downloading' | 'complete' } | null>(null);
   const { currentTrack, isPlaying, playTrack } = useAudioPlayer();
+  const router = useRouter();
   const { getToken, user } = useAuth();
   const { isOnline, connectionQuality } = useNetworkStatus();
 useEffect(() => {
@@ -72,6 +84,10 @@ useEffect(() => {
             quality: 'HD',
             downloadDate: record.downloadedAt,
             accessType: record.accessType,
+            likes: record.likes ?? 0,
+            playCount: record.playCount ?? 0,
+            liked: record.liked ?? false,
+            shareCount: record.shareCount ?? 0,
             downloadStatus: 'completed',
             isDRMProtected: record.encrypted,
             expiresAt: record.expiresAt ?? undefined,
@@ -168,6 +184,7 @@ const handleDownload = async (item: DownloadItem) => {
     ...existing.filter((download) => download.id !== item.id),
     { ...item, downloadStatus: 'downloading', progress: 0 },
   ]);
+  setDownloadStatus({ title: item.title, status: 'downloading' });
   try {
     const record = await downloadTrackToPrivateStorage(
       { ...item, url: item.url },
@@ -186,6 +203,10 @@ const handleDownload = async (item: DownloadItem) => {
       downloadStatus: 'completed',
       progress: 100,
       isDRMProtected: record.encrypted,
+      likes: record.likes ?? item.likes ?? 0,
+      playCount: record.playCount ?? item.playCount ?? 0,
+      liked: record.liked ?? item.liked ?? false,
+      shareCount: record.shareCount ?? item.shareCount ?? 0,
       expiresAt: record.expiresAt ?? undefined,
       privateRecord: record,
     };
@@ -194,9 +215,11 @@ const handleDownload = async (item: DownloadItem) => {
       completed,
     ]);
     setDownloads((existing) => existing.filter((download) => download.id !== item.id));
+    setDownloadStatus({ title: item.title, status: 'complete' });
   } catch (error) {
     console.error('Private download failed:', error);
     setDownloads((existing) => existing.filter((download) => download.id !== item.id));
+    setDownloadStatus(null);
     alert(error instanceof Error ? error.message : 'Download failed. Please try again.');
   }
 };
@@ -211,6 +234,73 @@ const handleDownload = async (item: DownloadItem) => {
       console.error('Error deleting private download:', error);
       alert(error instanceof Error ? error.message : 'Download could not be deleted.');
     }
+  };
+
+  const handleLike = async (item: DownloadItem) => {
+    if (!user) {
+      window.location.assign('/auth/user/signin');
+      return;
+    }
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('Please sign in to like tracks.');
+      const response = await fetch(`/api/media/${encodeURIComponent(item.privateRecord?.mediaId || item.mediaId || item.id)}/interact/like`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.message || payload.error || 'Could not update your like.');
+      }
+      const payload = await response.json().catch(() => ({}));
+      const liked = typeof payload.liked === 'boolean' ? payload.liked : !item.liked;
+      const likes = typeof payload.likes === 'number'
+        ? payload.likes
+        : Math.max(0, (item.likes || 0) + (liked ? 1 : -1));
+      if (item.privateRecord) {
+        await updatePrivateDownloadMetadata(item.privateRecord.id, {
+          likes,
+          liked,
+          playCount: item.playCount || 0,
+          shareCount: item.shareCount || 0,
+        });
+      }
+      setDownloadedFiles((existing) => existing.map((download) => {
+        if (download.id !== item.id) return download;
+        return { ...download, liked, likes };
+      }));
+    } catch (error) {
+      console.error('Could not like downloaded track:', error);
+      alert(error instanceof Error ? error.message : 'Could not update your like.');
+    }
+  };
+
+  const handleAddToPlaylist = (item: DownloadItem) => {
+    if (!user) {
+      window.location.assign('/auth/user/signin');
+      return;
+    }
+    window.dispatchEvent(new CustomEvent('fwaya:open-playlist-picker', {
+      detail: { mediaId: Number(item.privateRecord?.mediaId || item.mediaId || item.id) },
+    }));
+  };
+
+  const handleShare = async () => {
+    if (!shareItem) return;
+    const shareCount = (shareItem.shareCount || 0) + 1;
+    if (shareItem.privateRecord) {
+      await updatePrivateDownloadMetadata(shareItem.privateRecord.id, {
+        likes: shareItem.likes || 0,
+        liked: Boolean(shareItem.liked),
+        playCount: shareItem.playCount || 0,
+        shareCount,
+      });
+    }
+    setDownloadedFiles((existing) => existing.map((item) =>
+      item.id === shareItem.id ? { ...item, shareCount } : item
+    ));
+    setShareItem((item) => item ? { ...item, shareCount } : null);
   };
 
   const calculateStoragePercentage = () => {
@@ -269,14 +359,15 @@ const handleDownload = async (item: DownloadItem) => {
   };
 
   return (
-      <div className="bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen p-4 sm:p-6">
+      <>
+      <div className="min-h-screen bg-black p-4 text-white sm:p-6">
       
       {/* Network Status Notification */}
       {showNetworkNotification && (
         <div className={`mb-4 p-4 rounded-lg flex items-center gap-3 ${
           isOnline && connectionQuality !== 'offline' && connectionQuality !== 'poor'
-            ? 'bg-green-500/10 border border-green-500/30'
-            : 'bg-red-500/10 border border-red-500/30'
+            ? 'bg-green-500/10'
+            : 'bg-red-500/10'
         }`}>
           {isOnline && connectionQuality !== 'offline' && connectionQuality !== 'poor' ? (
             <>
@@ -300,10 +391,23 @@ const handleDownload = async (item: DownloadItem) => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+            <div className="mb-2 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.history.length > 1) router.back();
+                  else router.push('/browse');
+                }}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#171717] text-white/75 transition hover:bg-purple-600 hover:text-white"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
               <Download className="w-6 h-6 sm:w-8 sm:h-8 text-purple-300" />
               My Downloads
-            </h1>
+              </h1>
+            </div>
             <p className="text-sm sm:text-base text-gray-400">Access your offline music library</p>
           </div>
           
@@ -315,7 +419,7 @@ const handleDownload = async (item: DownloadItem) => {
                 {formatFileSize(storageUsage.used)} / {formatFileSize(storageUsage.total)}
               </span>
             </div>
-            <div className="w-full sm:w-32 h-2 bg-[#0a3747] rounded-full overflow-hidden">
+            <div className="w-full sm:w-32 h-2 bg-[#171717] rounded-full overflow-hidden">
               <div 
                 className="h-full bg-gradient-to-r from-purple-500 to-violet-500 rounded-full" 
                 style={{ width: `${calculateStoragePercentage()}%` }}
@@ -326,7 +430,7 @@ const handleDownload = async (item: DownloadItem) => {
               className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center transition-colors ${
                 isOfflineMode 
                   ? 'bg-purple-500 text-white' 
-                  : 'bg-[#0a3747] text-gray-300'
+                  : 'bg-[#171717] text-gray-300'
               }`}
               title={!isOnline || connectionQuality === 'offline' ? 'You are offline' : 'Toggle offline mode'}
             >
@@ -348,13 +452,13 @@ const handleDownload = async (item: DownloadItem) => {
         </div>
 
         {!user && (
-          <div className="mb-6 rounded-lg border border-purple-400/30 bg-purple-500/10 p-4 text-sm text-purple-100">
+          <div className="mb-6 rounded-lg bg-purple-500/10 p-4 text-sm text-purple-100">
             Create a Fwaya listener account to save tracks privately for offline playback.{' '}
             <a href="/auth/user/signup" className="font-semibold underline">Create account</a>
           </div>
         )}
 
-        <div className="mb-6 rounded-lg bg-[#0a3747]/50 p-3 text-xs text-gray-300">
+        <div className="mb-6 rounded-lg bg-[#111111] p-3 text-xs text-gray-300">
           <Shield className="mr-2 inline h-4 w-4 text-purple-300" />
           Downloads stay in this browser’s private Fwaya storage. Protected files are encrypted for this browser; they are not exported to the phone’s public Music or Downloads folder.
           {downloadedFiles.length > 0 && (
@@ -372,8 +476,8 @@ const handleDownload = async (item: DownloadItem) => {
                   onClick={() => setActiveTab(tab)}
                   className={`px-3 py-2 text-sm sm:text-base font-medium whitespace-nowrap ${
                     activeTab === tab
-                      ? 'text-purple-300 border-b-2 border-purple-500'
-                      : 'text-gray-400 hover:text-gray-300'
+                      ? 'rounded-full bg-purple-600 text-white'
+                      : 'rounded-full text-gray-400 hover:bg-white/5 hover:text-gray-300'
                   }`}
                 >
                   {tab === 'all' && 'All Content'}
@@ -396,7 +500,7 @@ const handleDownload = async (item: DownloadItem) => {
               return (
                 <div 
                   key={item.id} 
-                  className="flex items-center gap-3 rounded-xl bg-[#0a3747]/70 p-2 shadow-sm transition-colors hover:bg-[#0a3747]"
+                  className="flex items-center gap-3 rounded-xl bg-[#111111] p-2 transition-colors hover:bg-[#171717]"
                 >
                   <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md sm:h-16 sm:w-16">
                     <Image
@@ -432,9 +536,39 @@ const handleDownload = async (item: DownloadItem) => {
                       <div className="flex items-center gap-1 sm:gap-2 text-xs text-gray-500">
                         <Clock className="w-3 h-3" />
                         {formatDuration(item.duration)}
+                        <span className="ml-2 text-white/45">{item.playCount || 0} plays</span>
                       </div>
                       
                       <div className="flex gap-1 sm:gap-2 items-center">
+                        {item.downloadStatus === 'completed' && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleLike(item)}
+                              className={`inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-purple-600/20 ${item.liked ? 'text-purple-400' : 'text-white/65'}`}
+                              aria-label={`${item.liked ? 'Unlike' : 'Like'} ${item.title} (${item.likes || 0} likes)`}
+                            >
+                              <Heart className="h-4 w-4" fill={item.liked ? 'currentColor' : 'none'} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleAddToPlaylist(item)}
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white/65 hover:bg-purple-600/20 hover:text-purple-300"
+                              aria-label={`Add ${item.title} to a playlist`}
+                            >
+                              <ListPlus className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setShareItem(item)}
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-white/65 hover:bg-purple-600/20 hover:text-purple-300"
+                              aria-label={`Share ${item.title}`}
+                            >
+                              <Share2 className="h-4 w-4" />
+                            </button>
+                            <span className="mr-1 text-[11px] text-white/50">{item.likes || 0}</span>
+                          </>
+                        )}
                         <button
                           type="button"
                           onClick={() => handlePlay(item)}
@@ -457,7 +591,7 @@ const handleDownload = async (item: DownloadItem) => {
                             </button>
                           </>
                         ) : item.downloadStatus === 'downloading' ? (
-                          <div className="w-16 sm:w-20 bg-[#0a3747] rounded-full h-1.5">
+                          <div className="w-16 sm:w-20 bg-[#171717] rounded-full h-1.5">
                             <div 
                               className="bg-gradient-to-r from-purple-500 to-violet-500 h-1.5 rounded-full" 
                               style={{ width: `${item.progress || 0}%` }}
@@ -525,7 +659,7 @@ const handleDownload = async (item: DownloadItem) => {
             
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
               {suggestions.slice(0, 5).map(item => (
-                <div key={item.id} className="bg-[#0a3747]/50 rounded-lg p-2 sm:p-3 hover:bg-[#0a3747]/70 transition-colors">
+                <div key={item.id} className="bg-[#111111] rounded-lg p-2 sm:p-3 hover:bg-[#171717] transition-colors">
                   <div className="relative mb-2 sm:mb-3">
                     <Image
                       src={item.coverArt} 
@@ -555,14 +689,14 @@ const handleDownload = async (item: DownloadItem) => {
 
         {/* Download Queue */}
         {downloads.filter(d => d.downloadStatus === 'downloading').length > 0 && (
-          <div className="mt-8 sm:mt-12 bg-[#0a3747]/70 rounded-xl p-4 sm:p-6">
+          <div className="mt-8 sm:mt-12 bg-[#111111] rounded-xl p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
               <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300" />
               Download Queue
             </h2>
             <div className="space-y-2 sm:space-y-3">
               {downloads.filter(d => d.downloadStatus === 'downloading').map(item => (
-                <div key={item.id} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 bg-[#0a3747] rounded-lg">
+                <div key={item.id} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 bg-[#171717] rounded-lg">
                   <Image
                     src={item.coverArt} 
                     alt={item.title} 
@@ -573,7 +707,7 @@ const handleDownload = async (item: DownloadItem) => {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-white truncate text-sm sm:text-base">{item.title}</h3>
                     <p className="text-xs sm:text-sm text-gray-400 truncate">{item.artist}</p>
-                    <div className="w-full bg-[#0a1f29] rounded-full h-1 sm:h-1.5 mt-1 sm:mt-2">
+                    <div className="w-full bg-black rounded-full h-1 sm:h-1.5 mt-1 sm:mt-2">
                       <div 
                         className="bg-gradient-to-r from-purple-500 to-violet-500 h-full rounded-full" 
                         style={{ width: `${item.progress || 0}%` }}
@@ -589,9 +723,9 @@ const handleDownload = async (item: DownloadItem) => {
 
         {/* DRM Information */}
         {downloads.some(d => d.isDRMProtected) && (
-          <div className="mt-8 sm:mt-12 bg-[#0a3747]/70 rounded-xl p-4 sm:p-6">
+          <div className="mt-8 sm:mt-12 bg-[#111111] rounded-xl p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
-              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
               DRM Protection Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400">
@@ -608,5 +742,29 @@ const handleDownload = async (item: DownloadItem) => {
         )}
       </div>
       </div>
+      {shareItem && (
+        <ShareModal
+          open
+          onClose={() => setShareItem(null)}
+          title={shareItem.title}
+          artist={shareItem.artist}
+          coverUrl={shareItem.coverArt}
+          url={`${window.location.origin}/track/${createMediaSlug(shareItem.title, shareItem.privateRecord?.mediaId || shareItem.mediaId || shareItem.id)}`}
+          onShare={() => setShareItem((item) => item ? { ...item, shareCount: (item.shareCount || 0) + 1 } : null)}
+        />
+      )}
+      {downloadStatus && (
+        <DownloadStatusToast
+          title={downloadStatus.title}
+          status={downloadStatus.status}
+          onClose={() => setDownloadStatus(null)}
+          onView={() => {
+            setActiveTab('downloaded');
+            setDownloadStatus(null);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      )}
+      </>
   );
 }

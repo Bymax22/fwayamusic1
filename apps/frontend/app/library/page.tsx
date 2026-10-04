@@ -1,26 +1,38 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Play, Heart, Plus, Download, Disc, ListMusic, History, Folder, Trash2, Edit2, MoreVertical } from 'lucide-react';
+import { Play, Heart, Plus, Download, Disc, ListMusic, History, Folder, Trash2, Edit2, MoreVertical, Share2, ListPlus } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import Waveform from '@/components/Waveform';
 import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
-import { formatDuration } from '@/lib/utils';
+import { createMediaSlug, formatDuration } from '@/lib/utils';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import ShareModal from '@/components/ShareModal';
+import {
+  listPrivateDownloads,
+  readPrivateDownload,
+  updatePrivateDownloadMetadata,
+  type PrivateDownload,
+} from '@/lib/privateDownloads';
+
+let activeLibraryDownloadUrl: string | null = null;
 
 interface MediaFile {
-  id: number;
+  id: number | string;
   title: string;
   artist: string;
   url: string;
   duration: number;
   coverArt: string;
   views: number;
+  playCount?: number;
+  shareCount?: number;
   likes: number;
   genre?: string;
   liked?: boolean;
+  privateRecord?: PrivateDownload;
 }
 
 interface Playlist {
@@ -37,10 +49,12 @@ function mapMedia(item: any): MediaFile {
     id: item.id,
     title: item.title || 'Untitled',
     artist: item.artist || 'Unknown Artist',
-    url: item.url,
+    url: item.url || item.audioUrl || '',
     duration: item.duration || 0,
-    coverArt: item.coverArt || '/default-cover.jpg',
-    views: item.views || 0,
+    coverArt: item.coverArt || item.artCoverUrl || item.thumbnailUrl || '/default-cover.jpg',
+    views: item.views || item.playCount || 0,
+    playCount: item.playCount || item.views || 0,
+    shareCount: item.shareCount || 0,
     likes: item.likes || 0,
     genre: item.genre || 'Other',
     liked: Boolean(item.liked),
@@ -72,12 +86,13 @@ export default function LibraryPage() {
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [shareItem, setShareItem] = useState<MediaFile | null>(null);
   const [createName, setCreateName] = useState('');
   const [createDescription, setCreateDescription] = useState('');
   const [createCover, setCreateCover] = useState<File | null>(null);
   const [creating, setCreating] = useState(false);
   const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
-  const { getToken } = useAuth();
+  const { getToken, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -138,50 +153,24 @@ export default function LibraryPage() {
 
     fetchData();
     initDB();
-    // Listen for broadcast updates to refresh playlists / liked / recent
-    let bc: BroadcastChannel | null = null;
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'fwaya:message' && e.newValue) {
-        try {
-          const msg = JSON.parse(e.newValue);
-          if (msg?.type === 'playlists-updated') {
-            setPlaylists(prev => [mapPlaylist(msg.playlist), ...prev]);
-          } else if (msg?.type === 'media-downloaded') {
-            if (db) loadDownloadedFiles(db);
-          } else if (msg?.type === 'media-liked') {
-            // could refetch liked items if desired
-          }
-        } catch (_) {}
-      }
-    };
-
-    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-      try {
-        bc = new BroadcastChannel('fwaya');
-        bc.onmessage = (ev) => {
-          const msg = ev.data;
-          if (!msg) return;
-          if (msg.type === 'playlists-updated') {
-            setPlaylists(prev => [mapPlaylist(msg.playlist), ...prev]);
-          } else if (msg.type === 'media-downloaded') {
-            if (db) loadDownloadedFiles(db);
-          } else if (msg.type === 'media-liked') {
-            // no-op here; liked songs page listens separately
-          }
-        };
-      } catch (e) {
-        // fallback to storage event
-        if (typeof window !== 'undefined') (globalThis as any).addEventListener('storage', handleStorage);
-      }
-    } else {
-      if (typeof window !== 'undefined') (globalThis as any).addEventListener('storage', handleStorage);
-    }
-
-    return () => {
-      try { bc?.close(); } catch (_) {}
-      if (typeof window !== 'undefined') (globalThis as any).removeEventListener('storage', handleStorage);
-    };
   }, [getToken]);
+
+  useEffect(() => {
+    if (!db) return;
+    const refresh = () => void loadDownloadedFiles(db);
+    refresh();
+    const channel = 'BroadcastChannel' in window ? new BroadcastChannel('fwaya') : null;
+    if (channel) {
+      channel.onmessage = (event) => {
+        if (event.data?.type === 'media-downloaded' || event.data?.type === 'media-removed') refresh();
+      };
+    }
+    window.addEventListener('focus', refresh);
+    return () => {
+      channel?.close();
+      window.removeEventListener('focus', refresh);
+    };
+  }, [db, user?.id]);
 
   const getKey = async (deviceId: string): Promise<CryptoKey> => {
     const encoder = new TextEncoder();
@@ -225,19 +214,63 @@ export default function LibraryPage() {
     };
   };
 
-  const loadDownloadedFiles = (database: IDBDatabase) => {
+  const loadDownloadedFiles = async (database: IDBDatabase) => {
     const transaction = database.transaction(['downloadMetadata'], 'readonly');
     const store = transaction.objectStore('downloadMetadata');
     const request = store.getAll();
     request.onsuccess = () => {
       const files = request.result as MediaFile[];
-      setDownloadedSongs(files);
+      void listPrivateDownloads(user?.id ?? -1).then((privateDownloads) => {
+        const privateFiles: MediaFile[] = privateDownloads.map((record) => ({
+          id: Number(record.mediaId) || record.mediaId,
+          title: record.title,
+          artist: record.artist,
+          url: '',
+          duration: record.duration,
+          coverArt: record.coverArt,
+          views: record.playCount || 0,
+          playCount: record.playCount || 0,
+          likes: record.likes || 0,
+          shareCount: record.shareCount || 0,
+          liked: Boolean(record.liked),
+          privateRecord: record,
+        }));
+        const privateIds = new Set(privateFiles.map((file) => String(file.id)));
+        const legacyFiles = files.filter((file) => !privateIds.has(String(file.id)));
+        setDownloadedSongs([...privateFiles, ...legacyFiles]);
+      }).catch((error) => {
+        console.error('Could not load Fwaya private downloads into the library:', error);
+        setDownloadedSongs(files);
+      });
     };
   };
 
   const handlePlay = async (file: MediaFile) => {
-    if (currentTrack?.id === file.id) {
+    if (String(currentTrack?.id) === String(file.privateRecord?.mediaId || file.id)) {
       togglePlay();
+      return;
+    }
+
+    if (file.privateRecord) {
+      try {
+        const audio = await readPrivateDownload(file.privateRecord);
+        if (activeLibraryDownloadUrl) URL.revokeObjectURL(activeLibraryDownloadUrl);
+        const audioUrl = URL.createObjectURL(audio);
+        activeLibraryDownloadUrl = audioUrl;
+        playTrack({
+          id: file.privateRecord.mediaId,
+          title: file.title,
+          artist: file.artist,
+          audioUrl,
+          imageUrl: file.coverArt,
+          duration: file.duration,
+          type: 'AUDIO',
+          accessType: 'FREE',
+        });
+      } catch (error) {
+        console.error('Could not play private library download:', error);
+        alert(error instanceof Error ? error.message : 'This download could not be played.');
+      }
       return;
     }
 
@@ -303,6 +336,71 @@ export default function LibraryPage() {
         });
       }
     };
+  };
+
+  const handleDownloadedLike = async (file: MediaFile) => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        router.push('/auth/user/signin');
+        return;
+      }
+      const response = await fetch(`/api/media/${encodeURIComponent(file.privateRecord?.mediaId || file.id)}/interact/like`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.message || payload.error || 'Could not update your like.');
+      }
+      const payload = await response.json().catch(() => ({}));
+      const liked = typeof payload.liked === 'boolean' ? payload.liked : !file.liked;
+      const likes = typeof payload.likes === 'number'
+        ? payload.likes
+        : Math.max(0, file.likes + (liked ? 1 : -1));
+      if (file.privateRecord) {
+        await updatePrivateDownloadMetadata(file.privateRecord.id, {
+          likes,
+          liked,
+          playCount: file.playCount || 0,
+          shareCount: file.shareCount || 0,
+        });
+      }
+      setDownloadedSongs((items) => items.map((item) =>
+        String(item.id) === String(file.id) ? { ...item, liked, likes } : item
+      ));
+    } catch (error) {
+      console.error('Could not like downloaded library track:', error);
+      alert(error instanceof Error ? error.message : 'Could not update your like.');
+    }
+  };
+
+  const handleAddDownloadedToPlaylist = (file: MediaFile) => {
+    if (!user) {
+      router.push('/auth/user/signin');
+      return;
+    }
+    window.dispatchEvent(new CustomEvent('fwaya:open-playlist-picker', {
+      detail: { mediaId: Number(file.privateRecord?.mediaId || file.id) },
+    }));
+  };
+
+  const handleShareDownloaded = async () => {
+    if (!shareItem) return;
+    const shareCount = (shareItem.shareCount || 0) + 1;
+    if (shareItem.privateRecord) {
+      await updatePrivateDownloadMetadata(shareItem.privateRecord.id, {
+        likes: shareItem.likes || 0,
+        liked: Boolean(shareItem.liked),
+        playCount: shareItem.playCount || 0,
+        shareCount,
+      });
+    }
+    setDownloadedSongs((items) => items.map((item) =>
+      String(item.id) === String(shareItem.id) ? { ...item, shareCount } : item
+    ));
+    setShareItem((item) => item ? { ...item, shareCount } : null);
   };
 
   const handleCreatePlaylist = async () => {
@@ -608,7 +706,7 @@ export default function LibraryPage() {
                         onClick={() => handlePlay(file)}
                         className="absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/25 transition hover:bg-purple-500"
                       >
-                        {String(currentTrack?.id) === String(file.id) && isPlaying ? (
+                        {String(currentTrack?.id) === String(file.privateRecord?.mediaId || file.id) && isPlaying ? (
                           <Waveform playing className="h-5 w-5" />
                         ) : (
                           <Play className="w-5 h-5" />
@@ -618,12 +716,18 @@ export default function LibraryPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <div>
-                          <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="text-lg font-semibold text-white">{file.title}</ScrollingTrackTitle>
+                          <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.privateRecord?.mediaId || file.id) && isPlaying} className="text-lg font-semibold text-white">{file.title}</ScrollingTrackTitle>
                           <p className="text-sm text-gray-400 truncate">{file.artist}</p>
                         </div>
-                        <button className="rounded-full bg-[#15121f] px-3 py-2 text-sm text-white/90 transition hover:bg-purple-600/20">
-                          <Heart className="w-4 h-4 text-purple-300" />
-                        </button>
+                        {activeTab === 'downloaded' && (
+                          <button
+                            onClick={() => void handleDownloadedLike(file)}
+                            aria-label={`${file.liked ? 'Unlike' : 'Like'} ${file.title}`}
+                            className={`rounded-full bg-[#15121f] px-3 py-2 text-sm transition hover:bg-purple-600/20 ${file.liked ? 'text-purple-400' : 'text-white/70'}`}
+                          >
+                            <Heart className="w-4 h-4" fill={file.liked ? 'currentColor' : 'none'} />
+                          </button>
+                        )}
                       </div>
                       <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
                         <span>{formatDuration(file.duration)}</span>
@@ -631,7 +735,32 @@ export default function LibraryPage() {
                           <Disc className="w-4 h-4 text-purple-300" />
                           {file.genre || 'Genre'}
                         </span>
+                        {activeTab === 'downloaded' && (
+                          <>
+                            <span>{file.playCount || file.views || 0} plays</span>
+                            <span>{file.likes} likes</span>
+                            <span>{file.shareCount || 0} shares</span>
+                          </>
+                        )}
                       </div>
+                      {activeTab === 'downloaded' && (
+                        <div className="flex gap-2 pt-1">
+                          <button
+                            onClick={() => handleAddDownloadedToPlaylist(file)}
+                            className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-purple-500"
+                          >
+                            <ListPlus className="h-4 w-4" />
+                            Add to playlist
+                          </button>
+                          <button
+                            onClick={() => setShareItem(file)}
+                            className="inline-flex items-center gap-2 rounded-full bg-[#15121f] px-3 py-2 text-xs font-semibold text-white transition hover:bg-purple-600/30"
+                          >
+                            <Share2 className="h-4 w-4" />
+                            Share
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -774,6 +903,17 @@ export default function LibraryPage() {
             </motion.div>
           )}
         </AnimatePresence>
+        {shareItem && (
+          <ShareModal
+            open
+            onClose={() => setShareItem(null)}
+            title={shareItem.title}
+            artist={shareItem.artist}
+            coverUrl={shareItem.coverArt}
+            url={`${window.location.origin}/track/${createMediaSlug(shareItem.title, shareItem.privateRecord?.mediaId || shareItem.id)}`}
+            onShare={() => void handleShareDownloaded()}
+          />
+        )}
     </div>
   );
 }

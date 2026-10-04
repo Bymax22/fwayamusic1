@@ -28,6 +28,7 @@ import ShareModal from '@/components/ShareModal';
 import { useAuth } from '@/context/AuthContext';
 import { createMediaSlug, extractMediaIdFromSlug, formatDuration } from '@/lib/utils';
 import { downloadTrackToPrivateStorage } from '@/lib/privateDownloads';
+import DownloadStatusToast from '@/components/DownloadStatusToast';
 import VerifiedBadge from '@/components/VerifiedBadge';
 import Waveform from '@/components/Waveform';
 
@@ -97,6 +98,7 @@ export default function TrackPage() {
   const [relatedTracks, setRelatedTracks] = useState<MediaItem[]>([]);
   const [showShareModal, setShowShareModal] = useState(false);
   const [downloadBusy, setDownloadBusy] = useState(false);
+  const [downloadStatus, setDownloadStatus] = useState<'downloading' | 'complete' | null>(null);
 
   useEffect(() => {
     const fetchTrack = async () => {
@@ -291,11 +293,13 @@ export default function TrackPage() {
     }
 
     setDownloadBusy(true);
+    setDownloadStatus('downloading');
     try {
       await downloadTrackToPrivateStorage(track, user.id, token);
-      alert('Track saved privately in Fwaya Downloads. It is not placed in the public Music or Downloads folder.');
+      setDownloadStatus('complete');
     } catch (err) {
       console.error('Failed to save a private track download:', err);
+      setDownloadStatus(null);
       alert(err instanceof Error ? err.message : 'Download failed. Please try again.');
     } finally {
       setDownloadBusy(false);
@@ -784,6 +788,17 @@ export default function TrackPage() {
         duration={track?.duration ? `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}` : undefined}
         shareText={shareText}
       />
+      {downloadStatus && (
+        <DownloadStatusToast
+          title={track?.title || 'Track'}
+          status={downloadStatus}
+          onClose={() => setDownloadStatus(null)}
+          onView={() => {
+            setDownloadStatus(null);
+            router.push('/download');
+          }}
+        />
+      )}
     </div>
   );
 }

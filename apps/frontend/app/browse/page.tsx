@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import Waveform from '@/components/Waveform';
 import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import ShareModal from '@/components/ShareModal';
+import DownloadStatusToast from '@/components/DownloadStatusToast';
 import { createMediaSlug, formatAddedTime, formatDuration, formatFileSize, formatRelativeTime, resolveDateValue } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from "next/image";
@@ -658,19 +659,16 @@ export default function Browse() {
         accessType: 'FREE',
         expiresAt: null,
         contentType: audio.type || 'audio/mpeg',
+        likes: file.likes,
+        playCount: file.playCount || file.views,
+        shareCount: file.shareCount,
+        liked: Boolean(file.interactions?.some((interaction) => interaction.liked)),
       }, audio);
 
       setMediaFiles((existing) => existing.map((item) =>
         item.id === file.id ? { ...item, downloadCount: item.downloadCount + 1 } : item
       ));
       setDownloadDialog({ title: file.title, progress: 100, status: 'complete' });
-      try {
-        const channel = new BroadcastChannel('fwaya');
-        channel.postMessage({ type: 'media-downloaded', id: file.id });
-        channel.close();
-      } catch (error) {
-        console.warn('Could not notify other Fwaya tabs about the download:', error);
-      }
 
     } catch (err) {
       console.error('Download error:', err);
@@ -1657,36 +1655,17 @@ export default function Browse() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {downloadDialog && (
-          <motion.div
-            role="status"
-            aria-live="polite"
-            className="fixed bottom-24 left-0 z-[70] flex w-full max-w-md items-center justify-between gap-4 bg-gradient-to-r from-black via-black/90 to-transparent px-5 py-4 text-sm text-white"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-          >
-            {downloadDialog.status === 'downloading' ? (
-              <span className="truncate">Downloading... {downloadDialog.title}</span>
-            ) : (
-              <>
-                <span className="truncate">Download complete: {downloadDialog.title}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDownloadDialog(null);
-                    router.push('/download');
-                  }}
-                  className="shrink-0 font-semibold text-purple-300 hover:text-white"
-                >
-                  View download
-                </button>
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {downloadDialog && (
+        <DownloadStatusToast
+          title={downloadDialog.title}
+          status={downloadDialog.status}
+          onClose={() => setDownloadDialog(null)}
+          onView={() => {
+            setDownloadDialog(null);
+            router.push('/download');
+          }}
+        />
+      )}
 
     </div>
   );

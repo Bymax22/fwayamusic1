@@ -13,6 +13,10 @@ export interface PrivateDownload {
   iv: ArrayBuffer | null;
   data: Blob;
   downloadedAt: string;
+  likes?: number;
+  playCount?: number;
+  shareCount?: number;
+  liked?: boolean;
 }
 
 export interface DownloadableTrack {
@@ -25,6 +29,10 @@ export interface DownloadableTrack {
   imageUrl?: string;
   duration?: number;
   accessType?: string;
+  likes?: number;
+  playCount?: number;
+  shareCount?: number;
+  liked?: boolean;
 }
 
 const DATABASE_NAME = 'fwaya-private-downloads';
@@ -169,6 +177,10 @@ export async function downloadTrackToPrivateStorage(
       accessType,
       expiresAt: accessType === 'PREMIUM' ? expiresAt : null,
       contentType: audio.type || 'audio/mpeg',
+      likes: Math.max(0, Number(track.likes) || 0),
+      playCount: Math.max(0, Number(track.playCount) || 0),
+      shareCount: Math.max(0, Number(track.shareCount) || 0),
+      liked: Boolean(track.liked),
     },
     audio
   );
@@ -234,6 +246,7 @@ export async function savePrivateDownload(
       transaction.onerror = () => reject(transaction.error ?? new Error('Track could not be saved.'));
       transaction.onabort = () => reject(transaction.error ?? new Error('Track could not be saved.'));
     });
+    notifyPrivateDownloadsChanged(download.mediaId);
     return download;
   } finally {
     database.close();
@@ -287,6 +300,10 @@ export async function readPrivateDownload(download: PrivateDownload): Promise<Bl
 export async function deletePrivateDownload(id: string): Promise<void> {
   const database = await openDatabase();
   try {
+    const existing = await requestResult(
+      database.transaction(DOWNLOADS_STORE, 'readonly')
+        .objectStore(DOWNLOADS_STORE).get(id) as IDBRequest<PrivateDownload | undefined>
+    );
     const transaction = database.transaction(DOWNLOADS_STORE, 'readwrite');
     transaction.objectStore(DOWNLOADS_STORE).delete(id);
     await new Promise<void>((resolve, reject) => {
@@ -294,7 +311,43 @@ export async function deletePrivateDownload(id: string): Promise<void> {
       transaction.onerror = () => reject(transaction.error ?? new Error('Download could not be removed.'));
       transaction.onabort = () => reject(transaction.error ?? new Error('Download could not be removed.'));
     });
+    if (existing) notifyPrivateDownloadsChanged(existing.mediaId, 'media-removed');
   } finally {
     database.close();
+  }
+}
+
+export async function updatePrivateDownloadMetadata(
+  id: string,
+  updates: Pick<PrivateDownload, 'likes' | 'playCount' | 'shareCount' | 'liked'>
+): Promise<void> {
+  const database = await openDatabase();
+  try {
+    const transaction = database.transaction(DOWNLOADS_STORE, 'readwrite');
+    const store = transaction.objectStore(DOWNLOADS_STORE);
+    const request = store.get(id) as IDBRequest<PrivateDownload | undefined>;
+    request.onsuccess = () => {
+      if (request.result) store.put({ ...request.result, ...updates });
+    };
+    await new Promise<void>((resolve, reject) => {
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error ?? new Error('Download details could not be updated.'));
+      transaction.onabort = () => reject(transaction.error ?? new Error('Download details update was interrupted.'));
+    });
+  } finally {
+    database.close();
+  }
+}
+
+function notifyPrivateDownloadsChanged(
+  mediaId: string,
+  type: 'media-downloaded' | 'media-removed' = 'media-downloaded'
+): void {
+  try {
+    const channel = new BroadcastChannel('fwaya');
+    channel.postMessage({ type, mediaId });
+    channel.close();
+  } catch (error) {
+    console.warn('Could not notify other Fwaya tabs about private downloads:', error);
   }
 }

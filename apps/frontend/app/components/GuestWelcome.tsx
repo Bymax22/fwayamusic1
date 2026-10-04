@@ -410,7 +410,6 @@ export default function GuestWelcome() {
       image: string;
       kind: string;
       href: string;
-      track?: any;
     }>();
     const addItems = (
       items: any[],
@@ -431,7 +430,6 @@ export default function GuestWelcome() {
             image: getImage(item),
             kind,
             href: getHref(item),
-            track: item,
           });
         }
       });
@@ -497,7 +495,7 @@ export default function GuestWelcome() {
 
   const renderHomepageSearch = (className = '') => (
     <div className={`relative z-30 ${className}`}>
-      <div className="flex items-center gap-3 rounded-full bg-white/5 px-4 py-3 text-white/80 ring-1 ring-white/10 focus-within:ring-purple-400/60">
+      <div className="flex items-center gap-3 rounded-full bg-white/5 px-4 py-3 text-white/80">
         <FaSearch className="shrink-0 text-white/60" />
         <input
           type="search"
@@ -521,7 +519,7 @@ export default function GuestWelcome() {
         />
       </div>
       {homepageSearchOpen && homepageSearchQuery.trim() && (
-        <div className="absolute left-0 right-0 top-full mt-2 max-h-[min(70vh,36rem)] overflow-y-auto rounded-2xl bg-[#100d19] p-3 shadow-2xl ring-1 ring-purple-400/20">
+        <div className="absolute left-0 right-0 top-full mt-2 max-h-[min(70vh,36rem)] overflow-y-auto rounded-2xl bg-black p-3 shadow-2xl">
           <div className="mb-2 flex items-center justify-between px-1">
             <div>
               <p className="text-sm font-semibold text-white">Search results</p>
@@ -545,22 +543,9 @@ export default function GuestWelcome() {
                   type="button"
                   onClick={() => {
                     setHomepageSearchOpen(false);
-                    if (result.kind === 'Track' && result.track) {
-                      playTrack({
-                        id: result.track.id,
-                        title: result.track.title,
-                        artist: result.subtitle,
-                        imageUrl: result.image,
-                        audioUrl: result.track.audioUrl || result.track.url,
-                        duration: result.track.duration,
-                        accessType: result.track.accessType,
-                        type: result.track.type,
-                      });
-                    } else {
-                      router.push(result.href);
-                    }
+                    router.push(result.href);
                   }}
-                  className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-white/10"
+                  className="flex w-full items-center gap-3 rounded-xl bg-black p-2 text-left transition hover:bg-white/10"
                 >
                   <Image
                     src={result.image}
@@ -576,7 +561,7 @@ export default function GuestWelcome() {
                     <span className="block truncate text-sm font-semibold text-white">{result.title}</span>
                     <span className="block truncate text-xs text-white/55">{result.subtitle}</span>
                   </span>
-                  <span className="shrink-0 rounded-full bg-purple-500/20 px-2 py-1 text-[10px] font-medium text-purple-200">
+                  <span className="shrink-0 rounded-full bg-purple-600 px-2 py-1 text-[10px] font-semibold text-white">
                     {result.kind}
                   </span>
                 </button>
