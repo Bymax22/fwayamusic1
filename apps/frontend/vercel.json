@@ -10,6 +10,7 @@
       ]
     }
   ],
+  "installCommand": "npm ci --workspace=frontend --include-workspace-root=false --no-audit --no-fund",
   "env": {
     "NEXT_PUBLIC_BACKEND_URL": "https://fwayamusic1-backend.vercel.app",
     "NEXT_PUBLIC_API_URL": "https://fwayamusic1-backend.vercel.app",

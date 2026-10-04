@@ -1,4 +1,5 @@
 {
+  "installCommand": "npm ci --workspace=frontend --include-workspace-root=false --no-audit --no-fund",
   "version": 2,
   "env": {
     "NODE_ENV": "production"
