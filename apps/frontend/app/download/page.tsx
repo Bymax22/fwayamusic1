@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
-import { Download, Music, Headphones, HardDrive, ArrowDown, Check, Crown, Clock, Sparkles, Play, Shield, Lock, Wifi, WifiOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Download, Music, HardDrive, ArrowDown, Clock, Sparkles, Play, Shield, Wifi, WifiOff } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import Waveform from '@/components/Waveform';
 import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
@@ -16,8 +16,11 @@ import {
   type PrivateDownload,
 } from '@/lib/privateDownloads';
 
+let activePrivateDownloadUrl: string | null = null;
+
 interface DownloadItem {
   id: string;
+  mediaId?: string;
   title: string;
   artist: string;
   coverArt: string;
@@ -41,7 +44,7 @@ export default function DownloadPage() {
   const [suggestions, setSuggestions] = useState<DownloadItem[]>([]);
   const [freeDownloads, setFreeDownloads] = useState<DownloadItem[]>([]);
   const [premiumDownloads, setPremiumDownloads] = useState<DownloadItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'all' | 'downloaded' | 'suggested' | 'free' | 'premium'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'downloaded' | 'suggested' | 'free' | 'premium'>('downloaded');
   const [storageUsage, setStorageUsage] = useState({ used: 0, total: 10 * 1024 * 1024 * 1024 });
   const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [downloadedFiles, setDownloadedFiles] = useState<DownloadItem[]>([]);
@@ -49,12 +52,6 @@ export default function DownloadPage() {
   const { currentTrack, isPlaying, playTrack } = useAudioPlayer();
   const { getToken, user } = useAuth();
   const { isOnline, connectionQuality } = useNetworkStatus();
-  const currentObjectUrl = useRef<string | null>(null);
-
-  useEffect(() => () => {
-    if (currentObjectUrl.current) URL.revokeObjectURL(currentObjectUrl.current);
-  }, []);
-
 useEffect(() => {
   let mounted = true;
 
@@ -66,6 +63,7 @@ useEffect(() => {
         if (mounted) {
           setDownloadedFiles(localItems.map((record) => ({
             id: record.id,
+            mediaId: record.mediaId,
             title: record.title,
             artist: record.artist,
             coverArt: record.coverArt,
@@ -179,6 +177,7 @@ const handleDownload = async (item: DownloadItem) => {
     const completed: DownloadItem = {
       ...item,
       id: record.id,
+      mediaId: record.mediaId,
       coverArt: record.coverArt,
       duration: record.duration,
       fileSize: record.data.size,
@@ -222,15 +221,16 @@ const handleDownload = async (item: DownloadItem) => {
     try {
       if (item.privateRecord) {
         const audio = await readPrivateDownload(item.privateRecord);
-        if (currentObjectUrl.current) URL.revokeObjectURL(currentObjectUrl.current);
         const objectUrl = URL.createObjectURL(audio);
-        currentObjectUrl.current = objectUrl;
+        if (activePrivateDownloadUrl) URL.revokeObjectURL(activePrivateDownloadUrl);
+        activePrivateDownloadUrl = objectUrl;
         playTrack({
-          id: item.id,
+          id: item.privateRecord.mediaId,
           title: item.title,
           artist: item.artist,
           imageUrl: item.coverArt,
           audioUrl: objectUrl,
+          type: 'AUDIO',
           accessType: 'FREE',
         });
         return;
@@ -396,81 +396,23 @@ const handleDownload = async (item: DownloadItem) => {
               return (
                 <div 
                   key={item.id} 
-                  className="flex overflow-hidden rounded-xl bg-[#0a3747]/70 shadow-sm transition-all hover:shadow-md"
+                  className="flex items-center gap-3 rounded-xl bg-[#0a3747]/70 p-2 shadow-sm transition-colors hover:bg-[#0a3747]"
                 >
-                  <div className="relative w-24 shrink-0 group sm:w-32">
+                  <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md sm:h-16 sm:w-16">
                     <Image
                       src={item.coverArt} 
                       alt={item.title} 
                       width={200}
                       height={200}
-                      className="h-full min-h-28 w-full object-cover"
+                      className="h-full w-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/default-cover.jpg';
                       }}
                     />
-                    <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all ${
-                      String(currentTrack?.id) === String(item.id) && isPlaying ? 'bg-opacity-30' : ''
-                    }`}>
-                      <div className="flex gap-2 sm:gap-3">
-                        <button 
-                          onClick={() => handlePlay(item)}
-                          className={`transform transition-all ${String(currentTrack?.id) === String(item.id) && isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 group-hover:opacity-100 group-hover:translate-y-0'}`}
-                          disabled={item.isDRMProtected && !drmStatus}
-                        >
-                          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg ${
-                            item.isDRMProtected && !drmStatus 
-                              ? 'bg-gray-600 cursor-not-allowed' 
-                              : 'bg-purple-500'
-                          }`}>
-                            {String(currentTrack?.id) === String(item.id) && isPlaying ? (
-                              <Waveform playing className="h-5 w-5" />
-                            ) : (
-                              <Play className="w-4 h-4 sm:h-5 sm:w-5 text-white" />
-                            )}
-                          </div>
-                        </button>
-                        {item.downloadStatus === 'pending' && (
-                          <button 
-                            onClick={() => handleDownload(item)}
-                            className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
-                          >
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0a3747] border-2 border-purple-500 flex items-center justify-center shadow-lg">
-                              <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300" />
-                            </div>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Quality badge */}
-                    <div className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${
-                      item.quality === 'Lossless' ? 'bg-purple-600 text-white' :
-                      item.quality === 'HD' ? 'bg-blue-600 text-white' :
-                      'bg-gray-600 text-gray-300'
-                    }`}>
-                      {item.quality}
-                    </div>
-                    
-                    {/* Premium badge */}
-                    {item.accessType === 'PREMIUM' && (
-                      <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-purple-600 text-white text-xs font-medium flex items-center gap-1">
-                        <Crown className="w-3 h-3" />
-                        Premium
-                      </div>
-                    )}
-
-                    {/* DRM badge */}
-                    {item.isDRMProtected && (
-                      <div className="absolute bottom-2 left-2 px-2 py-1 rounded-full bg-blue-600 text-white text-xs font-medium flex items-center gap-1">
-                        <Lock className="w-3 h-3" />
-                        DRM
-                      </div>
-                    )}
                   </div>
                   
-                  <div className="min-w-0 flex-1 p-3 sm:p-4">
-                    <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(item.id) && isPlaying} className="text-sm font-medium text-white sm:text-base">{item.title}</ScrollingTrackTitle>
+                  <div className="min-w-0 flex-1">
+                    <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(item.privateRecord?.mediaId || item.id) && isPlaying} className="text-sm font-medium text-white sm:text-base">{item.title}</ScrollingTrackTitle>
                     <p className="text-xs sm:text-sm text-gray-400 truncate">{item.artist}</p>
                     
                     {/* DRM Status */}
@@ -497,21 +439,19 @@ const handleDownload = async (item: DownloadItem) => {
                           type="button"
                           onClick={() => handlePlay(item)}
                           disabled={item.isDRMProtected && !drmStatus}
-                          className="inline-flex items-center gap-1 rounded-md bg-purple-600 px-2 py-1 text-xs font-medium text-white hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-white hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
                           aria-label={`Play ${item.title}`}
                         >
-                          <Play className="h-3 w-3" />
-                          Play
+                          {String(currentTrack?.id) === String(item.privateRecord?.mediaId || item.id) && isPlaying
+                            ? <Waveform playing className="h-4 w-4" />
+                            : <Play className="h-4 w-4" />}
                         </button>
                         {item.downloadStatus === 'completed' ? (
                           <>
-                            <span className="text-xs text-purple-300 flex items-center gap-1">
-                              <Check className="w-3 h-3" />
-                              <span className="hidden sm:inline">Downloaded</span>
-                            </span>
                             <button 
                               onClick={() => handleDelete(item.id)}
                               className="text-xs text-gray-400 hover:text-purple-100"
+                              aria-label={`Delete ${item.title} from downloads`}
                             >
                               Delete
                             </button>

@@ -6,15 +6,15 @@ function getBackendBaseUrl() {
 
 export async function POST(
   request: NextRequest,
-  context: any
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const baseUrl = getBackendBaseUrl();
-    const id = context?.params?.id;
+    const { id } = await context.params;
     const token = request.headers.get('Authorization');
 
-    if (!id) {
-      return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
+    if (!/^\d+$/.test(id)) {
+      return NextResponse.json({ error: 'Invalid media id' }, { status: 400 });
     }
 
     const body = await request.json().catch(() => ({}));

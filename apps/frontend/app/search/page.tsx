@@ -58,6 +58,11 @@ export default function SearchPage() {
   const { currentTrack, isPlaying, togglePlay, playTrack } = useAudioPlayer();
 
   useEffect(() => {
+    const initialQuery = new URLSearchParams(window.location.search).get('q');
+    if (initialQuery) setSearchQuery(initialQuery);
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const [mediaResponse, artistsResponse] = await Promise.all([
@@ -318,7 +323,6 @@ export default function SearchPage() {
     </div>
   );
 }
-
 
 
 

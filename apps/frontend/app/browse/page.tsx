@@ -619,7 +619,9 @@ export default function Browse() {
 
       if (!response.ok) throw new Error('Download failed');
       const downloadData = await response.json();
-      const audioResponse = await fetch(downloadData.downloadUrl);
+      const audioUrl = typeof downloadData.downloadUrl === 'string' ? downloadData.downloadUrl : file.url;
+      if (!audioUrl) throw new Error('The track has no downloadable audio URL.');
+      const audioResponse = await fetch(audioUrl);
       if (!audioResponse.ok) throw new Error('The audio file could not be downloaded.');
       const contentLength = Number(audioResponse.headers.get('content-length')) || 0;
       let audio: Blob;
@@ -735,15 +737,15 @@ export default function Browse() {
       setShowAddToPlaylist(false);
       setSelectedMedia(null);
       toast.custom((toastItem) => (
-        <div role="status" className="flex items-center gap-3 rounded-xl bg-[#111] px-4 py-3 text-sm text-white shadow-xl ring-1 ring-purple-400/30">
-          <span>{addedTrackTitle} added to playlist.</span>
+        <div role="status" className="flex max-w-[calc(100vw-2rem)] items-center gap-2 rounded-xl bg-[#5b0ea6] px-3 py-2 text-xs text-white shadow-xl">
+          <span className="max-w-40 truncate">{addedTrackTitle} added.</span>
           <button
             type="button"
             onClick={() => {
               toast.dismiss(toastItem.id);
               router.push(`/track/${mediaId}`);
             }}
-            className="shrink-0 font-semibold text-purple-300 hover:text-purple-200"
+            className="shrink-0 font-semibold text-white hover:text-white/80"
           >
             View track
           </button>
@@ -753,7 +755,7 @@ export default function Browse() {
               toast.dismiss(toastItem.id);
               router.push(`/playlist/${playlistId}`);
             }}
-            className="shrink-0 font-semibold text-purple-300 hover:text-purple-200"
+            className="shrink-0 font-semibold text-white hover:text-white/80"
           >
             View playlist
           </button>
@@ -1658,64 +1660,30 @@ export default function Browse() {
       <AnimatePresence>
         {downloadDialog && (
           <motion.div
-            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            role="status"
+            aria-live="polite"
+            className="fixed bottom-24 left-0 z-[70] flex w-full max-w-md items-center justify-between gap-4 bg-gradient-to-r from-black via-black/90 to-transparent px-5 py-4 text-sm text-white"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
           >
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="download-dialog-title"
-              className="w-full max-w-sm rounded-2xl bg-[#111] p-5 text-white shadow-2xl ring-1 ring-purple-400/30"
-              initial={{ scale: 0.95, y: 10 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 10 }}
-            >
-              <h2 id="download-dialog-title" className="text-lg font-semibold">
-                {downloadDialog.status === 'complete' ? 'Saved to Fwaya Downloads' : 'Downloading track'}
-              </h2>
-              <p className="mt-1 truncate text-sm text-white/65">{downloadDialog.title}</p>
-              {downloadDialog.status === 'downloading' ? (
-                <div className="mt-4">
-                  <div className="h-2 overflow-hidden rounded-full bg-white/15">
-                    <div
-                      className={`h-full rounded-full bg-purple-400 transition-all ${downloadDialog.progress === 0 ? 'w-1/3 animate-pulse' : ''}`}
-                      style={downloadDialog.progress > 0 ? { width: `${downloadDialog.progress}%` } : undefined}
-                    />
-                  </div>
-                  <p className="mt-2 text-right text-xs text-white/60">
-                    {downloadDialog.progress > 0 ? `${downloadDialog.progress}%` : 'Saving privately…'}
-                  </p>
-                </div>
-              ) : (
-                <p className="mt-3 text-sm text-white/70">
-                  This track is stored privately in Fwaya, not in your device’s public Downloads folder.
-                </p>
-              )}
-              <div className="mt-5 flex justify-end gap-2">
-                {downloadDialog.status === 'complete' && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDownloadDialog(null);
-                      router.push('/download');
-                    }}
-                    className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold hover:bg-purple-500"
-                  >
-                    View Downloads
-                  </button>
-                )}
+            {downloadDialog.status === 'downloading' ? (
+              <span className="truncate">Downloading... {downloadDialog.title}</span>
+            ) : (
+              <>
+                <span className="truncate">Download complete: {downloadDialog.title}</span>
                 <button
                   type="button"
-                  onClick={() => setDownloadDialog(null)}
-                  disabled={downloadDialog.status === 'downloading'}
-                  className="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/15 disabled:opacity-50"
+                  onClick={() => {
+                    setDownloadDialog(null);
+                    router.push('/download');
+                  }}
+                  className="shrink-0 font-semibold text-purple-300 hover:text-white"
                 >
-                  {downloadDialog.status === 'complete' ? 'Close' : 'Downloading'}
+                  View download
                 </button>
-              </div>
-            </motion.div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

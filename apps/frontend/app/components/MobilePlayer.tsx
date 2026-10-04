@@ -701,8 +701,8 @@ export default function MobilePlayer({
                 priority
                 className="scale-105 object-cover opacity-75"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/45 to-black/95" />
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#5b0ea6]/45 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/95" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#5b0ea6]/30 via-transparent to-transparent" />
             </div>
 
             <div className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-3 pt-2 text-white">

@@ -41,6 +41,12 @@ export default function GuestWelcome() {
   const [isSliding, setIsSliding] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [homepageSearchQuery, setHomepageSearchQuery] = useState('');
+  const [homepageSearchOpen, setHomepageSearchOpen] = useState(false);
+  const [catalogTracks, setCatalogTracks] = useState<any[]>([]);
+  const [catalogArtists, setCatalogArtists] = useState<any[]>([]);
+  const [catalogSearchLoading, setCatalogSearchLoading] = useState(false);
+  const catalogRequested = useRef(false);
 
   // Data state
   const [quickPicks, setQuickPicks] = useState<any[]>([]);
@@ -346,6 +352,249 @@ export default function GuestWelcome() {
   const { playTrack, isPlaying } = useAudioPlayer();
 
   const featuredSongs = quickPicks;
+
+  useEffect(() => {
+    if (!homepageSearchQuery.trim() || catalogRequested.current) return;
+    catalogRequested.current = true;
+    const loadSearchCatalog = async () => {
+      setCatalogSearchLoading(true);
+      try {
+        const [mediaResponse, artistsResponse] = await Promise.all([
+          fetch('/api/media'),
+          fetch('/api/artists'),
+        ]);
+        if (!mediaResponse.ok || !artistsResponse.ok) {
+          throw new Error(`Search catalog request failed (media ${mediaResponse.status}, artists ${artistsResponse.status}).`);
+        }
+        const [mediaPayload, artistsPayload] = await Promise.all([
+          mediaResponse.json(),
+          artistsResponse.json(),
+        ]);
+        const rawMediaItems = Array.isArray(mediaPayload)
+          ? mediaPayload
+          : mediaPayload?.data || mediaPayload?.media || [];
+        const rawArtistItems = Array.isArray(artistsPayload)
+          ? artistsPayload
+          : artistsPayload?.artists || artistsPayload?.data || [];
+        const mediaItems = Array.isArray(rawMediaItems) ? rawMediaItems : [];
+        const artistItems = Array.isArray(rawArtistItems) ? rawArtistItems : [];
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const resolveUrl = (url?: string) =>
+          url && !/^https?:\/\//i.test(url) ? `${apiBase}${url}` : url;
+        setCatalogTracks(mediaItems.map((item: any) => ({
+          ...item,
+          artist: item.user?.displayName || item.user?.username || item.artist || 'Fwaya artist',
+          url: resolveUrl(item.url),
+          artCoverUrl: resolveUrl(item.artCoverUrl || item.coverArt || item.thumbnailUrl),
+        })));
+        setCatalogArtists(artistItems.map((artist: any) => ({
+          ...artist,
+          name: artist.name || artist.displayName || artist.username || 'Artist',
+          avatarUrl: resolveUrl(artist.avatarUrl || artist.avatar || artist.profileImage),
+        })));
+      } catch (error) {
+        catalogRequested.current = false;
+        console.error('Could not load the complete homepage search catalog:', error);
+      } finally {
+        setCatalogSearchLoading(false);
+      }
+    };
+    void loadSearchCatalog();
+  }, [homepageSearchQuery]);
+
+  const homepageSearchResults = useMemo(() => {
+    const entries = new Map<string, {
+      id: string | number;
+      title: string;
+      subtitle: string;
+      image: string;
+      kind: string;
+      href: string;
+      track?: any;
+    }>();
+    const addItems = (
+      items: any[],
+      kind: string,
+      getHref: (item: any) => string,
+      getSubtitle: (item: any) => string,
+      getImage: (item: any) => string,
+    ) => {
+      items.forEach((item) => {
+        const title = item?.title || item?.name || item?.displayName || item?.username;
+        if (!item?.id || !title) return;
+        const id = `${kind}:${item.id}`;
+        if (!entries.has(id)) {
+          entries.set(id, {
+            id: item.id,
+            title: String(title),
+            subtitle: getSubtitle(item),
+            image: getImage(item),
+            kind,
+            href: getHref(item),
+            track: item,
+          });
+        }
+      });
+    };
+
+    addItems(
+      [...quickPicks, ...trendingNow, ...topCharts, ...beats, ...catalogTracks.filter((item) => item.type?.toUpperCase() !== 'VIDEO')],
+      'Track',
+      (item) => `/track/${createMediaSlug(item.title, item.id)}`,
+      (item) => item.user?.displayName || item.user?.username || item.artist || 'Fwaya artist',
+      (item) => item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/default-cover.jpg',
+    );
+    addItems(
+      [...featuredArtists, ...featuredProducers, ...catalogArtists],
+      'Artist',
+      (item) => `/artists/${item.id}`,
+      (item) => `${getArtistFollowers(item).toLocaleString()} followers`,
+      (item) => item.avatarUrl || '/default-avatar.jpg',
+    );
+    addItems(
+      [...featuredAlbums, ...featuredEPs],
+      'Album',
+      (item) => `/albums/${createMediaSlug(item.title, item.id)}`,
+      (item) => item.artist || item.user?.displayName || item.user?.username || 'Fwaya release',
+      (item) => item.artCoverUrl || item.coverArt || item.coverUrl || '/default-cover.jpg',
+    );
+    addItems(
+      playlists,
+      'Playlist',
+      (item) => `/playlist/${item.id}`,
+      (item) => `${getTrackCount(item)} tracks`,
+      (item) => item.coverArt || item.coverUrl || item.imageUrl || '/default-playlist.png',
+    );
+    addItems(
+      [...musicVideos, ...otherVideos, ...catalogTracks.filter((item) => item.type?.toUpperCase() === 'VIDEO')],
+      'Video',
+      (item) => `/videos/${item.id}`,
+      (item) => item.user?.displayName || item.user?.username || item.artist || 'Fwaya video',
+      (item) => item.coverPreview || item.coverArt || item.thumbnailUrl || '/default-cover.jpg',
+    );
+
+    const query = homepageSearchQuery.trim().toLocaleLowerCase();
+    if (!query) return [];
+    return [...entries.values()].filter((entry) =>
+      `${entry.title} ${entry.subtitle} ${entry.kind}`.toLocaleLowerCase().includes(query),
+    ).slice(0, 12);
+  }, [
+    beats,
+    catalogArtists,
+    catalogTracks,
+    featuredAlbums,
+    featuredArtists,
+    featuredEPs,
+    featuredProducers,
+    homepageSearchQuery,
+    musicVideos,
+    otherVideos,
+    playlists,
+    quickPicks,
+    topCharts,
+    trendingNow,
+  ]);
+
+  const renderHomepageSearch = (className = '') => (
+    <div className={`relative z-30 ${className}`}>
+      <div className="flex items-center gap-3 rounded-full bg-white/5 px-4 py-3 text-white/80 ring-1 ring-white/10 focus-within:ring-purple-400/60">
+        <FaSearch className="shrink-0 text-white/60" />
+        <input
+          type="search"
+          value={homepageSearchQuery}
+          onFocus={() => setHomepageSearchOpen(true)}
+          onChange={(event) => {
+            setHomepageSearchQuery(event.target.value);
+            setHomepageSearchOpen(true);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') setHomepageSearchOpen(false);
+            if (event.key === 'Enter' && homepageSearchQuery.trim()) {
+              router.push(`/search?q=${encodeURIComponent(homepageSearchQuery.trim())}`);
+              setHomepageSearchOpen(false);
+            }
+          }}
+          placeholder="Search music, artists, albums, playlists"
+          aria-label="Search music, artists, albums, and playlists"
+          aria-expanded={homepageSearchOpen && Boolean(homepageSearchQuery.trim())}
+          className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/40"
+        />
+      </div>
+      {homepageSearchOpen && homepageSearchQuery.trim() && (
+        <div className="absolute left-0 right-0 top-full mt-2 max-h-[min(70vh,36rem)] overflow-y-auto rounded-2xl bg-[#100d19] p-3 shadow-2xl ring-1 ring-purple-400/20">
+          <div className="mb-2 flex items-center justify-between px-1">
+            <div>
+              <p className="text-sm font-semibold text-white">Search results</p>
+              <p className="text-xs text-white/50">
+                {catalogSearchLoading ? 'Searching the full catalog…' : `${homepageSearchResults.length} matches on Fwaya`}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setHomepageSearchOpen(false)}
+              className="rounded-full px-3 py-1 text-xs text-purple-200 hover:bg-white/10"
+            >
+              Close
+            </button>
+          </div>
+          {homepageSearchResults.length ? (
+            <div className="space-y-1">
+              {homepageSearchResults.map((result) => (
+                <button
+                  key={`${result.kind}:${result.id}`}
+                  type="button"
+                  onClick={() => {
+                    setHomepageSearchOpen(false);
+                    if (result.kind === 'Track' && result.track) {
+                      playTrack({
+                        id: result.track.id,
+                        title: result.track.title,
+                        artist: result.subtitle,
+                        imageUrl: result.image,
+                        audioUrl: result.track.audioUrl || result.track.url,
+                        duration: result.track.duration,
+                        accessType: result.track.accessType,
+                        type: result.track.type,
+                      });
+                    } else {
+                      router.push(result.href);
+                    }
+                  }}
+                  className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-white/10"
+                >
+                  <Image
+                    src={result.image}
+                    alt=""
+                    width={44}
+                    height={44}
+                    className={`h-11 w-11 shrink-0 object-cover ${result.kind === 'Artist' ? 'rounded-full' : 'rounded-lg'}`}
+                    onError={(event) => {
+                      event.currentTarget.src = result.kind === 'Artist' ? '/default-avatar.jpg' : '/default-cover.jpg';
+                    }}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-white">{result.title}</span>
+                    <span className="block truncate text-xs text-white/55">{result.subtitle}</span>
+                  </span>
+                  <span className="shrink-0 rounded-full bg-purple-500/20 px-2 py-1 text-[10px] font-medium text-purple-200">
+                    {result.kind}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : catalogSearchLoading ? (
+            <p className="rounded-xl bg-white/5 px-3 py-5 text-center text-sm text-white/55">
+              Searching tracks and artists…
+            </p>
+          ) : (
+            <p className="rounded-xl bg-white/5 px-3 py-5 text-center text-sm text-white/55">
+              No matches yet. Try a track, artist, album, or playlist name.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   // Fetch homepage data from backend
   useEffect(() => {
@@ -995,16 +1244,7 @@ export default function GuestWelcome() {
               </div>
             </div>
 
-            <div className="mb-4">
-              <div className="flex items-center gap-3 bg-white/5 rounded-full px-4 py-3 text-white/80">
-                <FaSearch className="text-white/60" />
-                <input
-                  type="search"
-                  placeholder="Search music, artists, playlists"
-                  className="bg-transparent outline-none text-sm text-white placeholder:text-white/40 w-full"
-                />
-              </div>
-            </div>
+            {renderHomepageSearch('mb-4')}
 
         {/* HERO SECTION - Mobile-friendly hero banner */}
         <div
@@ -2037,6 +2277,8 @@ export default function GuestWelcome() {
         {/* MAIN */}
         <div className="flex-1 h-full min-h-0 px-4 py-6 overflow-y-auto scrollbar-modern rounded-2xl bg-[#080812]/60">
 
+
+          {renderHomepageSearch('mb-6')}
 
           {/* ===== HERO ===== */}
           <div
