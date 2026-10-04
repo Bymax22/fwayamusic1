@@ -16,6 +16,26 @@ interface TrackMeta {
   user?: { id: number; username?: string; displayName?: string };
 }
 
+function getSocialPreviewUrl(rawUrl: string, baseUrl: string): string | null {
+  const resolved = resolveMediaUrl(rawUrl, baseUrl);
+  if (!resolved) return null;
+
+  try {
+    const imageUrl = new URL(resolved);
+    if (!imageUrl.hostname.endsWith('cloudinary.com') || !imageUrl.pathname.includes('/upload/')) {
+      return null;
+    }
+
+    const segments = imageUrl.pathname.split('/');
+    const uploadIndex = segments.indexOf('upload');
+    segments.splice(uploadIndex + 1, 0, 'f_jpg,q_55,w_1200,h_1200,c_fill');
+    imageUrl.pathname = segments.join('/');
+    return imageUrl.href;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchTrackMeta(id: string): Promise<TrackMeta | null> {
   try {
     const { extractMediaIdFromSlug } = await import('@/lib/utils');
@@ -26,7 +46,7 @@ async function fetchTrackMeta(id: string): Promise<TrackMeta | null> {
       return null;
     }
     
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://fwayamusic1-backend.vercel.app';
     const response = await fetch(`${apiUrl}/api/v1/media/${mediaId}`, {
       next: { revalidate: 60 },
     });
@@ -68,11 +88,11 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
     track?.artCoverUrl ||
     track?.thumbnailUrl;
   const previewImage = rawCoverUrl
-    ? resolveMediaUrl(rawCoverUrl, baseUrl) ?? ogImage
+    ? getSocialPreviewUrl(rawCoverUrl, baseUrl) ?? ogImage
     : ogImage;
 
   const trackUrl = `${baseUrl}/track/${id}`;
-  const imageType = previewImage.toLowerCase().includes('.png') ? 'image/png' : 'image/jpeg';
+  const imageType = 'image/jpeg';
 
   // eslint-disable-next-line no-console
   console.log("[track-layout] Metadata:", { mediaId, title, description, previewImage, ogImage, previewVideoUrl });

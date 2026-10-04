@@ -222,6 +222,7 @@ export default function Browse() {
       try {
         setLoading(true);
         setError(null);
+        const token = await getToken();
 
         const [mediaResponse, userPlaylistsResponse] = await Promise.all([
           fetchWithFallback(
@@ -233,11 +234,14 @@ export default function Browse() {
             }
           ),
           fetchWithFallback(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/playlist?type=USER`,
-            '/api/playlist?type=USER',
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/playlists`,
+            '/api/user/me/playlists',
             {
               credentials: 'include',
-              headers: { 'Accept': 'application/json' }
+              headers: {
+                'Accept': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              }
             }
           )
         ]);
@@ -296,8 +300,16 @@ export default function Browse() {
         setVisibleCount(PAGE_SIZE); // reset visible count on initial load
 
         if (userPlaylistsResponse.ok) {
-          const userPlaylistsRaw = await userPlaylistsResponse.json().catch(() => []);
-          const userPlaylistsData = (userPlaylistsRaw || []).map((p: PlaylistAPI) => ({
+          const userPlaylistsPayload: unknown = await userPlaylistsResponse.json().catch(() => []);
+          const userPlaylistsRaw = Array.isArray(userPlaylistsPayload)
+            ? userPlaylistsPayload
+            : userPlaylistsPayload &&
+                typeof userPlaylistsPayload === 'object' &&
+                'playlists' in userPlaylistsPayload &&
+                Array.isArray(userPlaylistsPayload.playlists)
+              ? userPlaylistsPayload.playlists
+              : [];
+          const userPlaylistsData = userPlaylistsRaw.map((p: PlaylistAPI) => ({
             id: p.id ?? 0,
             name: p.name ?? 'Untitled',
             description: p.description,
@@ -321,7 +333,7 @@ export default function Browse() {
     };
 
     fetchData();
-  }, []);
+  }, [getToken, user?.id]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -815,7 +827,7 @@ export default function Browse() {
   const handleAddToPlaylist = async (playlistId: number, mediaId: number) => {
     try {
       const token = await getToken();
-      if (!token) {
+      if (!token || !user?.id) {
         alert('Please sign in to add to playlists.');
         return;
       }
@@ -832,11 +844,21 @@ export default function Browse() {
 
       if (!response.ok) {
         let details = 'Failed to add to playlist';
-        try { const j = await response.json(); details = j.message || j.error || j.details || details; } catch (_) {}
+        try {
+          const j = await response.json();
+          details = j.message || j.error || j.details || details;
+          if (typeof details === 'string' && details.startsWith('{')) {
+            try {
+              const parsed = JSON.parse(details);
+              details = parsed.message || parsed.error || details;
+            } catch {}
+          }
+        } catch (_) {}
         throw new Error(details);
       }
 
       setShowAddToPlaylist(false);
+      setSelectedMedia(null);
       alert('Added to playlist successfully!');
     } catch (err) {
       console.error('Playlist error:', err);
@@ -1737,5 +1759,3 @@ export default function Browse() {
     </div>
   );
 }
-
-

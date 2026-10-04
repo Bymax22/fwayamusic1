@@ -18,6 +18,7 @@ import MobilePlayer from '@/components/MobilePlayer';
 import ShareModal from '@/components/ShareModal';
 import VideoPlayer from '@/components/VideoPlayer';
 import { createMediaSlug, MUSIC_GENRE_GROUPS } from '@/lib/utils';
+import { compressCoverImage } from '@/lib/compressCoverImage';
 import { subscribe } from '@/lib/realtime';
 import Waveform from '@/components/Waveform';
 import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
@@ -568,7 +569,7 @@ export default function ForArtistsPage() {
         let releaseCoverUrl: string | null = null;
         let releaseCoverPublicId: string | null = null;
         if (newMedia.artCoverFile) {
-          const coverData = await uploadToCloudinary(newMedia.artCoverFile, 'image');
+          const coverData = await uploadToCloudinary(await compressCoverImage(newMedia.artCoverFile), 'image');
           releaseCoverUrl = coverData.secure_url;
           releaseCoverPublicId = coverData.public_id;
         }
@@ -683,7 +684,7 @@ export default function ForArtistsPage() {
 
       let artCoverUrl: string | null = null;
       if (newMedia.artCoverFile) {
-        const coverData = await uploadToCloudinary(newMedia.artCoverFile, 'image');
+        const coverData = await uploadToCloudinary(await compressCoverImage(newMedia.artCoverFile), 'image');
         artCoverUrl = coverData.secure_url;
         setUploadProgress(20);
       }
@@ -2284,6 +2285,5 @@ export default function ForArtistsPage() {
     </RoleGuard>
   );
 }
-
 
 

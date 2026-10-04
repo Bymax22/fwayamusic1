@@ -8,6 +8,7 @@ import { CheckCircle, Music, Video, Headphones, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import { MUSIC_GENRE_GROUPS } from '@/lib/utils';
+import { compressCoverImage } from '@/lib/compressCoverImage';
 import { useToast } from "@/components/ui/use-toast";
 
 interface UploadMetadata {
@@ -235,7 +236,8 @@ export default function UploadPage() {
       let coverUrl: string | undefined = undefined;
       if (coverFile) {
         try {
-          const coverData = await uploadCoverToCloudinary(coverFile);
+          const compressedCover = await compressCoverImage(coverFile);
+          const coverData = await uploadCoverToCloudinary(compressedCover);
           coverUrl = coverData.secure_url;
         } catch (err) {
           console.warn("Cover upload warning:", err);
@@ -756,6 +758,5 @@ export default function UploadPage() {
     </div>
   );
 }
-
 
 

@@ -1,6 +1,8 @@
 "use client";
 import Image from 'next/image';
-import { useState, useRef, useEffect } from "react";
+import Link from 'next/link';
+import { useState, useRef, useEffect, useMemo } from "react";
+import type { FormEvent } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PlayIcon,
@@ -14,6 +16,9 @@ import {
   XMarkIcon,
   ArrowPathIcon,
   VideoCameraIcon,
+  ChevronDownIcon,
+  ChatBubbleLeftRightIcon,
+  ShareIcon,
 } from "@heroicons/react/24/solid";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { useAuth } from '@/context/AuthContext';
@@ -36,9 +41,27 @@ type TrackType = {
   currency?: string;
   liked?: boolean;
   likes?: number;
+  lyrics?: string;
 };
 
 type RepeatMode = 'off' | 'repeat-all' | 'repeat-one';
+type PlayerComment = { id: number; content: string; userName: string; createdAt: string };
+type LyricLine = { text: string; time: number | null };
+
+function parseLyrics(value: string): LyricLine[] {
+  const lines = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const timestamp = /\[(\d{1,2}):(\d{2}(?:\.\d{1,3})?)\]/g;
+  const parsed = lines.flatMap<LyricLine>((line) => {
+    const timestamps = Array.from(line.matchAll(timestamp));
+    const text = line.replace(timestamp, '').trim();
+    if (timestamps.length === 0) return [{ text: line, time: null }];
+    return timestamps.map((match) => ({
+      text,
+      time: Number(match[1]) * 60 + Number(match[2]),
+    }));
+  });
+  return parsed.length ? parsed : [{ text: 'No lyrics are available for this track.', time: null }];
+}
 
 const SPECTRUM_BARS = Array.from({ length: 48 }, (_, index) => ({
   id: index,
@@ -118,6 +141,8 @@ interface MobilePlayerProps {
   onSeek?: (time: number) => void;
   onVolumeChange?: (volume: number) => void;
   onToggleMute?: () => void;
+  queue?: TrackType[];
+  onSelectTrack?: (trackId: string | number) => void;
   className?: string;
 }
 
@@ -182,15 +207,36 @@ export default function MobilePlayer({
   onSeek,
   onVolumeChange,
   onToggleMute,
+  queue = [],
+  onSelectTrack,
   className,
 }: MobilePlayerProps) {
   const [isShuffled, setIsShuffled] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState<number | null>(null);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [lyrics, setLyrics] = useState(track.lyrics || '');
+  const [comments, setComments] = useState<PlayerComment[]>([]);
+  const [commentDraft, setCommentDraft] = useState('');
+  const [commentSending, setCommentSending] = useState(false);
+  const lyricContainerRef = useRef<HTMLDivElement>(null);
   const { getToken } = useAuth();
   const isRepeatEnabled = repeatMode && repeatMode !== 'off';
   const isRepeatOne = repeatMode === 'repeat-one';
+  const lyricLines = useMemo(() => parseLyrics(lyrics), [lyrics]);
+  const activeLyricIndex = useMemo(() => {
+    const timedLines = lyricLines.filter((line) => line.time !== null);
+    if (timedLines.length > 0) {
+      let active = lyricLines.findIndex((line) => line.time !== null);
+      lyricLines.forEach((line, index) => {
+        if (line.time !== null && line.time <= currentTime) active = index;
+      });
+      return active;
+    }
+    if (!lyrics.trim() || duration <= 0) return 0;
+    return Math.min(lyricLines.length - 1, Math.floor((currentTime / duration) * lyricLines.length));
+  }, [currentTime, duration, lyricLines, lyrics]);
 
   // Realtime: update like state when other clients like/unlike the same media
   useEffect(() => {
@@ -264,6 +310,71 @@ export default function MobilePlayer({
       setLikesCount(track.likes);
     }
   }, [track?.id, track?.liked, track?.likes]);
+
+  useEffect(() => {
+    setLyrics(track.lyrics || '');
+    if (!isExpanded) return;
+
+    const controller = new AbortController();
+    const loadExpandedTrackData = async () => {
+      try {
+        const response = await fetch(`/api/media/${encodeURIComponent(String(track.id))}`, {
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        if (response.ok) {
+          const payload = await response.json();
+          const lyricsText = typeof payload.lyrics === 'string'
+            ? payload.lyrics
+            : typeof payload.description === 'string'
+              ? payload.description
+              : '';
+          setLyrics(track.lyrics || lyricsText);
+        } else {
+          console.warn(`Could not load track lyrics (${response.status}).`);
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) console.warn('Could not load track lyrics:', error);
+      }
+
+      try {
+        const response = await fetch(`/api/media/${encodeURIComponent(String(track.id))}/comments`, {
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          console.warn(`Could not load track comments (${response.status}).`);
+          return;
+        }
+        const payload: unknown = await response.json();
+        const items = Array.isArray(payload)
+          ? payload
+          : payload && typeof payload === 'object' && 'comments' in payload && Array.isArray(payload.comments)
+            ? payload.comments
+            : [];
+        setComments(items.slice(0, 5).map((item: any, index: number) => ({
+          id: Number(item.id) || index,
+          content: String(item.content || item.text || ''),
+          userName: String(item.userName || item.user?.displayName || item.user?.username || 'Fwaya listener'),
+          createdAt: String(item.createdAt || item.timestamp || ''),
+        })));
+      } catch (error) {
+        if (!controller.signal.aborted) console.warn('Could not load track comments:', error);
+      }
+    };
+
+    void loadExpandedTrackData();
+    return () => controller.abort();
+  }, [isExpanded, track.id, track.lyrics]);
+
+  useEffect(() => {
+    if (isExpanded) {
+      lyricContainerRef.current?.querySelector<HTMLElement>('[data-active-lyric="true"]')?.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth',
+      });
+    }
+  }, [activeLyricIndex, isExpanded]);
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const isVideo = isVideoUrl(track.videoUrl || track.url || track.audioUrl);
@@ -340,6 +451,64 @@ export default function MobilePlayer({
     }
   };
 
+  const handlePostComment = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const content = commentDraft.trim();
+    if (!content || commentSending) return;
+
+    setCommentSending(true);
+    try {
+      const token = await getToken();
+      if (!token) {
+        window.location.assign('/auth/user/signin');
+        return;
+      }
+      const response = await fetch(`/api/media/${encodeURIComponent(String(track.id))}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        const message = payload && typeof payload === 'object' && 'message' in payload && typeof payload.message === 'string'
+          ? payload.message
+          : `Comment could not be posted (${response.status}).`;
+        throw new Error(message);
+      }
+      setComments((previous) => [{
+        id: Number(payload?.id) || Date.now(),
+        content,
+        userName: String(payload?.userName || payload?.user?.displayName || payload?.user?.username || 'You'),
+        createdAt: String(payload?.createdAt || new Date().toISOString()),
+      }, ...previous].slice(0, 5));
+      setCommentDraft('');
+    } catch (error) {
+      console.error('Failed to post a player comment:', error);
+      alert(error instanceof Error ? error.message : 'Could not post your comment.');
+    } finally {
+      setCommentSending(false);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/track/${track.id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: track.title || 'Fwaya track', text: `Listen to ${track.title || 'this track'} on Fwaya`, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert('Track link copied.');
+      }
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === 'AbortError')) {
+        console.error('Could not share track:', error);
+      }
+    }
+  };
+
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return "0:00";
     const mins = Math.floor(seconds / 60);
@@ -367,7 +536,12 @@ export default function MobilePlayer({
           {/* Compact Track Info and Controls */}
           <div className="flex items-center gap-2 relative z-10">
             {/* Track Image */}
-            <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
+            <button
+              type="button"
+              onClick={() => setIsExpanded(true)}
+              className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full"
+              aria-label="Expand player"
+            >
               <Image
                 src={track.imageUrl || "/default-cover.jpg"}
                 alt={track.title || "Track cover"}
@@ -385,15 +559,20 @@ export default function MobilePlayer({
                   <VideoCameraIcon className="w-3 h-3 text-white" />
                 </div>
               )}
-            </div>
+            </button>
 
             {/* Track Info with Scrolling Title */}
-            <div className="flex-1 min-w-0 relative z-10">
+            <button
+              type="button"
+              onClick={() => setIsExpanded(true)}
+              className="flex-1 min-w-0 relative z-10 text-left"
+              aria-label="Expand player"
+            >
               <ScrollingTitle title={track.title || "Unknown Title"} isPlaying={isPlaying} />
               <p className="text-white/70 text-xs truncate">
                 {isVideo ? 'Video • ' : ''}{track.artist || 'Unknown Artist'}
               </p>
-            </div>
+            </button>
 
             {/* Controls */}
             <div className="flex items-center gap-1 relative z-10">
@@ -496,6 +675,220 @@ export default function MobilePlayer({
           </div>
         </div>
       </motion.div>
+
+      {isExpanded && (
+        <>
+          <motion.button
+            type="button"
+            aria-label="Close expanded player"
+            className="fixed inset-0 bottom-16 z-[59] bg-black/60"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsExpanded(false)}
+          />
+          <motion.section
+            className="fixed inset-x-0 bottom-16 z-[60] flex h-[58dvh] min-h-[360px] max-h-[620px] flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-[#090914] shadow-2xl"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            aria-label="Expanded audio player"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="absolute inset-0">
+              <Image
+                src={track.imageUrl || '/default-cover.jpg'}
+                alt=""
+                fill
+                sizes="100vw"
+                className="object-cover opacity-25 blur-2xl scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-[#080812]/90 to-[#080812]" />
+            </div>
+
+            <div className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-3 pt-2 text-white">
+              <div className="flex items-center justify-center">
+                <button
+                  type="button"
+                  className="rounded-full p-2 text-white/70 hover:text-white"
+                  onClick={() => setIsExpanded(false)}
+                  aria-label="Collapse player"
+                >
+                  <ChevronDownIcon className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Image
+                  src={track.imageUrl || '/default-cover.jpg'}
+                  alt={track.title || 'Track cover'}
+                  width={52}
+                  height={52}
+                  className="h-[52px] w-[52px] rounded-xl object-cover shadow-lg"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-base font-semibold">{track.title || 'Unknown Title'}</p>
+                  <p className="truncate text-sm text-white/65">{track.artist || 'Unknown Artist'}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLike}
+                  disabled={likeLoading}
+                  className={`flex items-center gap-1 rounded-full bg-white/10 px-3 py-2 text-sm ${isLiked ? 'text-pink-400' : 'text-white/80'}`}
+                  aria-label={isLiked ? 'Unlike track' : 'Like track'}
+                >
+                  {isLiked ? <HeartIcon className="h-5 w-5" /> : <HeartOutline className="h-5 w-5" />}
+                  <span>{likesCount ?? track.likes ?? 0}</span>
+                </button>
+              </div>
+
+              <div className="relative my-2 h-9 shrink-0 overflow-hidden rounded-lg bg-black/20">
+                <SpectrumVisualizer
+                  isPlaying={isPlaying}
+                  progress={duration > 0 ? currentTime / duration : 0}
+                  className="h-full"
+                />
+                <div className="absolute inset-x-2 bottom-0 z-10 h-1 cursor-pointer rounded-full bg-white/20" onClick={handleSeek}>
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-400"
+                    style={{ width: `${duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0}%` }}
+                  />
+                </div>
+              </div>
+              <div className="-mt-1 flex justify-between text-[10px] text-white/55">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+
+              <div className="flex shrink-0 items-center justify-center gap-7 py-1">
+                <button type="button" onClick={onPrevious} className="p-2 text-white/80" aria-label="Previous track">
+                  <BackwardIcon className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={onPlayPause}
+                  disabled={isLoading}
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-black disabled:opacity-50"
+                  aria-label={isPlaying ? 'Pause' : 'Play'}
+                >
+                  {isPlaying ? <PauseIcon className="h-6 w-6" /> : <PlayIcon className="h-6 w-6" />}
+                </button>
+                <button type="button" onClick={onNext} className="p-2 text-white/80" aria-label="Next track">
+                  <ForwardIcon className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent('fwaya:open-playlist-picker', {
+                    detail: { mediaId: Number(track.id), track },
+                  }))}
+                  className="p-2 text-white/80"
+                  aria-label="Add track to playlist"
+                >
+                  <QueueListIcon className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleShare()}
+                  className="p-2 text-white/80"
+                  aria-label="Share track"
+                >
+                  <ShareIcon className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain pt-2">
+                <section>
+                  <h2 className="mb-1 text-xs font-semibold uppercase tracking-widest text-purple-200">Lyrics</h2>
+                  <div ref={lyricContainerRef} className="max-h-24 overflow-y-auto rounded-xl bg-black/25 px-3 py-2">
+                    {lyricLines.map((line, index) => (
+                      <p
+                        key={`${line.time ?? 'plain'}-${index}`}
+                        data-active-lyric={index === activeLyricIndex}
+                        className={`py-0.5 text-sm leading-5 transition-colors ${index === activeLyricIndex ? 'font-semibold text-white' : 'text-white/45'}`}
+                      >
+                        {line.text}
+                      </p>
+                    ))}
+                  </div>
+                </section>
+
+                <section>
+                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-purple-200">
+                    <QueueListIcon className="h-4 w-4" />
+                    Up next
+                  </div>
+                  {queue.length > 0 ? (
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                      {queue.map((queuedTrack) => (
+                        <button
+                          key={queuedTrack.id}
+                          type="button"
+                          onClick={() => onSelectTrack?.(queuedTrack.id)}
+                          className="flex w-36 shrink-0 items-center gap-2 rounded-xl bg-white/10 p-2 text-left"
+                        >
+                          <Image
+                            src={queuedTrack.imageUrl || '/default-cover.jpg'}
+                            alt=""
+                            width={36}
+                            height={36}
+                            className="h-9 w-9 rounded-lg object-cover"
+                          />
+                          <span className="min-w-0">
+                            <span className="block truncate text-xs font-medium">{queuedTrack.title || 'Untitled'}</span>
+                            <span className="block truncate text-[10px] text-white/55">{queuedTrack.artist || 'Unknown artist'}</span>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="rounded-xl bg-black/25 px-3 py-2 text-xs text-white/50">No tracks are queued.</p>
+                  )}
+                </section>
+
+                <section className="pb-1">
+                  <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-purple-200">
+                    <ChatBubbleLeftRightIcon className="h-4 w-4" />
+                    Comments
+                  </h2>
+                  {comments.length > 0 ? (
+                    <div className="space-y-2">
+                      {comments.map((comment) => (
+                        <article key={comment.id} className="rounded-xl bg-black/25 px-3 py-2">
+                          <p className="text-[11px] font-semibold text-white/80">{comment.userName}</p>
+                          <p className="text-xs leading-5 text-white/65">{comment.content}</p>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="rounded-xl bg-black/25 px-3 py-2 text-xs text-white/50">No comments yet.</p>
+                  )}
+                  <Link href={`/track/${track.id}`} className="mt-2 inline-block text-xs font-semibold text-purple-200">
+                    Open track discussion
+                  </Link>
+                  <form onSubmit={handlePostComment} className="mt-2 flex gap-2">
+                    <input
+                      value={commentDraft}
+                      onChange={(event) => setCommentDraft(event.target.value)}
+                      maxLength={1000}
+                      placeholder="Add a comment..."
+                      aria-label="Add a comment"
+                      className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white placeholder:text-white/40 focus:border-purple-400 focus:outline-none"
+                    />
+                    <button
+                      type="submit"
+                      disabled={commentSending || !commentDraft.trim()}
+                      className="rounded-xl bg-purple-600 px-3 text-xs font-semibold text-white disabled:opacity-50"
+                    >
+                      {commentSending ? 'Sending' : 'Post'}
+                    </button>
+                  </form>
+                </section>
+              </div>
+            </div>
+          </motion.section>
+        </>
+      )}
     </AnimatePresence>
   );
 }

@@ -5,6 +5,7 @@ import { ListMusic, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
+import { compressCoverImage } from '@/lib/compressCoverImage';
 
 interface PlaylistItem {
   id: number;
@@ -161,8 +162,9 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
 
       let coverUrl: string | undefined;
       if (newCover) {
+        const compressedCover = await compressCoverImage(newCover);
         const cloudinaryFormData = new FormData();
-        cloudinaryFormData.append('file', newCover);
+        cloudinaryFormData.append('file', compressedCover);
         cloudinaryFormData.append('upload_preset', 'bymaxdev1');
         const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dayn5vifn';
         const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {

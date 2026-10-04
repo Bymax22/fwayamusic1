@@ -26,7 +26,7 @@ import ChatwootWidget from "../components/ChatwootWidget";
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const { user, loading, authError, clearAuthError, verificationError } = useAuth();
-  const { currentTrack, isPlaying, togglePlay, playTrack, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute, nextTrack, previousTrack, toggleRepeat, repeatMode } = useAudioPlayer();
+  const { currentTrack, queue, isPlaying, togglePlay, playTrack, stopTrack, currentTime, duration, volume, isMuted, isLoading, seekTo, setVolume, toggleMute, nextTrack, previousTrack, toggleRepeat, repeatMode } = useAudioPlayer();
   const pathname = usePathname();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -207,6 +207,11 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
                 onSeek={seekTo}
                 onVolumeChange={setVolume}
                 onToggleMute={toggleMute}
+                queue={queue}
+                onSelectTrack={(trackId) => {
+                  const queuedTrack = queue.find((track) => String(track.id) === String(trackId));
+                  if (queuedTrack) playTrack(queuedTrack);
+                }}
               />
             </div>
           )}

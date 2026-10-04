@@ -115,6 +115,7 @@ export default function TrackPage() {
         const data = await response.json();
         const resolvedTrack: MediaItem = {
           ...data,
+          lyrics: data.lyrics || data.description || '',
           artist: data.artist || data.user?.displayName || data.user?.username || 'Unknown Artist',
           artistId: data.artistId ?? data.user?.id ?? 0,
           url: data.url || data.audioUrl || data.videoUrl || data.fileUrl || '',
@@ -576,8 +577,12 @@ export default function TrackPage() {
                       <span className="text-white font-semibold">{track.isDRMProtected ? 'DRM Protected' : track.accessType}</span>
                     </div>
                   ) : (
-                    <div className="rounded-3xl bg-white/5 p-5 text-gray-300 leading-relaxed whitespace-pre-wrap">
-                      {track.lyrics ? track.lyrics : 'No lyrics are available for this track.'}
+                    <div className="rounded-3xl bg-white/5 p-5 text-gray-300 leading-relaxed">
+                      {track.lyrics?.trim() ? (
+                        <pre className="whitespace-pre-wrap font-sans text-sm leading-7">{track.lyrics}</pre>
+                      ) : (
+                        'No lyrics are available for this track.'
+                      )}
                     </div>
                   )}
                 </div>

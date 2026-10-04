@@ -28,7 +28,7 @@ import Waveform from '@/components/Waveform';
 import ScrollingTrackTitle from '@/components/ScrollingTrackTitle';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAuth } from '@/context/AuthContext';
-import { formatDuration } from '@/lib/utils';
+import { createMediaSlug, formatAddedTime, formatDuration } from '@/lib/utils';
 import VerifiedBadge from '@/components/VerifiedBadge';
 
 interface Artist {
@@ -54,6 +54,7 @@ interface MediaItem {
   duration: number;
   format: string;
   createdAt: string;
+  addedAt?: string;
   coverArt: string;
   views: number;
   likes: number;
@@ -83,7 +84,7 @@ export default function ArtistPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [likedSongs, setLikedSongs] = useState<Set<number>>(new Set());
-  const { getToken } = useAuth();
+  const { getToken, user } = useAuth();
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [selectedSong, setSelectedSong] = useState<MediaItem | null>(null);
 
@@ -94,14 +95,14 @@ export default function ArtistPage() {
         const response = await fetch(`${base}/api/v1/artists/${params.id}`);
         if (response.ok) {
           const data = await response.json();
-          setArtist(data);
+          setArtist(normalizeArtist(data));
         } else {
           // Try falling back to users endpoint (covers producers or generic users)
           const userRes = await fetch(`${base}/api/v1/users/${params.id}`);
           if (userRes.ok) {
             const u = await userRes.json();
             const media = Array.isArray(u.media)
-              ? u.media.map((m: any) => ({ ...m, artist: u.displayName || u.username }))
+              ? u.media.map((m: any) => normalizeArtistMedia(m, u))
               : [];
 
             const mapped = {
@@ -119,7 +120,7 @@ export default function ArtistPage() {
               totalPlays: media.reduce((sum: number, m: any) => sum + (m.playCount || 0), 0)
             } as any;
 
-            setArtist(mapped);
+            setArtist(normalizeArtist(mapped));
           } else {
             throw new Error('Artist not found');
           }
@@ -135,6 +136,46 @@ export default function ArtistPage() {
       fetchArtist();
     }
   }, [params.id]);
+
+  const normalizeArtistMedia = (media: any, artistUser?: any): MediaItem => ({
+    ...media,
+    id: Number(media.id),
+    title: media.title || 'Untitled track',
+    artist: media.artist || artistUser?.displayName || artistUser?.username || artistUser?.artistName || 'Unknown Artist',
+    url: media.url || media.audioUrl || media.fileUrl || '',
+    duration: Number(media.duration) || 0,
+    createdAt: media.createdAt || media.created_at || media.addedAt || media.added_at || '',
+    addedAt: media.addedAt || media.added_at || media.createdAt || media.created_at || '',
+    coverArt: media.coverArt || media.artCoverUrl || media.art_cover_url || media.thumbnailUrl || media.thumbnail || '/default-cover.jpg',
+    views: Number(media.playCount ?? media.views ?? media.viewCount) || 0,
+    playCount: Number(media.playCount ?? media.views ?? media.viewCount) || 0,
+    likes: Array.isArray(media.interactions)
+      ? media.interactions.filter((interaction: any) => interaction?.liked).length
+      : Number(media.likes ?? media.likeCount) || 0,
+    accessType: media.accessType || 'FREE',
+    isExplicit: Boolean(media.isExplicit),
+    downloadCount: Number(media.downloadCount) || 0,
+    shareCount: Number(media.shareCount) || 0,
+    tags: Array.isArray(media.tags) ? media.tags : [],
+  });
+
+  const normalizeArtist = (raw: any): Artist => {
+    const rawMedia = Array.isArray(raw?.media) ? raw.media : Array.isArray(raw?.tracks) ? raw.tracks : [];
+    const media = rawMedia.map((item: any) => normalizeArtistMedia(item, raw));
+    return {
+      ...raw,
+      id: String(raw?.id ?? params.id),
+      name: raw?.name || raw?.displayName || raw?.artistName || raw?.username || 'Unknown Artist',
+      imageUrl: raw?.imageUrl || raw?.avatarUrl || raw?.profileImage || '/default-artist.png',
+      avatarUrl: raw?.avatarUrl || raw?.imageUrl || raw?.profileImage || '/default-artist.png',
+      followers: Number(raw?.followersCount ?? (Array.isArray(raw?.followers) ? raw.followers.length : raw?.followers)) || 0,
+      isVerified: Boolean(raw?.isVerified || raw?.verified || raw?.status === 'VERIFIED'),
+      isFollowing: Boolean(raw?.isFollowing),
+      mediaCount: Number(raw?.mediaCount ?? raw?._count?.media) || media.length,
+      media,
+      totalPlays: Number(raw?.totalPlays) || media.reduce((sum: number, item: MediaItem) => sum + (item.playCount || 0), 0),
+    } as Artist;
+  };
 
   useEffect(() => {
     const fetchFollowStatus = async () => {
@@ -204,17 +245,57 @@ export default function ArtistPage() {
     );
   };
 
-  const handleLikeSong = (songId: number) => {
+  const handleLikeSong = async (songId: number) => {
+    const token = await getToken();
+    if (!token) {
+      alert('Please sign in to like tracks.');
+      return;
+    }
+    const wasLiked = likedSongs.has(songId);
     setLikedSongs(prev => {
       const newLiked = new Set(prev);
-      if (newLiked.has(songId)) {
+      if (wasLiked) {
         newLiked.delete(songId);
       } else {
         newLiked.add(songId);
       }
       return newLiked;
     });
-    // TODO: API call to like/unlike song
+    setArtist((prev) => prev ? {
+      ...prev,
+      media: prev.media.map((song) => song.id === songId
+        ? { ...song, likes: Math.max(0, song.likes + (wasLiked ? -1 : 1)) }
+        : song),
+    } : prev);
+    try {
+      const response = await fetch(`/api/media/${songId}/interact/like`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error(`Like request failed (${response.status}).`);
+      const result = await response.json();
+      if (typeof result.likes === 'number') {
+        setArtist((prev) => prev ? {
+          ...prev,
+          media: prev.media.map((song) => song.id === songId ? { ...song, likes: result.likes } : song),
+        } : prev);
+      }
+    } catch (error) {
+      setLikedSongs((prev) => {
+        const reverted = new Set(prev);
+        if (wasLiked) reverted.add(songId);
+        else reverted.delete(songId);
+        return reverted;
+      });
+      setArtist((prev) => prev ? {
+        ...prev,
+        media: prev.media.map((song) => song.id === songId
+          ? { ...song, likes: Math.max(0, song.likes + (wasLiked ? 1 : -1)) }
+          : song),
+      } : prev);
+      console.error('Failed to update track like:', error);
+      alert(error instanceof Error ? error.message : 'Could not update track like.');
+    }
   };
 
   const handleShareSong = (song: MediaItem) => {
@@ -222,10 +303,10 @@ export default function ArtistPage() {
       navigator.share({
         title: song.title,
         text: `Check out "${song.title}" by ${song.artist} on Fwaya`,
-        url: `${window.location.origin}/songs/${song.id}`
+        url: `${window.location.origin}/track/${createMediaSlug(song.title, song.id)}`
       });
     } else {
-      navigator.clipboard.writeText(`${window.location.origin}/songs/${song.id}`);
+      navigator.clipboard.writeText(`${window.location.origin}/track/${createMediaSlug(song.title, song.id)}`);
       // TODO: Show toast notification
     }
   };
@@ -286,11 +367,11 @@ export default function ArtistPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="relative overflow-hidden">
-        <div className="relative p-6 max-w-7xl mx-auto pb-32">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
+        <div className="relative mx-auto max-w-7xl px-4 py-5 pb-32 sm:p-6">
+          <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-3">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Artist</p>
-              <h1 className="flex items-center gap-2 text-4xl md:text-5xl font-semibold tracking-tight">
+              <h1 className="flex flex-wrap items-center gap-2 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
                 <span>{artist.name}</span>
                 {artist.isVerified && (
                   <VerifiedBadge size="lg" title="Verified artist" />
@@ -323,14 +404,14 @@ export default function ArtistPage() {
           </div>
 
           {/* Artist Avatar and Bio Section */}
-          <div className="flex flex-col lg:flex-row gap-8 mb-12">
+          <div className="mb-10 flex min-w-0 flex-col gap-5 sm:gap-8 lg:flex-row">
             <div className="relative flex-shrink-0">
               <AvatarImage
                 src={artist.avatarUrl}
                 alt={artist.name}
                 width={300}
                 height={300}
-                className="rounded-[32px] object-cover shadow-2xl"
+                className="h-40 w-40 rounded-[24px] object-cover shadow-2xl sm:h-56 sm:w-56 sm:rounded-[32px] lg:h-[300px] lg:w-[300px]"
               />
               {artist.isVerified && (
                 <div className="absolute -bottom-4 -right-4 bg-purple-500 rounded-full p-3 shadow-lg">
@@ -347,7 +428,7 @@ export default function ArtistPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <div className="bg-white/5 rounded-2xl p-4">
                   <div className="text-2xl font-bold text-white">{artist.followers.toLocaleString()}</div>
                   <div className="text-sm text-gray-400">Followers</div>
@@ -396,19 +477,19 @@ export default function ArtistPage() {
               <span className="text-white/70">({artist.media.length})</span>
             </div>
 
-            <div className="grid gap-4">
+            <div className="grid min-w-0 gap-3 sm:gap-4">
               {artist.media.map((song, index) => (
                 <div
                   key={song.id}
-                  className="group flex items-center gap-4 rounded-2xl bg-white/5 p-4 hover:bg-white/10 transition-all duration-300"
+                  className="group flex min-w-0 items-center gap-2 rounded-2xl bg-white/5 p-2 transition-all duration-300 hover:bg-white/10 sm:gap-4 sm:p-4"
                 >
                   <div className="relative flex-shrink-0">
                     <Image
                       src={song.coverArt || '/default-cover.png'}
                       alt={song.title}
-                      width={60}
-                      height={60}
-                      className="rounded-xl object-cover"
+                      width={56}
+                      height={56}
+                      className="h-12 w-12 rounded-xl object-cover sm:h-14 sm:w-14"
                     />
                     <button
                       onClick={() => handlePlaySong(song)}
@@ -422,9 +503,9 @@ export default function ArtistPage() {
                     </button>
                   </div>
 
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <ScrollingTrackTitle isPlaying={currentTrack?.id === song.id.toString() && isPlaying} className="mb-1 font-medium text-white">{song.title}</ScrollingTrackTitle>
-                    <div className="flex items-center gap-4 text-sm text-gray-400">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400 sm:gap-x-4 sm:text-sm">
                       <span>{formatDuration(song.duration)}</span>
                       <span className="flex items-center gap-1">
                         <FaHeadphones size={12} />
@@ -444,32 +525,36 @@ export default function ArtistPage() {
                         <span className="text-xs bg-gray-600 px-2 py-0.5 rounded">E</span>
                       )}
                     </div>
+                    <p className="mt-1 truncate text-[10px] text-gray-500 sm:text-xs">
+                      Added {song.addedAt ? formatAddedTime(song.addedAt) : 'date unavailable'}
+                    </p>
                   </div>
 
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100">
                     <button
                       onClick={() => handleLikeSong(song.id)}
                       className={`transition-colors ${likedSongs.has(song.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                      aria-label={likedSongs.has(song.id) ? `Unlike ${song.title}` : `Like ${song.title}`}
                     >
-                      {likedSongs.has(song.id) ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
+                      {likedSongs.has(song.id) ? <FaHeart size={14} /> : <FaRegHeart size={14} />}
                     </button>
                     <button
                       onClick={() => handleShareSong(song)}
                       className="text-gray-400 hover:text-white transition-colors"
                     >
-                      <FaShare size={16} />
+                      <FaShare size={14} />
                     </button>
                     <button
                       onClick={() => handleDownloadSong(song)}
                       className="text-gray-400 hover:text-white transition-colors"
                     >
-                      <FaDownload size={16} />
+                      <FaDownload size={14} />
                     </button>
                     <button
                       onClick={() => handleAddToPlaylist(song)}
                       className="text-gray-400 hover:text-white transition-colors"
                     >
-                      <FaPlus size={16} />
+                      <FaPlus size={14} />
                     </button>
                   </div>
                 </div>
