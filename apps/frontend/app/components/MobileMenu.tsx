@@ -46,6 +46,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
+      setShowPaletteChooser(false);
       document.body.style.overflow = 'unset';
     }
     return () => {
@@ -221,9 +222,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     aria-label="Choose color palette"
                     aria-expanded={showPaletteChooser}
                     onClick={() => setShowPaletteChooser((open) => !open)}
-                    className="p-2 rounded-full bg-white/10 text-white hover:bg-white/15 transition-colors"
+                    className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-white hover:bg-white/15 transition-colors"
                   >
                     <Sun className="w-5 h-5 text-purple/45" />
+                    <span className="text-xs font-medium">Theme</span>
                   </button>
                   <button
                     onClick={onClose}
@@ -234,28 +236,6 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   </button>
                 </div>
               </div>
-
-              {showPaletteChooser && (
-                <div className="absolute right-16 top-4 z-20 w-56 rounded-2xl border border-white/10 bg-card p-2 shadow-2xl">
-                  <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/60">Color palette</p>
-                  {palettes.map((option) => (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => {
-                        selectPalette(option.id);
-                        setShowPaletteChooser(false);
-                      }}
-                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-white transition hover:bg-white/10"
-                      aria-pressed={palette.id === option.id}
-                    >
-                      <span className="h-4 w-4 rounded-full" style={{ backgroundColor: option.accent }} />
-                      <span className="flex-1">{option.name}</span>
-                      {palette.id === option.id && <Check className="h-4 w-4 text-purple" />}
-                    </button>
-                  ))}
-                </div>
-              )}
 
               {/* Search Bar */}
               <div className="relative">
@@ -486,6 +466,66 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </div>
             </div>
           </motion.div>
+          <AnimatePresence>
+            {showPaletteChooser && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[60] flex items-end justify-center"
+                role="presentation"
+                onClick={() => setShowPaletteChooser(false)}
+              >
+                <div className="absolute inset-0 bg-black/70" />
+                <motion.div
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{ y: "100%" }}
+                  transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="palette-chooser-title"
+                  className="relative z-10 w-full max-w-lg rounded-t-3xl border border-white/10 bg-card p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 id="palette-chooser-title" className="text-base font-semibold text-white">
+                      Choose a color palette
+                    </h3>
+                    <button
+                      type="button"
+                      aria-label="Close color palette choices"
+                      onClick={() => setShowPaletteChooser(false)}
+                      className="rounded-full bg-white/10 p-2 text-white/80"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="space-y-1">
+                    {palettes.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => {
+                          selectPalette(option.id);
+                          setShowPaletteChooser(false);
+                        }}
+                        className="flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-white transition hover:bg-white/10"
+                        aria-pressed={palette.id === option.id}
+                      >
+                        <span
+                          className="h-5 w-5 rounded-full ring-2 ring-white/30"
+                          style={{ backgroundColor: option.accent }}
+                        />
+                        <span className="flex-1">{option.name}</span>
+                        {palette.id === option.id && <Check className="h-4 w-4 text-purple" />}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
     </AnimatePresence>
@@ -493,6 +533,4 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   </>
   );
 }
-
-
 

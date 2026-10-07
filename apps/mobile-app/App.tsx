@@ -27,6 +27,7 @@ import {
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Image,
   ImageBackground,
   Linking,
@@ -333,6 +334,7 @@ export default function App() {
   const [nowPlayingOpen, setNowPlayingOpen] = useState(false);
   const [progressWidth, setProgressWidth] = useState(0);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [account, setAccount] = useState<MobileAccount | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [authConfigError, setAuthConfigError] = useState<string | null>(null);
@@ -695,10 +697,6 @@ export default function App() {
         person.isProducer === true ||
         Boolean(person.producerName)
       );
-      const fresh = [...tracks].sort((first, second) =>
-        Date.parse(second.createdAt || '') - Date.parse(first.createdAt || '')
-      );
-
       const asItems = (key: string) =>
         Array.isArray(home[key])
           ? (home[key] as unknown[]).filter(
@@ -715,13 +713,12 @@ export default function App() {
         artists,
         producers,
         playlists,
-        newReleases: fresh,
       });
     } catch (error) {
       console.error('Unable to load mobile home sections:', error);
       setHomeError(error instanceof Error ? error.message : 'Home sections could not be loaded.');
     }
-  }, [tracks]);
+  }, []);
 
   useEffect(() => {
     void loadHomeSections();
@@ -1323,7 +1320,7 @@ export default function App() {
           ? `$${item.price.toFixed(2)}`
           : 'BUY';
 
-    if (screen === 'home') {
+    if (screen === 'home' && homeTab !== 'local') {
       return (
         <View style={styles.homeTrackCard}>
           <Pressable
@@ -1494,17 +1491,23 @@ export default function App() {
             accessibilityRole="link"
             onPress={() => {
               setHomeTab(tab);
-              contentScrollRef.current?.scrollTo({ y: 0, animated: true });
+              contentScrollRef.current?.scrollToOffset({ offset: 0, animated: true });
             }}
           >
             <Text style={styles.seeAllText}>See All ›</Text>
           </Pressable>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.homeRail}>
-          {mediaTracks.map((item) => (
-            <View key={item.id} style={styles.railTrackCard}>{renderTrack({ item })}</View>
-          ))}
-        </ScrollView>
+        <FlatList
+          data={mediaTracks}
+          horizontal
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <View style={styles.railTrackCard}>{renderTrack({ item })}</View>}
+          initialNumToRender={4}
+          maxToRenderPerBatch={5}
+          windowSize={3}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.homeRail}
+        />
       </View>
     );
   };
@@ -1519,14 +1522,17 @@ export default function App() {
             accessibilityRole="link"
             onPress={() => {
               setHomeTab(tab);
-              contentScrollRef.current?.scrollTo({ y: 0, animated: true });
+              contentScrollRef.current?.scrollToOffset({ offset: 0, animated: true });
             }}
           >
             <Text style={styles.seeAllText}>See All ›</Text>
           </Pressable>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.homeRail}>
-          {items.map((item, index) => {
+        <FlatList
+          data={items}
+          horizontal
+          keyExtractor={(item, index) => String(item.id ?? `${tab}-${index}`)}
+          renderItem={({ item, index }) => {
             const name =
               item.title || item.name || item.displayName || item.producerName ||
               item.username || `Fwaya ${title.toLowerCase().replace(/s$/, '')}`;
@@ -1535,7 +1541,6 @@ export default function App() {
             return (
               <Pressable
                 accessibilityRole="button"
-                key={String(item.id ?? `${tab}-${index}`)}
                 onPress={() => openWebSection(entityPath(tab, item.id || index))}
                 style={({ pressed }) => [styles.entityCard, pressed && styles.pressed]}
               >
@@ -1549,8 +1554,13 @@ export default function App() {
                 </Text>
               </Pressable>
             );
-          })}
-        </ScrollView>
+          }}
+          initialNumToRender={4}
+          maxToRenderPerBatch={5}
+          windowSize={3}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.homeRail}
+        />
       </View>
     );
   };
@@ -1590,7 +1600,6 @@ export default function App() {
               <Text style={styles.seeAllText}>Refresh</Text>
             </Pressable>
           </View>
-          {localTracks.map((item) => <View key={item.id}>{renderTrack({ item })}</View>)}
         </View>
       );
     }
@@ -1650,7 +1659,7 @@ export default function App() {
     );
   };
 
-  const contentScrollRef = useRef<ScrollView>(null);
+  const contentScrollRef = useRef<FlatList<Track>>(null);
   const listHeader = (
     <View>
       <View style={styles.topBar}>
@@ -1731,7 +1740,7 @@ export default function App() {
                   if (key === 'local' && localTracks.length === 0 && !localTracksLoading) {
                     void loadLocalTracks();
                   }
-                  contentScrollRef.current?.scrollTo({ y: 0, animated: true });
+                  contentScrollRef.current?.scrollToOffset({ offset: 0, animated: true });
                 }}
                 style={[styles.homeTab, homeTab === key && styles.activeHomeTab]}
               >
@@ -1950,8 +1959,21 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
-        <ScrollView
+        <FlatList
           ref={contentScrollRef}
+          data={screen === 'home' ? (homeTab === 'local' ? localTracks : []) : filteredTracks}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <View>{renderTrack({ item })}</View>}
+          ListHeaderComponent={listHeader}
+          ListEmptyComponent={
+            screen === 'home'
+              ? homeTab === 'local' ? renderHomeSections() : null
+              : listEmpty
+          }
+          initialNumToRender={8}
+          maxToRenderPerBatch={8}
+          windowSize={7}
+          removeClippedSubviews={Platform.OS === 'android'}
           contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl
@@ -1962,14 +1984,7 @@ export default function App() {
             />
           }
           showsVerticalScrollIndicator={false}
-        >
-          {listHeader}
-          {screen !== 'home' && (
-            filteredTracks.length > 0
-              ? filteredTracks.map((item) => <View key={item.id}>{renderTrack({ item })}</View>)
-              : listEmpty
-          )}
-        </ScrollView>
+        />
 
         {catalogError && tracks.length > 0 && (
           <Text accessibilityRole="alert" style={styles.catalogNotice}>
@@ -2033,55 +2048,6 @@ export default function App() {
           </View>
         )}
 
-        <View style={styles.bottomNavigation}>
-          {([
-            ['home', 'Home', '⌂'],
-            ['browse', 'Browse', '⌕'],
-            ['help', 'Need Help?', '?'],
-            ['library', 'Library', '♡'],
-            ['more', 'More', '•••'],
-          ] as const).map(([key, label, glyph]) => {
-            const active =
-              (key === 'home' && screen === 'home') ||
-              (key === 'browse' && screen === 'search') ||
-              (key === 'library' && screen === 'saved');
-            return (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-                key={key}
-                onPress={() => {
-                  if (key === 'home') setScreen('home');
-                  else if (key === 'browse') setScreen('search');
-                  else if (key === 'library') setScreen('saved');
-                  else if (key === 'more') {
-                    setSignInError(null);
-                    setAccountOpen(true);
-                  } else {
-                    Alert.alert('Need help?', 'Find answers or contact Fwaya support.', [
-                      { text: 'FAQ', onPress: () => openWebSection('/help/faq') },
-                      { text: 'Contact us', onPress: () => openWebSection('/help/contact') },
-                      { text: 'Cancel', style: 'cancel' },
-                    ]);
-                  }
-                }}
-                style={({ pressed }) => [
-                  styles.bottomNavigationItem,
-                  active && styles.bottomNavigationItemActive,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Text style={[styles.bottomNavigationGlyph, active && styles.bottomNavigationTextActive]}>
-                  {glyph}
-                </Text>
-                <Text style={[styles.bottomNavigationText, active && styles.bottomNavigationTextActive]}>
-                  {label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-
         <Modal
           animationType="slide"
           onRequestClose={() => setPalettePickerOpen(false)}
@@ -2126,6 +2092,79 @@ export default function App() {
                   </Pressable>
                 )
               )}
+            </View>
+          </SafeAreaView>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          onRequestClose={() => setMoreOpen(false)}
+          presentationStyle="pageSheet"
+          visible={moreOpen}
+        >
+          <SafeAreaView style={styles.accountScreen}>
+            <View style={styles.accountHeader}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Close More menu"
+                onPress={() => setMoreOpen(false)}
+                style={styles.closePlayerButton}
+              >
+                <Text style={styles.closePlayerText}>×</Text>
+              </Pressable>
+              <Text style={styles.nowPlayingLabel}>MORE</Text>
+              <View style={styles.closePlayerButton} />
+            </View>
+            <View style={styles.moreOptions}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  setMoreOpen(false);
+                  setSignInError(null);
+                  setAccountOpen(true);
+                }}
+                style={({ pressed }) => [styles.moreOption, pressed && styles.pressed]}
+              >
+                <Text style={styles.moreOptionTitle}>{account ? 'Account' : 'Sign in'}</Text>
+                <Text style={styles.moreOptionDescription}>
+                  {account ? account.email : 'Sign in or create your Fwaya account'}
+                </Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  setMoreOpen(false);
+                  setPalettePickerOpen(true);
+                }}
+                style={({ pressed }) => [styles.moreOption, pressed && styles.pressed]}
+              >
+                <Text style={styles.moreOptionTitle}>Color theme</Text>
+                <Text style={styles.moreOptionDescription}>
+                  Currently using {COLOR_PALETTES[selectedPaletteId].name}
+                </Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() => {
+                  setMoreOpen(false);
+                  openWebSection('/settings');
+                }}
+                style={({ pressed }) => [styles.moreOption, pressed && styles.pressed]}
+              >
+                <Text style={styles.moreOptionTitle}>Settings</Text>
+                <Text style={styles.moreOptionDescription}>Manage your Fwaya preferences</Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() => {
+                  setMoreOpen(false);
+                  openWebSection('/help/faq');
+                }}
+                style={({ pressed }) => [styles.moreOption, pressed && styles.pressed]}
+              >
+                <Text style={styles.moreOptionTitle}>Help & support</Text>
+                <Text style={styles.moreOptionDescription}>Find answers or contact Fwaya</Text>
+              </Pressable>
             </View>
           </SafeAreaView>
         </Modal>
@@ -2446,8 +2485,7 @@ export default function App() {
                       { text: 'Cancel', style: 'cancel' },
                     ]);
                   } else if (key === 'more') {
-                    setSignInError(null);
-                    setAccountOpen(true);
+                    setMoreOpen(true);
                   } else {
                     setScreen(key);
                   }
@@ -2619,6 +2657,10 @@ function createStyles(palette: AppPalette) {
   paletteSwatch: { borderColor: palette.text, borderRadius: 10, borderWidth: 1, height: 20, width: 20 },
   paletteOptionText: { color: palette.text, flex: 1, fontSize: 13, fontWeight: '700' },
   paletteOptionCheck: { color: palette.accent, fontSize: 18, fontWeight: '900', width: 24 },
+  moreOptions: { gap: 10, paddingTop: 20 },
+  moreOption: { backgroundColor: palette.surface, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 },
+  moreOptionTitle: { color: palette.text, fontSize: 14, fontWeight: '700' },
+  moreOptionDescription: { color: palette.muted, fontSize: 11, marginTop: 4 },
   accountContent: { flexGrow: 1, justifyContent: 'center', paddingBottom: 35 },
   accountEmail: { color: palette.text, fontSize: 20, fontWeight: '800', marginTop: 10 },
   accountMembership: { color: palette.muted, fontSize: 14, marginTop: 8 },
