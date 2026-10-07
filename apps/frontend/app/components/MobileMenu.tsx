@@ -186,7 +186,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background/60 z-50"
+            className="fixed inset-0 bg-background/60 z-[99]"
             onClick={onClose}
           />
           
@@ -200,14 +200,15 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               damping: 30, 
               stiffness: 300 
             }}
-            className={`fixed bottom-0 left-0 right-0 h-[90vh] rounded-t-[32px] z-50 overflow-hidden bg-background flex flex-col relative`}
+            className="fixed bottom-0 left-0 right-0 z-[100] flex h-[90dvh] flex-col overflow-hidden rounded-t-[32px] border-t border-white/10 bg-card shadow-2xl"
           >
             {/* Header with search */}
-            <div className={`flex-shrink-0 p-6 bg-background`}>
+            <div className="flex-shrink-0 bg-card p-6">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
                   <motion.div 
                     className="w-12 h-12 rounded-3xl bg-purple/75 flex items-center justify-center"
+                    style={{ backgroundColor: "rgba(var(--primary-accent), 0.75)" }}
                   >
                     <Music className="w-6 h-6 text-white" />
                   </motion.div>
@@ -267,7 +268,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-background/70"
+                  className="fixed inset-0 z-[105] flex items-center justify-center bg-background/70 p-4"
                   onClick={() => setAuthModalMode(null)}
                 >
                   <motion.div
@@ -275,7 +276,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 30, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 240, damping: 22 }}
-                    className="w-full max-w-md overflow-hidden rounded-2xl bg-background shadow-2xl shadow-black/40"
+                    className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-card shadow-2xl shadow-black/40"
                     onClick={(event) => event.stopPropagation()}
                   >
                     <div className="flex items-center justify-between gap-4 bg-white/[0.02] px-4 py-3 sm:px-5">
@@ -328,10 +329,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
             {/* User Info */}
             {user ? (
-              <div className="flex-shrink-0 px-6 py-4 bg-background">
+              <div className="flex-shrink-0 bg-card px-6 py-4">
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3 bg-white/5 rounded-3xl p-3">
-                    <div className="w-10 h-10 rounded-full bg-purple/75 flex items-center justify-center text-white text-sm font-bold">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                      style={{ backgroundColor: "rgba(var(--primary-accent), 0.75)" }}
+                    >
                       {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -353,7 +357,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <button
                       type="button"
                       onClick={() => setSubscriptionOpen(true)}
-                      className="rounded-full bg-purple/75 px-3 py-2 text-xs font-semibold text-white hover:bg-purple/60"
+                      className="rounded-full px-3 py-2 text-xs font-semibold text-white hover:bg-purple/60"
+                      style={{ backgroundColor: "rgba(var(--primary-accent), 0.75)" }}
                     >
                       {hasActivePremium ? 'Change plan' : 'Subscribe'}
                     </button>
@@ -361,7 +366,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </div>
               </div>
             ) : (
-              <div className="flex-shrink-0 px-6 py-4 bg-background">
+              <div className="flex-shrink-0 bg-card px-6 py-4">
                 <div className="space-y-4">
                   {/* Guest Plan Info */}
                   <div className="flex items-center justify-between bg-white/5 rounded-2xl p-3">
@@ -381,7 +386,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   <button
                     type="button"
                     onClick={() => setAuthModalMode('signin')}
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-purple/75 py-2.5 text-sm font-semibold text-white hover:bg-purple/60"
+                    className="flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-sm font-semibold text-white hover:bg-purple/60"
+                    style={{ backgroundColor: "rgba(var(--primary-accent), 0.75)" }}
                   >
                     <Crown className="h-4 w-4" /> Subscribe to Premium
                   </button>
@@ -398,7 +404,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <button
                       type="button"
                       onClick={() => setAuthModalMode('signup')}
-                      className="py-2.5 px-3 rounded-full bg-purple/75 text-white text-sm font-medium hover:bg-purple/60 transition-colors"
+                      className="py-2.5 px-3 rounded-full text-white text-sm font-medium hover:bg-purple/60 transition-colors"
+                      style={{ backgroundColor: "rgba(var(--primary-accent), 0.75)" }}
                     >
                       Sign Up
                     </button>
@@ -423,6 +430,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                           ? "bg-purple/75 text-white"
                           : "text-white/60 hover:text-white hover:bg-white/10"
                       }`}
+                      style={isActive ? { backgroundColor: "rgba(var(--primary-accent), 0.75)" } : undefined}
                     >
                       <Icon size={18} />
                       <span>{tab.label}</span>
@@ -472,7 +480,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[60] flex items-end justify-center"
+                className="fixed inset-0 z-[110] flex items-end justify-center"
                 role="presentation"
                 onClick={() => setShowPaletteChooser(false)}
               >
@@ -533,4 +541,3 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   </>
   );
 }
-

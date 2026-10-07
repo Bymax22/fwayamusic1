@@ -29,7 +29,6 @@ import {
 import { FaRegHeart, FaPlus } from "react-icons/fa";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useAuth } from "@/context/AuthContext";
-import MobileMenu from "./MobileMenu";
 import { createMediaSlug, formatAddedTime, formatRelativeTime, resolveDateValue } from "@/lib/utils";
 import { subscribe } from '@/lib/realtime';
 import VerifiedBadge from "./VerifiedBadge";
@@ -40,7 +39,6 @@ export default function GuestWelcome() {
   const [activeTab, setActiveTab] = useState<string>("for-you");
   const [heroImageIndex, setHeroImageIndex] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [homepageSearchQuery, setHomepageSearchQuery] = useState('');
   const [homepageSearchOpen, setHomepageSearchOpen] = useState(false);
@@ -77,7 +75,7 @@ export default function GuestWelcome() {
   };
 
   useEffect(() => {
-    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 1000);
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 60_000);
     return () => window.clearInterval(interval);
   }, []);
 
@@ -2919,9 +2917,6 @@ export default function GuestWelcome() {
         </div>
       </div>
       </div>
-
-      {/* Mobile Menu */}
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
     </>
   );

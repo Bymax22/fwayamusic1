@@ -3,16 +3,17 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { Compass, Search, Library, MoreHorizontal, LifeBuoy, Megaphone, Handshake, FileText, ShieldCheck, HelpCircle, Mail, BookOpen, Users, AlertCircle, Code, Bell, Flag } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface BottomNavProps {
-  onMoreClick?: () => void;
+  onMoreClick: () => void;
 }
 
 export default function BottomNav({ onMoreClick }: BottomNavProps) {
-  const router = useRouter();
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useAuth();
   const [needHelpOpen, setNeedHelpOpen] = useState(false);
   const [needHelpClosing, setNeedHelpClosing] = useState(false);
@@ -42,7 +43,7 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
   })?.id || "home";
 
   const handleClick = (item: typeof navItems[number]) => {
-    if (item.id === "more" && onMoreClick) {
+    if (item.id === "more") {
       onMoreClick();
       return;
     }
@@ -53,22 +54,52 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
       return;
     }
 
-    if (item.href) {
-      router.push(item.href);
-    }
   };
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[80]">
       <div className="glass-pill mx-4 mb-3 px-2 py-2 flex items-center justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (
+            item.href ? (
+              <Link
+                key={item.id}
+                href={item.href}
+                prefetch
+                aria-current={isActive ? "page" : undefined}
+                className={`relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 touch-manipulation ${
+                  isActive ? "text-white" : "text-white/60"
+                }`}
+              >
+                {item.image ? (
+                  <Image
+                    src={isActive ? item.image : (item.inactiveImage || item.image)}
+                    alt=""
+                    width={22}
+                    height={22}
+                    className="opacity-100"
+                  />
+                ) : Icon ? (
+                  <Icon
+                    size={22}
+                    className={isActive ? "text-purple/60" : "text-current"}
+                    fill={isActive ? "rgba(var(--primary-accent), 0.2)" : "none"}
+                  />
+                ) : null}
+                <span className="text-[10px] font-medium">{item.label}</span>
+                {isActive && (
+                  <div className="absolute -bottom-2 w-6 h-0.5 bg-purple/75 rounded-full" />
+                )}
+              </Link>
+            ) : (
             <button
               key={item.id}
+              type="button"
               onClick={() => handleClick(item)}
-              className={`relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${
+              aria-label={item.id === "more" ? "Open More menu" : item.label}
+              className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-3 py-2 transition-all duration-200 touch-manipulation ${
                 isActive ? "text-white" : "text-white/60"
               }`}
             >
@@ -92,6 +123,7 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
                 <div className="absolute -bottom-2 w-6 h-0.5 bg-purple/75 rounded-full" />
               )}
             </button>
+            )
           );
         })}
       </div>

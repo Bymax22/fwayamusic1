@@ -141,7 +141,7 @@ export default function Browse() {
   };
 
   useEffect(() => {
-    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 1000);
+    const interval = window.setInterval(() => setRelativeTimeTick((value) => value + 1), 60_000);
     return () => window.clearInterval(interval);
   }, []);
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -182,11 +182,12 @@ export default function Browse() {
   }, []);
 
   useEffect(() => {
+    let active = true;
     const fetchWithTimeout = async (input: RequestInfo, timeout = 8000, options: RequestInit = {}) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
       try {
-        const res = await fetch(input, { signal: controller.signal, ...options });
+        const res = await fetch(input, { ...options, signal: controller.signal });
         clearTimeout(id);
         return res;
       } catch (err) {
@@ -197,7 +198,7 @@ export default function Browse() {
 
     const fetchWithFallback = async (primaryUrl: string, fallbackUrl: string, options: RequestInit = {}) => {
       try {
-        const proxyRes = await fetchWithTimeout(fallbackUrl, 5000, options);
+        const proxyRes = await fetchWithTimeout(fallbackUrl, 2500, options);
         if (proxyRes.ok) return proxyRes;
         console.warn(`Proxy fetch failed: ${fallbackUrl}`, proxyRes.status, proxyRes.statusText);
       } catch (proxyErr) {
@@ -211,29 +212,10 @@ export default function Browse() {
       try {
         setLoading(true);
         setError(null);
-        const token = await getToken();
-
-        const [mediaResponse, userPlaylistsResponse] = await Promise.all([
-          fetchWithFallback(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/media`,
-            '/api/media',
-            {
-              credentials: 'include',
-              headers: { 'Accept': 'application/json' }
-            }
-          ),
-          fetchWithFallback(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me/playlists`,
-            '/api/user/me/playlists',
-            {
-              credentials: 'include',
-              headers: {
-                'Accept': 'application/json',
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              }
-            }
-          )
-        ]);
+        const mediaResponse = await fetchWithTimeout('/api/media', 8000, {
+          credentials: 'include',
+          headers: { Accept: 'application/json' }
+        });
 
         if (!mediaResponse.ok) {
           const errorData = await mediaResponse.json().catch(() => ({}));
@@ -244,7 +226,23 @@ export default function Browse() {
         }
 
         // Process media data
-        const mediaData = await mediaResponse.json();
+        const mediaPayload: unknown = await mediaResponse.json();
+        const mediaData = Array.isArray(mediaPayload)
+          ? mediaPayload
+          : mediaPayload &&
+              typeof mediaPayload === 'object' &&
+              'data' in mediaPayload &&
+              Array.isArray(mediaPayload.data)
+            ? mediaPayload.data
+            : mediaPayload &&
+                typeof mediaPayload === 'object' &&
+                'media' in mediaPayload &&
+                Array.isArray(mediaPayload.media)
+              ? mediaPayload.media
+              : null;
+        if (!mediaData) {
+          throw new Error('Media response did not contain a media list.');
+        }
         const formattedData = (mediaData as BackendMedia[]).map((item) => ({
           id: item.id,
           title: item.title || 'Untitled',
@@ -284,44 +282,67 @@ export default function Browse() {
           })) || []
         }));
 
+        if (!active) return;
         setMediaFiles(formattedData);
         setFilteredFiles(formattedData);
-        setVisibleCount(PAGE_SIZE); // reset visible count on initial load
+        setVisibleCount(PAGE_SIZE);
 
-        if (userPlaylistsResponse.ok) {
-          const userPlaylistsPayload: unknown = await userPlaylistsResponse.json().catch(() => []);
-          const userPlaylistsRaw = Array.isArray(userPlaylistsPayload)
-            ? userPlaylistsPayload
-            : userPlaylistsPayload &&
-                typeof userPlaylistsPayload === 'object' &&
-                'playlists' in userPlaylistsPayload &&
-                Array.isArray(userPlaylistsPayload.playlists)
-              ? userPlaylistsPayload.playlists
-              : [];
-          const userPlaylistsData = userPlaylistsRaw.map((p: PlaylistAPI) => ({
-            id: p.id ?? 0,
-            name: p.name ?? 'Untitled',
-            description: p.description,
-            coverUrl: p.coverUrl || p.imageUrl || '/default-playlist.png',
-            isPublic: p.isPublic ?? true,
-            type: (p.type as Playlist['type']) || 'USER',
-            mediaCount: p.entries?.length ?? p.mediaCount ?? 0
-          }));
-          setUserPlaylists(userPlaylistsData);
-        }
+        void getToken()
+          .then((token) => {
+            if (!token) return null;
+            return fetchWithFallback(
+              `${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/users/me/playlists`,
+              '/api/user/me/playlists',
+              {
+                credentials: 'include',
+                headers: {
+                  'Accept': 'application/json',
+                  Authorization: `Bearer ${token}`,
+                }
+              }
+            );
+          })
+          .then(async (playlistsResponse) => {
+            if (!active || !playlistsResponse?.ok) return;
+            const payload: unknown = await playlistsResponse.json().catch(() => []);
+            const playlistRows = Array.isArray(payload)
+              ? payload
+              : payload &&
+                  typeof payload === 'object' &&
+                  'playlists' in payload &&
+                  Array.isArray(payload.playlists)
+                ? payload.playlists
+                : [];
+            setUserPlaylists(playlistRows.map((playlist: PlaylistAPI) => ({
+              id: playlist.id ?? 0,
+              name: playlist.name ?? 'Untitled',
+              description: playlist.description,
+              coverUrl: playlist.coverUrl || playlist.imageUrl || '/default-playlist.png',
+              isPublic: playlist.isPublic ?? true,
+              type: (playlist.type as Playlist['type']) || 'USER',
+              mediaCount: playlist.entries?.length ?? playlist.mediaCount ?? 0
+            })));
+          })
+          .catch((playlistError) => {
+            if (active) console.warn('Could not load the user playlist list:', playlistError);
+          });
 
       } catch (err) {
+        if (!active) return;
         console.error('Fetch error:', err);
         setError({
           message: 'Failed to load media',
           details: err instanceof Error ? err.message : String(err)
         });
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
-    fetchData();
+    void fetchData();
+    return () => {
+      active = false;
+    };
   }, [getToken, user?.id]);
 
   // Close menu when clicking outside
@@ -474,7 +495,7 @@ export default function Browse() {
     );
 
     try {
-      const token = await getToken();
+      const token = user ? await getToken() : null;
       if (!token) {
         alert('Please sign in to like tracks.');
         return;
@@ -977,7 +998,7 @@ export default function Browse() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="mt-4 bg-background rounded-xl p-4 overflow-hidden"
+                    className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-card p-4"
                   >
                     <h3 className="font-medium mb-3 text-white/90">Sort by</h3>
                     <div className="flex flex-wrap gap-2">
@@ -1205,7 +1226,7 @@ export default function Browse() {
             displayedFiles.map((file, index) => (
               <Fragment key={file.id}>
               <div 
-                className="bg-background rounded-xl overflow-hidden group"
+                className="group overflow-hidden rounded-xl bg-card"
               >
                 <div className="relative">
                   <Image 
@@ -1466,12 +1487,12 @@ export default function Browse() {
             {/* Media Action Menu - UPDATED PURCHASE BUTTON */}
             <AnimatePresence>
               {showMediaMenu && selectedMedia && (
-                <div className="fixed inset-0 bg-background/50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/70 p-4">
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className="bg-background rounded-xl p-4 w-full max-w-sm"
+                    className="w-full max-w-sm rounded-xl border border-white/10 bg-card p-4 shadow-2xl"
                     ref={menuRef}
                   >
                     <div className="flex items-center gap-3 mb-4 p-2">
@@ -1615,12 +1636,12 @@ export default function Browse() {
       {/* Add to Playlist Menu */}
       <AnimatePresence>
         {showAddToPlaylist && selectedMedia && (
-          <div className="fixed inset-0 bg-background/50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/70 p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-background rounded-xl p-4 w-full max-w-sm"
+              className="w-full max-w-sm rounded-xl border border-white/10 bg-card p-4 shadow-2xl"
               ref={menuRef}
             >
               <h3 className="font-medium text-white mb-4">Add to Playlist</h3>
@@ -1629,9 +1650,9 @@ export default function Browse() {
                   <button
                     key={playlist.id}
                     onClick={() => selectedMedia && handleAddToPlaylist(playlist.id, selectedMedia.id)}
-                    className="w-full flex items-center gap-3 p-3 text-left hover:bg-background rounded-lg transition-colors"
+                    className="w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors hover:bg-white/10"
                   >
-                    <div className="w-10 h-10 bg-background rounded-lg flex items-center justify-center">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10">
                       <ListMusic className="w-5 h-5 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
