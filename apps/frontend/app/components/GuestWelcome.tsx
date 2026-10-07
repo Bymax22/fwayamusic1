@@ -868,64 +868,113 @@ export default function GuestWelcome() {
       subtitle: "Visual story live now — Video ID 11",
       image: "/featured6.jpg",
       href: "/videos/11"
+    },
+    {
+      title: "Discover New Music",
+      subtitle: "Fresh sounds from Fwaya artists",
+      image: "/featured5.jpg",
+      href: "/browse"
+    },
+    {
+      title: "Albums & EPs",
+      subtitle: "Find your next favorite release",
+      image: "/featured6.jpg",
+      href: "/albums"
+    },
+    {
+      title: "Trending on Fwaya",
+      subtitle: "Hear what listeners are enjoying",
+      image: "/featured5.jpg",
+      href: "/trending"
+    },
+    {
+      title: "Watch on Fwaya",
+      subtitle: "Music videos and more",
+      image: "/featured6.jpg",
+      href: "/videos"
     }
   ];
 
   const heroSlides = useMemo(() => {
-    const slides: any[] = [];
-
-    if (featuredSongs.length) {
-      const item = featuredSongs[0];
-      slides.push({
+    const slideGroups = [
+      featuredSongs.map((item: any) => ({
         title: item.title || 'Featured Track',
         subtitle: item.user?.displayName || item.user?.username || item.artist || 'Featured audio',
-        image: item.artCoverUrl || item.coverArt || item.thumbnailUrl || item.url || '/featured5.jpg',
-        primaryButton: 'Play Track',
-        secondaryButton: 'View Details',
+        image: item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/featured5.jpg',
         href: item.id && item.title ? `/track/${createMediaSlug(item.title, item.id)}` : '/browse',
-        primaryAction: () => {
-          if (item.id) {
-            playTrack({
-              id: item.id,
-              title: item.title,
-              artist: item.user?.displayName || item.user?.username || item.artist || 'Unknown',
-              imageUrl: item.artCoverUrl || item.coverArt || item.thumbnailUrl,
-              audioUrl: item.url,
-            });
-          }
-        },
-        secondaryAction: () => {
-          if (item.id && item.title) {
-            router.push(`/track/${createMediaSlug(item.title, item.id)}`);
-          }
-        },
-      });
-    }
-
-    if (musicVideos.length) {
-      const item = musicVideos[0];
-      slides.push({
+      })),
+      featuredAlbums.map((item: any) => ({
+        title: item.title || 'Featured Album',
+        subtitle: item.user?.displayName || item.user?.username || 'Album',
+        image: item.artCoverUrl || item.coverArt || item.coverUrl || item.thumbnailUrl || '/featured5.jpg',
+        href: item.id && item.title ? `/albums/${createMediaSlug(item.title, item.id)}` : '/albums',
+      })),
+      featuredEPs.map((item: any) => ({
+        title: item.title || 'Featured EP',
+        subtitle: item.user?.displayName || item.user?.username || 'EP',
+        image: item.artCoverUrl || item.coverArt || item.coverUrl || item.thumbnailUrl || '/featured5.jpg',
+        href: item.id && item.title ? `/albums/${createMediaSlug(item.title, item.id)}` : '/albums',
+      })),
+      musicVideos.map((item: any) => ({
         title: item.title || 'Featured Video',
-        subtitle: item.user?.displayName || item.user?.username || item.artist || 'New video',
-        image: item.coverPreview || item.artCoverUrl || item.thumbnailUrl || item.coverArt || item.url || '/featured6.jpg',
-        primaryButton: 'Watch Video',
-        secondaryButton: 'View Details',
+        subtitle: item.user?.displayName || item.user?.username || item.artist || 'Music video',
+        image: item.coverPreview || item.artCoverUrl || item.thumbnailUrl || item.coverArt || '/featured6.jpg',
         href: item.id ? `/videos/${item.id}` : '/videos',
-        primaryAction: () => {
-          if (item.id) router.push(`/videos/${item.id}?autoplay=1`);
-        },
-        secondaryAction: () => {
-          if (item.id) router.push(`/videos/${item.id}`);
-        },
-      });
+      })),
+      otherVideos.map((item: any) => ({
+        title: item.title || 'Featured Video',
+        subtitle: item.user?.displayName || item.user?.username || item.artist || 'Video',
+        image: item.coverPreview || item.artCoverUrl || item.thumbnailUrl || item.coverArt || '/featured6.jpg',
+        href: item.id ? `/videos/${item.id}` : '/videos',
+      })),
+      beats.map((item: any) => ({
+        title: item.title || 'Featured Beat',
+        subtitle: item.user?.displayName || item.user?.username || item.artist || 'Beat',
+        image: item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/featured5.jpg',
+        href: item.id && item.title ? `/track/${createMediaSlug(item.title, item.id)}` : '/browse?section=beats',
+      })),
+      trendingNow.map((item: any) => ({
+        title: item.title || 'Trending Track',
+        subtitle: item.user?.displayName || item.user?.username || item.artist || 'Trending now',
+        image: item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/featured5.jpg',
+        href: item.id && item.title ? `/track/${createMediaSlug(item.title, item.id)}` : '/trending',
+      })),
+      topCharts.map((item: any) => ({
+        title: item.title || 'Top Chart Track',
+        subtitle: item.user?.displayName || item.user?.username || item.artist || 'Top charts',
+        image: item.artCoverUrl || item.coverArt || item.thumbnailUrl || '/featured5.jpg',
+        href: item.id && item.title ? `/track/${createMediaSlug(item.title, item.id)}` : '/top-charts',
+      })),
+      playlists.map((item: any) => ({
+        title: item.name || item.title || 'Featured Playlist',
+        subtitle: 'Playlist',
+        image: item.coverArt || item.coverUrl || '/featured6.jpg',
+        href: item.id ? `/playlist/${item.id}` : '/playlist',
+      })),
+    ];
+    const slides: any[] = [];
+    const seenSlides = new Set<string>();
+    const maxGroupLength = Math.max(...slideGroups.map((group) => group.length), 0);
+
+    for (let itemIndex = 0; itemIndex < maxGroupLength && slides.length < 9; itemIndex += 1) {
+      for (const group of slideGroups) {
+        const slide = group[itemIndex];
+        if (!slide || slides.length >= 9) continue;
+
+        const identity = `${slide.href}:${slide.title}`;
+        if (seenSlides.has(identity)) continue;
+
+        seenSlides.add(identity);
+        slides.push(slide);
+      }
     }
 
-    if (slides.length === 0) {
-      return defaultHeroSlides;
+    for (let index = 0; slides.length < 9; index += 1) {
+      slides.push(defaultHeroSlides[index]);
     }
 
-    return [...slides, ...defaultHeroSlides.slice(0, Math.max(0, 3 - slides.length))];
-  }, [featuredSongs, musicVideos, playTrack, router]);
+    return slides;
+  }, [featuredSongs, featuredAlbums, featuredEPs, musicVideos, otherVideos, beats, trendingNow, topCharts, playlists]);
 
   const safeHeroIndex = heroSlides.length > 0 ? Math.min(heroImageIndex, heroSlides.length - 1) : 0;
   const activeHeroSlide = heroSlides[safeHeroIndex] || heroSlides[0] || defaultHeroSlides[0];

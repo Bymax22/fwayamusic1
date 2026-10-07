@@ -1,8 +1,9 @@
 'use client';
 
+import { useRef } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { FaChevronLeft, FaChevronRight, FaPlay } from 'react-icons/fa';
+import { FaPlay } from 'react-icons/fa';
 
 interface HeroSlide {
   title: string;
@@ -27,6 +28,9 @@ export default function HeroBannerCarousel({
   onActivate,
   className = '',
 }: HeroBannerCarouselProps) {
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const touchSwiped = useRef(false);
+
   if (slides.length === 0) return null;
 
   const move = (direction: number) => {
@@ -44,28 +48,53 @@ export default function HeroBannerCarousel({
             : rawOffset;
       return { slide, index, offset };
     })
-    .filter(({ offset }) => Math.abs(offset) <= 3);
+    .filter(({ offset }) => Math.abs(offset) <= 1);
 
   return (
     <section
       aria-label="Featured banners"
-      className={`relative isolate h-[190px] overflow-hidden bg-black sm:h-[320px] lg:h-[390px] ${className}`}
+      onTouchStart={(event) => {
+        const touch = event.touches[0];
+        touchStart.current = { x: touch.clientX, y: touch.clientY };
+      }}
+      onTouchEnd={(event) => {
+        if (!touchStart.current) return;
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStart.current.x;
+        const deltaY = touch.clientY - touchStart.current.y;
+        touchStart.current = null;
+
+        if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+        touchSwiped.current = true;
+        move(deltaX < 0 ? 1 : -1);
+        window.setTimeout(() => {
+          touchSwiped.current = false;
+        }, 300);
+      }}
+      className={`relative isolate h-[190px] touch-pan-y overflow-hidden bg-black sm:h-[320px] lg:h-[390px] ${className}`}
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(83,35,112,0.32),transparent_68%)]" />
 
       {visibleSlides.map(({ slide, index, offset }) => {
         const distance = Math.abs(offset);
         const isActive = offset === 0;
-        const scale = distance === 0 ? 1 : distance === 1 ? 0.78 : distance === 2 ? 0.62 : 0.48;
-        const opacity = distance === 0 ? 1 : distance === 1 ? 0.82 : distance === 2 ? 0.55 : 0.3;
+        const scale = isActive ? 1 : 0.88;
+        const opacity = isActive ? 1 : 0.78;
 
         return (
           <motion.button
             key={`${slide.title}-${index}`}
             type="button"
             aria-label={`${isActive ? 'Open' : 'Select'} ${slide.title}`}
-            onClick={() => (isActive ? onActivate(slide) : onChange(index))}
-            className="absolute top-1/2 h-[88%] w-[64%] overflow-visible rounded-xl sm:w-[36%] sm:rounded-2xl"
+            onClick={(event) => {
+              if (touchSwiped.current) {
+                event.preventDefault();
+                return;
+              }
+              if (isActive) onActivate(slide);
+              else onChange(index);
+            }}
+            className="absolute top-1/2 h-[88%] w-[50%] overflow-visible rounded-2xl sm:w-[36%] sm:rounded-3xl"
             initial={false}
             animate={{
               x: '-50%',
@@ -73,15 +102,15 @@ export default function HeroBannerCarousel({
               scale,
               opacity,
             }}
-            transition={{ type: 'spring', stiffness: 150, damping: 24 }}
-            style={{ left: `calc(50% + ${offset * 22}%)`, zIndex: 20 - distance }}
+            transition={{ type: 'spring', stiffness: 180, damping: 28 }}
+            style={{ left: `calc(50% + ${offset * 48}%)`, zIndex: 20 - distance }}
           >
-            <span className="absolute inset-x-0 top-0 z-10 h-full overflow-hidden rounded-xl bg-[#111] shadow-[0_18px_50px_rgba(0,0,0,0.65)] sm:rounded-2xl">
+            <span className="absolute inset-x-0 top-0 z-10 h-full overflow-hidden rounded-2xl bg-[#111] shadow-[0_18px_50px_rgba(0,0,0,0.65)] sm:rounded-3xl">
               <Image
                 src={slide.image || '/featured5.jpg'}
                 alt={slide.title}
                 fill
-                sizes="(max-width: 640px) 64vw, 36vw"
+                sizes="(max-width: 640px) 50vw, 36vw"
                 className="object-cover"
                 priority={distance === 0}
               />
@@ -104,30 +133,13 @@ export default function HeroBannerCarousel({
             </span>
             <span
               aria-hidden="true"
-              className="absolute left-0 right-0 top-[96%] h-[28%] scale-y-[-1] overflow-hidden rounded-xl opacity-25 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.5),transparent)] sm:rounded-2xl"
+              className="absolute left-0 right-0 top-[96%] h-[28%] scale-y-[-1] overflow-hidden rounded-2xl opacity-25 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.5),transparent)] sm:rounded-3xl"
             >
-              <Image src={slide.image || '/featured5.jpg'} alt="" fill sizes="(max-width: 640px) 64vw, 36vw" className="object-cover" />
+              <Image src={slide.image || '/featured5.jpg'} alt="" fill sizes="(max-width: 640px) 50vw, 36vw" className="object-cover" />
             </span>
           </motion.button>
         );
       })}
-
-      <button
-        type="button"
-        aria-label="Previous banner"
-        onClick={() => move(-1)}
-        className="absolute left-2 top-1/2 z-30 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white transition hover:bg-purple-600 sm:left-5 sm:h-11 sm:w-11"
-      >
-        <FaChevronLeft />
-      </button>
-      <button
-        type="button"
-        aria-label="Next banner"
-        onClick={() => move(1)}
-        className="absolute right-2 top-1/2 z-30 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white transition hover:bg-purple-600 sm:right-5 sm:h-11 sm:w-11"
-      >
-        <FaChevronRight />
-      </button>
 
       <div className="absolute inset-x-0 bottom-2 z-30 flex justify-center gap-1.5 sm:bottom-3">
         {slides.map((slide, index) => (
@@ -136,7 +148,13 @@ export default function HeroBannerCarousel({
             type="button"
             aria-label={`Go to banner ${index + 1}`}
             aria-current={index === activeIndex}
-            onClick={() => onChange(index)}
+            onClick={(event) => {
+              if (touchSwiped.current) {
+                event.preventDefault();
+                return;
+              }
+              onChange(index);
+            }}
             className={`h-1.5 rounded-full transition-all ${
               index === activeIndex ? 'w-6 bg-purple-400' : 'w-1.5 bg-white/40 hover:bg-white/70'
             }`}
