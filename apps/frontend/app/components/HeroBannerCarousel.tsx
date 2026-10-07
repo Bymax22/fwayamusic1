@@ -71,15 +71,15 @@ export default function HeroBannerCarousel({
           touchSwiped.current = false;
         }, 300);
       }}
-      className={`relative isolate h-[190px] touch-pan-y overflow-hidden bg-black sm:h-[320px] lg:h-[390px] ${className}`}
+      className={`relative isolate h-[190px] touch-pan-y overflow-hidden bg-black [perspective:1400px] sm:h-[320px] lg:h-[390px] ${className}`}
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(83,35,112,0.32),transparent_68%)]" />
 
       {visibleSlides.map(({ slide, index, offset }) => {
         const distance = Math.abs(offset);
         const isActive = offset === 0;
-        const scale = isActive ? 1 : 0.88;
-        const opacity = isActive ? 1 : 0.78;
+        const scale = isActive ? 1 : 0.82;
+        const opacity = isActive ? 1 : 0.82;
 
         return (
           <motion.button
@@ -94,23 +94,30 @@ export default function HeroBannerCarousel({
               if (isActive) onActivate(slide);
               else onChange(index);
             }}
-            className="absolute top-1/2 h-[88%] w-[50%] overflow-visible rounded-2xl sm:w-[36%] sm:rounded-3xl"
+            className="absolute top-1/2 h-[82%] w-[60%] overflow-visible rounded-2xl sm:h-[88%] sm:w-[50%] sm:rounded-3xl"
             initial={false}
             animate={{
+              left: `${50 + offset * 48}%`,
               x: '-50%',
               y: '-50%',
               scale,
               opacity,
+              rotateY: offset === 0 ? 0 : offset < 0 ? 38 : -38,
             }}
-            transition={{ type: 'spring', stiffness: 180, damping: 28 }}
-            style={{ left: `calc(50% + ${offset * 48}%)`, zIndex: 20 - distance }}
+            transition={{ type: 'spring', stiffness: 110, damping: 24, mass: 1.1 }}
+            style={{
+              left: '50%',
+              zIndex: 20 - distance,
+              transformStyle: 'preserve-3d',
+              transformOrigin: 'center center',
+            }}
           >
             <span className="absolute inset-x-0 top-0 z-10 h-full overflow-hidden rounded-2xl bg-[#111] shadow-[0_18px_50px_rgba(0,0,0,0.65)] sm:rounded-3xl">
               <Image
                 src={slide.image || '/featured5.jpg'}
                 alt={slide.title}
                 fill
-                sizes="(max-width: 640px) 50vw, 36vw"
+                sizes="(max-width: 640px) 60vw, 50vw"
                 className="object-cover"
                 priority={distance === 0}
               />
@@ -135,7 +142,7 @@ export default function HeroBannerCarousel({
               aria-hidden="true"
               className="absolute left-0 right-0 top-[96%] h-[28%] scale-y-[-1] overflow-hidden rounded-2xl opacity-25 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.5),transparent)] sm:rounded-3xl"
             >
-              <Image src={slide.image || '/featured5.jpg'} alt="" fill sizes="(max-width: 640px) 50vw, 36vw" className="object-cover" />
+              <Image src={slide.image || '/featured5.jpg'} alt="" fill sizes="(max-width: 640px) 60vw, 50vw" className="object-cover" />
             </span>
           </motion.button>
         );

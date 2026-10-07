@@ -996,11 +996,32 @@ export default function GuestWelcome() {
 
   const musicVideoCards = musicVideos.slice(0, 6);
   const otherVideoCards = otherVideos.slice(0, 6);
+  const quickPickCards: any[] = [];
+  for (let index = 0; index < Math.max(quickPicks.length, otherVideoCards.length); index += 1) {
+    if (quickPicks[index]) quickPickCards.push(quickPicks[index]);
+    if (otherVideoCards[index]) quickPickCards.push(otherVideoCards[index]);
+  }
   const relatedVideoPool = [...musicVideos, ...otherVideos].filter((video: any) => video?.url).slice(0, 10);
 
   const openVideoPlayer = (video: any) => {
     if (!video?.id) return;
     router.push(`/videos/${video.id}?autoplay=1`);
+  };
+
+  const selectQuickPick = (item: any) => {
+    if (item.type?.toString().toUpperCase() === 'VIDEO') {
+      openVideoPlayer(item);
+      return;
+    }
+
+    playTrack({
+      id: item.id,
+      title: item.title,
+      artist: item.user?.displayName || item.user?.username || 'Unknown',
+      imageUrl: item.artCoverUrl,
+      audioUrl: item.audioUrl || item.url,
+      duration: item.duration,
+    });
   };
 
   useEffect(() => {
@@ -1325,24 +1346,29 @@ export default function GuestWelcome() {
                 {renderSeeAll('quickPicks')}
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {quickPicks.map((item: any, i: number) => (
-                  <div 
-                    key={i} 
+                {quickPickCards.map((item: any, i: number) => {
+                  const isVideo = item.type?.toString().toUpperCase() === 'VIDEO';
+                  const image = item.artCoverUrl || item.coverArt || item.thumbnailUrl;
+
+                  return (
+                  <div
+                    key={item.id || i}
+                    role="button"
+                    tabIndex={0}
                     className="w-32 flex-shrink-0 cursor-pointer"
-                    onClick={() => playTrack({
-                      id: item.id,
-                      title: item.title,
-                      artist: item.user?.displayName || item.user?.username || 'Unknown',
-                      imageUrl: item.artCoverUrl,
-                      audioUrl: item.audioUrl || item.url,
-                      duration: item.duration
-                    })}
+                    onClick={() => selectQuickPick(item)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        selectQuickPick(item);
+                      }
+                    }}
                   >
                     <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
-                      <div className="aspect-square relative">
-                        {item.artCoverUrl ? (
+                      <div className={`${isVideo ? 'aspect-video' : 'aspect-square'} relative`}>
+                        {image ? (
                           <Image
-                            src={item.artCoverUrl}
+                            src={image}
                             alt={item.title}
                             fill
                             className="object-cover"
@@ -1350,23 +1376,30 @@ export default function GuestWelcome() {
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500" />
                         )}
-                        <button
-                          type="button"
-                          aria-label={`Add ${item.title} to a playlist`}
-                          onClick={(event) => handleAddToPlaylist(event, item)}
-                          className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple-600"
-                        >
-                          <FaPlus className="text-xs" />
-                        </button>
+                        {isVideo ? (
+                          <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                            <FaPlay className="text-sm text-white" />
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            aria-label={`Add ${item.title} to a playlist`}
+                            onClick={(event) => handleAddToPlaylist(event, item)}
+                            className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple-600"
+                          >
+                            <FaPlus className="text-xs" />
+                          </button>
+                        )}
                       </div>
                     </div>
                     <div className="px-1">
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
-                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || (isVideo ? 'Fwaya video' : 'Unknown')}</p>
                       <p className="text-[11px] text-gray-500">{getPublishedTime(item)}</p>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -1380,10 +1413,10 @@ export default function GuestWelcome() {
                 {musicVideoCards.map((item: any, i: number) => (
                   <div
                     key={i}
-                    className="w-32 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+                    className="w-40 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
                     onClick={() => openVideoPlayer(item)}
                   >
-                    <div className="relative aspect-[9/16]">
+                    <div className="relative aspect-video">
                       {item.coverPreview ? (
                         <div
                           className="absolute inset-0 bg-black"
@@ -2126,10 +2159,10 @@ export default function GuestWelcome() {
                 {musicVideoCards.map((item: any, i: number) => (
                   <div
                     key={i}
-                    className="w-32 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+                    className="w-40 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
                     onClick={() => openVideoPlayer(item)}
                   >
-                    <div className="relative aspect-[9/16]">
+                    <div className="relative aspect-video">
                       <div
                         className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
                         style={{
@@ -2170,10 +2203,10 @@ export default function GuestWelcome() {
                 {otherVideoCards.map((item: any, i: number) => (
                   <div
                     key={i}
-                    className="w-32 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+                    className="w-40 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
                     onClick={() => openVideoPlayer(item)}
                   >
-                    <div className="relative aspect-[9/16]">
+                    <div className="relative aspect-video">
                       <div
                         className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
                         style={{
@@ -2312,30 +2345,43 @@ export default function GuestWelcome() {
 
             {/* GRID LAYOUT - ALL 6 CARDS VISIBLE */}
             <div className="grid grid-cols-6 gap-3">
-              {quickPicks.slice(0, 6).map((item: any, i: number) => (
-                <div
-                  key={i}
-                  className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
-                >
-                  {/* IMAGE */}
+              {quickPickCards.slice(0, 6).map((item: any, i: number) => {
+                const isVideo = item.type?.toString().toUpperCase() === 'VIDEO';
+                const image = item.artCoverUrl || item.coverArt || item.thumbnailUrl;
+
+                return (
                   <div
-                    className={`aspect-[4/5] ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} group-hover:scale-105 transition-transform`}
-                    style={{
-                      backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
+                    key={item.id || i}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => selectQuickPick(item)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        selectQuickPick(item);
+                      }
                     }}
-                  />
-                  <div className="p-3 bg-[#080a13]">
-                    <p className="text-xs font-medium truncate text-white">
-                      {item.title}
-                    </p>
-                    <p className="text-xs text-gray-400 truncate">
-                      {item.user?.displayName || item.user?.username || 'Unknown Artist'}
-                    </p>
+                    className="overflow-hidden rounded-lg shadow-md transition-all hover:shadow-lg cursor-pointer group"
+                  >
+                    <div className={`${isVideo ? 'aspect-video' : 'aspect-[4/5]'} relative bg-gradient-to-br from-purple-500 to-pink-500`}>
+                      {image && (
+                        <Image src={image} alt={item.title || ''} fill className="object-cover" />
+                      )}
+                      {isVideo && (
+                        <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                          <FaPlay className="text-white" />
+                        </span>
+                      )}
+                    </div>
+                    <div className="bg-[#080a13] p-3">
+                      <p className="truncate text-xs font-medium text-white">{item.title}</p>
+                      <p className="truncate text-xs text-gray-400">
+                        {item.user?.displayName || item.user?.username || (isVideo ? 'Fwaya video' : 'Unknown Artist')}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -2491,7 +2537,7 @@ export default function GuestWelcome() {
                   onClick={() => openVideoPlayer(video)}
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
-                  <div className="relative aspect-[9/16]">
+                  <div className="relative aspect-video">
                     {video.coverPreview ? (
                       <div
                         className="absolute inset-0 bg-black"
@@ -2678,7 +2724,7 @@ export default function GuestWelcome() {
                   onClick={() => openVideoPlayer(video)}
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
-                  <div className="relative aspect-[9/16]">
+                  <div className="relative aspect-video">
                     <div
                       className={`absolute inset-0 ${video.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
                       style={{

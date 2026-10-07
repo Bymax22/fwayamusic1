@@ -1282,11 +1282,14 @@ async getHomepageSections() {
   let otherVideos = await this.prisma.media.findMany({
     where: { 
       type: MediaType.VIDEO,
+      userId: { not: null },
+      deletedAt: null,
       NOT: {
         OR: [
           { tags: { has: "music" } },
           { tags: { has: "song" } },
           { tags: { has: "mv" } },
+          { genre: { contains: "music", mode: "insensitive" } },
         ]
       },
       contentModerations: {
@@ -1306,10 +1309,9 @@ async getHomepageSections() {
       },
       contentModerations: true
     },
-    orderBy: { playCount: "desc" },
+    orderBy: { createdAt: "desc" },
     take: 6,
   });
-  otherVideos = otherVideos.filter(m => m.userId !== null);
 
   // Fetch albums and EPs separately so one release type cannot hide the other.
   const releaseWhere = {

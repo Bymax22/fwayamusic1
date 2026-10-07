@@ -27,6 +27,34 @@ describe('MediaService type normalization', () => {
   });
 });
 
+describe('MediaService homepage video sections', () => {
+  it('prioritizes recent, owned, non-music video uploads for Other Videos', async () => {
+    const media = { findMany: jest.fn().mockResolvedValue([]) };
+    const album = { findMany: jest.fn().mockResolvedValue([]) };
+    const service = new MediaService({ media, album } as any, {} as any, {} as any, {} as any);
+
+    await service.getHomepageSections();
+
+    const otherVideosQuery = media.findMany.mock.calls
+      .map(([query]) => query)
+      .find((query) => query.where.type === MediaType.VIDEO && query.where.NOT);
+
+    expect(otherVideosQuery).toEqual(expect.objectContaining({
+      where: expect.objectContaining({
+        userId: { not: null },
+        deletedAt: null,
+        NOT: {
+          OR: expect.arrayContaining([
+            { genre: { contains: 'music', mode: 'insensitive' } },
+          ]),
+        },
+      }),
+      orderBy: { createdAt: 'desc' },
+      take: 6,
+    }));
+  });
+});
+
 describe('MediaService protected playback authorization', () => {
   const premiumUntil = new Date(Date.now() + 60_000);
 
