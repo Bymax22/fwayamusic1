@@ -47,10 +47,10 @@ export default function RadioPage() {
   if (loading) return <div className="p-4 text-center">Loading radio stations...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#050d12] p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#000000] to-[#000000] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
-          <Radio className="w-8 h-8 text-purple-500 animate-pulse" />
+          <Radio className="w-8 h-8 text-purple/75 animate-pulse" />
           <h1 className="text-4xl font-bold text-white">Radio & Podcasts</h1>
         </div>
 
@@ -61,7 +61,7 @@ export default function RadioPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="group bg-[#0f2935]/50 backdrop-blur-lg rounded-lg overflow-hidden border border-purple-500/20 hover:border-purple-500/50 transition-all"
+              className="group bg-[#36454F]/50 backdrop-blur-lg rounded-lg overflow-hidden border border-purple/20 hover:border-purple/50 transition-all"
             >
               <div className="relative">
                 <Image
@@ -78,24 +78,24 @@ export default function RadioPage() {
                   onClick={() => playTrack(track)}
                   className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <Play className="w-12 h-12 text-purple-500 fill-purple-500" />
+                  <Play className="w-12 h-12 text-purple/75 fill-purple/75" />
                 </button>
               </div>
 
               <div className="p-4">
                 <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className="mb-1 font-semibold text-white">{track.title}</ScrollingTrackTitle>
-                <p className="text-sm text-gray-400 truncate mb-3">{track.artist}</p>
+                <p className="text-sm text-white/60 truncate mb-3">{track.artist}</p>
                 
-                <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
+                <div className="flex items-center justify-between text-xs text-white/60 mb-3">
                   <span>{(track.views || 0).toLocaleString()} listens</span>
-                  <span className="px-2 py-1 bg-[#0a3747] rounded text-purple-400 font-semibold">{track.type || 'Podcast'}</span>
+                  <span className="px-2 py-1 bg-[#36454F] rounded text-purple/60 font-semibold">{track.type || 'Podcast'}</span>
                 </div>
 
                 <div className="flex gap-2">
-                  <button className="flex-1 p-2 bg-purple-500/20 text-purple-400 rounded hover:bg-purple-500/30 transition-colors text-xs font-semibold">
+                  <button className="flex-1 p-2 bg-purple/20 text-purple/60 rounded hover:bg-purple/30 transition-colors text-xs font-semibold">
                     <Heart className="w-4 h-4 inline mr-1" /> Like
                   </button>
-                  <button className="flex-1 p-2 bg-[#0a3747] text-gray-300 rounded hover:bg-[#0f4a5f] transition-colors text-xs font-semibold">
+                  <button className="flex-1 p-2 bg-[#36454F] text-white/90 rounded hover:bg-[#36454F] transition-colors text-xs font-semibold">
                     <Download className="w-4 h-4 inline mr-1" /> Subscribe
                   </button>
                 </div>
@@ -106,7 +106,7 @@ export default function RadioPage() {
 
         {media.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-400">No radio stations available</p>
+            <p className="text-white/60">No radio stations available</p>
           </div>
         )}
       </div>

@@ -343,7 +343,7 @@ export default function ArtistPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple/75"></div>
       </div>
     );
   }
@@ -355,7 +355,7 @@ export default function ArtistPage() {
           <h1 className="text-2xl font-bold text-white mb-4">Artist Not Found</h1>
           <button
             onClick={() => router.back()}
-            className="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-400 transition-colors"
+            className="bg-purple/75 text-white px-6 py-2 rounded-lg hover:bg-purple/60 transition-colors"
           >
             Go Back
           </button>
@@ -370,14 +370,14 @@ export default function ArtistPage() {
         <div className="relative mx-auto max-w-7xl px-4 py-5 pb-32 sm:p-6">
           <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-3">
-              <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Artist</p>
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple/45">Artist</p>
               <h1 className="flex flex-wrap items-center gap-2 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
                 <span>{artist.name}</span>
                 {artist.isVerified && (
                   <VerifiedBadge size="lg" title="Verified artist" />
                 )}
               </h1>
-              <p className="max-w-2xl text-gray-400">
+              <p className="max-w-2xl text-white/60">
                 {artist.followers.toLocaleString()} followers • {artist.mediaCount} songs • {artist.totalPlays.toLocaleString()} plays
                 {artist.isVerified && ' • Verified Artist'}
               </p>
@@ -387,8 +387,8 @@ export default function ArtistPage() {
                 onClick={handleFollow}
                 className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold shadow-lg transition ${
                   artist.isFollowing
-                    ? 'bg-purple-500 text-white shadow-purple-500/20 hover:bg-purple-400'
-                    : 'bg-white text-black hover:bg-gray-200'
+                    ? 'bg-purple/75 text-white shadow-purple/20 hover:bg-purple/60'
+                    : 'bg-white text-black hover:bg-white/20'
                 }`}
               >
                 {artist.isFollowing ? 'Following' : 'Follow'}
@@ -414,7 +414,7 @@ export default function ArtistPage() {
                 className="h-40 w-40 rounded-[24px] object-cover shadow-2xl sm:h-56 sm:w-56 sm:rounded-[32px] lg:h-[300px] lg:w-[300px]"
               />
               {artist.isVerified && (
-                <div className="absolute -bottom-4 -right-4 bg-purple-500 rounded-full p-3 shadow-lg">
+                <div className="absolute -bottom-4 -right-4 bg-purple/75 rounded-full p-3 shadow-lg">
                   <FaCrown size={16} className="text-white" />
                 </div>
               )}
@@ -424,28 +424,28 @@ export default function ArtistPage() {
               {artist.bio && (
                 <div className="space-y-3">
                   <h3 className="text-lg font-semibold text-white">About</h3>
-                  <p className="text-gray-300 leading-relaxed max-w-2xl">{artist.bio}</p>
+                  <p className="text-white/90 leading-relaxed max-w-2xl">{artist.bio}</p>
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <div className="bg-white/5 rounded-2xl p-4">
                   <div className="text-2xl font-bold text-white">{artist.followers.toLocaleString()}</div>
-                  <div className="text-sm text-gray-400">Followers</div>
+                  <div className="text-sm text-white/60">Followers</div>
                 </div>
                 <div className="bg-white/5 rounded-2xl p-4">
                   <div className="text-2xl font-bold text-white">{artist.mediaCount}</div>
-                  <div className="text-sm text-gray-400">Songs</div>
+                  <div className="text-sm text-white/60">Songs</div>
                 </div>
                 <div className="bg-white/5 rounded-2xl p-4">
                   <div className="text-2xl font-bold text-white">{artist.totalPlays.toLocaleString()}</div>
-                  <div className="text-sm text-gray-400">Total Plays</div>
+                  <div className="text-sm text-white/60">Total Plays</div>
                 </div>
                 <div className="bg-white/5 rounded-2xl p-4">
                   <div className="text-2xl font-bold text-white">
                     {artist.media.reduce((sum, song) => sum + (song.likes || 0), 0).toLocaleString()}
                   </div>
-                  <div className="text-sm text-gray-400">Total Likes</div>
+                  <div className="text-sm text-white/60">Total Likes</div>
                 </div>
               </div>
 
@@ -471,8 +471,8 @@ export default function ArtistPage() {
 
           {/* Songs Section */}
           <div className="space-y-6">
-            <div className="flex items-center gap-3 text-sm text-gray-400 mb-4">
-              <span className="inline-flex h-2 w-2 rounded-full bg-purple-400" />
+            <div className="flex items-center gap-3 text-sm text-white/60 mb-4">
+              <span className="inline-flex h-2 w-2 rounded-full bg-purple/60" />
               <span>Songs</span>
               <span className="text-white/70">({artist.media.length})</span>
             </div>
@@ -505,7 +505,7 @@ export default function ArtistPage() {
 
                   <div className="min-w-0 flex-1">
                     <ScrollingTrackTitle isPlaying={currentTrack?.id === song.id.toString() && isPlaying} className="mb-1 font-medium text-white">{song.title}</ScrollingTrackTitle>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400 sm:gap-x-4 sm:text-sm">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-white/60 sm:gap-x-4 sm:text-sm">
                       <span>{formatDuration(song.duration)}</span>
                       <span className="flex items-center gap-1">
                         <FaHeadphones size={12} />
@@ -516,16 +516,16 @@ export default function ArtistPage() {
                         {song.likes || 0}
                       </span>
                       {song.accessType === 'PREMIUM' && (
-                        <span className="flex items-center gap-1 text-purple-400">
+                        <span className="flex items-center gap-1 text-purple/60">
                           <FaCrown size={12} />
                           Premium
                         </span>
                       )}
                       {song.isExplicit && (
-                        <span className="text-xs bg-gray-600 px-2 py-0.5 rounded">E</span>
+                        <span className="text-xs bg-charcoal px-2 py-0.5 rounded">E</span>
                       )}
                     </div>
-                    <p className="mt-1 truncate text-[10px] text-gray-500 sm:text-xs">
+                    <p className="mt-1 truncate text-[10px] text-white/60 sm:text-xs">
                       Added {song.addedAt ? formatAddedTime(song.addedAt) : 'date unavailable'}
                     </p>
                   </div>
@@ -533,26 +533,26 @@ export default function ArtistPage() {
                   <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100">
                     <button
                       onClick={() => handleLikeSong(song.id)}
-                      className={`transition-colors ${likedSongs.has(song.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                      className={`transition-colors ${likedSongs.has(song.id) ? 'text-purple/75' : 'text-white/60 hover:text-purple/75'}`}
                       aria-label={likedSongs.has(song.id) ? `Unlike ${song.title}` : `Like ${song.title}`}
                     >
                       {likedSongs.has(song.id) ? <FaHeart size={14} /> : <FaRegHeart size={14} />}
                     </button>
                     <button
                       onClick={() => handleShareSong(song)}
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="text-white/60 hover:text-white transition-colors"
                     >
                       <FaShare size={14} />
                     </button>
                     <button
                       onClick={() => handleDownloadSong(song)}
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="text-white/60 hover:text-white transition-colors"
                     >
                       <FaDownload size={14} />
                     </button>
                     <button
                       onClick={() => handleAddToPlaylist(song)}
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="text-white/60 hover:text-white transition-colors"
                     >
                       <FaPlus size={14} />
                     </button>

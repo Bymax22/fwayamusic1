@@ -191,14 +191,14 @@ export default function ResellerSignUp() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
+        className="bg-[#000000] rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#000000] rounded-full flex items-center justify-center mx-auto mb-4">
             <FaStore className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Reseller</h1>
-          <p className="text-gray-300">Create your reseller account and start earning</p>
+          <p className="text-white/90">Create your reseller account and start earning</p>
         </div>
 
         {/* Progress Bar */}
@@ -209,10 +209,10 @@ export default function ResellerSignUp() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                     step === s
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-purple/85 text-white'
                       : index < ['basic', 'business', 'consent', 'verification'].indexOf(step)
-                      ? 'bg-purple-500 text-white'
-                      : 'bg-gray-200 text-gray-400'
+                      ? 'bg-purple/75 text-white'
+                      : 'bg-white/20 text-white/60'
                   }`}
                 >
                   {index < ['basic', 'business', 'consent', 'verification'].indexOf(step) ? (
@@ -221,7 +221,7 @@ export default function ResellerSignUp() {
                     index + 1
                   )}
                 </div>
-                <span className="text-xs text-gray-500 mt-1 capitalize">
+                <span className="text-xs text-white/60 mt-1 capitalize">
                   {s === 'basic' && 'Account'}
                   {s === 'business' && 'Business'}
                   {s === 'consent' && 'Terms'}
@@ -230,9 +230,9 @@ export default function ResellerSignUp() {
               </div>
             ))}
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-white/20 rounded-full h-2">
             <div
-              className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+              className="bg-purple/85 h-2 rounded-full transition-all duration-300"
               style={{
                 width: `${(['basic', 'business', 'consent', 'verification'].indexOf(step) + 1) * 25}%`,
               }}
@@ -260,10 +260,10 @@ export default function ResellerSignUp() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="your@email.com"
                 />
-                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-purple/60 text-sm mt-1">{errors.email}</p>}
               </div>
 
               <div>
@@ -274,10 +274,10 @@ export default function ResellerSignUp() {
                   type="text"
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="username"
                 />
-                {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
+                {errors.username && <p className="text-purple/60 text-sm mt-1">{errors.username}</p>}
               </div>
             </div>
 
@@ -289,7 +289,7 @@ export default function ResellerSignUp() {
                 type="text"
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="Your display name"
               />
             </div>
@@ -302,7 +302,7 @@ export default function ResellerSignUp() {
                 type="file"
                 accept="image/*"
                 onChange={(e) => setFormData({ ...formData, avatarFile: e.target.files?.[0] || null })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-[#121517] rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1f1b36] file:text-purple-300 hover:file:bg-[#2d254e]"
+                className="w-full px-4 py-3 bg-[#36454F] border border-[#000000] rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#36454F] file:text-purple/45 hover:file:bg-[#36454F]"
               />
             </div>
 
@@ -316,18 +316,18 @@ export default function ResellerSignUp() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+                    className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-12"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white"
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
-                {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
+                {errors.password && <p className="text-purple/60 text-sm mt-1">{errors.password}</p>}
               </div>
 
               <div>
@@ -338,24 +338,24 @@ export default function ResellerSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="••••••••"
                 />
-                {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-purple/60 text-sm mt-1">{errors.confirmPassword}</p>}
               </div>
             </div>
 
             <div className="flex justify-between pt-4">
               <Link
                 href="/auth/reseller/signin"
-                className="flex items-center gap-2 px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517] transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors"
               >
                 <FaArrowLeft className="w-4 h-4" />
                 Back to Sign In
               </Link>
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-colors font-semibold"
+                className="px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -383,10 +383,10 @@ export default function ResellerSignUp() {
                   type="text"
                   value={formData.businessName}
                   onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="Your business name"
                 />
-                {errors.businessName && <p className="text-red-400 text-sm mt-1">{errors.businessName}</p>}
+                {errors.businessName && <p className="text-purple/60 text-sm mt-1">{errors.businessName}</p>}
               </div>
 
               <div>
@@ -396,7 +396,7 @@ export default function ResellerSignUp() {
                 <select
                   value={formData.businessType}
                   onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 >
                   <option value="">Select business type</option>
                   {businessTypes.map((type) => (
@@ -405,7 +405,7 @@ export default function ResellerSignUp() {
                     </option>
                   ))}
                 </select>
-                {errors.businessType && <p className="text-red-400 text-sm mt-1">{errors.businessType}</p>}
+                {errors.businessType && <p className="text-purple/60 text-sm mt-1">{errors.businessType}</p>}
               </div>
             </div>
 
@@ -418,10 +418,10 @@ export default function ResellerSignUp() {
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="+260 96 123 4567"
                 />
-                {errors.phoneNumber && <p className="text-red-400 text-sm mt-1">{errors.phoneNumber}</p>}
+                {errors.phoneNumber && <p className="text-purple/60 text-sm mt-1">{errors.phoneNumber}</p>}
               </div>
 
               <div>
@@ -432,9 +432,9 @@ export default function ResellerSignUp() {
                   type="date"
                   value={formData.dateOfBirth}
                   onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 />
-                {errors.dateOfBirth && <p className="text-red-400 text-sm mt-1">{errors.dateOfBirth}</p>}
+                {errors.dateOfBirth && <p className="text-purple/60 text-sm mt-1">{errors.dateOfBirth}</p>}
               </div>
             </div>
 
@@ -446,10 +446,10 @@ export default function ResellerSignUp() {
                 type="text"
                 value={formData.taxNumber}
                 onChange={(e) => setFormData({ ...formData, taxNumber: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="Tax ID or VAT number"
               />
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-white/60 text-sm mt-1">
                 Required for commission payments and tax reporting
               </p>
             </div>
@@ -457,13 +457,13 @@ export default function ResellerSignUp() {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517] transition-colors"
+                className="px-6 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-colors font-semibold"
+                className="px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -482,20 +482,20 @@ export default function ResellerSignUp() {
               Reseller Agreements
             </h2>
 
-            <div className="bg-[#0a3747] rounded-xl p-6 space-y-4">
+            <div className="bg-[#36454F] rounded-xl p-6 space-y-4">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms-reseller"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0f1112] border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="terms-reseller" className="text-white text-sm">
-                  I agree to the <a href="/terms" className="text-purple-400 hover:text-purple-300 hover:underline">Reseller Terms of Service</a> and <a href="/privacy" className="text-purple-400 hover:text-purple-300 hover:underline">Privacy Policy</a> *
+                  I agree to the <a href="/terms" className="text-purple/60 hover:text-purple/45 hover:underline">Reseller Terms of Service</a> and <a href="/privacy" className="text-purple/60 hover:text-purple/45 hover:underline">Privacy Policy</a> *
                 </label>
               </div>
-              {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
+              {errors.acceptedTerms && <p className="text-purple/60 text-sm">{errors.acceptedTerms}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -503,13 +503,13 @@ export default function ResellerSignUp() {
                   id="privacy-reseller"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0f1112] border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="privacy-reseller" className="text-white text-sm">
                   I acknowledge that I have read and understood how my personal and business data will be processed *
                 </label>
               </div>
-              {errors.acceptedPrivacy && <p className="text-red-400 text-sm">{errors.acceptedPrivacy}</p>}
+              {errors.acceptedPrivacy && <p className="text-purple/60 text-sm">{errors.acceptedPrivacy}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -517,13 +517,13 @@ export default function ResellerSignUp() {
                   id="cookies-reseller"
                   checked={formData.acceptedCookies}
                   onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0f1112] border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="cookies-reseller" className="text-white text-sm">
                   I agree to the use of cookies for analytics and personalization.
                 </label>
               </div>
-              {errors.acceptedCookies && <p className="text-red-400 text-sm">{errors.acceptedCookies}</p>}
+              {errors.acceptedCookies && <p className="text-purple/60 text-sm">{errors.acceptedCookies}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -531,7 +531,7 @@ export default function ResellerSignUp() {
                   id="marketing-reseller"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0f1112] border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="marketing-reseller" className="text-white text-sm">
                   I agree to receive marketing emails and promotional offers
@@ -544,7 +544,7 @@ export default function ResellerSignUp() {
                   id="dataSharing-reseller"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-500 bg-[#0f1112] border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="dataSharing-reseller" className="text-white text-sm">
                   I consent to my data being shared with trusted partners for service improvement
@@ -554,7 +554,7 @@ export default function ResellerSignUp() {
 
             {/* Avatar Upload */}
             <div className="flex flex-col items-center gap-4 mb-6">
-              <div className="w-32 h-32 rounded-full bg-[#0f1112] border border-[#121517] flex items-center justify-center overflow-hidden">
+              <div className="w-32 h-32 rounded-full bg-[#000000] border border-[#000000] flex items-center justify-center overflow-hidden">
                 {avatarPreview ? (
                   <Image
                     src={avatarPreview}
@@ -564,14 +564,14 @@ export default function ResellerSignUp() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <FaCamera className="text-3xl text-purple-300/80" />
+                  <FaCamera className="text-3xl text-purple/80" />
                 )}
               </div>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="px-4 py-2 bg-[#0f1112] border border-[#121517] text-white rounded-lg hover:bg-[#121517] transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-[#000000] border border-[#000000] text-white rounded-lg hover:bg-[#000000] transition-colors disabled:opacity-50"
               >
                 {uploading ? 'Uploading...' : 'Upload Avatar'}
               </button>
@@ -582,27 +582,27 @@ export default function ResellerSignUp() {
                 onChange={handleAvatarChange}
                 className="hidden"
               />
-              {errors.avatar && <p className="text-red-400 text-sm">{errors.avatar}</p>}
+              {errors.avatar && <p className="text-purple/60 text-sm">{errors.avatar}</p>}
             </div>
 
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517] transition-colors"
+                className="px-6 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={loading || uploading}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                className="px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
               >
                 {loading ? 'Creating Account...' : uploading ? 'Uploading Avatar...' : 'Create Reseller Account'}
               </button>
             </div>
 
             {errors.submit && (
-              <p className="text-red-400 text-sm text-center">{errors.submit}</p>
+              <p className="text-purple/60 text-sm text-center">{errors.submit}</p>
             )}
           </motion.div>
         )}
@@ -614,7 +614,7 @@ export default function ResellerSignUp() {
             animate={{ opacity: 1, x: 0 }}
             className="text-center space-y-6"
           >
-            <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto">
+            <div className="w-20 h-20 bg-purple/85 rounded-full flex items-center justify-center mx-auto">
               <FaCheck className="w-10 h-10 text-white" />
             </div>
             
@@ -623,29 +623,29 @@ export default function ResellerSignUp() {
                 Verify Your Email!
               </h2>
               {verificationError && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-3 text-left">
-                  <p className="text-red-200 text-sm font-semibold">Verification email failed to send.</p>
-                  <p className="text-red-100 text-xs break-words">{verificationError}</p>
+                <div className="bg-purple/10 border border-purple/20 rounded-xl p-3 mb-3 text-left">
+                  <p className="text-purple/30 text-sm font-semibold">Verification email failed to send.</p>
+                  <p className="text-purple/20 text-xs break-words">{verificationError}</p>
                 </div>
               )}
-              <p className="text-gray-300 mb-2">
+              <p className="text-white/90 mb-2">
                 We&lsquo;ve sent a verification link to <strong>{formData.email}</strong>
               </p>
-              <p className="text-gray-500 text-sm">
+              <p className="text-white/60 text-sm">
                 Click the link in the email to verify your account and complete your reseller registration.
               </p>
               <button
                 type="button"
                 onClick={handleResendVerificationEmail}
                 disabled={resendLoading}
-                className="mt-4 px-5 py-2 bg-[#121517] rounded-xl text-white hover:bg-[#1f1f1f] transition-colors disabled:opacity-50"
+                className="mt-4 px-5 py-2 bg-[#000000] rounded-xl text-white hover:bg-[#000000] transition-colors disabled:opacity-50"
               >
                 {resendLoading ? 'Resending…' : 'Resend verification email'}
               </button>
             </div>
 
-            <div className="bg-[#121517] border border-[#121517] rounded-xl p-4">
-              <p className="text-purple-200 text-sm">
+            <div className="bg-[#000000] border border-[#000000] rounded-xl p-4">
+              <p className="text-purple/30 text-sm">
                 <strong>Important:</strong> After email verification, you&lsquo;ll need to complete KYC and business verification to start reselling and receiving commissions.
               </p>
             </div>
@@ -653,13 +653,13 @@ export default function ResellerSignUp() {
             <div className="space-y-3">
               <button
                 onClick={() => router.push('/auth/reseller/signin')}
-                className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-colors font-semibold"
+                className="w-full px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 transition-colors font-semibold"
               >
                 Go to Reseller Sign In
               </button>
               <button
                 onClick={() => setStep('basic')}
-                className="w-full px-6 py-3 border border-[#121517] text-white rounded-xl hover:bg-[#0a3747] transition-colors"
+                className="w-full px-6 py-3 border border-[#000000] text-white rounded-xl hover:bg-[#36454F] transition-colors"
               >
                 Create Another Account
               </button>
@@ -668,18 +668,18 @@ export default function ResellerSignUp() {
         )}
 
         {/* Navigation Links */}
-        <div className="text-center mt-8 pt-6 border-t border-gray-200">
-          <p className="text-gray-300">
+        <div className="text-center mt-8 pt-6 border-t border-white/20">
+          <p className="text-white/90">
             Already have a reseller account?{' '}
-            <Link href="/auth/reseller/signin" className="text-purple-400 hover:text-purple-300 hover:underline font-semibold">
+            <Link href="/auth/reseller/signin" className="text-purple/60 hover:text-purple/45 hover:underline font-semibold">
               Sign In
             </Link>
           </p>
           <div className="mt-4 flex gap-4 justify-center">
-            <Link href="/auth/user/signup" className="text-sm text-purple-400 hover:underline">
+            <Link href="/auth/user/signup" className="text-sm text-purple/60 hover:underline">
               Listener Sign Up
             </Link>
-            <Link href="/auth/artist/signup" className="text-sm text-purple-600 hover:underline">
+            <Link href="/auth/artist/signup" className="text-sm text-purple/85 hover:underline">
               Artist Sign Up
             </Link>
           </div>

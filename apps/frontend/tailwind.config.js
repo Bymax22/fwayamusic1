@@ -17,59 +17,60 @@ module.exports = {
     extend: {
       colors: {
         // Semantic colors mapped to CSS variables
-        border: "var(--border)",
-        input: "var(--input)",
-        ring: "var(--ring)",
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        purple: "#9B5DE5",
+        charcoal: "#36454F",
+        border: "rgb(var(--border))",
+        input: "rgb(var(--input))",
+        ring: "rgb(var(--ring))",
+        background: "rgb(var(--background))",
+        foreground: "rgb(var(--foreground))",
         
         // Primary colors with opacity variants
         primary: {
-          DEFAULT: "var(--primary-accent)",
+          DEFAULT: "rgb(var(--primary-accent))",
           dark: {
-            DEFAULT: "var(--primary-dark)",
+            DEFAULT: "rgb(var(--primary-dark))",
             50: "rgb(var(--primary-dark) / 0.5)",
             95: "rgb(var(--primary-dark) / 0.95)",
           },
-          light: "var(--primary-light)",
-          foreground: "var(--foreground)",
+          light: "rgb(var(--primary-light))",
+          foreground: "rgb(var(--foreground))",
         },
         
         // Accent colors
         accent: {
-          DEFAULT: "var(--primary-accent)",
-          light: "var(--accent-light)",
-          foreground: "var(--foreground)",
+          DEFAULT: "rgb(var(--primary-accent))",
+          light: "rgb(var(--accent-light))",
+          foreground: "rgb(var(--foreground))",
         },
         
         // Card colors
         card: {
-          DEFAULT: "var(--card)",
-          foreground: "var(--card-foreground)",
+          DEFAULT: "rgb(var(--card))",
+          foreground: "rgb(var(--card-foreground))",
         },
         
         // Destructive colors
         destructive: {
-          DEFAULT: "hsl(0 84.2% 60.2%)",
-          foreground: "hsl(0 0% 98%)",
+          DEFAULT: "rgb(var(--primary-accent))",
+          foreground: "rgb(var(--foreground))",
         },
         
         // Muted colors
         muted: {
-          DEFAULT: "var(--muted)",
-          foreground: "var(--muted-foreground)",
+          DEFAULT: "rgb(var(--muted))",
+          foreground: "rgb(var(--muted-foreground))",
         },
         
         // Popover colors
         popover: {
-          DEFAULT: "var(--card)",
-          foreground: "var(--foreground)",
+          DEFAULT: "rgb(var(--card))",
+          foreground: "rgb(var(--foreground))",
         },
         
         // Custom colors
-        'dark-bg': "var(--dark-bg)",
-        'light-bg': "var(--light-bg)",
-        'custom-blue': "#222831",
+        'dark-bg': "rgb(var(--dark-bg))",
+        'light-bg': "rgb(var(--light-bg))",
       },
       borderRadius: {
         sm: "var(--radius-sm)",

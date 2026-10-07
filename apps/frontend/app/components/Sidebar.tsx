@@ -44,7 +44,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
 
   // Custom icon wrapper with red color
   const Icon = ({ children }: { children: React.ReactNode }) => (
-    <span className="text-[#ce7f16]">{children}</span>
+    <span className="text-[#36454F]">{children}</span>
   );
 
   // Main navigation items
@@ -87,7 +87,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
 
   return (
     <div
-      className={`hidden md:block fixed top-0 left-0 h-screen bg-[#0f2d3d] border-r border-[#1e293b] shadow-lg z-30 overflow-y-auto transition-all duration-300
+      className={`hidden md:block fixed top-0 left-0 h-screen bg-[#36454F] border-r border-[#36454F] shadow-lg z-30 overflow-y-auto transition-all duration-300
         ${sidebarExpanded ? "w-56" : "w-16"} lg:w-56`}
     >
       <div className="flex flex-col h-[calc(100vh-4rem)] p-2 space-y-2">
@@ -97,7 +97,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             <Link
               key={item.title}
               href={item.href}
-              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group mobile-text-sm"
+              className="flex items-center justify-start p-2 rounded-md text-[#9B5DE5] hover:text-white hover:bg-[#36454F] transition-all group mobile-text-sm"
             >
               <span className="flex-shrink-0 group-hover:scale-110 transition-transform">
                 {item.icon}
@@ -109,12 +109,12 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
           ))}
         </div>
 
-        <div className="border-t border-[#1e293b] my-1"></div>
+        <div className="border-t border-[#36454F] my-1"></div>
 
         {/* Music Library */}
         <div className="flex flex-col space-y-0.5">
           {sidebarExpanded && (
-            <h3 className="text-xs uppercase text-[#64748b] px-2 mb-1 mobile-text-xs">
+            <h3 className="text-xs uppercase text-[#36454F] px-2 mb-1 mobile-text-xs">
               Your Library
             </h3>
           )}
@@ -122,7 +122,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             <Link
               key={item.title}
               href={item.href}
-              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group mobile-text-sm"
+              className="flex items-center justify-start p-2 rounded-md text-[#9B5DE5] hover:text-white hover:bg-[#36454F] transition-all group mobile-text-sm"
             >
               <span className="flex-shrink-0 group-hover:scale-110 transition-transform">
                 {item.icon}
@@ -134,12 +134,12 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
           ))}
         </div>
 
-        <div className="border-t border-[#1e293b] my-1"></div>
+        <div className="border-t border-[#36454F] my-1"></div>
 
         {/* Discover Section */}
         <div className="flex flex-col space-y-0.5">
           {sidebarExpanded && (
-            <h3 className="text-xs uppercase text-[#64748b] px-2 mb-1 mobile-text-xs">
+            <h3 className="text-xs uppercase text-[#36454F] px-2 mb-1 mobile-text-xs">
               Discover
             </h3>
           )}
@@ -147,7 +147,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             <Link
               key={item.title}
               href={item.href}
-              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group mobile-text-sm"
+              className="flex items-center justify-start p-2 rounded-md text-[#9B5DE5] hover:text-white hover:bg-[#36454F] transition-all group mobile-text-sm"
             >
               <span className="flex-shrink-0 group-hover:scale-110 transition-transform">
                 {item.icon}
@@ -163,7 +163,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
 
         {/* Now Playing Section - Enhanced */}
         {sidebarExpanded && (
-          <div className="p-2 rounded-lg bg-[#1a5a72] bg-opacity-30 mb-2">
+          <div className="p-2 rounded-lg bg-[#36454F] bg-opacity-30 mb-2">
             <div className="flex items-center">
               <Image
                 src={currentSong.cover}
@@ -174,14 +174,14 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
               />
               <div className="ml-2 overflow-hidden">
                 <p className="text-xs font-medium truncate mobile-text-xs">{currentSong.title}</p>
-                <p className="text-xs text-[#64748b] truncate mobile-text-xs">{currentSong.artist}</p>
+                <p className="text-xs text-[#36454F] truncate mobile-text-xs">{currentSong.artist}</p>
               </div>
             </div>
 
             {/* Progress Bar */}
-            <div className="mt-1.5 w-full bg-[#240e47] rounded-full h-1">
+            <div className="mt-1.5 w-full bg-[#36454F] rounded-full h-1">
               <div
-                className="bg-gradient-to-r from-[#ce7f16] to-[#240e47] h-1 rounded-full"
+                className="bg-gradient-to-r from-[#36454F] to-[#36454F] h-1 rounded-full"
                 style={{ width: `${currentSong.progress}%` }}
               />
             </div>
@@ -192,7 +192,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
                 <div
                   key={index}
                   style={{ height: `${height}%` }}
-                  className="w-0.5 bg-gradient-to-t from-[#ce7f16] to-[#240e47] rounded-full transition-all duration-300"
+                  className="w-0.5 bg-gradient-to-t from-[#36454F] to-[#36454F] rounded-full transition-all duration-300"
                 />
               ))}
             </div>
@@ -200,7 +200,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             {/* Controls */}
             <div className="flex items-center mt-1.5 gap-1.5">
               <button
-                className="flex-1 bg-gradient-to-r from-[#ce7f16] to-[#240e47] p-1 rounded flex justify-center items-center text-xs hover:opacity-90 transition-all mobile-text-xs"
+                className="flex-1 bg-gradient-to-r from-[#36454F] to-[#36454F] p-1 rounded flex justify-center items-center text-xs hover:opacity-90 transition-all mobile-text-xs"
                 onClick={() => setIsPlaying(!isPlaying)}
               >
                 {isPlaying ? (
@@ -213,7 +213,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
                 </span>
               </button>
 
-              <button className="p-1 text-[#ce7f16] hover:text-[#240e47]">
+              <button className="p-1 text-[#36454F] hover:text-[#36454F]">
                 <FaVolumeUp size={12} />
               </button>
             </div>
@@ -223,7 +223,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
         {/* Settings Section */}
         <div className="flex flex-col space-y-0.5">
           {sidebarExpanded && (
-            <h3 className="text-xs uppercase text-[#64748b] px-2 mb-1 mobile-text-xs">
+            <h3 className="text-xs uppercase text-[#36454F] px-2 mb-1 mobile-text-xs">
               Settings
             </h3>
           )}
@@ -231,7 +231,7 @@ const Sidebar = ({ sidebarExpanded }: { sidebarExpanded: boolean }) => {
             <Link
               key={item.title}
               href={item.href}
-              className="flex items-center justify-start p-2 rounded-md text-[#94a3b8] hover:text-white hover:bg-[#1a5a72] transition-all group mobile-text-sm"
+              className="flex items-center justify-start p-2 rounded-md text-[#9B5DE5] hover:text-white hover:bg-[#36454F] transition-all group mobile-text-sm"
             >
               <span className="flex-shrink-0 group-hover:scale-110 transition-transform">
                 {item.icon}

@@ -214,23 +214,23 @@ const NewsDetailPage = () => {
 
   const getReactionColor = (type: string) => {
     switch (type) {
-      case 'like': return 'text-blue-500';
-      case 'love': return 'text-red-500';
-      case 'laugh': return 'text-yellow-500';
-      case 'angry': return 'text-red-600';
-      case 'sad': return 'text-blue-400';
-      case 'surprise': return 'text-purple-500';
-      case 'fire': return 'text-orange-500';
-      case 'star': return 'text-yellow-400';
-      default: return 'text-gray-500';
+      case 'like': return 'text-purple/75';
+      case 'love': return 'text-purple/75';
+      case 'laugh': return 'text-purple/75';
+      case 'angry': return 'text-purple/85';
+      case 'sad': return 'text-purple/60';
+      case 'surprise': return 'text-purple/75';
+      case 'fire': return 'text-purple/75';
+      case 'star': return 'text-purple/60';
+      default: return 'text-white/60';
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#000000] to-[#36454F] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#e51f48] mx-auto mb-3"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#36454F] mx-auto mb-3"></div>
           <p className="text-white">Loading news article...</p>
         </div>
       </div>
@@ -239,13 +239,13 @@ const NewsDetailPage = () => {
 
   if (error || !news) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#000000] to-[#36454F] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">News Article Not Found</h1>
-          <p className="text-gray-400 mb-6">{error}</p>
+          <p className="text-white/60 mb-6">{error}</p>
           <button
             onClick={() => router.back()}
-            className="bg-[#e51f48] text-white px-6 py-2 rounded-lg hover:bg-[#d1183a] transition-colors"
+            className="bg-[#36454F] text-white px-6 py-2 rounded-lg hover:bg-[#36454F] transition-colors"
           >
             Go Back
           </button>
@@ -255,14 +255,14 @@ const NewsDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
+    <div className="min-h-screen bg-gradient-to-b from-[#000000] to-[#36454F]">
       {/* Header */}
       <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a1f29]/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#000000]/80" />
         <div className="relative z-10 p-6">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-white hover:text-[#e51f48] transition-colors mb-6"
+            className="flex items-center gap-2 text-white hover:text-[#36454F] transition-colors mb-6"
           >
             <FaArrowLeft size={20} />
             Back to News
@@ -280,7 +280,7 @@ const NewsDetailPage = () => {
               }}
             />
             <div className="absolute top-4 left-4">
-              <span className="bg-[#e51f48] text-white px-3 py-1 rounded-full text-sm font-medium">
+              <span className="bg-[#36454F] text-white px-3 py-1 rounded-full text-sm font-medium">
                 {news.category}
               </span>
             </div>
@@ -289,10 +289,10 @@ const NewsDetailPage = () => {
           {/* Article Header */}
           <div className="text-white">
             <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">{news.title}</h1>
-            <p className="text-xl text-gray-300 mb-6">{news.excerpt}</p>
+            <p className="text-xl text-white/90 mb-6">{news.excerpt}</p>
 
             {/* Article Meta */}
-            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400 mb-6">
+            <div className="flex flex-wrap items-center gap-6 text-sm text-white/60 mb-6">
               {news.author && (
                 <div className="flex items-center gap-2">
                   <div className="relative w-8 h-8 rounded-full overflow-hidden">
@@ -322,8 +322,8 @@ const NewsDetailPage = () => {
                 onClick={handleLike}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                   isLiked
-                    ? 'bg-[#e51f48] text-white'
-                    : 'bg-[#0a3747] text-white hover:bg-[#0b2936]'
+                    ? 'bg-[#36454F] text-white'
+                    : 'bg-[#36454F] text-white hover:bg-[#36454F]'
                 }`}
               >
                 {isLiked ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
@@ -332,7 +332,7 @@ const NewsDetailPage = () => {
 
               <button
                 onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-2 bg-[#0a3747] text-white px-4 py-2 rounded-lg hover:bg-[#0b2936] transition-colors"
+                className="flex items-center gap-2 bg-[#36454F] text-white px-4 py-2 rounded-lg hover:bg-[#36454F] transition-colors"
               >
                 <FaComment size={16} />
                 {news.comments.length} Comments
@@ -340,7 +340,7 @@ const NewsDetailPage = () => {
 
               <button
                 onClick={handleShare}
-                className="flex items-center gap-2 bg-[#0a3747] text-white px-4 py-2 rounded-lg hover:bg-[#0b2936] transition-colors"
+                className="flex items-center gap-2 bg-[#36454F] text-white px-4 py-2 rounded-lg hover:bg-[#36454F] transition-colors"
               >
                 <FaShare size={16} />
                 Share
@@ -353,7 +353,7 @@ const NewsDetailPage = () => {
       {/* Article Content */}
       <div className="px-6 pb-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-[#0a3747]/50 rounded-lg p-6 md:p-8">
+          <div className="bg-[#36454F]/50 rounded-lg p-6 md:p-8">
             <div
               className="prose prose-lg prose-invert max-w-none"
               dangerouslySetInnerHTML={{ __html: news.content }}
@@ -361,7 +361,7 @@ const NewsDetailPage = () => {
           </div>
 
           {/* Reactions Section */}
-          <div className="bg-[#0a3747]/50 rounded-lg p-6 mt-6">
+          <div className="bg-[#36454F]/50 rounded-lg p-6 mt-6">
             <h3 className="text-xl font-bold text-white mb-4">React to this article</h3>
             <div className="flex flex-wrap gap-2">
               {[
@@ -380,7 +380,7 @@ const NewsDetailPage = () => {
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                     userReactions[news.id] === type
                       ? `${getReactionColor(type)} bg-opacity-20`
-                      : 'text-gray-400 hover:text-white hover:bg-[#0b2936]'
+                      : 'text-white/60 hover:text-white hover:bg-[#36454F]'
                   }`}
                 >
                   <Icon size={16} />
@@ -397,7 +397,7 @@ const NewsDetailPage = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="bg-[#0a3747]/50 rounded-lg p-6 mt-6"
+                className="bg-[#36454F]/50 rounded-lg p-6 mt-6"
               >
                 <h3 className="text-xl font-bold text-white mb-6">Comments ({news.comments.length})</h3>
 
@@ -417,14 +417,14 @@ const NewsDetailPage = () => {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         placeholder="Write a comment..."
-                        className="w-full bg-[#0b2936] text-white rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
+                        className="w-full bg-[#36454F] text-white rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-[#36454F]"
                         rows={3}
                       />
                       <div className="flex justify-end mt-2">
                         <button
                           onClick={handleComment}
                           disabled={!newComment.trim()}
-                          className="bg-[#e51f48] text-white px-4 py-2 rounded-lg hover:bg-[#d1183a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          className="bg-[#36454F] text-white px-4 py-2 rounded-lg hover:bg-[#36454F] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           Comment
                         </button>
@@ -436,7 +436,7 @@ const NewsDetailPage = () => {
                 {/* Comments List */}
                 <div className="space-y-6">
                   {news.comments.map((comment) => (
-                    <div key={comment.id} className="border-b border-gray-700 pb-6 last:border-b-0">
+                    <div key={comment.id} className="border-b border-charcoal/50 pb-6 last:border-b-0">
                       <div className="flex gap-3">
                         <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                           <Image
@@ -447,14 +447,14 @@ const NewsDetailPage = () => {
                           />
                         </div>
                         <div className="flex-1">
-                          <div className="bg-[#0b2936] rounded-lg p-3">
+                          <div className="bg-[#36454F] rounded-lg p-3">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="font-medium text-white">{comment.user.displayName}</span>
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-white/60">
                                 {formatDate(comment.createdAt)}
                               </span>
                             </div>
-                            <p className="text-gray-300">{comment.text}</p>
+                            <p className="text-white/90">{comment.text}</p>
                           </div>
 
                           {/* Comment Actions */}
@@ -462,7 +462,7 @@ const NewsDetailPage = () => {
                             <button
                               onClick={() => handleReaction(comment.id, 'like')}
                               className={`flex items-center gap-1 transition-colors ${
-                                userReactions[comment.id] === 'like' ? 'text-blue-500' : 'text-gray-400 hover:text-white'
+                                userReactions[comment.id] === 'like' ? 'text-purple/75' : 'text-white/60 hover:text-white'
                               }`}
                             >
                               <FaThumbsUp size={12} />
@@ -471,7 +471,7 @@ const NewsDetailPage = () => {
 
                             <button
                               onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                              className="text-gray-400 hover:text-white transition-colors"
+                              className="text-white/60 hover:text-white transition-colors"
                             >
                               Reply
                             </button>
@@ -500,20 +500,20 @@ const NewsDetailPage = () => {
                                       value={newReply}
                                       onChange={(e) => setNewReply(e.target.value)}
                                       placeholder="Write a reply..."
-                                      className="w-full bg-[#0b2936] text-white rounded-lg p-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#e51f48]"
+                                      className="w-full bg-[#36454F] text-white rounded-lg p-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#36454F]"
                                       rows={2}
                                     />
                                     <div className="flex justify-end gap-2 mt-2">
                                       <button
                                         onClick={() => setReplyingTo(null)}
-                                        className="text-gray-400 hover:text-white text-sm"
+                                        className="text-white/60 hover:text-white text-sm"
                                       >
                                         Cancel
                                       </button>
                                       <button
                                         onClick={() => handleReply(comment.id)}
                                         disabled={!newReply.trim()}
-                                        className="bg-[#e51f48] text-white px-3 py-1 rounded text-sm hover:bg-[#d1183a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        className="bg-[#36454F] text-white px-3 py-1 rounded text-sm hover:bg-[#36454F] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                       >
                                         Reply
                                       </button>
@@ -538,20 +538,20 @@ const NewsDetailPage = () => {
                                     />
                                   </div>
                                   <div className="flex-1">
-                                    <div className="bg-[#0b2936] rounded-lg p-2">
+                                    <div className="bg-[#36454F] rounded-lg p-2">
                                       <div className="flex items-center gap-2 mb-1">
                                         <span className="font-medium text-white text-sm">{reply.user.displayName}</span>
-                                        <span className="text-xs text-gray-400">
+                                        <span className="text-xs text-white/60">
                                           {formatDate(reply.createdAt)}
                                         </span>
                                       </div>
-                                      <p className="text-gray-300 text-sm">{reply.text}</p>
+                                      <p className="text-white/90 text-sm">{reply.text}</p>
                                     </div>
                                     <div className="flex items-center gap-2 mt-1 text-xs">
                                       <button
                                         onClick={() => handleReaction(reply.id, 'like')}
                                         className={`flex items-center gap-1 transition-colors ${
-                                          userReactions[reply.id] === 'like' ? 'text-blue-500' : 'text-gray-400 hover:text-white'
+                                          userReactions[reply.id] === 'like' ? 'text-purple/75' : 'text-white/60 hover:text-white'
                                         }`}
                                       >
                                         <FaThumbsUp size={10} />

@@ -118,11 +118,11 @@ export default function RecentlyPlayedPage() {
 
   if (loading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen">
+      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen">
         <div className="animate-pulse">
-          <div className="h-8 bg-[#0a3747] rounded w-1/4 mb-8"></div>
+          <div className="h-8 bg-[#36454F] rounded w-1/4 mb-8"></div>
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-20 bg-[#0a3747] rounded-lg mb-4"></div>
+            <div key={i} className="h-20 bg-[#36454F] rounded-lg mb-4"></div>
           ))}
         </div>
       </div>
@@ -131,17 +131,17 @@ export default function RecentlyPlayedPage() {
 
   return (
     <Protected>
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Recently Played</h1>
-        <p className="text-gray-400">Your listening history</p>
+        <p className="text-white/60">Your listening history</p>
       </div>
 
       {/* Tracks List */}
-      <div className="bg-[#0a3747]/70 rounded-xl overflow-hidden">
+      <div className="bg-[#36454F]/70 rounded-xl overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-12 gap-4 items-center p-4 border-b border-[#0a3747] text-gray-400 text-sm font-medium">
+        <div className="grid grid-cols-12 gap-4 items-center p-4 border-b border-[#36454F] text-white/60 text-sm font-medium">
           <div className="col-span-1">#</div>
           <div className="col-span-5">TITLE</div>
           <div className="col-span-2">PLAYS</div>
@@ -152,24 +152,24 @@ export default function RecentlyPlayedPage() {
         </div>
 
         {recentTracks.length > 0 ? (
-          <div className="divide-y divide-[#0a3747]">
+          <div className="divide-y divide-[#36454F]">
             {recentTracks.map((track, index) => (
               <div 
                 key={track.id} 
                 className={`grid grid-cols-12 gap-4 items-center p-4 transition-colors ${
                   currentTrack?.id === track.id 
-                    ? 'bg-[#0a3747]' 
-                    : 'hover:bg-[#0a3747]/50'
+                    ? 'bg-[#36454F]'
+                    : 'hover:bg-[#36454F]/50'
                 }`}
               >
-                <div className="col-span-1 text-gray-400">
+                <div className="col-span-1 text-white/60">
                   {currentTrack?.id === track.id && isPlaying ? (
                     <button onClick={() => handlePlay(track)} aria-label={`Pause ${track.title}`}>
                       <Waveform playing className="h-5 w-5" />
                     </button>
                   ) : (
                     <span 
-                      className="cursor-pointer hover:text-[#e51f48] transition-colors"
+                      className="cursor-pointer hover:text-[#36454F] transition-colors"
                       onClick={() => handlePlay(track)}
                     >
                       {index + 1}
@@ -188,30 +188,30 @@ export default function RecentlyPlayedPage() {
                   />
                   <div>
                     <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className={`font-medium ${
-                      currentTrack?.id === track.id ? 'text-[#e51f48]' : 'text-white'
+                      currentTrack?.id === track.id ? 'text-[#36454F]' : 'text-white'
                     }`}>
                       {track.title}
                     </ScrollingTrackTitle>
-                    <p className="text-sm text-gray-400">{track.artist}</p>
+                    <p className="text-sm text-white/60">{track.artist}</p>
                   </div>
                 </div>
                 
-                <div className="col-span-2 text-gray-300">
+                <div className="col-span-2 text-white/90">
                   {track.playCount} plays
                 </div>
                 
-                <div className="col-span-2 text-gray-300 text-sm">
+                <div className="col-span-2 text-white/90 text-sm">
                   {getTimeAgo(track.lastPlayedAt)}
                 </div>
                 
                 <div className="col-span-2 flex justify-end gap-3 items-center">
-                  <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
+                  <button className="text-white/60 hover:text-[#36454F] transition-colors">
                     <Heart className="w-5 h-5" />
                   </button>
-                  <span className="text-gray-400 text-sm w-12 text-right">
+                  <span className="text-white/60 text-sm w-12 text-right">
                     {formatDuration(track.duration)}
                   </span>
-                  <button className="text-gray-400 hover:text-white transition-colors">
+                  <button className="text-white/60 hover:text-white transition-colors">
                     <MoreHorizontal className="w-5 h-5" />
                   </button>
                 </div>
@@ -219,7 +219,7 @@ export default function RecentlyPlayedPage() {
             ))}
           </div>
         ) : (
-          <div className="p-8 text-center text-gray-400">
+          <div className="p-8 text-center text-white/60">
             <Clock className="w-16 h-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg mb-2">No recently played tracks</p>
             <p>Start listening to build your history</p>
@@ -230,7 +230,7 @@ export default function RecentlyPlayedPage() {
       {/* Clear History Button */}
       {recentTracks.length > 0 && (
         <div className="mt-6 flex justify-end">
-          <button className="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm">
+          <button className="px-4 py-2 text-white/60 hover:text-white transition-colors text-sm">
             Clear listening history
           </button>
         </div>

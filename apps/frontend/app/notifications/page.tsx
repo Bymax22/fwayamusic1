@@ -93,24 +93,24 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-black text-white">
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-8 flex items-center gap-3">
-          <div className="rounded-3xl bg-indigo-500/10 p-3 text-indigo-300">
+          <div className="rounded-3xl bg-purple/10 p-3 text-purple/45">
             <Bell className="h-6 w-6" />
           </div>
           <div>
             <h1 className="text-3xl font-semibold">Notifications</h1>
-            <p className="text-sm text-slate-400">All recent activity for your account.</p>
+            <p className="text-sm text-white/60">All recent activity for your account.</p>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-slate-900 p-4">
-          {loading && <p className="text-slate-400">Loading notifications...</p>}
-          {error && <p className="text-red-400">{error}</p>}
+        <div className="rounded-3xl border border-white/10 bg-charcoal p-4">
+          {loading && <p className="text-white/60">Loading notifications...</p>}
+          {error && <p className="text-purple/60">{error}</p>}
 
           {!loading && !error && notifications.length === 0 && (
-            <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950 p-8 text-center text-slate-400">
+            <div className="rounded-3xl border border-dashed border-white/10 bg-black p-8 text-center text-white/60">
               No notifications yet.
             </div>
           )}
@@ -120,15 +120,15 @@ export default function NotificationsPage() {
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`rounded-3xl border px-4 py-4 transition ${notification.isRead ? "border-white/10 bg-slate-950" : "border-indigo-500/30 bg-slate-900"}`}
+                  className={`rounded-3xl border px-4 py-4 transition ${notification.isRead ? "border-white/10 bg-black" : "border-purple/30 bg-charcoal"}`}
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h2 className="text-lg font-semibold text-white">{notification.title}</h2>
-                      <p className="mt-1 text-sm text-slate-400">{notification.message}</p>
+                      <p className="mt-1 text-sm text-white/60">{notification.message}</p>
                     </div>
                     <div className="flex flex-col gap-2 sm:items-end">
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{new Date(notification.createdAt).toLocaleString()}</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-white/60">{new Date(notification.createdAt).toLocaleString()}</p>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -138,7 +138,7 @@ export default function NotificationsPage() {
                           Mark as read
                         </button>
                         {notification.data?.link && (
-                          <Link href={notification.data.link} className="rounded-full bg-indigo-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-indigo-400">
+                          <Link href={notification.data.link} className="rounded-full bg-purple/75 px-3 py-1 text-xs font-semibold text-white transition hover:bg-purple/60">
                             View content
                           </Link>
                         )}

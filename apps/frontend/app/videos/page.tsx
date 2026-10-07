@@ -77,20 +77,20 @@ export default function VideosPage() {
         <div className="mb-8 flex flex-col gap-3">
           <div>
             <h1 className="text-3xl font-semibold text-white">Videos</h1>
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-white/60">
               Discover trending music videos, recommended picks, new releases, and curated playlists.
             </p>
           </div>
         </div>
 
         {error ? (
-          <div className="rounded-3xl bg-slate-950 p-6 text-sm text-red-300">{error}</div>
+          <div className="rounded-3xl bg-black p-6 text-sm text-purple/45">{error}</div>
         ) : loading ? (
           <div className="space-y-4">
-            <div className="h-24 rounded-3xl bg-slate-900 animate-pulse" />
+            <div className="h-24 rounded-3xl bg-charcoal animate-pulse" />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="h-64 rounded-3xl bg-slate-900 animate-pulse" />
+                <div key={index} className="h-64 rounded-3xl bg-charcoal animate-pulse" />
               ))}
             </div>
           </div>
@@ -99,11 +99,11 @@ export default function VideosPage() {
             <section className="mb-10">
               <div className="mb-5 flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Recommended for you</p>
+                  <p className="text-sm uppercase tracking-[0.2em] text-white/60">Recommended for you</p>
                   <h2 className="text-xl font-semibold text-white">Suggested videos</h2>
                 </div>
                 <button
-                  className="rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
+                  className="rounded-full bg-purple/85 px-4 py-2 text-sm text-white transition hover:bg-purple/75"
                   onClick={() => router.push('/videos?section=recommended')}
                 >
                   View all
@@ -119,11 +119,11 @@ export default function VideosPage() {
             <section className="mb-10">
               <div className="mb-5 flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Trending</p>
+                  <p className="text-sm uppercase tracking-[0.2em] text-white/60">Trending</p>
                   <h2 className="text-xl font-semibold text-white">Trending videos</h2>
                 </div>
                 <button
-                  className="rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
+                  className="rounded-full bg-purple/85 px-4 py-2 text-sm text-white transition hover:bg-purple/75"
                   onClick={() => router.push('/videos?section=trending')}
                 >
                   View all
@@ -139,11 +139,11 @@ export default function VideosPage() {
             <section className="mb-10">
               <div className="mb-5 flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500">New releases</p>
+                  <p className="text-sm uppercase tracking-[0.2em] text-white/60">New releases</p>
                   <h2 className="text-xl font-semibold text-white">Latest drops</h2>
                 </div>
                 <button
-                  className="rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
+                  className="rounded-full bg-purple/85 px-4 py-2 text-sm text-white transition hover:bg-purple/75"
                   onClick={() => router.push('/videos?section=new-releases')}
                 >
                   View all
@@ -159,7 +159,7 @@ export default function VideosPage() {
             <section className="mb-10">
               <div className="mb-5 flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500">All videos</p>
+                  <p className="text-sm uppercase tracking-[0.2em] text-white/60">All videos</p>
                   <h2 className="text-xl font-semibold text-white">Browse the full feed</h2>
                 </div>
               </div>

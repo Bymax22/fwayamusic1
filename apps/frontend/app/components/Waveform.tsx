@@ -7,7 +7,7 @@ type Props = {
   accentColor?: string;
 };
 
-export default function Waveform({ playing = false, className = '', accentColor = '#a855f7' }: Props) {
+export default function Waveform({ playing = false, className = '', accentColor = '#9B5DE5' }: Props) {
   return (
     <div className={`waveform inline-flex items-end gap-0.5 ${playing ? 'is-playing' : ''} ${className}`} aria-hidden="true">
       {[0, 1, 2, 3, 4, 5, 6].map((i) => (

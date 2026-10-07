@@ -50,12 +50,12 @@ export default function ProducerPage() {
     if (params.id) fetchProducer();
   }, [params.id]);
 
-  if (loading) return <div className="min-h-screen bg-black text-white flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div></div>;
+  if (loading) return <div className="min-h-screen bg-black text-white flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple/75"></div></div>;
   if (error || !producer) return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-white mb-4">Producer Not Found</h1>
-        <button onClick={() => router.back()} className="bg-purple-500 text-white px-6 py-2 rounded-lg">Go Back</button>
+        <button onClick={() => router.back()} className="bg-purple/75 text-white px-6 py-2 rounded-lg">Go Back</button>
       </div>
     </div>
   );
@@ -71,18 +71,18 @@ export default function ProducerPage() {
             <h1 className="text-3xl font-semibold flex items-center gap-3">
               {producer.name}
               {producer.isVerified && (
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-purple-600 text-white shadow-sm"><FaStar className="w-3.5 h-3.5"/></span>
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-purple/85 text-white shadow-sm"><FaStar className="w-3.5 h-3.5"/></span>
               )}
             </h1>
-            <p className="text-gray-400">{producer.followers.toLocaleString()} followers • {producer.mediaCount} items • {producer.totalPlays.toLocaleString()} plays</p>
-            {producer.website && <a href={producer.website} className="text-purple-300 block mt-2">Visit website</a>}
+            <p className="text-white/60">{producer.followers.toLocaleString()} followers • {producer.mediaCount} items • {producer.totalPlays.toLocaleString()} plays</p>
+            {producer.website && <a href={producer.website} className="text-purple/45 block mt-2">Visit website</a>}
           </div>
         </div>
 
         {producer.bio && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold">About</h3>
-            <p className="text-gray-300 mt-2">{producer.bio}</p>
+            <p className="text-white/90 mt-2">{producer.bio}</p>
           </div>
         )}
 

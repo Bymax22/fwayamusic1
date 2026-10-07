@@ -735,7 +735,7 @@ export default function Browse() {
       setShowAddToPlaylist(false);
       setSelectedMedia(null);
       toast.custom((toastItem) => (
-        <div role="status" className="flex max-w-[calc(100vw-2rem)] items-center gap-2 rounded-xl bg-[#5b0ea6] px-3 py-2 text-xs text-white shadow-xl">
+        <div role="status" className="flex max-w-[calc(100vw-2rem)] items-center gap-2 rounded-xl bg-[#36454F] px-3 py-2 text-xs text-white shadow-xl">
           <span className="max-w-40 truncate">{addedTrackTitle} added.</span>
           <button
             type="button"
@@ -846,13 +846,13 @@ export default function Browse() {
       <div className="py-6 px-2 sm:px-6 max-w-7xl mx-auto bg-black min-h-screen">
         <h1 className="text-3xl font-bold text-white mb-8">Browse Music</h1>
         <div className="bg-black p-6 rounded-xl">
-          <h3 className="text-[#c4b5fd] font-medium text-lg">{error.message}</h3>
+          <h3 className="text-[#FFFFFF] font-medium text-lg">{error.message}</h3>
           {error.details && (
-            <p className="text-[#d8b4fe] text-sm mt-2">{error.details}</p>
+            <p className="text-[#FFFFFF] text-sm mt-2">{error.details}</p>
           )}
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-purple-500 hover:bg-purple-400 text-white rounded-lg transition-colors"
+            className="mt-4 px-4 py-2 bg-purple/75 hover:bg-purple/60 text-white rounded-lg transition-colors"
           >
             Try again
           </button>
@@ -871,21 +871,21 @@ export default function Browse() {
               <div className="flex gap-2">
                 <button 
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-full ${viewMode === 'grid' ? 'bg-purple-500 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/15'}`}
+                  className={`p-2 rounded-full ${viewMode === 'grid' ? 'bg-purple/75 text-white' : 'bg-white/10 text-white/90 hover:bg-white/15'}`}
                   aria-label="Grid view"
                 >
                   <Grid className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-full ${viewMode === 'list' ? 'bg-purple-500 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/15'}`}
+                  className={`p-2 rounded-full ${viewMode === 'list' ? 'bg-purple/75 text-white' : 'bg-white/10 text-white/90 hover:bg-white/15'}`}
                   aria-label="List view"
                 > 
                   <ListMusic className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => setViewMode('compact')}
-                  className={`p-2 rounded-full ${viewMode === 'compact' ? 'bg-purple-500 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/15'}`}
+                  className={`p-2 rounded-full ${viewMode === 'compact' ? 'bg-purple/75 text-white' : 'bg-white/10 text-white/90 hover:bg-white/15'}`}
                   aria-label="Compact view"
                 >
                   <Eye className="w-5 h-5" />
@@ -896,11 +896,11 @@ export default function Browse() {
             {/* Search and filter bar */}
             <div className="mb-8">
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60" />
                 <input
                   type="text"
                   placeholder="Search songs, artists, genres, or tags..."
-                  className="w-full pl-10 pr-4 py-3 bg-[#080a13]/70 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent placeholder-gray-400"
+                  className="w-full pl-10 pr-4 py-3 bg-[#000000]/70 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-purple/85 focus:border-transparent placeholder-white/60"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -910,22 +910,22 @@ export default function Browse() {
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <button 
                     onClick={() => setShowFilters(!showFilters)}
-                    className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors"
+                    className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-purple/85 hover:bg-purple/90 text-white rounded-full transition-colors"
                   >
                     <Filter className="w-4 h-4" />
                     Filters
                   </button>
 
                   <div className="flex flex-wrap gap-2 items-center justify-start sm:justify-end">
-                    <div className="hidden md:flex flex-wrap gap-2 items-center bg-[#080a13]/50 rounded-full px-2 py-1">
+                    <div className="hidden md:flex flex-wrap gap-2 items-center bg-[#000000]/50 rounded-full px-2 py-1">
                       {getGenres().map(genre => (
                         <button
                           key={genre ?? "Other"}
                           onClick={() => setSelectedGenre(genre ?? "Other")}
                           className={`px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap transition-colors ${
                             selectedGenre === (genre ?? "Other") 
-                              ? 'bg-purple-600 text-white' 
-                              : 'bg-[#080a13] text-gray-300 hover:bg-[#0a0d18]'
+                              ? 'bg-purple/85 text-white'
+                              : 'bg-[#000000] text-white/90 hover:bg-[#000000]'
                           }`}
                         >
                           {(genre ?? "Other").charAt(0).toUpperCase() + (genre ?? "Other").slice(1)}
@@ -934,7 +934,7 @@ export default function Browse() {
                     </div>
 
                     <div className="flex gap-2 md:hidden w-full">
-                      <div className="flex flex-1 rounded-full bg-[#080a13]/60 p-1">
+                      <div className="flex flex-1 rounded-full bg-[#000000]/60 p-1">
                         {(['all', 'AUDIO', 'VIDEO'] as const).map((type) => {
                           const label = type === 'all' ? 'All' : type === 'AUDIO' ? 'Audios' : 'Videos';
                           const active = selectedMediaType === type;
@@ -943,7 +943,7 @@ export default function Browse() {
                               key={type}
                               onClick={() => setSelectedMediaType(type)}
                               className={`flex-1 rounded-full px-3 py-2 text-xs font-medium transition-colors ${
-                                active ? 'bg-purple-600 text-white' : 'text-gray-300'
+                                active ? 'bg-purple/85 text-white' : 'text-white/90'
                               }`}
                             >
                               {label}
@@ -956,7 +956,7 @@ export default function Browse() {
                         <select
                           value={selectedGenre}
                           onChange={(e) => setSelectedGenre(e.target.value)}
-                          className="w-full appearance-none rounded-full border border-white/10 bg-[#080a13]/60 px-3 py-2 text-xs text-white outline-none"
+                          className="w-full appearance-none rounded-full border border-white/10 bg-[#000000]/60 px-3 py-2 text-xs text-white outline-none"
                         >
                           {getGenres().map((genre) => (
                             <option key={genre ?? 'Other'} value={genre ?? 'Other'}>
@@ -979,14 +979,14 @@ export default function Browse() {
                     exit={{ opacity: 0, height: 0 }}
                     className="mt-4 bg-black rounded-xl p-4 overflow-hidden"
                   >
-                    <h3 className="font-medium mb-3 text-gray-300">Sort by</h3>
+                    <h3 className="font-medium mb-3 text-white/90">Sort by</h3>
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setActiveFilter('popular')}
                         className={`px-3 py-1.5 rounded-full text-sm transition-colors flex items-center gap-2 ${
                           activeFilter === 'popular' 
-                            ? 'bg-purple-500 text-white' 
-                            : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                            ? 'bg-purple/75 text-white'
+                            : 'bg-white/10 text-white/90 hover:bg-white/15'
                         }`}
                       >
                         <TrendingUp className="w-4 h-4" />
@@ -996,8 +996,8 @@ export default function Browse() {
                         onClick={() => setActiveFilter('newest')}
                         className={`px-3 py-1.5 rounded-full text-sm transition-colors flex items-center gap-2 ${
                           activeFilter === 'newest' 
-                            ? 'bg-purple-500 text-white' 
-                            : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                            ? 'bg-purple/75 text-white'
+                            : 'bg-white/10 text-white/90 hover:bg-white/15'
                         }`}
                       >
                         <Calendar className="w-4 h-4" />
@@ -1007,8 +1007,8 @@ export default function Browse() {
                         onClick={() => setActiveFilter('trending')}
                         className={`px-3 py-1.5 rounded-full text-sm transition-colors flex items-center gap-2 ${
                           activeFilter === 'trending' 
-                            ? 'bg-purple-500 text-white' 
-                            : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                            ? 'bg-purple/75 text-white'
+                            : 'bg-white/10 text-white/90 hover:bg-white/15'
                         }`}
                       >
                         <Star className="w-4 h-4" />
@@ -1018,8 +1018,8 @@ export default function Browse() {
                         onClick={() => setActiveFilter('recommended')}
                         className={`px-3 py-1.5 rounded-full text-sm transition-colors flex items-center gap-2 ${
                           activeFilter === 'recommended' 
-                            ? 'bg-purple-500 text-white' 
-                            : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                            ? 'bg-purple/75 text-white'
+                            : 'bg-white/10 text-white/90 hover:bg-white/15'
                         }`}
                       >
                         <Users className="w-4 h-4" />
@@ -1035,7 +1035,7 @@ export default function Browse() {
             {viewMode === 'list' ? (
               <div className="bg-black rounded-xl overflow-hidden">
                 {/* Table-like header */}
-                <div className="grid grid-cols-12 gap-4 items-center p-4 border-b border-[#080a13] text-gray-400 text-sm font-medium">
+                <div className="grid grid-cols-12 gap-4 items-center p-4 border-b border-[#000000] text-white/60 text-sm font-medium">
                   <div className="col-span-1">#</div>
                   <div className="col-span-1"></div>
                   <div className="col-span-4">TITLE</div>
@@ -1048,18 +1048,18 @@ export default function Browse() {
                 </div>
 
                 {displayedFiles.length > 0 ? (
-                  <div className="divide-y divide-[#080a13]">
+                  <div className="divide-y divide-[#000000]">
                     {displayedFiles.map((file, index) => (
                       <Fragment key={file.id}>
                       <div 
                         className={`grid grid-cols-12 gap-4 items-center p-4 transition-colors ${
                           String(currentTrack?.id) === String(file.id) 
-                            ? 'bg-[#080a13]' 
-                            : 'hover:bg-[#080a13]/50'
+                            ? 'bg-[#000000]'
+                            : 'hover:bg-[#000000]/50'
                         }`}
                 >
                   {/* Track # */}
-                  <div className="col-span-1 text-gray-400">
+                  <div className="col-span-1 text-white/60">
                     {index + 1}
                   </div>
 
@@ -1067,7 +1067,7 @@ export default function Browse() {
                     <div className="col-span-1 flex justify-center items-center">
                     <button
                       onClick={() => handlePlay(file)}
-                      className="w-8 h-8 flex items-center justify-center rounded-full text-[#a855f7] hover:text-white transition-colors"
+                      className="w-8 h-8 flex items-center justify-center rounded-full text-[#9B5DE5] hover:text-white transition-colors"
                         aria-label={String(currentTrack?.id) === String(file.id) && isPlaying ? 'Pause' : 'Play'}
                     >
                       {String(currentTrack?.id) === String(file.id) && isPlaying ? (
@@ -1092,21 +1092,21 @@ export default function Browse() {
                     />
                     <div className="flex-1 min-w-0">
                       <Link href={`/track/${createMediaSlug(file.title, file.id)}`}>
-                        <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className={`font-medium flex items-center gap-2 cursor-pointer hover:text-green-400 transition-colors ${
+                        <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className={`font-medium flex items-center gap-2 cursor-pointer hover:text-purple/60 transition-colors ${
                           String(currentTrack?.id) === String(file.id) 
-                            ? 'text-[#a855f7]' 
+                            ? 'text-[#9B5DE5]'
                             : 'text-white'
                         }`}>
                           {file.title}
                           {file.isExplicit && (
-                            <span className="px-1.5 py-0.5 bg-gray-600 text-gray-300 rounded text-xs">E</span>
+                            <span className="px-1.5 py-0.5 bg-charcoal text-white/90 rounded text-xs">E</span>
                           )}
                           {file.isDRMProtected && (
-                            <Lock className="w-3 h-3 text-gray-600" />
+                            <Lock className="w-3 h-3 text-white/60" />
                           )}
                         </ScrollingTrackTitle>
                       </Link>
-                      <div className="flex items-center gap-3 text-sm text-gray-400">
+                      <div className="flex items-center gap-3 text-sm text-white/60">
                         <span>{file.views} plays</span>
                         <span>•</span>
                         <span>{file.format.toUpperCase()}</span>
@@ -1131,19 +1131,19 @@ export default function Browse() {
       className="rounded-full"
     />
   )}
-  <span className="text-gray-300">{file.artist}</span>
+  <span className="text-white/90">{file.artist}</span>
   {file.user?.isVerified && (
-    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified artist">
+    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple/85 text-white shadow-sm shadow-purple/20" title="Verified artist">
       <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
       </svg>
     </span>
   )}
   <span title="Location">
-    <MapPin className="w-3 h-3 text-gray-400" />
+    <MapPin className="w-3 h-3 text-white/60" />
   </span>
   {file.user?.isVerified && (
-    <Star className="w-3 h-3 text-gray-600 fill-current" />
+    <Star className="w-3 h-3 text-white/60 fill-current" />
   )}
 </div>
                   </div>
@@ -1151,7 +1151,7 @@ export default function Browse() {
                   {/* Info */}
                   <div className="col-span-2">
                     <div className="flex flex-wrap gap-1">
-                      <span className="px-2 py-1 bg-[#080a13] text-gray-300 rounded-full text-xs">
+                      <span className="px-2 py-1 bg-[#000000] text-white/90 rounded-full text-xs">
                         {file.genre}
                         {formatFileSize ? formatFileSize(5 * 1024 * 1024) : "5 MB"}
                       </span>
@@ -1161,13 +1161,13 @@ export default function Browse() {
                   
                   {/* Duration and Actions */}
                   <div className="col-span-2 flex items-center justify-end gap-3">
-                    <span className="text-gray-400 text-sm w-12 text-right">
+                    <span className="text-white/60 text-sm w-12 text-right">
                       {formatDuration(file.duration)}
                     </span>
                     <div className="flex gap-2">
                       <button 
                         onClick={() => handleLike(file.id)}
-                        className="text-gray-400 hover:text-[#a855f7] transition-colors group"
+                        className="text-white/60 hover:text-[#9B5DE5] transition-colors group"
                         aria-label="Like"
                       >
                         <Heart 
@@ -1180,7 +1180,7 @@ export default function Browse() {
                           setSelectedMedia(file);
                           setShowMediaMenu(true);
                         }}
-                        className="text-gray-400 hover:text-[#a855f7] transition-colors group"
+                        className="text-white/60 hover:text-[#9B5DE5] transition-colors group"
                         aria-label="More options"
                       >
                         <MoreHorizontal className="w-4 h-4 group-hover:scale-110 transition-transform" />
@@ -1193,7 +1193,7 @@ export default function Browse() {
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center text-gray-400">
+            <div className="p-8 text-center text-white/60">
               <div className="text-lg mb-2">No results found</div>
               <p>Try adjusting your search or filters</p>
             </div>
@@ -1228,7 +1228,7 @@ export default function Browse() {
                           String(currentTrack?.id) === String(file.id) && isPlaying ? 'opacity-100 translate-y-0' : ''
                         }`}
                       >
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg text-[#a855f7] hover:text-white transition-colors">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg text-[#9B5DE5] hover:text-white transition-colors">
                           {String(currentTrack?.id) === String(file.id) && isPlaying ? (
                             <Waveform playing={true} className="w-6 h-6" />
                           ) : (
@@ -1243,7 +1243,7 @@ export default function Browse() {
                         }}
                         className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
                       >
-                        <div className="w-10 h-10 rounded-full bg-[#080a13] flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-[#000000] flex items-center justify-center">
                           <MoreHorizontal className="w-5 h-5 text-white" />
                         </div>
                       </button>
@@ -1255,7 +1255,7 @@ export default function Browse() {
                         aria-label={`Add ${file.title} to a playlist`}
                         className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
                       >
-                        <div className="w-10 h-10 rounded-full bg-[#080a13] flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-[#000000] flex items-center justify-center">
                           <Plus className="w-5 h-5 text-white" />
                         </div>
                       </button>
@@ -1266,7 +1266,7 @@ export default function Browse() {
                   <div className="absolute top-2 left-2 flex flex-col gap-1">
                     {getAccessTypeBadge(file)}
                     {file.isDRMProtected && (
-                      <div className="flex items-center gap-1 px-2 py-1 bg-gray-600/20 text-gray-400 rounded-full text-xs">
+                      <div className="flex items-center gap-1 px-2 py-1 bg-charcoal/20 text-white/60 rounded-full text-xs">
                         <Lock className="w-3 h-3" />
                         DRM
                       </div>
@@ -1274,7 +1274,7 @@ export default function Browse() {
                   </div>
 
                   {!file.isDRMProtected && (
-  <div className="flex items-center gap-1 px-2 py-1 bg-[#4c1d95]/20 text-[#d8b4fe] rounded-full text-xs">
+  <div className="flex items-center gap-1 px-2 py-1 bg-[#36454F]/20 text-[#FFFFFF] rounded-full text-xs">
     <Unlock className="w-3 h-3" />
     Unlocked
   </div>
@@ -1282,7 +1282,7 @@ export default function Browse() {
 
                   {/* Type badge */}
                   <div className="absolute top-2 right-2">
-                    <div className="flex items-center gap-1 px-2 py-1 bg-gray-500/20 text-gray-300 rounded-full text-xs">
+                    <div className="flex items-center gap-1 px-2 py-1 bg-charcoal/20 text-white/90 rounded-full text-xs">
                       {getTypeIcon(file.type || "AUDIO")}
                       {file.type}
                     </div>
@@ -1291,7 +1291,7 @@ export default function Browse() {
 
                 <div className="p-4">
                   <Link href={`/track/${createMediaSlug(file.title, file.id)}`}>
-                    <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="mb-1 font-medium text-white hover:text-green-400 cursor-pointer">{file.title}</ScrollingTrackTitle>
+                    <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="mb-1 font-medium text-white hover:text-purple/60 cursor-pointer">{file.title}</ScrollingTrackTitle>
                   </Link>
                   <div className="flex items-center gap-2 mb-2">
                     {file.user?.avatarUrl && (
@@ -1303,20 +1303,20 @@ export default function Browse() {
                         className="rounded-full"
                       />
                     )}
-                    <p className="text-sm text-gray-400 truncate">{file.artist}</p>
+                    <p className="text-sm text-white/60 truncate">{file.artist}</p>
                     {file.user?.isVerified && (
-                      <Star className="w-3 h-3 text-gray-600 fill-current" />
+                      <Star className="w-3 h-3 text-white/60 fill-current" />
                     )}
                   </div>
 
                   <div className="flex justify-between items-center">
                     <div className="flex gap-2">
-                      <span className="px-2 py-1 bg-[#080a13] text-gray-300 rounded-full text-xs">
+                      <span className="px-2 py-1 bg-[#000000] text-white/90 rounded-full text-xs">
                         {file.genre}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <div className="flex items-center gap-3 text-xs text-white/60">
                                             <span>{getPublishedTime(file)}</span>
                       <div className="flex items-center gap-1">
                         <Heart className="w-3 h-3" />
@@ -1338,7 +1338,7 @@ export default function Browse() {
               </Fragment>
             ))
           ) : (
-            <div className="col-span-full p-8 text-center text-gray-400">
+            <div className="col-span-full p-8 text-center text-white/60">
               <div className="text-lg mb-2">No results found</div>
               <p>Try adjusting your search or filters</p>
             </div>
@@ -1364,7 +1364,7 @@ export default function Browse() {
                   />
                   <button
                     onClick={() => handlePlay(file)}
-                    className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 transition-colors text-[#a855f7] hover:text-white"
+                    className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 transition-colors text-[#9B5DE5] hover:text-white"
                   >
                     {String(currentTrack?.id) === String(file.id) && isPlaying ? (
                       <Waveform playing={true} className="w-5 h-5" />
@@ -1378,16 +1378,16 @@ export default function Browse() {
                 <div className="flex-1 min-w-0 py-0.5">
                   {/* Line 1: Title - Artist (with horizontal scroll animation when playing) */}
                   <Link href={`/track/${createMediaSlug(file.title, file.id)}`}>
-                    <div className="overflow-hidden cursor-pointer hover:text-green-400 transition-colors">
+                    <div className="overflow-hidden cursor-pointer hover:text-purple/60 transition-colors">
                       <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="text-sm font-medium text-white">
-                        {file.title} <span className="text-gray-400">• {file.artist}</span>
+                        {file.title} <span className="text-white/60">• {file.artist}</span>
                       </ScrollingTrackTitle>
                     </div>
                   </Link>
 
                   {/* Line 2: Access Type | Genre | Duration | Play Count */}
-                  <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
-                    <span className={file.accessType === 'FREE' ? 'text-gray-400 font-semibold' : 'text-[#c4b5fd] font-semibold'}>
+                  <div className="flex items-center gap-1 text-xs text-white/60 mt-0.5">
+                    <span className={file.accessType === 'FREE' ? 'text-white/60 font-semibold' : 'text-[#FFFFFF] font-semibold'}>
                       {file.accessType === 'FREE' ? 'FREE' : (file.accessType === 'PAY_PER_VIEW' ? 'PAY_PER_VIEW' : 'PREMIUM')}
                     </span>
                     <span>•</span>
@@ -1403,7 +1403,7 @@ export default function Browse() {
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button 
                     onClick={() => handleLike(file.id)}
-                    className="text-gray-400 hover:text-[#a855f7] transition-colors"
+                    className="text-white/60 hover:text-[#9B5DE5] transition-colors"
                   >
                     <Heart 
                       className="w-3.5 h-3.5" 
@@ -1414,8 +1414,8 @@ export default function Browse() {
                     onClick={() => handleDownload(file)}
                     className={`transition-colors ${
                       file.accessType === 'PREMIUM' || file.accessType === 'PAY_PER_VIEW'
-                        ? 'text-[#c4b5fd] hover:text-[#d8b4fe]'
-                        : 'text-gray-400 hover:text-[#a855f7]'
+                        ? 'text-[#FFFFFF] hover:text-[#FFFFFF]'
+                        : 'text-white/60 hover:text-[#9B5DE5]'
                     }`}
                     aria-label="Download"
                   >
@@ -1423,7 +1423,7 @@ export default function Browse() {
                   </button>
                   <button 
                     onClick={() => handleShare(file)}
-                    className="text-gray-400 hover:text-[#a855f7] transition-colors"
+                    className="text-white/60 hover:text-[#9B5DE5] transition-colors"
                     aria-label="Share"
                   >
                     <Share2 className="w-3.5 h-3.5" />
@@ -1433,7 +1433,7 @@ export default function Browse() {
                       setSelectedMedia(file);
                       setShowMediaMenu(true);
                     }}
-                    className="text-gray-400 hover:text-[#a855f7] transition-colors"
+                    className="text-white/60 hover:text-[#9B5DE5] transition-colors"
                   >
                     <MoreHorizontal className="w-3.5 h-3.5" />
                   </button>
@@ -1443,7 +1443,7 @@ export default function Browse() {
               </Fragment>
             ))
           ) : (
-            <div className="p-8 text-center text-gray-400">
+            <div className="p-8 text-center text-white/60">
               <div className="text-lg mb-2">No results found</div>
               <p>Try adjusting your search or filters</p>
             </div>
@@ -1456,7 +1456,7 @@ export default function Browse() {
               <div className="flex justify-center mt-6">
                 <button
                   onClick={loadMore}
-                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl"
+                  className="px-6 py-3 bg-purple/85 hover:bg-purple/90 text-white rounded-xl"
                 >
                   Load more
                 </button>
@@ -1484,7 +1484,7 @@ export default function Browse() {
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-white truncate">{selectedMedia.title}</p>
-                        <p className="text-sm text-gray-400 truncate">{selectedMedia.artist}</p>
+                        <p className="text-sm text-white/60 truncate">{selectedMedia.artist}</p>
                       </div>
                     </div>
 
@@ -1494,9 +1494,9 @@ export default function Browse() {
                   className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
                 >
                   {currentTrack?.id === selectedMedia.id && isPlaying ? (
-                    <Pause className="w-5 h-5 text-[#a855f7]" />
+                    <Pause className="w-5 h-5 text-[#9B5DE5]" />
                   ) : (
-                    <Play className="w-5 h-5 text-[#a855f7]" />
+                    <Play className="w-5 h-5 text-[#9B5DE5]" />
                   )}
                   <span className="text-white">
                     {currentTrack?.id === selectedMedia.id && isPlaying ? 'Pause' : 'Play'}
@@ -1508,8 +1508,8 @@ export default function Browse() {
                   className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
                 >
                   <Heart 
-                    className="w-5 h-5 text-[#a855f7]" 
-                    fill={selectedMedia.likes > 0 ? '#a855f7' : 'none'}
+                    className="w-5 h-5 text-[#9B5DE5]"
+                    fill={selectedMedia.likes > 0 ? '#9B5DE5' : 'none'}
                   />
                   <span className="text-white">Like</span>
                 </button>
@@ -1518,7 +1518,7 @@ export default function Browse() {
   className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
   onClick={() => selectedMedia && handleSave(selectedMedia.id)}
 >
-  <Bookmark className="w-5 h-5 text-[#a855f7]" />
+  <Bookmark className="w-5 h-5 text-[#9B5DE5]" />
   <span className="text-white">Bookmark</span>
 </button>
 
@@ -1526,7 +1526,7 @@ export default function Browse() {
   className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
   onClick={() => selectedMedia && handleSave(selectedMedia.id)}
 >
-  <BookmarkCheck className="w-5 h-5 text-[#a855f7]" />
+  <BookmarkCheck className="w-5 h-5 text-[#9B5DE5]" />
   <span className="text-white">Save to Library</span>
 </button>
 
@@ -1535,7 +1535,7 @@ export default function Browse() {
                     onClick={() => selectedMedia && handleDownload(selectedMedia)}
                     className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
                   >
-                    <Download className="w-5 h-5 text-[#a855f7]" />
+                    <Download className="w-5 h-5 text-[#9B5DE5]" />
                     <span className="text-white">Download</span>
                   </button>
                 )}
@@ -1549,7 +1549,7 @@ export default function Browse() {
                           }}
                           className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
                         >
-                          <ShoppingCart className="w-5 h-5 text-[#a855f7]" />
+                          <ShoppingCart className="w-5 h-5 text-[#9B5DE5]" />
                           <span className="text-white">
                             Purchase ZMW{selectedMedia.price}
                           </span>
@@ -1563,7 +1563,7 @@ export default function Browse() {
                   }}
                   className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
                 >
-                  <Plus className="w-5 h-5 text-[#a855f7]" />
+                  <Plus className="w-5 h-5 text-[#9B5DE5]" />
                   <span className="text-white">Add to Playlist</span>
                 </button>
 
@@ -1571,7 +1571,7 @@ export default function Browse() {
                   onClick={() => selectedMedia && handleShare(selectedMedia)}
                   className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 rounded-lg transition-colors"
                 >
-                  <Share2 className="w-5 h-5 text-[#a855f7]" />
+                  <Share2 className="w-5 h-5 text-[#9B5DE5]" />
                   <span className="text-white">Share</span>
                 </button>
               </div>
@@ -1620,7 +1620,7 @@ export default function Browse() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-[#0a0a0d] rounded-xl p-4 w-full max-w-sm"
+              className="bg-[#000000] rounded-xl p-4 w-full max-w-sm"
               ref={menuRef}
             >
               <h3 className="font-medium text-white mb-4">Add to Playlist</h3>
@@ -1629,24 +1629,24 @@ export default function Browse() {
                   <button
                     key={playlist.id}
                     onClick={() => selectedMedia && handleAddToPlaylist(playlist.id, selectedMedia.id)}
-                    className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#100c26] rounded-lg transition-colors"
+                    className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#000000] rounded-lg transition-colors"
                   >
-                    <div className="w-10 h-10 bg-[#100c26] rounded-lg flex items-center justify-center">
-                      <ListMusic className="w-5 h-5 text-[#a855f7]" />
+                    <div className="w-10 h-10 bg-[#000000] rounded-lg flex items-center justify-center">
+                      <ListMusic className="w-5 h-5 text-[#9B5DE5]" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-white truncate">{playlist.name}</p>
-                      <p className="text-sm text-gray-400">{playlist.mediaCount} tracks</p>
+                      <p className="text-sm text-white/60">{playlist.mediaCount} tracks</p>
                     </div>
                   </button>
                 ))}
                 {userPlaylists.length === 0 && (
-                  <p className="text-gray-400 text-center py-4">No playlists found</p>
+                  <p className="text-white/60 text-center py-4">No playlists found</p>
                 )}
               </div>
               <button
                 onClick={() => setShowAddToPlaylist(false)}
-                className="w-full mt-4 p-3 text-gray-400 hover:text-white transition-colors"
+                className="w-full mt-4 p-3 text-white/60 hover:text-white transition-colors"
               >
                 Cancel
               </button>

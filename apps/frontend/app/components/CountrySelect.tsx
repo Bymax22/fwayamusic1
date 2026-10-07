@@ -43,14 +43,14 @@ export function CountrySelect({ label, value, onChange, error }: CountrySelectPr
 
   return (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-300 mb-2">
+      <label className="block text-sm font-medium text-white/90 mb-2">
         {label}
       </label>
       <div className="relative" ref={dropdownRef}>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-4 py-2.5 bg-[#1f1f1f] text-white text-left flex items-center justify-between rounded-3xl ring-1 ring-white/10 hover:ring-purple-500 focus:outline-none transition-all"
+          className="w-full px-4 py-2.5 bg-[#000000] text-white text-left flex items-center justify-between rounded-3xl ring-1 ring-white/10 hover:ring-purple/75 focus:outline-none transition-all"
         >
           <span className="flex items-center gap-2">
             {selectedCountry ? (
@@ -59,7 +59,7 @@ export function CountrySelect({ label, value, onChange, error }: CountrySelectPr
                 <span>{selectedCountry.name}</span>
               </>
             ) : (
-              <span className="text-gray-400">Select a country</span>
+              <span className="text-white/60">Select a country</span>
             )}
           </span>
           <FaChevronDown
@@ -68,7 +68,7 @@ export function CountrySelect({ label, value, onChange, error }: CountrySelectPr
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1f1f] ring-1 ring-purple-500/30 z-50 max-h-96 overflow-hidden flex flex-col rounded-3xl">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-[#000000] ring-1 ring-purple/30 z-50 max-h-96 overflow-hidden flex flex-col rounded-3xl">
             <div className="p-2">
               <input
                 ref={inputRef}
@@ -76,7 +76,7 @@ export function CountrySelect({ label, value, onChange, error }: CountrySelectPr
                 placeholder="Search countries..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 bg-[#0f0f0f] text-white text-sm placeholder-gray-500 focus:outline-none rounded-2xl"
+                className="w-full px-3 py-2 bg-[#000000] text-white text-sm placeholder-white/60 focus:outline-none rounded-2xl"
               />
             </div>
             <div className="overflow-y-auto">
@@ -90,13 +90,13 @@ export function CountrySelect({ label, value, onChange, error }: CountrySelectPr
                     setSearchTerm('');
                   }}
                   className={`w-full px-4 py-2.5 text-left flex items-center gap-3 transition-all rounded-3xl ${
-                    value === country.code ? 'bg-purple-700/20' : 'hover:bg-[#111]'
+                    value === country.code ? 'bg-purple/20' : 'hover:bg-[#000000]'
                   }`}
                 >
                   <span className="text-lg">{country.flag}</span>
                   <div>
                     <div className="text-white text-sm">{country.name}</div>
-                    <div className="text-gray-400 text-xs">{country.code}</div>
+                    <div className="text-white/60 text-xs">{country.code}</div>
                   </div>
                 </button>
               ))}
@@ -105,7 +105,7 @@ export function CountrySelect({ label, value, onChange, error }: CountrySelectPr
         )}
       </div>
       {error && (
-        <p className="text-xs text-red-500 mt-1">{error}</p>
+        <p className="text-xs text-purple/75 mt-1">{error}</p>
       )}
     </div>
   );

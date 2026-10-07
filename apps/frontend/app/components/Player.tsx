@@ -166,7 +166,7 @@ export default function Player({
             key={i}
             className={`w-0.5 rounded-sm transition-all duration-200 ${
               bar.isActive
-                ? "bg-gradient-to-t from-purple-500 to-pink-500"
+                ? "bg-gradient-to-t from-purple/75 to-purple/75"
                 : isPlaying
                   ? "bg-white/40"
                   : "bg-white/20"
@@ -244,7 +244,7 @@ export default function Player({
         <motion.div
           className={`fixed left-0 right-0 z-50 ${
             isExpanded ? "h-[60vh]" : "h-32 sm:h-28"
-          } bg-gradient-to-br from-[#0a1f29]/95 to-[#0a3747]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg bottom-0 md:bottom-0 ${
+          } bg-gradient-to-br from-[#000000]/95 to-[#36454F]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg bottom-0 md:bottom-0 ${
             className || ""
           }`}
           initial={{ y: "100%" }}
@@ -256,10 +256,10 @@ export default function Player({
         <div className="flex items-center justify-between py-1 px-3 sm:py-0.5 sm:px-2 border-b border-white/10">
           <div className="flex items-center gap-3 sm:gap-2 min-w-0 flex-1">
             <div className="relative flex-shrink-0">
-              <MusicalNoteIcon className="w-4 h-4 text-purple-400" />
+              <MusicalNoteIcon className="w-4 h-4 text-purple/60" />
               {isPlaying && (
                 <motion.div
-                  className="absolute -top-0.5 -right-0.5 w-0.5 h-0.5 bg-purple-400 rounded-full"
+                  className="absolute -top-0.5 -right-0.5 w-0.5 h-0.5 bg-purple/60 rounded-full"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 />
@@ -277,7 +277,7 @@ export default function Player({
                   <p className="text-xs font-bold text-white truncate">
                     {track.title || "Unknown Title"}
                   </p>
-                  <p className="text-xs text-gray-400 truncate">
+                  <p className="text-xs text-white/60 truncate">
                     {track.artist || "Unknown Artist"}
                   </p>
                 </div>
@@ -286,7 +286,7 @@ export default function Player({
                     <p className="text-xs font-bold text-white truncate">
                       {track.title || "Unknown Title"}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-xs text-white/60 truncate">
                       {track.artist || "Unknown Artist"}
                     </p>
                   </div>
@@ -344,11 +344,11 @@ export default function Player({
                   alt={track.title || "Track cover"}
                   width={56}
                   height={56}
-                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#e51f48]/50 w-14 h-14 sm:w-12 sm:h-12"
+                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#36454F]/50 w-14 h-14 sm:w-12 sm:h-12"
                 />
                 {isLoading ? (
                   <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-400"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple/60"></div>
                   </div>
                 ) : isPlaying ? (
                   <motion.div
@@ -370,11 +370,11 @@ export default function Player({
               <div className="h-1 bg-white/10 rounded-full w-full cursor-pointer">
                 <div
                   ref={progressBarRef}
-                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-100"
+                  className="h-full bg-gradient-to-r from-purple/75 to-purple/75 rounded-full transition-all duration-100"
                   style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                 />
               </div>
-              <div className="flex justify-between text-xs text-gray-400 mt-1 sm:mt-0.5">
+              <div className="flex justify-between text-xs text-white/60 mt-1 sm:mt-0.5">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
@@ -390,7 +390,7 @@ export default function Player({
               <div className="flex items-center gap-1 sm:gap-1.5">
                 <button 
                   onClick={toggleLoop} 
-                  className={`p-2 sm:p-1.5 rounded-full ${isLooping ? "text-[#e51f48] bg-white/10" : "text-gray-400 hover:text-white hover:bg-white/10"} transition-colors active:bg-white/20`} 
+                  className={`p-2 sm:p-1.5 rounded-full ${isLooping ? "text-[#36454F] bg-white/10" : "text-white/60 hover:text-white hover:bg-white/10"} transition-colors active:bg-white/20`}
                   aria-label={isLooping ? "Disable loop" : "Enable loop"}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-4 sm:h-4">
@@ -401,7 +401,7 @@ export default function Player({
 
                 <button 
                   onClick={() => { if (onSeek) onSeek(Math.max(0, currentTime - 10)); }} 
-                  className="p-2 sm:p-1.5 text-gray-400 hover:text-white rounded-full hover:bg-white/10 transition-colors active:bg-white/20" 
+                  className="p-2 sm:p-1.5 text-white/60 hover:text-white rounded-full hover:bg-white/10 transition-colors active:bg-white/20"
                   aria-label="Rewind 10 seconds"
                 >
                   <BackwardIcon className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -411,7 +411,7 @@ export default function Player({
               <button 
                 onClick={onPlayPause} 
                 disabled={isLoading} 
-                className="p-3 sm:p-2.5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full hover:shadow-lg hover:shadow-purple-500/30 transition-all shadow-md disabled:opacity-50 active:scale-95" 
+                className="p-3 sm:p-2.5 bg-gradient-to-br from-purple/75 to-purple/75 rounded-full hover:shadow-lg hover:shadow-purple/30 transition-all shadow-md disabled:opacity-50 active:scale-95"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? <PauseIcon className="w-5 h-5 sm:w-4 sm:h-4 text-white" /> : <PlayIcon className="w-5 h-5 sm:w-4 sm:h-4 text-white" />}
@@ -420,7 +420,7 @@ export default function Player({
               <div className="flex items-center gap-1 sm:gap-1.5">
                 <button 
                   onClick={() => { if (onSeek) onSeek(Math.min(duration, currentTime + 10)); }} 
-                  className="p-2 sm:p-1.5 text-gray-400 hover:text-white rounded-full hover:bg-white/10 transition-colors active:bg-white/20" 
+                  className="p-2 sm:p-1.5 text-white/60 hover:text-white rounded-full hover:bg-white/10 transition-colors active:bg-white/20"
                   aria-label="Forward 10 seconds"
                 >
                   <ForwardIcon className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -429,13 +429,13 @@ export default function Player({
                 <div className="relative group">
                   <button 
                     onClick={toggleMute} 
-                    className="p-2 sm:p-1.5 text-gray-400 hover:text-white rounded-full transition-colors hover:bg-white/10 active:bg-white/20" 
+                    className="p-2 sm:p-1.5 text-white/60 hover:text-white rounded-full transition-colors hover:bg-white/10 active:bg-white/20"
                     aria-label={isMuted ? "Unmute" : "Mute"}
                   >
                     {isMuted || volume === 0 ? <SpeakerXMarkIcon className="w-5 h-5 sm:w-4 sm:h-4" /> : <SpeakerWaveIcon className="w-5 h-5 sm:w-4 sm:h-4" />}
                   </button>
 
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#0a3747] p-2 rounded-lg shadow-lg z-10">
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#36454F] p-2 rounded-lg shadow-lg z-10">
                     <input 
                       type="range" 
                       min="0" 
@@ -443,7 +443,7 @@ export default function Player({
                       step="0.01" 
                       value={isMuted ? 0 : volume} 
                       onChange={handleVolumeChange} 
-                      className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white" 
+                      className="w-20 h-1 bg-charcoal rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
                       aria-label="Volume control" 
                     />
                   </div>
@@ -454,7 +454,7 @@ export default function Player({
             {/* Compact Expanded View Controls */}
             {isExpanded && (
               <div className="mt-4 w-full">
-                <h4 className="text-sm font-medium text-gray-300 mb-3">Playback Speed</h4>
+                <h4 className="text-sm font-medium text-white/90 mb-3">Playback Speed</h4>
                 <button 
                   onClick={changePlaybackRate} 
                   className="px-4 py-2.5 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-colors active:bg-white/30 font-medium"
@@ -474,11 +474,11 @@ export default function Player({
                   alt={track.title || "Track cover"}
                   width={120}
                   height={120}
-                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#e51f48]/50 w-30 h-30"
+                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#36454F]/50 w-30 h-30"
                 />
                 {isLoading ? (
                   <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-400"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple/60"></div>
                   </div>
                 ) : isPlaying ? (
                   <motion.div
@@ -496,25 +496,25 @@ export default function Player({
                   <h3 className="text-lg font-bold text-white truncate">
                       {track.title || "Unknown Title"}
                     </h3>
-                  {isLiked && <HeartIcon className="flex-shrink-0 w-4 h-4 text-purple-400" />}
+                  {isLiked && <HeartIcon className="flex-shrink-0 w-4 h-4 text-purple/60" />}
                 </div>
-                <p className="text-sm text-gray-300 truncate">
+                <p className="text-sm text-white/90 truncate">
                   {track.artist || "Unknown Artist"}
                 </p>
                 {track.album && (
-                  <p className="text-xs text-gray-400 mt-0.5">{track.album}</p>
+                  <p className="text-xs text-white/60 mt-0.5">{track.album}</p>
                 )}
 
                 <div className="flex items-center mt-4 space-x-4">
                   <button 
                     onClick={() => setIsLiked(!isLiked)} 
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm hover:bg-white/10 hover:text-purple-400 transition-colors active:bg-white/20"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm hover:bg-white/10 hover:text-purple/60 transition-colors active:bg-white/20"
                   >
-                    {isLiked ? <HeartIcon className="w-4 h-4 text-purple-400" /> : <HeartOutline className="w-4 h-4 text-gray-400" />}
+                    {isLiked ? <HeartIcon className="w-4 h-4 text-purple/60" /> : <HeartOutline className="w-4 h-4 text-white/60" />}
                     <span>Like</span>
                   </button>
 
-                  <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/10 transition-colors active:bg-white/20">
+                  <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/10 transition-colors active:bg-white/20">
                     <QueueListIcon className="w-4 h-4" />
                     <span>Queue</span>
                   </button>

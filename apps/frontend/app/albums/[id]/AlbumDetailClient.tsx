@@ -134,7 +134,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
         </button>
 
         <div className="grid min-w-0 gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <div className="w-full min-w-0 overflow-hidden rounded-3xl bg-[#151515] shadow-2xl shadow-black/30">
+          <div className="w-full min-w-0 overflow-hidden rounded-3xl bg-[#000000] shadow-2xl shadow-black/30">
             <div className="relative mx-auto aspect-square w-full max-w-lg overflow-hidden bg-black sm:aspect-[4/5] lg:h-96 lg:max-w-none">
               <Image
                 src={album.coverUrl || album.artCoverUrl || album.thumbnailUrl || '/default-cover.jpg'}
@@ -144,10 +144,10 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
               />
             </div>
             <div className="p-4 space-y-3">
-              <p className="text-xs uppercase tracking-[0.3em] text-purple-300">{album.type === 'EP' ? 'EP' : 'Album'}</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-purple/45">{album.type === 'EP' ? 'EP' : 'Album'}</p>
               <h1 className="text-2xl font-semibold">{album.title || 'Untitled Album'}</h1>
-              <div className="flex min-w-0 items-center gap-2 text-sm text-slate-400">
-                <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-slate-800">
+              <div className="flex min-w-0 items-center gap-2 text-sm text-white/60">
+                <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-charcoal">
                   <Image
                     src={album.user?.avatarUrl || DEFAULT_AVATAR_URL}
                     alt={album.user?.displayName || album.user?.username || 'Artist'}
@@ -159,14 +159,14 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                   {album.user?.displayName || album.user?.username || 'Unknown Artist'}
                 </Link>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-white/60">
                 Published {formatRelativeTime(publishedAt)}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={handlePlayAll}
-                  className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-4 py-2 text-sm font-medium text-white transition hover:opacity-95"
+                  className="inline-flex items-center gap-2 rounded-full bg-purple/85 px-4 py-2 text-sm font-medium text-white transition hover:opacity-95"
                 >
                   <Play className="h-4 w-4" />
                   Play
@@ -177,7 +177,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                   onClick={() => setAlbumLiked((v) => !v)}
                   className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-sm font-medium text-white transition hover:bg-white/10"
                 >
-                  <Heart className={`h-4 w-4 ${albumLiked ? 'text-pink-400' : 'text-white'}`} />
+                  <Heart className={`h-4 w-4 ${albumLiked ? 'text-purple/60' : 'text-white'}`} />
                   {albumLiked ? 'Liked' : 'Like'}
                 </button>
 
@@ -203,41 +203,41 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-3xl bg-[#151515] p-6 shadow-2xl shadow-black/30">
-              <h3 className="text-sm text-slate-400">About</h3>
-              <p className="mt-2 text-sm leading-7 text-slate-300">{album.description || 'No description provided yet.'}</p>
+            <div className="rounded-3xl bg-[#000000] p-6 shadow-2xl shadow-black/30">
+              <h3 className="text-sm text-white/60">About</h3>
+              <p className="mt-2 text-sm leading-7 text-white/90">{album.description || 'No description provided yet.'}</p>
             </div>
 
-            <div className="rounded-3xl bg-[#151515] p-4 shadow-2xl shadow-black/30">
+            <div className="rounded-3xl bg-[#000000] p-4 shadow-2xl shadow-black/30">
               <div className="mb-3 flex items-center justify-between">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.3em] text-purple-300">Tracklist</p>
+                  <p className="text-sm uppercase tracking-[0.3em] text-purple/45">Tracklist</p>
                   <h2 className="text-xl font-semibold">{album.media?.length ?? 0} tracks</h2>
                 </div>
               </div>
 
               {Array.isArray(album.media) && album.media.length > 0 ? (
-                <div className="divide-y divide-slate-800">
+                <div className="divide-y divide-charcoal/50">
                   {album.media.map((track: any, idx: number) => {
                     const isCurrent = Boolean(currentTrack && String(currentTrack.id) === String(track.id));
                     return (
                       <div key={track.id ?? idx} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 px-1.5 py-2 sm:flex sm:justify-between sm:gap-3 sm:px-2 sm:py-3">
                         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-                          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-slate-900 sm:h-14 sm:w-14 sm:rounded-2xl">
+                          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-charcoal sm:h-14 sm:w-14 sm:rounded-2xl">
                             {track.artCoverUrl || track.coverArt || track.thumbnailUrl || track.imageUrl ? (
                               <Image src={track.artCoverUrl || track.coverArt || track.thumbnailUrl || track.imageUrl} alt={track.title || ''} fill className="object-cover" />
                             ) : (
-                              <div className="h-full w-full bg-gradient-to-br from-purple-600 to-fuchsia-500" />
+                              <div className="h-full w-full bg-gradient-to-br from-purple/85 to-purple/75" />
                             )}
                           </div>
                           <div className="min-w-0">
                             <ScrollingTrackTitle isPlaying={isCurrent && isPlaying} className="text-sm font-semibold text-white">{track.title || `Track ${idx + 1}`}</ScrollingTrackTitle>
-                            <p className="text-xs text-slate-400 truncate">{track.user?.displayName || track.user?.username || ''}</p>
+                            <p className="text-xs text-white/60 truncate">{track.user?.displayName || track.user?.username || ''}</p>
                           </div>
                         </div>
 
                         <div className="col-span-2 flex min-w-0 justify-end gap-2 sm:col-auto sm:shrink-0 sm:gap-3">
-                          <div className="mr-1 text-right text-[10px] leading-tight text-slate-400 sm:mr-2 sm:text-xs">
+                          <div className="mr-1 text-right text-[10px] leading-tight text-white/60 sm:mr-2 sm:text-xs">
                             <div>{track.duration ? `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, '0')}` : '0:00'}</div>
                             <div className="hidden capitalize sm:block">{(track.type || 'audio').toString().toLowerCase()}</div>
                             <div className="hidden sm:block">{Number(track.plays ?? track.playCount ?? track.views ?? 0).toLocaleString()} plays</div>
@@ -265,7 +265,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                             title={trackLikes[track.id] ? 'Unlike track' : 'Like track'}
                             className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-white transition hover:bg-white/10 disabled:cursor-wait disabled:opacity-50 sm:h-9 sm:w-9"
                           >
-                            <Heart className={`h-4 w-4 ${trackLikes[track.id] ? 'text-pink-400' : 'text-white'}`} />
+                            <Heart className={`h-4 w-4 ${trackLikes[track.id] ? 'text-purple/60' : 'text-white'}`} />
                           </button>
 
                           <button
@@ -290,7 +290,7 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
                   })}
                 </div>
               ) : (
-                <p className="text-sm text-slate-400">This album has no released tracks yet.</p>
+                <p className="text-sm text-white/60">This album has no released tracks yet.</p>
               )}
             </div>
           </div>

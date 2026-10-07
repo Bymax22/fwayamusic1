@@ -24,14 +24,14 @@ export default function NowPlayingPanel({
 
       {/* Progress */}
       <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-        <div className="h-full bg-gradient-to-r from-purple-500 to-orange-500 w-1/3" />
+        <div className="h-full bg-gradient-to-r from-purple/75 to-purple/75 w-1/3" />
       </div>
 
       {/* Controls */}
       <div className="flex justify-center">
         <button
           onClick={onPlayPause}
-          className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center"
+          className="w-12 h-12 rounded-full bg-purple/85 flex items-center justify-center"
         >
           {isPlaying ? <Pause /> : <Play />}
         </button>

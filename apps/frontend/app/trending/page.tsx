@@ -50,7 +50,7 @@ export default function TrendingPage() {
     <div className="min-h-screen bg-black/95 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
-          <TrendingUp className="w-8 h-8 text-purple-400" />
+          <TrendingUp className="w-8 h-8 text-purple/60" />
           <h1 className="text-4xl font-bold text-white">Trending Now</h1>
         </div>
 
@@ -61,7 +61,7 @@ export default function TrendingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="group bg-[#111827]/80 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/10 hover:border-purple-400/30 transition-all"
+              className="group bg-[#000000]/80 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/10 hover:border-purple/30 transition-all"
             >
               <div className="relative">
                 <Image
@@ -78,24 +78,24 @@ export default function TrendingPage() {
                   onClick={() => playTrack(track)}
                   className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <Play className="w-12 h-12 text-purple-300 fill-purple-300" />
+                  <Play className="w-12 h-12 text-purple/45 fill-purple/45" />
                 </button>
               </div>
 
               <div className="p-4">
                 <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className="mb-1 font-semibold text-white">{track.title}</ScrollingTrackTitle>
-                <p className="text-sm text-gray-400 truncate mb-3">{track.artist}</p>
+                <p className="text-sm text-white/60 truncate mb-3">{track.artist}</p>
                 
-                <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
+                <div className="flex items-center justify-between text-xs text-white/60 mb-3">
                   <span>{(track.views || 0).toLocaleString()} plays</span>
-                  <span className="px-2 py-1 bg-white/10 rounded text-purple-300 font-semibold">{track.genre || 'Unknown'}</span>
+                  <span className="px-2 py-1 bg-white/10 rounded text-purple/45 font-semibold">{track.genre || 'Unknown'}</span>
                 </div>
 
                 <div className="flex gap-2">
-                  <button className="flex-1 p-2 bg-purple-600/20 text-purple-300 rounded hover:bg-purple-600/30 transition-colors text-xs font-semibold">
+                  <button className="flex-1 p-2 bg-purple/20 text-purple/45 rounded hover:bg-purple/30 transition-colors text-xs font-semibold">
                     <Heart className="w-4 h-4 inline mr-1" /> Like
                   </button>
-                  <button className="flex-1 p-2 bg-white/10 text-white rounded hover:bg-purple-600 transition-colors text-xs font-semibold">
+                  <button className="flex-1 p-2 bg-white/10 text-white rounded hover:bg-purple/85 transition-colors text-xs font-semibold">
                     <Download className="w-4 h-4 inline mr-1" /> Get
                   </button>
                 </div>
@@ -106,7 +106,7 @@ export default function TrendingPage() {
 
         {media.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-400">No trending tracks found</p>
+            <p className="text-white/60">No trending tracks found</p>
           </div>
         )}
       </div>

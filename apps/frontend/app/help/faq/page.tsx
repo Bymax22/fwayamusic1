@@ -32,8 +32,8 @@ export default function HelpFaqPage() {
   return (
     <div className="min-h-screen bg-black px-4 py-6 text-white md:px-6">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-6 rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-900/30 to-black p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-purple-300">FAQ</p>
+        <div className="mb-6 rounded-2xl border border-purple/30 bg-gradient-to-r from-purple/30 to-black p-5">
+          <p className="text-xs uppercase tracking-[0.2em] text-purple/45">FAQ</p>
           <h1 className="mt-2 text-2xl font-bold md:text-3xl">Quick answers. No long searching.</h1>
         </div>
 
@@ -41,13 +41,13 @@ export default function HelpFaqPage() {
           {faqItems.map((item) => (
             <div key={item.id} id={item.id} className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <h2 className="text-lg font-semibold text-white">{item.question}</h2>
-              <p className="mt-2 text-sm text-gray-300">{item.answer}</p>
+              <p className="mt-2 text-sm text-white/90">{item.answer}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-gray-200">
-          Need more help? <Link href="/help/contact" className="text-purple-300">Contact support</Link> or reach us on WhatsApp at <a href="https://wa.me/260966999999" className="text-purple-300">0966 999 999</a>.
+        <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-white/90">
+          Need more help? <Link href="/help/contact" className="text-purple/45">Contact support</Link> or reach us on WhatsApp at <a href="https://wa.me/260966999999" className="text-purple/45">0966 999 999</a>.
         </div>
       </div>
     </div>

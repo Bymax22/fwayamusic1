@@ -200,16 +200,16 @@ export default function UserSignUp() {
         <button
           type="button"
           onClick={() => router.push('/')}
-          className="absolute right-4 top-4 rounded-full bg-[#0f1112] text-white hover:bg-[#1f1f1f] p-2 transition-colors"
+          className="absolute right-4 top-4 rounded-full bg-[#000000] text-white hover:bg-[#000000] p-2 transition-colors"
         >
           <FaTimes className="w-4 h-4" />
         </button>
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#0d0d0d] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#000000] rounded-full flex items-center justify-center mx-auto mb-4">
             <FaUser className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Listener</h1>
-          <p className="text-gray-400">Create your music listener account</p>
+          <p className="text-white/60">Create your music listener account</p>
         </div>
 
         <AuthErrorBanner error={authError} />
@@ -219,15 +219,15 @@ export default function UserSignUp() {
             type="button"
             onClick={handleGoogleSignUp}
             disabled={loading || socialLoading}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-purple/85 text-white font-semibold hover:bg-purple/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FaGoogle className="w-5 h-5" />
             Continue with Google
           </button>
-          <div className="flex items-center gap-3 mt-4 text-xs text-gray-400">
-            <span className="h-px flex-1 bg-[#1f1f1f]" />
+          <div className="flex items-center gap-3 mt-4 text-xs text-white/60">
+            <span className="h-px flex-1 bg-[#000000]" />
             <span>or continue with your email</span>
-            <span className="h-px flex-1 bg-[#1f1f1f]" />
+            <span className="h-px flex-1 bg-[#000000]" />
           </div>
         </div>
 
@@ -268,7 +268,7 @@ export default function UserSignUp() {
               type="text"
               value={formData.displayName}
               onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-              className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               placeholder="Your display name"
             />
           </div>
@@ -283,18 +283,18 @@ export default function UserSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3 py-2 rounded-3xl bg-[#101010] ring-1 ring-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-10"
+                  className="w-full px-3 py-2 rounded-3xl bg-[#000000] ring-1 ring-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-10"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-purple/60 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <div>
@@ -305,10 +305,10 @@ export default function UserSignUp() {
                 type={showPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="w-full px-3 py-2 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="••••••••"
               />
-              {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && <p className="text-purple/60 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
           </div>
 
@@ -330,7 +330,7 @@ export default function UserSignUp() {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-3 rounded-3xl bg-[#101010] ring-1 ring-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-3xl bg-[#000000] ring-1 ring-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               />
             </div>
           </div>
@@ -341,11 +341,11 @@ export default function UserSignUp() {
               Profile Picture
             </label>
             <div className="flex items-center gap-4">
-              <div className="relative w-24 h-24 rounded-full bg-[#0f1112] flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div className="relative w-24 h-24 rounded-full bg-[#000000] flex items-center justify-center overflow-hidden flex-shrink-0">
                 {avatarPreview ? (
                   <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
                 ) : (
-                  <FaUser className="text-3xl text-gray-400" />
+                  <FaUser className="text-3xl text-white/60" />
                 )}
               </div>
               <div className="flex-1">
@@ -361,15 +361,15 @@ export default function UserSignUp() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FaCamera className="text-sm" />
                   {uploading ? 'Uploading...' : 'Upload Picture'}
                 </button>
-                <p className="text-xs text-gray-400 mt-2">JPG, PNG or GIF (Max 5MB)</p>
+                <p className="text-xs text-white/60 mt-2">JPG, PNG or GIF (Max 5MB)</p>
               </div>
             </div>
-            {errors.avatar && <p className="text-red-400 text-sm mt-2">{errors.avatar}</p>}
+            {errors.avatar && <p className="text-purple/60 text-sm mt-2">{errors.avatar}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -388,27 +388,27 @@ export default function UserSignUp() {
                 type="text"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-4 py-3 rounded-3xl bg-[#0f1112] ring-1 ring-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-3xl bg-[#000000] ring-1 ring-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="Street address"
               />
             </div>
           </div>
 
           {/* Consent Section */}
-          <div className="bg-[#0e0e0e] rounded-3xl p-4 space-y-3">
+          <div className="bg-[#000000] rounded-3xl p-4 space-y-3">
             <div className="flex items-start gap-3">
               <input
                 type="checkbox"
                 id="terms"
                 checked={formData.acceptedTerms}
                 onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-purple/75 bg-transparent rounded focus:ring-purple/75 focus:ring-2"
               />
-              <label htmlFor="terms" className="text-sm text-gray-300">
+              <label htmlFor="terms" className="text-sm text-white/90">
                 I agree to the <a href="/terms" className="text-white/80 hover:text-white hover:underline">Terms of Service</a> and <a href="/privacy" className="text-white/80 hover:text-white hover:underline">Privacy Policy</a> *
               </label>
             </div>
-            {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
+            {errors.acceptedTerms && <p className="text-purple/60 text-sm">{errors.acceptedTerms}</p>}
 
             <div className="flex items-start gap-3">
               <input
@@ -416,13 +416,13 @@ export default function UserSignUp() {
                 id="privacy"
                 checked={formData.acceptedPrivacy}
                 onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-purple/75 bg-transparent rounded focus:ring-purple/75 focus:ring-2"
               />
-              <label htmlFor="privacy" className="text-sm text-gray-300">
+              <label htmlFor="privacy" className="text-sm text-white/90">
                 I acknowledge that I have read and understood how my personal data will be processed *
               </label>
             </div>
-            {errors.acceptedPrivacy && <p className="text-red-400 text-sm">{errors.acceptedPrivacy}</p>}
+            {errors.acceptedPrivacy && <p className="text-purple/60 text-sm">{errors.acceptedPrivacy}</p>}
 
             <div className="flex items-start gap-3">
               <input
@@ -430,13 +430,13 @@ export default function UserSignUp() {
                 id="cookies"
                 checked={formData.acceptedCookies}
                 onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })}
-                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-purple/75 bg-transparent rounded focus:ring-purple/75 focus:ring-2"
               />
-              <label htmlFor="cookies" className="text-sm text-gray-300">
+              <label htmlFor="cookies" className="text-sm text-white/90">
                 I agree to the use of cookies for analytics and personalization.
               </label>
             </div>
-            {errors.acceptedCookies && <p className="text-red-400 text-sm">{errors.acceptedCookies}</p>}
+            {errors.acceptedCookies && <p className="text-purple/60 text-sm">{errors.acceptedCookies}</p>}
 
             <div className="flex items-start gap-3">
               <input
@@ -444,9 +444,9 @@ export default function UserSignUp() {
                 id="marketing"
                 checked={formData.marketingEmails}
                 onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-purple/75 bg-transparent rounded focus:ring-purple/75 focus:ring-2"
               />
-              <label htmlFor="marketing" className="text-sm text-gray-300">
+              <label htmlFor="marketing" className="text-sm text-white/90">
                 I agree to receive marketing emails and promotional offers
               </label>
             </div>
@@ -457,9 +457,9 @@ export default function UserSignUp() {
                 id="dataSharing"
                 checked={formData.dataSharing}
                 onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                className="mt-1 w-4 h-4 text-purple-500 bg-transparent rounded focus:ring-purple-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-purple/75 bg-transparent rounded focus:ring-purple/75 focus:ring-2"
               />
-              <label htmlFor="dataSharing" className="text-sm text-gray-300">
+              <label htmlFor="dataSharing" className="text-sm text-white/90">
                 I consent to my data being shared with trusted partners for service improvement
               </label>
             </div>
@@ -469,7 +469,7 @@ export default function UserSignUp() {
           <button
             type="submit"
             disabled={loading || uploading}
-            className="w-full px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow-lg"
+            className="w-full px-4 py-3 bg-purple/75 text-white rounded-lg hover:bg-purple/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow-lg"
           >
             {loading ? 'Creating Account...' : uploading ? 'Uploading Avatar...' : 'Create Account'}
           </button>
@@ -478,9 +478,9 @@ export default function UserSignUp() {
         </form>
 
         <div className="text-center mt-6 pt-4 border-t border-white/10">
-          <p className="text-gray-300">
+          <p className="text-white/90">
             Already have an account?{' '}
-            <Link href="/auth/user/signin" className="text-purple-400 hover:text-purple-300 hover:underline font-semibold">
+            <Link href="/auth/user/signin" className="text-purple/60 hover:text-purple/45 hover:underline font-semibold">
               Sign In
             </Link>
           </p>

@@ -100,7 +100,7 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
                 type="button"
                 aria-label="Premium"
                 onClick={() => router.push('/premium')}
-                className="rounded-full bg-purple-500 p-2.5 text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
+                className="rounded-full bg-purple/75 p-2.5 text-white shadow-lg shadow-purple/20 transition hover:bg-purple/60"
               >
                 <FaStar className="h-4 w-4" />
               </button>

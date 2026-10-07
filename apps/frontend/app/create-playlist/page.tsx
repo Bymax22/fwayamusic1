@@ -98,14 +98,14 @@ export default function CreatePlaylistPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-gradient-to-br from-[#090b14]/95 via-[#120a28]/80 to-[#160930]/95 min-h-screen pb-32">
-      <div className="mb-8 rounded-3xl border border-purple-700/40 bg-[#090b14]/80 p-8 shadow-2xl shadow-purple-900/20">
+    <div className="p-6 max-w-4xl mx-auto bg-gradient-to-br from-[#000000]/95 via-[#000000]/80 to-[#000000]/95 min-h-screen pb-32">
+      <div className="mb-8 rounded-3xl border border-purple/40 bg-[#000000]/80 p-8 shadow-2xl shadow-purple/20">
         <div className="flex flex-col gap-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-purple-500/10 px-4 py-2 text-sm uppercase tracking-[0.24em] text-purple-300">
+          <div className="inline-flex items-center gap-2 rounded-full bg-purple/10 px-4 py-2 text-sm uppercase tracking-[0.24em] text-purple/45">
             Create Playlist
           </div>
           <h1 className="text-4xl font-semibold tracking-tight text-white">Build your playlist, your way</h1>
-          <p className="max-w-2xl text-sm text-slate-400">
+          <p className="max-w-2xl text-sm text-white/60">
             Use the same library style as your music experience. Create a playlist, give it a cover, and share it with fans.
           </p>
         </div>
@@ -113,7 +113,7 @@ export default function CreatePlaylistPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Cover Image Upload */}
-        <div className="bg-[#0a3747]/70 rounded-xl p-6">
+        <div className="bg-[#36454F]/70 rounded-xl p-6">
           <h2 className="text-lg font-medium text-white mb-4">Cover Image</h2>
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             {/* Cover Preview */}
@@ -130,13 +130,13 @@ export default function CreatePlaylistPage() {
                   <button
                     type="button"
                     onClick={handleRemoveCover}
-                    className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                    className="absolute -top-2 -right-2 w-8 h-8 bg-purple/75 rounded-full flex items-center justify-center hover:bg-purple/85 transition-colors"
                   >
                     <X className="w-4 h-4 text-white" />
                   </button>
                 </div>
               ) : (
-                <div className="w-48 h-48 bg-[#0a3747] border-2 border-dashed border-gray-600 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-gray-500 transition-colors">
+                <div className="w-48 h-48 bg-[#36454F] border-2 border-dashed border-charcoal/50 rounded-xl flex flex-col items-center justify-center text-white/60 hover:border-charcoal/50 transition-colors">
                   <ImageIcon className="w-12 h-12 mb-2" />
                   <span className="text-sm">No cover</span>
                 </div>
@@ -145,10 +145,10 @@ export default function CreatePlaylistPage() {
 
             {/* Upload Controls */}
             <div className="flex-1">
-              <p className="text-gray-400 mb-4">
+              <p className="text-white/60 mb-4">
                 Upload a cover image for your playlist. Recommended size: 1000x1000 pixels.
               </p>
-              <label className="flex items-center gap-2 px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-lg transition-colors cursor-pointer w-fit">
+              <label className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-lg transition-colors cursor-pointer w-fit">
                 <Upload className="w-4 h-4" />
                 Choose Image
                 <input
@@ -163,13 +163,13 @@ export default function CreatePlaylistPage() {
         </div>
 
         {/* Playlist Details */}
-        <div className="bg-[#0a3747]/70 rounded-xl p-6">
+        <div className="bg-[#36454F]/70 rounded-xl p-6">
           <h2 className="text-lg font-medium text-white mb-4">Playlist Details</h2>
           
           <div className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Playlist Name *
               </label>
               <input
@@ -178,14 +178,14 @@ export default function CreatePlaylistPage() {
                 value={playlistData.name}
                 onChange={handleInputChange}
                 placeholder="My Awesome Playlist"
-                className="w-full px-4 py-3 bg-[#0f1320] border border-purple-700/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400"
+                className="w-full px-4 py-3 bg-[#000000] border border-purple/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent placeholder-white/60"
                 required
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Description
               </label>
               <textarea
@@ -194,13 +194,13 @@ export default function CreatePlaylistPage() {
                 onChange={handleInputChange}
                 placeholder="Describe your playlist..."
                 rows={4}
-                className="w-full px-4 py-3 bg-[#0f1320] border border-purple-700/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400 resize-none"
+                className="w-full px-4 py-3 bg-[#000000] border border-purple/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent placeholder-white/60 resize-none"
               />
             </div>
 
             {/* Privacy */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Privacy
               </label>
               <div className="flex gap-4">
@@ -210,7 +210,7 @@ export default function CreatePlaylistPage() {
                     name="isPublic"
                     checked={playlistData.isPublic}
                     onChange={() => setPlaylistData(prev => ({ ...prev, isPublic: true }))}
-                    className="text-purple-500 focus:ring-purple-500"
+                    className="text-purple/75 focus:ring-purple/75"
                   />
                   <span className="text-white">Public</span>
                 </label>
@@ -220,7 +220,7 @@ export default function CreatePlaylistPage() {
                     name="isPublic"
                     checked={!playlistData.isPublic}
                     onChange={() => setPlaylistData(prev => ({ ...prev, isPublic: false }))}
-                    className="text-purple-500 focus:ring-purple-500"
+                    className="text-purple/75 focus:ring-purple/75"
                   />
                   <span className="text-white">Private</span>
                 </label>
@@ -233,7 +233,7 @@ export default function CreatePlaylistPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-full transition-colors font-medium shadow-lg shadow-purple-500/20"
+            className="flex items-center gap-2 px-6 py-3 bg-purple/85 hover:bg-purple/75 text-white rounded-full transition-colors font-medium shadow-lg shadow-purple/20"
           >
             <Save className="w-5 h-5" />
             Create Playlist

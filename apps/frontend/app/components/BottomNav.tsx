@@ -69,7 +69,7 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
               key={item.id}
               onClick={() => handleClick(item)}
               className={`relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${
-                isActive ? "text-white" : "text-gray-400"
+                isActive ? "text-white" : "text-white/60"
               }`}
             >
               {item.image ? (
@@ -83,13 +83,13 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
               ) : Icon ? (
                 <Icon
                   size={22}
-                  className={isActive ? "text-purple-400" : "text-current"}
+                  className={isActive ? "text-purple/60" : "text-current"}
                   fill={isActive ? "rgba(155, 93, 229, 0.2)" : "none"}
                 />
               ) : null}
               <span className="text-[10px] font-medium">{item.label}</span>
               {isActive && (
-                <div className="absolute -bottom-2 w-6 h-0.5 bg-purple-500 rounded-full" />
+                <div className="absolute -bottom-2 w-6 h-0.5 bg-purple/75 rounded-full" />
               )}
             </button>
           );
@@ -109,7 +109,7 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
           >
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white">Need Help?</h3>
-              <button onClick={closeNeedHelp} className="text-gray-400">Close</button>
+              <button onClick={closeNeedHelp} className="text-white/60">Close</button>
             </div>
 
             <div className="mt-3">
@@ -132,57 +132,57 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
                       window.fwayaOpenChatwoot?.();
                     }, 220);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-sm text-white flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 rounded-lg bg-purple/20 hover:bg-purple/30 text-sm text-white flex items-center gap-2"
                 >
-                  <LifeBuoy className="w-4 h-4 text-purple-400" />
+                  <LifeBuoy className="w-4 h-4 text-purple/60" />
                   Chat with Support
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/help/contact'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/help/contact'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-purple/60" />
                   Contact Us
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/help/faq'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/help/faq'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-purple/60" />
                   FAQ
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/blog'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/blog'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-purple/60" />
                   Blog & News
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/advertising'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <Megaphone className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/advertising'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <Megaphone className="w-4 h-4 text-purple/60" />
                   Advertisement
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/partnership'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <Handshake className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/partnership'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <Handshake className="w-4 h-4 text-purple/60" />
                   Partnership
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/community'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/community'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-purple/60" />
                   Community
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/community-guidelines'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <Flag className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/community-guidelines'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <Flag className="w-4 h-4 text-purple/60" />
                   Community Guidelines
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/report-issue'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/report-issue'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-purple/60" />
                   Report Issue
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/status'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/status'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-purple/60" />
                   System Status
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/developers'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <Code className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/developers'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <Code className="w-4 h-4 text-purple/60" />
                   Developers
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/terms'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/terms'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-purple/60" />
                   Terms & Conditions
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/privacy'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-gray-200 flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-purple-400" />
+                <button onClick={(e) => { e.stopPropagation(); closeNeedHelp(); void router.push('/privacy'); }} className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-white/90 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-purple/60" />
                   Privacy Policy
                 </button>
               </div>

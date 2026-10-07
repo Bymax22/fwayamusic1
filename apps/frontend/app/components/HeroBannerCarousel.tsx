@@ -73,7 +73,7 @@ export default function HeroBannerCarousel({
       }}
       className={`relative isolate h-[190px] touch-pan-y overflow-hidden bg-black [perspective:1400px] sm:h-[320px] lg:h-[390px] ${className}`}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(83,35,112,0.32),transparent_68%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(54, 69, 79, 0.32),transparent_68%)]" />
 
       {visibleSlides.map(({ slide, index, offset }) => {
         const distance = Math.abs(offset);
@@ -115,7 +115,7 @@ export default function HeroBannerCarousel({
               transformOrigin: 'center center',
             }}
           >
-            <span className="absolute inset-x-0 top-0 z-10 h-full overflow-hidden rounded-2xl bg-[#111] shadow-[0_18px_50px_rgba(0,0,0,0.65)] sm:rounded-3xl">
+            <span className="absolute inset-x-0 top-0 z-10 h-full overflow-hidden rounded-2xl bg-[#000000] shadow-[0_18px_50px_rgba(0, 0, 0, 0.65)] sm:rounded-3xl">
               <Image
                 src={slide.image || '/featured5.jpg'}
                 alt={slide.title}
@@ -143,7 +143,7 @@ export default function HeroBannerCarousel({
             </span>
             <span
               aria-hidden="true"
-              className="absolute left-0 right-0 top-[96%] h-[28%] scale-y-[-1] overflow-hidden rounded-2xl opacity-25 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.5),transparent)] sm:rounded-3xl"
+              className="absolute left-0 right-0 top-[96%] h-[28%] scale-y-[-1] overflow-hidden rounded-2xl opacity-25 [mask-image:linear-gradient(to_bottom,rgba(0, 0, 0, 0.5),transparent)] sm:rounded-3xl"
             >
               <Image src={slide.image || '/featured5.jpg'} alt="" fill sizes="(max-width: 640px) 78vw, 760px" className="object-cover" />
             </span>
@@ -166,7 +166,7 @@ export default function HeroBannerCarousel({
               onChange(index);
             }}
             className={`h-1.5 rounded-full transition-all ${
-              index === activeIndex ? 'w-6 bg-purple-400' : 'w-1.5 bg-white/40 hover:bg-white/70'
+              index === activeIndex ? 'w-6 bg-purple/60' : 'w-1.5 bg-white/40 hover:bg-white/70'
             }`}
           />
         ))}

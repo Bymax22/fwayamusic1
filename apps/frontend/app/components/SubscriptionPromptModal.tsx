@@ -31,7 +31,7 @@ export default function SubscriptionPromptModal({
           <X className="h-4 w-4" />
         </button>
         <div className="flex items-start gap-3 pr-5">
-          <div className="rounded-xl bg-purple-500/15 p-2.5 text-purple-300">
+          <div className="rounded-xl bg-purple/15 p-2.5 text-purple/45">
             <Crown className="h-5 w-5" />
           </div>
           <div>
@@ -46,7 +46,7 @@ export default function SubscriptionPromptModal({
             <button
               type="button"
               onClick={onSubscribe}
-              className="flex-1 rounded-xl bg-purple-600 px-3 py-2.5 text-sm font-semibold transition hover:bg-purple-500"
+              className="flex-1 rounded-xl bg-purple/85 px-3 py-2.5 text-sm font-semibold transition hover:bg-purple/75"
             >
               Subscribe
             </button>
@@ -54,7 +54,7 @@ export default function SubscriptionPromptModal({
             <button
               type="button"
               onClick={onLogin}
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-3 py-2.5 text-sm font-semibold transition hover:bg-purple-500"
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-purple/85 px-3 py-2.5 text-sm font-semibold transition hover:bg-purple/75"
             >
               <LogIn className="h-4 w-4" /> Sign in to subscribe
             </button>

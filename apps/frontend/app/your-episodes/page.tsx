@@ -63,7 +63,7 @@ export default function YourEpisodesPage() {
   if (loading) return <div className="p-4 text-center">Loading episodes...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#2E055E] to-[#5B0EA6] p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#36454F] to-[#36454F] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <History className="w-8 h-8 text-primary" />
@@ -78,7 +78,7 @@ export default function YourEpisodesPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="group bg-[#2E055E]/50 backdrop-blur-lg rounded-lg overflow-hidden border border-primary/20 hover:border-primary/50 transition-all p-4 flex items-center gap-4"
+                className="group bg-[#36454F]/50 backdrop-blur-lg rounded-lg overflow-hidden border border-primary/20 hover:border-primary/50 transition-all p-4 flex items-center gap-4"
               >
                 <div className="relative flex-shrink-0">
                   <Image
@@ -101,8 +101,8 @@ export default function YourEpisodesPage() {
 
                 <div className="flex-1 min-w-0">
                   <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(episode.id) && isPlaying} className="mb-1 font-semibold text-white">{episode.title}</ScrollingTrackTitle>
-                  <p className="text-sm text-gray-400 truncate mb-2">{episode.artist}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <p className="text-sm text-white/60 truncate mb-2">{episode.artist}</p>
+                  <div className="flex items-center gap-2 text-xs text-white/60">
                     <Clock className="w-3 h-3" />
                     <span>{episode.genre || 'Episode'}</span>
                     <span>•</span>
@@ -114,7 +114,7 @@ export default function YourEpisodesPage() {
                   <button className="p-2 bg-primary/20 text-primary rounded hover:bg-primary/30 transition-colors">
                     <Heart className="w-4 h-4" />
                   </button>
-                  <button className="p-2 bg-primary text-gray-300 rounded hover:bg-primary-light transition-colors">
+                  <button className="p-2 bg-primary text-white/90 rounded hover:bg-primary-light transition-colors">
                     <Download className="w-4 h-4" />
                   </button>
                 </div>
@@ -123,9 +123,9 @@ export default function YourEpisodesPage() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <History className="w-16 h-16 text-gray-600 mx-auto mb-4 opacity-50" />
-            <p className="text-gray-400 mb-2">No episodes yet</p>
-            <p className="text-gray-500 text-sm">Subscribe to podcasts to see episodes here</p>
+            <History className="w-16 h-16 text-white/60 mx-auto mb-4 opacity-50" />
+            <p className="text-white/60 mb-2">No episodes yet</p>
+            <p className="text-white/60 text-sm">Subscribe to podcasts to see episodes here</p>
           </div>
         )}
       </div>

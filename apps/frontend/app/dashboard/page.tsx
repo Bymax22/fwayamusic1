@@ -216,7 +216,7 @@ const UserDashboard: React.FC = () => {
   }, [user]);
 
   if (authLoading || !user) return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747]">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#000000] to-[#36454F]">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
     </div>
   );
@@ -259,28 +259,28 @@ const UserDashboard: React.FC = () => {
       value: `$${((user?.totalEarnings) ?? 0).toFixed(2)}`, 
       icon: <FaDollarSign />, 
       change: '+15%',
-      color: 'bg-green-500/20'
+      color: 'bg-purple/20'
     },
     { 
       label: 'Plays', 
       value: userMedia.reduce((sum, media) => sum + media.views, 0).toLocaleString(), 
       icon: <FaHeadphones />, 
       change: '+23%',
-      color: 'bg-blue-500/20'
+      color: 'bg-purple/20'
     },
     { 
       label: 'Uploads', 
       value: userMedia.length.toString(), 
       icon: <FaUpload />, 
       change: '+2',
-      color: 'bg-purple-500/20'
+      color: 'bg-purple/20'
     },
     { 
       label: 'Rating', 
       value: '4.8', 
       icon: <FaStar />, 
       change: '+0.2',
-      color: 'bg-amber-500/20'
+      color: 'bg-purple/20'
     }
   ] : user.role === 'RESELLER' ? [
     { 
@@ -288,28 +288,28 @@ const UserDashboard: React.FC = () => {
       value: `$${((user?.totalCommission) ?? 0).toFixed(2)}`, 
       icon: <FaDollarSign />, 
       change: '+18%',
-      color: 'bg-green-500/20'
+      color: 'bg-purple/20'
     },
     { 
       label: 'Paid', 
       value: `$${((user?.paidCommission) ?? 0).toFixed(2)}`, 
       icon: <FaChartLine />, 
       change: '+12%',
-      color: 'bg-blue-500/20'
+      color: 'bg-purple/20'
     },
     { 
       label: 'Links', 
       value: '24', 
       icon: <FaShare />, 
       change: '+3',
-      color: 'bg-purple-500/20'
+      color: 'bg-purple/20'
     },
     { 
       label: 'Conversion', 
       value: '8.5%', 
       icon: <FaChartLine />, 
       change: '+1.2%',
-      color: 'bg-amber-500/20'
+      color: 'bg-purple/20'
     }
   ] : [];
 
@@ -416,7 +416,7 @@ const UserDashboard: React.FC = () => {
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-3 border-white/20 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-gray-400 mobile-text-sm">Loading dashboard...</p>
+          <p className="text-white/60 mobile-text-sm">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -442,8 +442,8 @@ const UserDashboard: React.FC = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-1 px-3 py-2 rounded-md transition-all flex-shrink-0 mobile-text-xs ${
                 activeTab === tab.id
-                  ? 'bg-[#e51f48] text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-[#36454F] text-white shadow-lg'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
               }`}
             >
               {tab.icon}
@@ -501,13 +501,13 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center gap-1">
                 <button 
                   onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-lg ${viewMode === 'grid' ? 'bg-[#e51f48] text-white' : 'bg-white/5 text-gray-400'}`}
+                  className={`p-1.5 rounded-lg ${viewMode === 'grid' ? 'bg-[#36454F] text-white' : 'bg-white/5 text-white/60'}`}
                 >
                   <FaThLarge className="w-3 h-3" />
                 </button>
                 <button 
                   onClick={() => setViewMode('list')}
-                  className={`p-1.5 rounded-lg ${viewMode === 'list' ? 'bg-[#e51f48] text-white' : 'bg-white/5 text-gray-400'}`}
+                  className={`p-1.5 rounded-lg ${viewMode === 'list' ? 'bg-[#36454F] text-white' : 'bg-white/5 text-white/60'}`}
                 >
                   <FaList className="w-3 h-3" />
                 </button>
@@ -549,11 +549,11 @@ const UserDashboard: React.FC = () => {
                       <ScrollingTrackTitle isPlaying={currentTrack?.id === track.id && isPlaying} className="font-semibold mobile-text-sm flex items-center gap-1">
                         {track.title}
                         {track.isExplicit && (
-                          <span className="px-1 py-0.5 bg-gray-600 text-gray-300 rounded text-xs mobile-text-xs">E</span>
+                          <span className="px-1 py-0.5 bg-charcoal text-white/90 rounded text-xs mobile-text-xs">E</span>
                         )}
                       </ScrollingTrackTitle>
-                      <p className="text-gray-400 truncate mobile-text-xs">{track.artist}</p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5 mobile-text-xs">
+                      <p className="text-white/60 truncate mobile-text-xs">{track.artist}</p>
+                      <div className="flex items-center gap-2 text-xs text-white/60 mt-0.5 mobile-text-xs">
                         <span>{formatDuration(track.duration)}</span>
                         <span>•</span>
                         <span>{track.views.toLocaleString()} plays</span>
@@ -563,9 +563,9 @@ const UserDashboard: React.FC = () => {
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={(e) => { e.stopPropagation(); handleLike(track.id); }}
-                        className="text-gray-400 hover:text-[#e51f48] transition-colors touch-target"
+                        className="text-white/60 hover:text-[#36454F] transition-colors touch-target"
                       >
-                        <FaHeart className={track.likes > 0 ? 'text-[#e51f48] fill-current w-4 h-4' : 'w-4 h-4'} />
+                        <FaHeart className={track.likes > 0 ? 'text-[#36454F] fill-current w-4 h-4' : 'w-4 h-4'} />
                       </button>
                     </div>
                   </motion.div>
@@ -595,11 +595,11 @@ const UserDashboard: React.FC = () => {
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all">
                         {currentTrack?.id === track.id && isPlaying ? (
-                          <button className="w-8 h-8 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
+                          <button className="w-8 h-8 rounded-full bg-[#36454F] flex items-center justify-center shadow-lg">
                             <Waveform playing className="h-3 w-3" />
                           </button>
                         ) : (
-                          <button className="w-8 h-8 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
+                          <button className="w-8 h-8 rounded-full bg-[#36454F] flex items-center justify-center shadow-lg">
                             <FaPlay className="text-white w-3 h-3 ml-0.5" />
                           </button>
                         )}
@@ -608,8 +608,8 @@ const UserDashboard: React.FC = () => {
                     
                     <div className="p-3">
                       <ScrollingTrackTitle isPlaying={currentTrack?.id === track.id && isPlaying} className="mb-1 font-semibold mobile-text-sm">{track.title}</ScrollingTrackTitle>
-                      <p className="text-gray-400 truncate mobile-text-xs mb-2">{track.artist}</p>
-                      <div className="flex justify-between items-center text-xs text-gray-500">
+                      <p className="text-white/60 truncate mobile-text-xs mb-2">{track.artist}</p>
+                      <div className="flex justify-between items-center text-xs text-white/60">
                         <div className="flex items-center gap-1">
                           {getTypeIcon(track.type || 'AUDIO')}
                         </div>
@@ -617,9 +617,9 @@ const UserDashboard: React.FC = () => {
                           <span>{formatDuration(track.duration)}</span>
                           <button 
                             onClick={(e) => { e.stopPropagation(); handleLike(track.id); }}
-                            className="text-gray-400 hover:text-[#e51f48] transition-colors"
+                            className="text-white/60 hover:text-[#36454F] transition-colors"
                           >
-                            <FaHeart className={track.likes > 0 ? 'text-[#e51f48] fill-current w-3 h-3' : 'w-3 h-3'} />
+                            <FaHeart className={track.likes > 0 ? 'text-[#36454F] fill-current w-3 h-3' : 'w-3 h-3'} />
                           </button>
                         </div>
                       </div>
@@ -636,10 +636,10 @@ const UserDashboard: React.FC = () => {
               <section className="bg-white/5 rounded-xl p-4 border border-white/10">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="font-bold flex items-center gap-2 mobile-text-base">
-                    <FaCompactDisc className="text-[#e51f48]" />
+                    <FaCompactDisc className="text-[#36454F]" />
                     Featured EPs
                   </h2>
-                  <a href="/browse" className="text-[#e51f48] hover:underline text-xs mobile-text-xs">More</a>
+                  <a href="/browse" className="text-[#36454F] hover:underline text-xs mobile-text-xs">More</a>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {featuredEPs.slice(0, 4).map((ep: any, index: number) => (
@@ -665,7 +665,7 @@ const UserDashboard: React.FC = () => {
                         }}
                       />
                       <h3 className="font-medium text-sm truncate mt-2">{ep.title}</h3>
-                      <p className="text-xs text-gray-400 truncate">{ep.user?.displayName || ep.user?.username || 'Unknown Artist'}</p>
+                      <p className="text-xs text-white/60 truncate">{ep.user?.displayName || ep.user?.username || 'Unknown Artist'}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -676,10 +676,10 @@ const UserDashboard: React.FC = () => {
             <section className="bg-white/5 rounded-xl p-4 border border-white/10">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="font-bold flex items-center gap-2 mobile-text-base">
-                  <FaStar className="text-amber-400" />
+                  <FaStar className="text-purple/60" />
                   For You
                 </h2>
-                <button className="text-[#e51f48] hover:underline text-xs mobile-text-xs">
+                <button className="text-[#36454F] hover:underline text-xs mobile-text-xs">
                   More
                 </button>
               </div>
@@ -712,7 +712,7 @@ const UserDashboard: React.FC = () => {
                     
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-sm truncate mobile-text-sm">{track.title}</h3>
-                      <p className="text-xs text-gray-400 truncate mobile-text-xs">{track.artist}</p>
+                      <p className="text-xs text-white/60 truncate mobile-text-xs">{track.artist}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -724,14 +724,14 @@ const UserDashboard: React.FC = () => {
               <h2 className="font-bold mb-3 mobile-text-base">Quick Actions</h2>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { label: 'Browse', icon: <FaSearch />, href: '/browse', color: 'bg-blue-500/20 text-blue-400' },
-                  { label: 'Library', icon: <FaMusic />, href: '/library', color: 'bg-green-500/20 text-green-400' },
-                  { label: 'Playlist', icon: <FaPlus />, href: '/playlists/new', color: 'bg-purple-500/20 text-purple-400' },
-                  { label: 'Liked', icon: <FaHeart />, href: '/library/liked', color: 'bg-pink-500/20 text-pink-400' },
+                  { label: 'Browse', icon: <FaSearch />, href: '/browse', color: 'bg-purple/20 text-purple/60' },
+                  { label: 'Library', icon: <FaMusic />, href: '/library', color: 'bg-purple/20 text-purple/60' },
+                  { label: 'Playlist', icon: <FaPlus />, href: '/playlists/new', color: 'bg-purple/20 text-purple/60' },
+                  { label: 'Liked', icon: <FaHeart />, href: '/library/liked', color: 'bg-purple/20 text-purple/60' },
                   ...(user.role === 'ARTIST' ? [
-                    { label: 'Upload', icon: <FaUpload />, href: '/upload', color: 'bg-amber-500/20 text-amber-400' },
+                    { label: 'Upload', icon: <FaUpload />, href: '/upload', color: 'bg-purple/20 text-purple/60' },
                   ] : []),
-                  { label: 'Settings', icon: <FaCog />, href: '/settings', color: 'bg-gray-500/20 text-gray-400' },
+                  { label: 'Settings', icon: <FaCog />, href: '/settings', color: 'bg-charcoal/20 text-white/60' },
                 ].slice(0, 6).map((action, index) => (
                   <motion.a
                     key={action.label}
@@ -768,12 +768,12 @@ const UserDashboard: React.FC = () => {
                     onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/playlist/${playlist.id}`); }}
                     className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg cursor-pointer transition-colors touch-target"
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple/75 to-purple/75 rounded-lg flex items-center justify-center">
                       <FaMusic className="text-white text-sm" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-sm truncate mobile-text-sm">{playlist.name}</h3>
-                      <p className="text-xs text-gray-400 mobile-text-xs">{playlist.mediaCount} tracks</p>
+                      <p className="text-xs text-white/60 mobile-text-xs">{playlist.mediaCount} tracks</p>
                     </div>
                   </motion.div>
                 ))}
@@ -789,7 +789,7 @@ const UserDashboard: React.FC = () => {
                   <FaMicrophone />
                   Your Uploads
                 </h2>
-                <a href="/upload" className="text-[#e51f48] hover:underline text-xs flex items-center gap-1 mobile-text-xs">
+                <a href="/upload" className="text-[#36454F] hover:underline text-xs flex items-center gap-1 mobile-text-xs">
                   <FaPlus className="w-2 h-2" />
                   New
                 </a>
@@ -816,26 +816,26 @@ const UserDashboard: React.FC = () => {
                       />
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm truncate mobile-text-sm">{media.title}</h3>
-                        <p className="text-xs text-gray-400 mobile-text-xs">{(media.views || 0).toLocaleString()} plays</p>
+                        <p className="text-xs text-white/60 mobile-text-xs">{(media.views || 0).toLocaleString()} plays</p>
                       </div>
                     </div>
-                    <div className="flex justify-between items-center text-xs text-gray-400 mobile-text-xs">
+                    <div className="flex justify-between items-center text-xs text-white/60 mobile-text-xs">
                       <span>${(((media.views || 0) * 0.001) * (media.artistCommissionRate || 0.5)).toFixed(2)}</span>
                       <span>{formatDuration(media.duration)}</span>
                     </div>
 
                     {/* Pricing snapshot status */}
-                    <div className="mt-3 flex items-center justify-between text-xs text-gray-300">
+                    <div className="mt-3 flex items-center justify-between text-xs text-white/90">
                       <div>
                         {media['acceptedPricingSnapshotId'] ? (
-                          <span className="px-2 py-1 bg-green-600/20 rounded-lg">Pricing accepted</span>
+                          <span className="px-2 py-1 bg-purple/20 rounded-lg">Pricing accepted</span>
                         ) : (
-                          <span className="px-2 py-1 bg-yellow-600/20 rounded-lg">No accepted pricing</span>
+                          <span className="px-2 py-1 bg-purple/20 rounded-lg">No accepted pricing</span>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
                         {media['acceptedPricingSnapshotId'] ? (
-                          <button onClick={() => viewPricingSnapshot(media.id)} className="text-sm text-[#e51f48]">View snapshot</button>
+                          <button onClick={() => viewPricingSnapshot(media.id)} className="text-sm text-[#36454F]">View snapshot</button>
                         ) : (
                           <button onClick={() => router.push(`/media/${media.id}/pricing`)} className="text-sm text-white/80 bg-white/5 px-2 py-1 rounded">Request pricing</button>
                         )}
@@ -870,7 +870,7 @@ const UserDashboard: React.FC = () => {
                 />
                 <div className="min-w-0">
                   <p className="font-semibold text-white truncate mobile-text-sm">{currentTrack.title}</p>
-                  <p className="text-xs text-gray-300 truncate mobile-text-xs">{currentTrack.artist}</p>
+                  <p className="text-xs text-white/90 truncate mobile-text-xs">{currentTrack.artist}</p>
                 </div>
               </div>
               
@@ -878,12 +878,12 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center gap-3 w-3/5 justify-end">
                 <button 
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-10 h-10 rounded-full bg-[#e51f48] hover:bg-[#ff4d6d] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 touch-target"
+                  className="w-10 h-10 rounded-full bg-[#36454F] hover:bg-[#9B5DE5] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 touch-target"
                 >
                   {isPlaying ? <FaPause className="w-4 h-4" /> : <FaPlay className="w-4 h-4 ml-0.5" />}
                 </button>
                 
-                <button className="text-gray-300 hover:text-white transition-colors touch-target">
+                <button className="text-white/90 hover:text-white transition-colors touch-target">
                   <FaStepForward className="w-4 h-4" />
                 </button>
               </div>
@@ -891,14 +891,14 @@ const UserDashboard: React.FC = () => {
             
             {/* Progress Bar */}
             <div className="w-full flex items-center gap-2 mt-2">
-              <span className="text-xs text-gray-400 w-8 text-right mobile-text-xs">0:00</span>
+              <span className="text-xs text-white/60 w-8 text-right mobile-text-xs">0:00</span>
               <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] rounded-full" 
+                  className="h-full bg-gradient-to-r from-[#36454F] to-[#9B5DE5] rounded-full"
                   style={{ width: '30%' }}
                 ></div>
               </div>
-              <span className="text-xs text-gray-400 w-8 mobile-text-xs">
+              <span className="text-xs text-white/60 w-8 mobile-text-xs">
                 {formatDuration(currentTrack.duration)}
               </span>
             </div>

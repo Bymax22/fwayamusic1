@@ -97,7 +97,7 @@ function SpectrumVisualizer({ isPlaying, progress, className = '' }: { isPlaying
           transform: scaleY(0.35);
           transform-origin: bottom;
           border-radius: 2px 2px 0 0;
-          background: linear-gradient(to top, #9333ea, #f472b6);
+          background: linear-gradient(to top, #9B5DE5, #9B5DE5);
           opacity: 0.35;
         }
         .spectrum-bar.is-playing {
@@ -105,9 +105,9 @@ function SpectrumVisualizer({ isPlaying, progress, className = '' }: { isPlaying
           opacity: 0.8;
         }
         .spectrum-progress {
-          background: linear-gradient(to right, #a855f7, #f472b6, #9333ea);
+          background: linear-gradient(to right, #9B5DE5, #9B5DE5, #9B5DE5);
           transition: width 250ms linear;
-          box-shadow: 0 0 8px rgba(236, 72, 153, 0.65);
+          box-shadow: 0 0 8px rgba(155, 93, 229, 0.65);
         }
         @keyframes spectrum-pulse {
           0%, 100% { transform: scaleY(0.3); opacity: 0.45; }
@@ -579,7 +579,7 @@ export default function MobilePlayer({
                   aria-label="Like track"
                 >
                   {isLiked ? (
-                    <HeartIcon className="w-4 h-4 text-pink-400" />
+                    <HeartIcon className="w-4 h-4 text-purple/60" />
                   ) : (
                     <HeartOutline className="w-4 h-4 text-white/70" />
                   )}
@@ -635,7 +635,7 @@ export default function MobilePlayer({
                 onClick={() => {
                   if (onRepeat) onRepeat();
                 }}
-                className={`p-1 rounded-full hover:bg-white/10 transition-colors ${isRepeatEnabled ? 'text-purple-400' : 'text-white/70'}`}
+                className={`p-1 rounded-full hover:bg-white/10 transition-colors ${isRepeatEnabled ? 'text-purple/60' : 'text-white/70'}`}
                 aria-label={isRepeatEnabled ? (isRepeatOne ? 'Repeat one' : 'Repeat all') : 'Repeat off'}
                 title={isRepeatEnabled ? (isRepeatOne ? 'Repeat one' : 'Repeat all') : 'Repeat off'}
               >
@@ -659,7 +659,7 @@ export default function MobilePlayer({
               onClick={handleSeek}
             >
               <motion.div
-                className="h-full bg-gradient-to-r from-purple-400 to-purple-500 rounded-full"
+                className="h-full bg-gradient-to-r from-purple/60 to-purple/75 rounded-full"
                 style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                 transition={{ duration: 0.1 }}
               />
@@ -702,7 +702,7 @@ export default function MobilePlayer({
                 className="scale-105 object-cover opacity-75"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/95" />
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#5b0ea6]/30 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#36454F]/30 via-transparent to-transparent" />
             </div>
 
             <div className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-3 pt-2 text-white">
@@ -733,7 +733,7 @@ export default function MobilePlayer({
                   type="button"
                   onClick={handleLike}
                   disabled={likeLoading}
-                  className={`flex items-center gap-1 rounded-full bg-white/10 px-3 py-2 text-sm ${isLiked ? 'text-pink-400' : 'text-white/80'}`}
+                  className={`flex items-center gap-1 rounded-full bg-white/10 px-3 py-2 text-sm ${isLiked ? 'text-purple/60' : 'text-white/80'}`}
                   aria-label={isLiked ? 'Unlike track' : 'Like track'}
                 >
                   {isLiked ? <HeartIcon className="h-5 w-5" /> : <HeartOutline className="h-5 w-5" />}
@@ -749,7 +749,7 @@ export default function MobilePlayer({
                 />
                 <div className="absolute inset-x-2 bottom-0 z-10 h-1 cursor-pointer rounded-full bg-white/20" onClick={handleSeek}>
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-400"
+                    className="h-full rounded-full bg-gradient-to-r from-purple/60 to-purple/60"
                     style={{ width: `${duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0}%` }}
                   />
                 </div>
@@ -797,8 +797,8 @@ export default function MobilePlayer({
 
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain pt-2">
                 <section>
-                  <h2 className="mb-1 text-xs font-semibold uppercase tracking-widest text-purple-200">Lyrics</h2>
-                  <div className="rounded-xl bg-[#5b0ea6] px-3 py-2">
+                  <h2 className="mb-1 text-xs font-semibold uppercase tracking-widest text-purple/30">Lyrics</h2>
+                  <div className="rounded-xl bg-[#36454F] px-3 py-2">
                     <p className="min-h-5 text-sm font-semibold leading-5 text-white" aria-live="polite">
                       {lyricLines[activeLyricIndex]?.text || 'No lyrics are available for this track.'}
                     </p>
@@ -806,7 +806,7 @@ export default function MobilePlayer({
                 </section>
 
                 <section>
-                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-purple-200">
+                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-purple/30">
                     <QueueListIcon className="h-4 w-4" />
                     Up next
                   </div>
@@ -839,23 +839,23 @@ export default function MobilePlayer({
                 </section>
 
                 <section className="pb-1">
-                  <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-purple-200">
+                  <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-purple/30">
                     <ChatBubbleLeftRightIcon className="h-4 w-4" />
                     Comments
                   </h2>
                   {comments.length > 0 ? (
                     <div className="space-y-2">
                       {comments.map((comment) => (
-                        <article key={comment.id} className="rounded-xl bg-[#5b0ea6]/70 px-3 py-2">
+                        <article key={comment.id} className="rounded-xl bg-[#36454F]/70 px-3 py-2">
                           <p className="text-[11px] font-semibold text-white/80">{comment.userName}</p>
                           <p className="text-xs leading-5 text-white/65">{comment.content}</p>
                         </article>
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-xl bg-[#5b0ea6]/70 px-3 py-2 text-xs text-white/70">No comments yet.</p>
+                    <p className="rounded-xl bg-[#36454F]/70 px-3 py-2 text-xs text-white/70">No comments yet.</p>
                   )}
-                  <Link href={`/track/${track.id}`} className="mt-2 inline-block text-xs font-semibold text-purple-200">
+                  <Link href={`/track/${track.id}`} className="mt-2 inline-block text-xs font-semibold text-purple/30">
                     Open track discussion
                   </Link>
                   <form onSubmit={handlePostComment} className="mt-2 flex gap-2">
@@ -865,7 +865,7 @@ export default function MobilePlayer({
                       maxLength={1000}
                       placeholder="Add a comment..."
                       aria-label="Add a comment"
-                      className="min-w-0 flex-1 rounded-xl bg-[#5b0ea6] px-3 py-2 text-xs text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
+                      className="min-w-0 flex-1 rounded-xl bg-[#36454F] px-3 py-2 text-xs text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
                     />
                     <button
                       type="submit"

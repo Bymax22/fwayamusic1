@@ -96,21 +96,21 @@ export default function ProducerBeatsGrid() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-white/5 to-white/10 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Beats</h1>
+          <h1 className="text-3xl font-bold text-charcoal">My Beats</h1>
           <Link
             href="/dashboard/beats/upload"
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition"
+            className="px-6 py-3 bg-gradient-to-r from-purple/75 to-purple/85 hover:from-purple/85 hover:to-purple/90 text-white rounded-lg font-medium transition"
           >
             + Upload New Beat
           </Link>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 rounded-lg text-red-700">
+          <div className="mb-6 p-4 bg-purple/20 border border-purple/60 rounded-lg text-purple/90">
             {error}
           </div>
         )}
@@ -118,13 +118,13 @@ export default function ProducerBeatsGrid() {
         {isLoading && !beats.length ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin">
-              <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full" />
+              <div className="w-12 h-12 border-4 border-purple/30 border-t-blue-600 rounded-full" />
             </div>
-            <p className="mt-4 text-gray-600">Loading your beats...</p>
+            <p className="mt-4 text-white/60">Loading your beats...</p>
           </div>
         ) : beats.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">No beats yet. Start by uploading one!</p>
+            <p className="text-white/60 text-lg">No beats yet. Start by uploading one!</p>
           </div>
         ) : (
           <>
@@ -136,7 +136,7 @@ export default function ProducerBeatsGrid() {
                   className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
                 >
                   {/* Cover Image */}
-                  <div className="relative aspect-square bg-gray-200 overflow-hidden">
+                  <div className="relative aspect-square bg-white/20 overflow-hidden">
                     <CoverArtImage
                       src={beat.artCoverUrl || '/placeholder-beat.png'}
                       alt={beat.title}
@@ -145,14 +145,14 @@ export default function ProducerBeatsGrid() {
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
                       <Link
                         href={`/beats/${beat.id}`}
-                        className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition"
+                        className="p-2 bg-purple/85 hover:bg-purple/90 text-white rounded-full transition"
                         title="View"
                       >
                         <Play size={20} />
                       </Link>
                       <Link
                         href={`/dashboard/beats/${beat.id}/edit`}
-                        className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition"
+                        className="p-2 bg-purple/85 hover:bg-purple/90 text-white rounded-full transition"
                         title="Edit"
                       >
                         <Edit size={20} />
@@ -162,8 +162,8 @@ export default function ProducerBeatsGrid() {
                       <span
                         className={`px-2 py-1 rounded text-xs font-bold ${
                           beat.accessType === 'FREE'
-                            ? 'bg-green-500 text-white'
-                            : 'bg-purple-500 text-white'
+                            ? 'bg-purple/75 text-white'
+                            : 'bg-purple/75 text-white'
                         }`}
                       >
                         {beat.accessType}
@@ -173,28 +173,28 @@ export default function ProducerBeatsGrid() {
 
                   {/* Beat Info */}
                   <div className="p-4">
-                    <h3 className="font-bold text-gray-900 truncate">{beat.title}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{beat.genre}</p>
+                    <h3 className="font-bold text-charcoal truncate">{beat.title}</h3>
+                    <p className="text-sm text-white/60 mb-3">{beat.genre}</p>
 
                     {/* Stats */}
                     <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
-                      <div className="flex items-center gap-1 text-gray-600">
+                      <div className="flex items-center gap-1 text-white/60">
                         <Play size={14} /> {beat.playCount}
                       </div>
-                      <div className="flex items-center gap-1 text-gray-600">
+                      <div className="flex items-center gap-1 text-white/60">
                         <Download size={14} /> {beat.downloadCount}
                       </div>
-                      <div className="flex items-center gap-1 text-gray-600">
+                      <div className="flex items-center gap-1 text-white/60">
                         <Heart size={14} /> {beat.shareCount}
                       </div>
-                      <div className="flex items-center gap-1 text-gray-600">
+                      <div className="flex items-center gap-1 text-white/60">
                         {beat.bpm} BPM
                       </div>
                     </div>
 
                     {beat.price > 0 && (
-                      <div className="mb-3 p-2 bg-blue-50 rounded text-center">
-                        <p className="text-sm font-bold text-blue-600">${beat.price.toFixed(2)}</p>
+                      <div className="mb-3 p-2 bg-purple/15 rounded text-center">
+                        <p className="text-sm font-bold text-purple/85">${beat.price.toFixed(2)}</p>
                       </div>
                     )}
 
@@ -202,7 +202,7 @@ export default function ProducerBeatsGrid() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleToggleAccess(beat.id, beat.accessType)}
-                        className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-gray-100 hover:bg-gray-200 rounded transition"
+                        className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-white/10 hover:bg-white/20 rounded transition"
                         title={beat.accessType === 'FREE' ? 'Make Premium' : 'Make Free'}
                       >
                         {beat.accessType === 'FREE' ? (
@@ -213,7 +213,7 @@ export default function ProducerBeatsGrid() {
                       </button>
                       <button
                         onClick={() => handleDeleteBeat(beat.id)}
-                        className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-red-100 hover:bg-red-200 text-red-600 rounded transition"
+                        className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-purple/20 hover:bg-purple/30 text-purple/85 rounded transition"
                         title="Delete"
                       >
                         <Trash2 size={14} />
@@ -230,15 +230,15 @@ export default function ProducerBeatsGrid() {
                 <button
                   onClick={() => setPage(p => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded transition"
+                  className="px-4 py-2 bg-purple/85 hover:bg-purple/90 disabled:bg-charcoal/50 text-white rounded transition"
                 >
                   Previous
                 </button>
-                <span className="text-gray-600 font-medium">Page {page + 1}</span>
+                <span className="text-white/60 font-medium">Page {page + 1}</span>
                 <button
                   onClick={() => setPage(p => p + 1)}
                   disabled={beats.length < beatsPerPage}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded transition"
+                  className="px-4 py-2 bg-purple/85 hover:bg-purple/90 disabled:bg-charcoal/50 text-white rounded transition"
                 >
                   Next
                 </button>

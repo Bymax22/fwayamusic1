@@ -49,10 +49,10 @@ export default function VideoCard({
   return (
     <Link
       href={route}
-      className="block w-full rounded-2xl bg-slate-950 hover:bg-slate-900 transition-colors"
+      className="block w-full rounded-2xl bg-black hover:bg-charcoal transition-colors"
       aria-label={`Open video ${title}`}
     >
-      <div className="relative overflow-hidden rounded-2xl bg-slate-800">
+      <div className="relative overflow-hidden rounded-2xl bg-charcoal">
         {thumbnail ? (
           <CoverArtImage
             src={thumbnail}
@@ -70,17 +70,17 @@ export default function VideoCard({
             preload="metadata"
           />
         ) : (
-          <div className="h-48 w-full bg-gradient-to-br from-purple-500 to-pink-500" />
+          <div className="h-48 w-full bg-gradient-to-br from-purple/75 to-purple/75" />
         )}
 
-        <div className="absolute right-3 top-3 rounded-full bg-slate-900/90 px-2 py-1 text-[11px] font-medium text-white">
+        <div className="absolute right-3 top-3 rounded-full bg-charcoal/90 px-2 py-1 text-[11px] font-medium text-white">
           {formatDuration(duration)}
         </div>
       </div>
       <div className="p-3">
         <h3 className="text-sm font-semibold text-white line-clamp-2">{title}</h3>
-        <p className="mt-1 text-xs text-slate-400 truncate">{artist}</p>
-        <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
+        <p className="mt-1 text-xs text-white/60 truncate">{artist}</p>
+        <div className="mt-3 flex items-center justify-between text-[11px] text-white/60">
           <span>{views.toLocaleString()} views</span>
           <span title={addedAt || createdAt || undefined}>{relativeAddedTime}</span>
         </div>

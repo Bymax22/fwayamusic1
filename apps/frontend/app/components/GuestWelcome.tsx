@@ -101,7 +101,7 @@ export default function GuestWelcome() {
       icon: <FaUser className="h-5 w-5" />,
       signInHref: '/auth/user/signin',
       signUpHref: '/auth/user/signup',
-      accent: 'from-purple-500 to-pink-500',
+      accent: 'from-purple/75 to-purple/75',
     },
     {
       id: 'ARTIST',
@@ -111,7 +111,7 @@ export default function GuestWelcome() {
       icon: <FaMicrophone className="h-5 w-5" />,
       signInHref: '/auth/artist/signin',
       signUpHref: '/auth/artist/signup',
-      accent: 'from-cyan-500 to-blue-500',
+      accent: 'from-purple/75 to-purple/75',
     },
     {
       id: 'RESELLER',
@@ -121,7 +121,7 @@ export default function GuestWelcome() {
       icon: <FaBookOpen className="h-5 w-5" />,
       signInHref: '/auth/reseller/signin',
       signUpHref: '/auth/reseller/signup',
-      accent: 'from-amber-500 to-orange-500',
+      accent: 'from-purple/75 to-purple/75',
     },
     {
       id: 'PRODUCER',
@@ -131,7 +131,7 @@ export default function GuestWelcome() {
       icon: <FaMusic className="h-5 w-5" />,
       signInHref: '/auth/producer/signin',
       signUpHref: '/auth/producer/signup',
-      accent: 'from-emerald-500 to-teal-500',
+      accent: 'from-purple/75 to-purple/75',
     },
   ];
 
@@ -329,7 +329,7 @@ export default function GuestWelcome() {
     <button
       type="button"
       onClick={() => router.push(getSectionHref(section))}
-      className="text-xs text-purple-300 hover:text-white transition"
+      className="text-xs text-purple/45 hover:text-white transition"
     >
       See All {'>'}
     </button>
@@ -531,7 +531,7 @@ export default function GuestWelcome() {
             <button
               type="button"
               onClick={() => setHomepageSearchOpen(false)}
-              className="rounded-full px-3 py-1 text-xs text-purple-200 hover:bg-white/10"
+              className="rounded-full px-3 py-1 text-xs text-purple/30 hover:bg-white/10"
             >
               Close
             </button>
@@ -562,7 +562,7 @@ export default function GuestWelcome() {
                     <span className="block truncate text-sm font-semibold text-white">{result.title}</span>
                     <span className="block truncate text-xs text-white/55">{result.subtitle}</span>
                   </span>
-                  <span className="shrink-0 rounded-full bg-purple-600 px-2 py-1 text-[10px] font-semibold text-white">
+                  <span className="shrink-0 rounded-full bg-purple/85 px-2 py-1 text-[10px] font-semibold text-white">
                     {result.kind}
                   </span>
                 </button>
@@ -1064,13 +1064,13 @@ export default function GuestWelcome() {
     <>
       {showRoleModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm px-4">
-          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#0f1112] shadow-xl shadow-black/40 sm:p-5">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#000000] shadow-xl shadow-black/40 sm:p-5">
             <div className="px-4 py-3 sm:px-5 sm:py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-purple-300">Quick start</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-purple/45">Quick start</p>
                   <h2 className="mt-2 text-2xl font-bold text-white">Choose your experience</h2>
-                  <p className="mt-2 text-xs text-gray-400 max-w-md">
+                  <p className="mt-2 text-xs text-white/60 max-w-md">
                     Select how you want to use Fwaya and continue with the right account flow.
                   </p>
                 </div>
@@ -1092,15 +1092,15 @@ export default function GuestWelcome() {
                   className="rounded-3xl bg-white/5 p-3 transition hover:bg-white/10"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`rounded-3xl bg-gradient-to-r ${role.accent} p-2.5 text-white shadow-lg shadow-purple-500/10`}>
+                    <div className={`rounded-3xl bg-gradient-to-r ${role.accent} p-2.5 text-white shadow-lg shadow-purple/10`}>
                       {role.icon}
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-white truncate">{role.title}</p>
-                      <p className="mt-1 text-xs text-gray-400 truncate">{role.subtitle}</p>
+                      <p className="mt-1 text-xs text-white/60 truncate">{role.subtitle}</p>
                     </div>
                   </div>
-                  <p className="mt-2 text-xs leading-5 text-gray-300">{role.description}</p>
+                  <p className="mt-2 text-xs leading-5 text-white/90">{role.description}</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     <Link
                       href={role.signInHref}
@@ -1112,7 +1112,7 @@ export default function GuestWelcome() {
                     <Link
                       href={role.signUpHref}
                       onClick={() => setShowRoleModal(false)}
-                      className="rounded-2xl bg-purple-500 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-purple-400"
+                      className="rounded-2xl bg-purple/75 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-purple/60"
                     >
                       Create account
                     </Link>
@@ -1150,7 +1150,7 @@ export default function GuestWelcome() {
                 {isPlaying ? (
                   <div className="relative overflow-hidden">
                     <span
-                      className="text-2xl font-semibold bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent"
+                      className="text-2xl font-semibold bg-gradient-to-r from-purple/60 via-purple/75 to-purple/60 bg-clip-text text-transparent"
                       style={{
                         backgroundSize: '200% 200%',
                         animation: 'fwayaColorShift 3s ease-in-out infinite'
@@ -1188,7 +1188,7 @@ export default function GuestWelcome() {
                     type="button"
                     onClick={() => setShowRoleModal(true)}
                     aria-label="Register or log in"
-                    className="rounded-full bg-purple-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
+                    className="rounded-full bg-purple/75 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-purple/20 transition hover:bg-purple/60"
                   >
                     {isMobileViewport ? 'Sign In' : 'Register'}
                   </button>
@@ -1210,7 +1210,7 @@ export default function GuestWelcome() {
                           }}
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-semibold text-white">
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple/75 to-purple/75 text-sm font-semibold text-white">
                           {(user.displayName || user.username || 'U').charAt(0).toUpperCase()}
                         </div>
                       )}
@@ -1221,7 +1221,7 @@ export default function GuestWelcome() {
                         <div className="absolute right-0 top-full z-50 mt-2 w-52 rounded-3xl bg-black/95 backdrop-blur-xl shadow-xl shadow-black/50 overflow-hidden">
                           <div className="px-4 py-3">
                             <div className="flex items-center gap-3">
-                              <div className="relative h-10 w-10 rounded-full overflow-hidden bg-purple-500">
+                              <div className="relative h-10 w-10 rounded-full overflow-hidden bg-purple/75">
                                 {user.avatarUrl ? (
                                   <Image
                                     src={user.avatarUrl}
@@ -1249,42 +1249,42 @@ export default function GuestWelcome() {
                               onClick={() => handleUserMenuNavigation(getDashboardPath(user.role))}
                               className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              <FaHome className="w-4 h-4 text-purple-300" />
+                              <FaHome className="w-4 h-4 text-purple/45" />
                               <span>Dashboard</span>
                             </button>
                             <button
                               onClick={() => handleUserMenuNavigation('/profile')}
                               className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              <FaUser className="w-4 h-4 text-purple-300" />
+                              <FaUser className="w-4 h-4 text-purple/45" />
                               <span>Profile</span>
                             </button>
                             <button
                               onClick={() => handleUserMenuNavigation('/browse')}
                               className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              <FaCompass className="w-4 h-4 text-purple-300" />
+                              <FaCompass className="w-4 h-4 text-purple/45" />
                               <span>Browse</span>
                             </button>
                             <button
                               onClick={() => handleUserMenuNavigation('/videos')}
                               className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              <FaFilm className="w-4 h-4 text-purple-300" />
+                              <FaFilm className="w-4 h-4 text-purple/45" />
                               <span>Videos</span>
                             </button>
                             <button
                               onClick={() => handleUserMenuNavigation('/settings')}
                               className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-white/90 hover:bg-white/10 transition"
                             >
-                              <FaCog className="w-4 h-4 text-purple-300" />
+                              <FaCog className="w-4 h-4 text-purple/45" />
                               <span>Settings</span>
                             </button>
                             <button
                               onClick={handleUserLogout}
-                              className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-red-400 hover:bg-white/10 transition"
+                              className="flex items-center gap-3 w-full rounded-2xl px-3 py-2 text-sm text-purple/60 hover:bg-white/10 transition"
                             >
-                              <FaSignOutAlt className="w-4 h-4 text-red-400" />
+                              <FaSignOutAlt className="w-4 h-4 text-purple/60" />
                               <span>Logout</span>
                             </button>
                           </div>
@@ -1327,7 +1327,7 @@ export default function GuestWelcome() {
             <button
               key={i}
               className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
-                activeTab === tab.key ? "bg-purple-600 text-white" : "bg-white/5 text-white hover:bg-white/10"
+                activeTab === tab.key ? "bg-purple/85 text-white" : "bg-white/5 text-white hover:bg-white/10"
               }`}
               onClick={() => setActiveTab(tab.key)}
             >
@@ -1365,7 +1365,7 @@ export default function GuestWelcome() {
                     }}
                   >
                     <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
-                      <div className={`${isVideo ? 'aspect-video' : 'aspect-square'} relative`}>
+                      <div className="aspect-square relative">
                         {image ? (
                           <Image
                             src={image}
@@ -1374,7 +1374,7 @@ export default function GuestWelcome() {
                             className="object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500" />
+                          <div className="w-full h-full bg-gradient-to-br from-purple/75 to-purple/75" />
                         )}
                         {isVideo ? (
                           <span className="absolute inset-0 flex items-center justify-center bg-black/25">
@@ -1385,7 +1385,7 @@ export default function GuestWelcome() {
                             type="button"
                             aria-label={`Add ${item.title} to a playlist`}
                             onClick={(event) => handleAddToPlaylist(event, item)}
-                            className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple-600"
+                            className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple/85"
                           >
                             <FaPlus className="text-xs" />
                           </button>
@@ -1394,8 +1394,8 @@ export default function GuestWelcome() {
                     </div>
                     <div className="px-1">
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
-                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || (isVideo ? 'Fwaya video' : 'Unknown')}</p>
-                      <p className="text-[11px] text-gray-500">{getPublishedTime(item)}</p>
+                      <p className="text-xs text-white/60 truncate">{item.user?.displayName || item.user?.username || (isVideo ? 'Fwaya video' : 'Unknown')}</p>
+                      <p className="text-[11px] text-white/60">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                   );
@@ -1413,7 +1413,7 @@ export default function GuestWelcome() {
                 {musicVideoCards.map((item: any, i: number) => (
                   <div
                     key={i}
-                    className="w-40 flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+                    className="min-w-[calc(50%-0.375rem)] flex-shrink-0 cursor-pointer rounded-2xl overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
                     onClick={() => openVideoPlayer(item)}
                   >
                     <div className="relative aspect-video">
@@ -1437,7 +1437,7 @@ export default function GuestWelcome() {
                           className="absolute inset-0 h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple/75 to-purple/75" />
                       )}
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                         <FaPlay className="text-white text-xl" />
@@ -1445,7 +1445,7 @@ export default function GuestWelcome() {
                     </div>
                     <div className="p-2">
                       <p className="text-xs font-semibold truncate text-white">{item.title}</p>
-                      <div className="flex items-center justify-between text-[9px] text-gray-300 mb-1">
+                      <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
                         <div className="flex items-center gap-1">
                           <FaHeadphones className="text-[10px]" />
                           <span>{getMediaViews(item).toLocaleString()}</span>
@@ -1455,8 +1455,8 @@ export default function GuestWelcome() {
                           <span>{getMediaComments(item).toLocaleString()}</span>
                         </div>
                       </div>
-                      <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Producer'}</p>
-                      <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
+                      <p className="text-[10px] text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown Producer'}</p>
+                      <p className="text-xs text-white/60">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                 ))}
@@ -1474,7 +1474,7 @@ export default function GuestWelcome() {
                 {featuredArtists.map((artist: any, i: number) => (
                   <Link key={i} href={`/artists/${artist.id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
                     <div 
-                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto"
+                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple/75 to-purple/75 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto"
                       style={{
                         backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -1493,7 +1493,7 @@ export default function GuestWelcome() {
                         <VerifiedBadge size="sm" title="Verified artist" />
                       )}
                     </div>
-                    <p className="text-[10px] text-gray-400">{getArtistFollowers(artist)} followers</p>
+                    <p className="text-[10px] text-white/60">{getArtistFollowers(artist)} followers</p>
                   </Link>
                 ))}
               </div>
@@ -1509,7 +1509,7 @@ export default function GuestWelcome() {
                 {featuredProducers.map((producer: any, i: number) => (
                   <Link key={i} href={`/producers/${producer.id || producer._id}`} className="flex-shrink-0 w-28 text-center cursor-pointer">
                     <div 
-                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto overflow-hidden"
+                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple/75 to-purple/75 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow mx-auto overflow-hidden"
                       style={{
                         backgroundImage: producer.avatarUrl ? `url(${producer.avatarUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -1530,7 +1530,7 @@ export default function GuestWelcome() {
                       )}
                     </div>
 
-                    <p className="text-[10px] text-gray-400">{getProducerFollowers(producer)} followers</p>
+                    <p className="text-[10px] text-white/60">{getProducerFollowers(producer)} followers</p>
                   </Link>
                 ))}
               </div>
@@ -1558,7 +1558,7 @@ export default function GuestWelcome() {
                   >
                     <div className="relative aspect-[4/5] overflow-hidden bg-black/10">
                       <div
-                        className={`absolute inset-0 ${beat.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                        className={`absolute inset-0 ${beat.artCoverUrl ? '' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
                         style={{
                           backgroundImage: beat.artCoverUrl ? `url(${beat.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -1568,7 +1568,7 @@ export default function GuestWelcome() {
                     </div>
                     <div className="p-3">
                       <p className="text-[11px] font-semibold truncate text-white mb-1">{beat.title}</p>
-                      <div className="flex items-center justify-between text-[9px] text-gray-300 mb-1">
+                      <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
                         <div className="flex items-center gap-1">
                           <FaHeadphones className="text-[10px]" />
                           <span>{getMediaViews(beat).toLocaleString()}</span>
@@ -1579,12 +1579,12 @@ export default function GuestWelcome() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <p className="text-[10px] text-gray-400 truncate">{beat.user?.displayName || beat.user?.username || 'Unknown Producer'}</p>
+                        <p className="text-[10px] text-white/60 truncate">{beat.user?.displayName || beat.user?.username || 'Unknown Producer'}</p>
                         {beat.user?.isVerified && (
                           <VerifiedBadge size="sm" title="Verified producer" />
                         )}
                       </div>
-                      <p className="text-[10px] text-gray-500">{getPublishedTime(beat)}</p>
+                      <p className="text-[10px] text-white/60">{getPublishedTime(beat)}</p>
                     </div>
                   </div>
                 ))}
@@ -1621,13 +1621,13 @@ export default function GuestWelcome() {
                             className="object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500" />
+                          <div className="w-full h-full bg-gradient-to-br from-purple/75 to-purple/75" />
                         )}
                         <button
                           type="button"
                           aria-label={`Add ${item.title} to a playlist`}
                           onClick={(event) => handleAddToPlaylist(event, item)}
-                          className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple-600"
+                          className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple/85"
                         >
                           <FaPlus className="text-xs" />
                         </button>
@@ -1645,8 +1645,8 @@ export default function GuestWelcome() {
                         </div>
                       </div>
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
-                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                      <p className="text-[10px] text-gray-500">{getPublishedTime(item)}</p>
+                      <p className="text-xs text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-[10px] text-white/60">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                 ))}
@@ -1663,7 +1663,7 @@ export default function GuestWelcome() {
                 {featuredAlbums.map((item: any, i: number) => (
                   <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                     <div 
-                      className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
+                      className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple/75 to-purple/75'}` }
                       style={{
                         backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -1672,9 +1672,9 @@ export default function GuestWelcome() {
                     />
                     <div className="p-3 bg-transparent">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
-                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                      <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
-                      <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
+                      <p className="text-xs text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-xs text-white/60">{getTrackCount(item) || 0} tracks</p>
+                      <p className="text-xs text-white/60">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                 ))}
@@ -1691,14 +1691,14 @@ export default function GuestWelcome() {
                   {featuredEPs.map((item: any, i: number) => (
                     <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="w-32 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                       <div
-                        className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                        className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
                         style={{ backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }}
                       />
                       <div className="p-3 bg-transparent">
                         <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
-                        <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                        <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
-                        <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
+                        <p className="text-xs text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                        <p className="text-xs text-white/60">{getTrackCount(item) || 0} tracks</p>
+                        <p className="text-xs text-white/60">{getPublishedTime(item)}</p>
                       </div>
                     </div>
                   ))}
@@ -1713,7 +1713,7 @@ export default function GuestWelcome() {
                 {topCharts.map((track: any, i: number) => (
                   <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
+                      <span className="text-white/60 w-5 text-sm">{i + 1}</span>
                       <div className="w-10 h-10 rounded-md overflow-hidden bg-black flex-shrink-0 relative">
                         {track.artCoverUrl ? (
                           <Image
@@ -1727,9 +1727,9 @@ export default function GuestWelcome() {
                       <div className="flex-1">
                         <p className="text-sm font-medium">{track.title}</p>
                         <div className="flex items-center justify-between">
-                          <p className="text-xs text-gray-400">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
-                          <p className="text-[11px] text-gray-500">{getPublishedTime(track)}</p>
-                          <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
+                          <p className="text-xs text-white/60">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
+                          <p className="text-[11px] text-white/60">{getPublishedTime(track)}</p>
+                          <span className="text-xs text-white/60 ml-2 flex-shrink-0">
                             {track.duration ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` : '0:00'}
                           </span>
                         </div>
@@ -1743,7 +1743,7 @@ export default function GuestWelcome() {
                           audioUrl: track.audioUrl || track.url,
                           duration: track.duration
                         })}
-                        className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
+                        className="w-8 h-8 rounded-full bg-purple/85 hover:bg-purple/90 flex items-center justify-center transition-colors flex-shrink-0"
                       >
                         <FaPlay className="text-white text-xs ml-0.5" />
                       </button>
@@ -1770,7 +1770,7 @@ export default function GuestWelcome() {
                     className="min-w-[120px] bg-white/5 rounded-xl p-3 cursor-pointer hover:bg-white/10 transition-colors flex-shrink-0"
                   >
                     <div
-                      className={`w-full aspect-square ${item.coverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'} rounded-lg mb-2`}
+                      className={`w-full aspect-square ${item.coverUrl ? '' : 'bg-gradient-to-br from-purple/75 to-purple/75'} rounded-lg mb-2`}
                       style={{
                         backgroundImage: item.coverUrl ? `url(${item.coverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -1778,7 +1778,7 @@ export default function GuestWelcome() {
                       }}
                     />
                     <p className="text-xs font-semibold truncate">{item.name || item.title}</p>
-                    <p className="text-xs text-gray-400">{item.mediasCount || 0} tracks</p>
+                    <p className="text-xs text-white/60">{item.mediasCount || 0} tracks</p>
                   </div>
                 ))}
               </div>
@@ -1830,7 +1830,7 @@ export default function GuestWelcome() {
                         </div>
                       </div>
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
-                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-xs text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                     </div>
                   </div>
                 ))}
@@ -1847,7 +1847,7 @@ export default function GuestWelcome() {
                 {featuredAlbums.map((item: any, i: number) => (
                   <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                     <div 
-                      className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}` }
+                      className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple/75 to-purple/75'}` }
                       style={{
                         backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -1856,9 +1856,9 @@ export default function GuestWelcome() {
                     />
                     <div className="p-3 bg-transparent">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
-                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                      <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
-                      <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
+                      <p className="text-xs text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-xs text-white/60">{getTrackCount(item) || 0} tracks</p>
+                      <p className="text-xs text-white/60">{getPublishedTime(item)}</p>
                     </div>
                   </div>
                 ))}
@@ -1872,12 +1872,12 @@ export default function GuestWelcome() {
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                   {featuredEPs.map((item: any, i: number) => (
                     <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="w-32 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
-                      <div className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`} style={{ backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                      <div className={`aspect-square ${item.artCoverUrl ? '' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`} style={{ backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                       <div className="p-3 bg-transparent">
                         <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
-                        <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
-                        <p className="text-xs text-gray-400">{getTrackCount(item) || 0} tracks</p>
-                        <p className="text-xs text-gray-500">{getPublishedTime(item)}</p>
+                        <p className="text-xs text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                        <p className="text-xs text-white/60">{getTrackCount(item) || 0} tracks</p>
+                        <p className="text-xs text-white/60">{getPublishedTime(item)}</p>
                       </div>
                     </div>
                   ))}
@@ -1890,9 +1890,9 @@ export default function GuestWelcome() {
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
                 {topCharts.map((track: any, i: number) => (
-                  <div key={track.id || i} className="bg-[#080a13] p-3 rounded-lg hover:bg-[#11131c] transition-colors">
+                  <div key={track.id || i} className="bg-[#000000] p-3 rounded-lg hover:bg-[#000000] transition-colors">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
+                      <span className="text-white/60 w-5 text-sm">{i + 1}</span>
                       <div 
                         className="w-10 h-10 rounded-md bg-black flex-shrink-0"
                         style={{
@@ -1904,8 +1904,8 @@ export default function GuestWelcome() {
                       <div className="flex-1">
                         <p className="text-sm font-medium">{track.title}</p>
                         <div className="flex items-center justify-between">
-                          <p className="text-xs text-gray-400">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
-                          <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
+                          <p className="text-xs text-white/60">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
+                          <span className="text-xs text-white/60 ml-2 flex-shrink-0">
                             {track.duration ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` : '0:00'}
                           </span>
                         </div>
@@ -1919,7 +1919,7 @@ export default function GuestWelcome() {
                           audioUrl: track.audioUrl || track.url,
                           duration: track.duration
                         })}
-                        className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
+                        className="w-8 h-8 rounded-full bg-purple/85 hover:bg-purple/90 flex items-center justify-center transition-colors flex-shrink-0"
                       >
                         <FaPlay className="text-white text-xs ml-0.5" />
                       </button>
@@ -1941,7 +1941,7 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.map((item: any, i: number) => (
-                  <div key={i} className="min-w-[120px] rounded-xl p-3 cursor-pointer hover:bg-[#11131c] transition-colors flex-shrink-0 bg-transparent">
+                  <div key={i} className="min-w-[120px] rounded-xl p-3 cursor-pointer hover:bg-[#000000] transition-colors flex-shrink-0 bg-transparent">
                     <div 
                       className="w-full aspect-square bg-black rounded-lg mb-2"
                       style={{
@@ -1951,7 +1951,7 @@ export default function GuestWelcome() {
                       }}
                     />
                     <p className="text-xs font-semibold truncate">{item.name || item.title}</p>
-                    <p className="text-xs text-gray-400">{item.mediasCount || 0} tracks</p>
+                    <p className="text-xs text-white/60">{item.mediasCount || 0} tracks</p>
                   </div>
                 ))}
               </div>
@@ -1992,7 +1992,7 @@ export default function GuestWelcome() {
                     </div>
                     <div className="px-1">
                       <p className="text-xs font-semibold truncate text-white mb-1">{item.title}</p>
-                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-xs text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                     </div>
                   </div>
                 ))}
@@ -2012,7 +2012,7 @@ export default function GuestWelcome() {
                 {featuredArtists.map((artist: any, i: number) => (
                   <Link key={i} href={`/artists/${artist.id}`} className="flex-shrink-0 text-center cursor-pointer">
                     <div 
-                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
+                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple/75 to-purple/75 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
                       style={{
                         backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -2026,7 +2026,7 @@ export default function GuestWelcome() {
                       )}
                     </div>
                     <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
-                    <p className="text-[10px] text-gray-400">{getArtistFollowers(artist)} followers</p>
+                    <p className="text-[10px] text-white/60">{getArtistFollowers(artist)} followers</p>
                   </Link>
                 ))}
               </div>
@@ -2056,7 +2056,7 @@ export default function GuestWelcome() {
                     </div>
                     <div className="p-3 bg-transparent">
                       <p className="text-sm font-semibold truncate text-white mb-1">{item.title}</p>
-                      <p className="text-xs text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
+                      <p className="text-xs text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown'}</p>
                     </div>
                   </div>
                 ))}
@@ -2071,9 +2071,9 @@ export default function GuestWelcome() {
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
                 {topCharts.map((track: any, i: number) => (
-                  <div key={track.id || i} className="bg-[#080a13] p-3 rounded-lg hover:bg-[#11131c] transition-colors">
+                  <div key={track.id || i} className="bg-[#000000] p-3 rounded-lg hover:bg-[#000000] transition-colors">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-gray-400 w-5 text-sm">{i + 1}</span>
+                      <span className="text-white/60 w-5 text-sm">{i + 1}</span>
                       <div 
                         className="w-10 h-10 rounded-md bg-black flex-shrink-0"
                         style={{
@@ -2085,8 +2085,8 @@ export default function GuestWelcome() {
                       <div className="flex-1">
                         <p className="text-sm font-medium">{track.title}</p>
                         <div className="flex items-center justify-between">
-                          <p className="text-xs text-gray-400">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
-                          <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
+                          <p className="text-xs text-white/60">{track.user?.displayName || track.user?.username || 'Unknown'} — {track.genre || 'Track'}</p>
+                          <span className="text-xs text-white/60 ml-2 flex-shrink-0">
                             {track.duration ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` : '0:00'}
                           </span>
                         </div>
@@ -2100,7 +2100,7 @@ export default function GuestWelcome() {
                           audioUrl: track.audioUrl || track.url,
                           duration: track.duration
                         })}
-                        className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors flex-shrink-0"
+                        className="w-8 h-8 rounded-full bg-purple/85 hover:bg-purple/90 flex items-center justify-center transition-colors flex-shrink-0"
                       >
                         <FaPlay className="text-white text-xs ml-0.5" />
                       </button>
@@ -2138,7 +2138,7 @@ export default function GuestWelcome() {
                             <VerifiedBadge size="md" title="Verified artist" />
                           )}
                         </div>
-                        <p className="text-xs text-gray-400">Latest update from your favorite artists</p>
+                        <p className="text-xs text-white/60">Latest update from your favorite artists</p>
                       </div>
                     </div>
                   </Link>
@@ -2164,7 +2164,7 @@ export default function GuestWelcome() {
                   >
                     <div className="relative aspect-video">
                       <div
-                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
                         style={{
                           backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -2177,7 +2177,7 @@ export default function GuestWelcome() {
                     </div>
                     <div className="p-2">
                       <p className="text-xs font-semibold truncate text-white">{item.title}</p>
-                      <div className="flex items-center justify-between text-[9px] text-gray-300 mb-1">
+                      <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
                         <div className="flex items-center gap-1">
                           <FaHeadphones className="text-[10px]" />
                           <span>{getMediaViews(item).toLocaleString()}</span>
@@ -2187,7 +2187,7 @@ export default function GuestWelcome() {
                           <span>{getMediaComments(item).toLocaleString()}</span>
                         </div>
                       </div>
-                      <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Producer'}</p>
+                      <p className="text-[10px] text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown Producer'}</p>
                     </div>
                   </div>
                 ))}
@@ -2208,7 +2208,7 @@ export default function GuestWelcome() {
                   >
                     <div className="relative aspect-video">
                       <div
-                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
                         style={{
                           backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -2221,7 +2221,7 @@ export default function GuestWelcome() {
                     </div>
                     <div className="p-2">
                       <p className="text-xs font-semibold truncate text-white">{item.title}</p>
-                      <div className="flex items-center justify-between text-[9px] text-gray-300 mb-1">
+                      <div className="flex items-center justify-between text-[9px] text-white/90 mb-1">
                         <div className="flex items-center gap-1">
                           <FaHeadphones className="text-[10px]" />
                           <span>{getMediaViews(item).toLocaleString()}</span>
@@ -2231,7 +2231,7 @@ export default function GuestWelcome() {
                           <span>{getMediaComments(item).toLocaleString()}</span>
                         </div>
                       </div>
-                      <p className="text-[10px] text-gray-400 truncate">{item.user?.displayName || item.user?.username || 'Unknown Artist'}</p>
+                      <p className="text-[10px] text-white/60 truncate">{item.user?.displayName || item.user?.username || 'Unknown Artist'}</p>
                     </div>
                   </div>
                 ))}
@@ -2252,7 +2252,7 @@ export default function GuestWelcome() {
                 {featuredArtists.map((artist: any, i: number) => (
                   <Link key={i} href={`/artists/${artist.id}`} className="flex-shrink-0 text-center cursor-pointer">
                     <div 
-                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
+                      className="w-20 h-20 rounded-full bg-gradient-to-br from-purple/75 to-purple/75 flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-shadow"
                       style={{
                         backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -2266,7 +2266,7 @@ export default function GuestWelcome() {
                       )}
                     </div>
                     <p className="text-xs font-semibold truncate text-white mb-1">{artist.name || 'Unknown'}</p>
-                    <p className="text-[10px] text-gray-400">{getArtistFollowers(artist)} followers</p>
+                    <p className="text-[10px] text-white/60">{getArtistFollowers(artist)} followers</p>
                   </Link>
                 ))}
               </div>
@@ -2279,7 +2279,7 @@ export default function GuestWelcome() {
       <div className="hidden lg:flex h-full gap-3 items-stretch">
 
         {/* SIDEBAR */}
-        <div className="w-60 h-full min-h-0 overflow-y-auto scrollbar-modern bg-[#080812]/60 backdrop-blur p-6 flex flex-col rounded-2xl">
+        <div className="w-60 h-full min-h-0 overflow-y-auto scrollbar-modern bg-[#000000]/60 backdrop-blur p-6 flex flex-col rounded-2xl">
          
 
           {[
@@ -2296,8 +2296,8 @@ export default function GuestWelcome() {
               key={i}
               className={`px-4 py-3 rounded-lg mb-2 text-sm font-medium flex items-center gap-3 ${
                 i === 0
-                  ? "bg-purple-600 text-white"
-                  : "text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
+                  ? "bg-purple/85 text-white"
+                  : "text-white/60 hover:bg-white/10 hover:text-white transition-colors"
               }`}
             >
               <item.icon className="text-base" />
@@ -2307,7 +2307,7 @@ export default function GuestWelcome() {
         </div>
 
         {/* MAIN */}
-        <div className="flex-1 h-full min-h-0 px-4 py-6 overflow-y-auto scrollbar-modern rounded-2xl bg-[#080812]/60">
+        <div className="flex-1 h-full min-h-0 px-4 py-6 overflow-y-auto scrollbar-modern rounded-2xl bg-[#000000]/60">
 
 
           {renderHomepageSearch('mb-6')}
@@ -2363,7 +2363,7 @@ export default function GuestWelcome() {
                     }}
                     className="overflow-hidden rounded-lg shadow-md transition-all hover:shadow-lg cursor-pointer group"
                   >
-                    <div className={`${isVideo ? 'aspect-video' : 'aspect-[4/5]'} relative bg-gradient-to-br from-purple-500 to-pink-500`}>
+                    <div className={`${isVideo ? 'aspect-video' : 'aspect-[4/5]'} relative bg-gradient-to-br from-purple/75 to-purple/75`}>
                       {image && (
                         <Image src={image} alt={item.title || ''} fill className="object-cover" />
                       )}
@@ -2373,9 +2373,9 @@ export default function GuestWelcome() {
                         </span>
                       )}
                     </div>
-                    <div className="bg-[#080a13] p-3">
+                    <div className="bg-[#000000] p-3">
                       <p className="truncate text-xs font-medium text-white">{item.title}</p>
-                      <p className="truncate text-xs text-gray-400">
+                      <p className="truncate text-xs text-white/60">
                         {item.user?.displayName || item.user?.username || (isVideo ? 'Fwaya video' : 'Unknown Artist')}
                       </p>
                     </div>
@@ -2396,7 +2396,7 @@ export default function GuestWelcome() {
                 <button
                   type="button"
                   onClick={() => router.push(getSectionHref('featuredAlbums'))}
-                  className="rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
+                  className="rounded-full bg-purple/85 px-4 py-2 text-sm text-white transition hover:bg-purple/75"
                 >
                   See All
                 </button>
@@ -2437,14 +2437,14 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  <div className="p-3 bg-[#080a13]">
+                  <div className="p-3 bg-[#000000]">
                     <p className="text-xs font-semibold truncate text-white mb-0.5">
                       {album.title}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-xs text-white/60 truncate">
                       {album.user?.displayName || album.user?.username || 'Unknown Artist'}
                     </p>
-                    <p className="text-xs text-gray-500">{getReleaseTime(album)}</p>
+                    <p className="text-xs text-white/60">{getReleaseTime(album)}</p>
                   </div>
                 </div>
               ))}
@@ -2461,11 +2461,11 @@ export default function GuestWelcome() {
                 {featuredEPs.slice(0, 6).map((ep: any, i: number) => (
                   <div key={i} onClick={() => goToAlbum(ep.id, ep.title)} role="button" tabIndex={0} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group">
                     <div className="aspect-[4/5] bg-black group-hover:scale-105 transition-transform" style={{ backgroundImage: ep.artCoverUrl ? `url(${ep.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                    <div className="p-3 bg-[#080a13]">
+                    <div className="p-3 bg-[#000000]">
                       <p className="text-xs font-semibold truncate text-white mb-0.5">{ep.title}</p>
-                      <p className="text-xs text-gray-400 truncate">{ep.user?.displayName || ep.user?.username || 'Unknown Artist'}</p>
-                      <p className="text-xs text-gray-400">{getTrackCount(ep) || 0} tracks</p>
-                      <p className="text-xs text-gray-500">{getReleaseTime(ep)}</p>
+                      <p className="text-xs text-white/60 truncate">{ep.user?.displayName || ep.user?.username || 'Unknown Artist'}</p>
+                      <p className="text-xs text-white/60">{getTrackCount(ep) || 0} tracks</p>
+                      <p className="text-xs text-white/60">{getReleaseTime(ep)}</p>
                     </div>
                   </div>
                 ))}
@@ -2483,7 +2483,7 @@ export default function GuestWelcome() {
 
               <div className="grid grid-cols-6 gap-3">
               {featuredProducers.length === 0 ? (
-                <div className="col-span-6 rounded-xl border border-dashed border-white/10 bg-[#080a13] p-6 text-center text-sm text-gray-400">
+                <div className="col-span-6 rounded-xl border border-dashed border-white/10 bg-[#000000] p-6 text-center text-sm text-white/60">
                   No producers found right now.
                 </div>
               ) : (
@@ -2494,7 +2494,7 @@ export default function GuestWelcome() {
                     className="text-center cursor-pointer hover:bg-transparent rounded-xl p-3 transition-colors"
                   >
                     <div
-                      className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mx-auto mb-2 flex items-center justify-center overflow-hidden"
+                      className="w-16 h-16 rounded-full bg-gradient-to-br from-purple/75 to-purple/75 mx-auto mb-2 flex items-center justify-center overflow-hidden"
                       style={{
                         backgroundImage: producer.avatarUrl ? `url(${producer.avatarUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -2511,7 +2511,7 @@ export default function GuestWelcome() {
                     <p className="text-sm font-semibold truncate mb-1">
                       {getProducerDisplayName(producer)}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-white/60">
                       {getProducerFollowers(producer)} followers
                     </p>
                   </Link>
@@ -2558,18 +2558,18 @@ export default function GuestWelcome() {
                         className="absolute inset-0 h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple/75 to-purple/75" />
                     )}
                     <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/50 transition-colors">
                       <FaPlay className="text-white text-xl" />
                     </div>
                   </div>
 
-                  <div className="p-3 bg-[#080a13]">
+                  <div className="p-3 bg-[#000000]">
                     <p className="text-xs font-medium truncate text-white">
                       {video.title}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-xs text-white/60 truncate">
                       {video.user?.displayName || video.user?.username || 'Unknown Producer'}
                     </p>
                   </div>
@@ -2598,7 +2598,7 @@ export default function GuestWelcome() {
                 >
                   {/* ARTIST IMAGE */}
                   <div
-                    className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mx-auto mb-2"
+                    className="w-16 h-16 rounded-full bg-gradient-to-br from-purple/75 to-purple/75 mx-auto mb-2"
                     style={{
                       backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
                       backgroundSize: 'cover',
@@ -2610,7 +2610,7 @@ export default function GuestWelcome() {
                   <p className="text-sm font-semibold truncate mb-1">
                     {artist.displayName || artist.username || artist.artistName || 'Unknown Artist'}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-white/60">
                     {artist.followers ? `${artist.followers.length} followers` : '0 followers'}
                   </p>
                 </Link>
@@ -2635,7 +2635,7 @@ export default function GuestWelcome() {
                 >
                   {/* IMAGE */}
                   <div
-                    className={`aspect-[4/5] ${track.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} group-hover:scale-105 transition-transform`}
+                    className={`aspect-[4/5] ${track.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'} group-hover:scale-105 transition-transform`}
                     style={{
                       backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
                       backgroundSize: 'cover',
@@ -2643,14 +2643,14 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  <div className="p-3 bg-[#080a13]">
+                  <div className="p-3 bg-[#000000]">
                     <p className="text-xs font-medium truncate text-white">
                       {track.title}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-xs text-white/60 truncate">
                       {track.user?.displayName || track.user?.username || 'Unknown Artist'}
                     </p>
-                    <p className="text-xs text-gray-500">{getPublishedTime(track)}</p>
+                    <p className="text-xs text-white/60">{getPublishedTime(track)}</p>
                   </div>
                 </div>
               ))}
@@ -2686,7 +2686,7 @@ export default function GuestWelcome() {
                 >
                   {/* PLAYLIST COVER */}
                   <div
-                    className={`aspect-[4/5] ${playlist.coverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} rounded-lg group-hover:scale-105 transition-transform`}
+                    className={`aspect-[4/5] ${playlist.coverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'} rounded-lg group-hover:scale-105 transition-transform`}
                     style={{
                       backgroundImage: playlist.coverUrl ? `url(${playlist.coverUrl})` : undefined,
                       backgroundSize: 'cover',
@@ -2694,11 +2694,11 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  <div className="p-3 bg-[#080a13]">
+                  <div className="p-3 bg-[#000000]">
                     <p className="text-xs font-semibold truncate text-white mb-0.5">
                       {playlist.name || playlist.title}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-white/60">
                       {playlist.mediasCount || 0} tracks
                     </p>
                   </div>
@@ -2726,7 +2726,7 @@ export default function GuestWelcome() {
                 >
                   <div className="relative aspect-video">
                     <div
-                      className={`absolute inset-0 ${video.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'}`}
+                      className={`absolute inset-0 ${video.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
                       style={{
                         backgroundImage: video.artCoverUrl ? `url(${video.artCoverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -2738,11 +2738,11 @@ export default function GuestWelcome() {
                     </div>
                   </div>
 
-                  <div className="p-3 bg-[#080a13]">
+                  <div className="p-3 bg-[#000000]">
                     <p className="text-xs font-medium truncate text-white">
                       {video.title}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-xs text-white/60 truncate">
                       {video.user?.displayName || video.user?.username || 'Unknown Artist'}
                     </p>
                   </div>
@@ -2769,12 +2769,12 @@ export default function GuestWelcome() {
                     className="flex gap-3 p-3 rounded-xl hover:bg-transparent transition-colors cursor-pointer"
                   >
                     <div className="flex flex-col items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-bold text-purple-400">{index + 1}</span>
+                      <span className="text-sm font-bold text-purple/60">{index + 1}</span>
                     </div>
                     <div
                       className={
                         "w-10 h-10 rounded-lg flex-shrink-0 " +
-                        (track.artCoverUrl ? "" : "bg-gradient-to-br from-purple-500 to-pink-500")
+                        (track.artCoverUrl ? "" : "bg-gradient-to-br from-purple/75 to-purple/75")
                       }
                       style={{
                         backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
@@ -2784,11 +2784,11 @@ export default function GuestWelcome() {
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{track.title}</p>
-                      <p className="text-xs text-gray-400 truncate">
+                      <p className="text-xs text-white/60 truncate">
                         {track.user?.displayName || track.user?.username || 'Unknown Artist'}
                       </p>
                     </div>
-                    <div className="text-xs text-gray-500 flex-shrink-0">
+                    <div className="text-xs text-white/60 flex-shrink-0">
                       {track.duration ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}` : '0:00'}
                     </div>
                   </div>
@@ -2807,7 +2807,7 @@ export default function GuestWelcome() {
 
               <div className="flex flex-wrap gap-2">
                 {[
-                  { label: "Pop", color: "bg-purple-600" },
+                  { label: "Pop", color: "bg-purple/85" },
                   { label: "Electronic", color: "bg-white/10" },
                   { label: "Hip-Hop", color: "bg-white/10" },
                   { label: "Rock", color: "bg-white/10" },
@@ -2840,7 +2840,7 @@ export default function GuestWelcome() {
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
                   <div
-                    className={`aspect-[4/5] ${beat.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple-500 to-pink-500'} group-hover:scale-105 transition-transform`}
+                    className={`aspect-[4/5] ${beat.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'} group-hover:scale-105 transition-transform`}
                     style={{
                       backgroundImage: beat.artCoverUrl ? `url(${beat.artCoverUrl})` : undefined,
                       backgroundSize: 'cover',
@@ -2848,14 +2848,14 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  <div className="p-3 bg-[#080a13]">
+                  <div className="p-3 bg-[#000000]">
                     <p className="text-xs font-medium truncate text-white">
                       {beat.title}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-xs text-white/60 truncate">
                       {beat.user?.displayName || beat.user?.username || 'Unknown Producer'}
                     </p>
-                    <p className="text-xs text-gray-500">{getPublishedTime(beat)}</p>
+                    <p className="text-xs text-white/60">{getPublishedTime(beat)}</p>
                   </div>
                 </div>
               ))}
@@ -2864,20 +2864,20 @@ export default function GuestWelcome() {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-64 h-full min-h-0 overflow-y-auto scrollbar-modern bg-[#080812]/60 backdrop-blur p-6 rounded-2xl">
+        <div className="w-64 h-full min-h-0 overflow-y-auto scrollbar-modern bg-[#000000]/60 backdrop-blur p-6 rounded-2xl">
           <h3 className="mb-6 font-semibold text-lg">Now Playing</h3>
 
           {/* Current Track */}
           <div className="mb-6">
-            <div className="w-full aspect-square rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mb-4" />
+            <div className="w-full aspect-square rounded-2xl bg-gradient-to-br from-purple/75 to-purple/75 mb-4" />
             <h4 className="font-semibold text-base mb-1">Lost in the Echo</h4>
-            <p className="text-sm text-gray-400 mb-4">Linkin Park — Recharged</p>
+            <p className="text-sm text-white/60 mb-4">Linkin Park — Recharged</p>
 
             {/* Progress Bar */}
             <div className="w-full bg-white/20 rounded-full h-1 mb-2">
-              <div className="bg-purple-500 h-1 rounded-full w-1/3"></div>
+              <div className="bg-purple/75 h-1 rounded-full w-1/3"></div>
             </div>
-            <div className="flex justify-between text-xs text-gray-400">
+            <div className="flex justify-between text-xs text-white/60">
               <span>1:45</span>
               <span>3:45</span>
             </div>
@@ -2888,7 +2888,7 @@ export default function GuestWelcome() {
             <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
               <FaChevronLeft className="text-sm" />
             </button>
-            <button className="w-12 h-12 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center">
+            <button className="w-12 h-12 rounded-full bg-purple/85 hover:bg-purple/90 flex items-center justify-center">
               <FaPause className="text-lg" />
             </button>
             <button className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
@@ -2906,12 +2906,12 @@ export default function GuestWelcome() {
                 { title: "The Rock Revival", artist: "Various Artists" }
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-transparent transition-colors cursor-pointer">
-                  <div className="w-8 h-8 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0" />
+                  <div className="w-8 h-8 rounded-md bg-gradient-to-br from-purple/75 to-purple/75 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{item.title}</p>
-                    <p className="text-xs text-gray-400 truncate">{item.artist}</p>
+                    <p className="text-xs text-white/60 truncate">{item.artist}</p>
                   </div>
-                  <span className="text-xs text-gray-400">3:45</span>
+                  <span className="text-xs text-white/60">3:45</span>
                 </div>
               ))}
             </div>

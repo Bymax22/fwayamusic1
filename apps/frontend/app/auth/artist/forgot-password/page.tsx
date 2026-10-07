@@ -43,29 +43,29 @@ export default function ArtistForgotPassword() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-md shadow-2xl"
+          className="bg-[#000000] rounded-3xl p-8 w-full max-w-md shadow-2xl"
         >
           <div className="text-center">
-            <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#000000] rounded-full flex items-center justify-center mx-auto mb-4">
               <FaCheck className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-4">Check Your Email</h1>
-            <p className="text-gray-300 mb-6">
+            <p className="text-white/90 mb-6">
               We&lsquo;ve sent a password reset link to <strong>{email}</strong>
             </p>
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-white/60 text-sm mb-6">
               Click the link in the email to reset your password. The link will expire in 1 hour.
             </p>
             <div className="space-y-3">
               <Link
                 href="/auth/artist/signin"
-                className="w-full block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors font-semibold text-center"
+                className="w-full block px-4 py-2 bg-purple/85 text-white rounded-lg hover:bg-purple/75 transition-colors font-semibold text-center"
               >
                 Back to Artist Sign In
               </Link>
               <button
                 onClick={() => setIsSubmitted(false)}
-                className="w-full px-4 py-2 border border-purple-500/40 text-white rounded-lg hover:bg-[#0a3747] transition-colors"
+                className="w-full px-4 py-2 border border-purple/40 text-white rounded-lg hover:bg-[#36454F] transition-colors"
               >
                 Try Another Email
               </button>
@@ -81,14 +81,14 @@ export default function ArtistForgotPassword() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#0f1112] rounded-3xl p-8 w-full max-w-md shadow-2xl"
+        className="bg-[#000000] rounded-3xl p-8 w-full max-w-md shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#0f1112] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#000000] rounded-full flex items-center justify-center mx-auto mb-4">
             <FaMusic className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Reset Your Password</h1>
-          <p className="text-gray-300">Enter your artist email to receive a reset link</p>
+          <p className="text-white/90">Enter your artist email to receive a reset link</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -100,26 +100,26 @@ export default function ArtistForgotPassword() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               placeholder="your@email.com"
             />
-            {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+            {errors.email && <p className="text-purple/60 text-sm mt-1">{errors.email}</p>}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="w-full px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
           >
             {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
           </button>
 
           {errors.submit && (
-            <p className="text-red-400 text-sm text-center">{errors.submit}</p>
+            <p className="text-purple/60 text-sm text-center">{errors.submit}</p>
           )}
         </form>
 
-        <div className="text-center mt-8 pt-6 border-t border-purple-500/20">
+        <div className="text-center mt-8 pt-6 border-t border-purple/20">
           <Link
             href="/auth/artist/signin"
             className="inline-flex items-center gap-2 text-white hover:underline font-semibold"

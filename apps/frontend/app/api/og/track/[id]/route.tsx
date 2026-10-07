@@ -66,7 +66,7 @@ export async function GET(req: Request, context: any) {
         display: 'flex',
         alignItems: 'stretch',
         justifyContent: 'center',
-        backgroundColor: '#000',
+        backgroundColor: '#000000',
         position: 'relative',
         fontFamily: 'Inter, sans-serif',
       }}>
@@ -81,7 +81,7 @@ export async function GET(req: Request, context: any) {
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.7) 100%)',
+          background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.7) 100%)',
         }} />
         <div style={{
           zIndex: 2,
@@ -93,42 +93,42 @@ export async function GET(req: Request, context: any) {
           height: '100%',
         }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', gap: '24px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '300px', minHeight: '300px', borderRadius: '32px', background: 'rgba(255,255,255,0.14)', backdropFilter: 'blur(22px)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '300px', minHeight: '300px', borderRadius: '32px', background: 'rgba(255, 255, 255, 0.14)', backdropFilter: 'blur(22px)' }}>
               <div style={{
                 width: '180px',
                 height: '180px',
                 borderRadius: '50%',
-                background: 'rgba(255,255,255,0.95)',
+                background: 'rgba(255, 255, 255, 0.95)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
                 <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <polygon points="28,16 28,80 72,48" fill="#111827" />
+                  <polygon points="28,16 28,80 72,48" fill="#000000" />
                 </svg>
               </div>
-              <span style={{ marginTop: '22px', color: '#E5E7EB', fontSize: '24px', fontWeight: 700 }}>Play</span>
+              <span style={{ marginTop: '22px', color: '#FFFFFF', fontSize: '24px', fontWeight: 700 }}>Play</span>
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '20px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '68%' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <p style={{ margin: 0, color: '#A78BFA', fontSize: '28px', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Fwaya</p>
-                <h1 style={{ margin: '4px 0 0 0', color: '#fff', fontSize: '80px', lineHeight: '0.95', fontWeight: 800 }}>
+                <p style={{ margin: 0, color: '#9B5DE5', fontSize: '28px', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Fwaya</p>
+                <h1 style={{ margin: '4px 0 0 0', color: '#FFFFFF', fontSize: '80px', lineHeight: '0.95', fontWeight: 800 }}>
                   {title}
                 </h1>
-                <p style={{ margin: '16px 0 0 0', color: '#E5E7EB', fontSize: '36px', lineHeight: 1.1 }}>
+                <p style={{ margin: '16px 0 0 0', color: '#FFFFFF', fontSize: '36px', lineHeight: 1.1 }}>
                   {artist}
                 </p>
               </div>
-              <p style={{ margin: '24px 0 0 0', color: '#D1D5DB', fontSize: '26px', lineHeight: 1.4, maxHeight: '144px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <p style={{ margin: '24px 0 0 0', color: '#FFFFFF', fontSize: '26px', lineHeight: 1.4, maxHeight: '144px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {description}
               </p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>
-              <span style={{ color: '#A78BFA', fontSize: '20px', fontWeight: 700 }}>Track</span>
-              <span style={{ color: '#fff', fontSize: '46px', fontWeight: 800 }}>Tap to play</span>
+              <span style={{ color: '#9B5DE5', fontSize: '20px', fontWeight: 700 }}>Track</span>
+              <span style={{ color: '#FFFFFF', fontSize: '46px', fontWeight: 800 }}>Tap to play</span>
             </div>
           </div>
         </div>

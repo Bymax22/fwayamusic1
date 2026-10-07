@@ -39,7 +39,7 @@ export default function VideoMiniPlayer() {
 
   return (
     <div
-      className="fixed bottom-24 right-4 z-50 w-[calc(100%-2rem)] sm:w-[340px] rounded-3xl bg-slate-950 p-3 shadow-lg shadow-black/40 transition-all duration-200 lg:bottom-6 lg:right-6 cursor-pointer"
+      className="fixed bottom-24 right-4 z-50 w-[calc(100%-2rem)] sm:w-[340px] rounded-3xl bg-black p-3 shadow-lg shadow-black/40 transition-all duration-200 lg:bottom-6 lg:right-6 cursor-pointer"
       onClick={openWatchPage}
       role="button"
       tabIndex={0}
@@ -52,7 +52,7 @@ export default function VideoMiniPlayer() {
       }}
     >
       <div className="flex items-center gap-3">
-        <div className="h-14 w-14 overflow-hidden rounded-2xl bg-slate-800">
+        <div className="h-14 w-14 overflow-hidden rounded-2xl bg-charcoal">
           <img
             src={currentTrack.imageUrl || "/default-cover.jpg"}
             alt={currentTrack.title || "Video"}
@@ -61,14 +61,14 @@ export default function VideoMiniPlayer() {
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-white">{currentTrack.title}</p>
-          <p className="truncate text-xs text-slate-400">{currentTrack.artist}</p>
+          <p className="truncate text-xs text-white/60">{currentTrack.artist}</p>
         </div>
         <button
           onClick={(event) => {
             event.stopPropagation();
             togglePlay();
           }}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-charcoal"
           aria-label={isPlaying ? "Pause video" : "Play video"}
         >
           {isPlaying ? <Pause size={16} /> : <Play size={16} />}
@@ -78,7 +78,7 @@ export default function VideoMiniPlayer() {
             event.stopPropagation();
             openWatchPage();
           }}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-charcoal"
           aria-label="Open video page"
         >
           <Maximize2 size={16} />
@@ -88,7 +88,7 @@ export default function VideoMiniPlayer() {
             event.stopPropagation();
             stopTrack();
           }}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-charcoal"
           aria-label="Close mini player"
         >
           <X size={16} />

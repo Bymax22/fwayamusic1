@@ -22,7 +22,7 @@ export default function DownloadStatusToast({
       className="fixed bottom-24 left-0 z-[70] flex w-full max-w-md items-center justify-between gap-3 bg-gradient-to-r from-black via-black/90 to-transparent px-5 py-4 text-sm"
     >
       {status === 'downloading' ? (
-        <span className="min-w-0 truncate font-bold text-purple-400">
+        <span className="min-w-0 truncate font-bold text-purple/60">
           Downloading
           <span className="ml-1 inline-flex items-center gap-0.5" aria-label="in progress">
             <span className="animate-bounce">.</span>
@@ -37,7 +37,7 @@ export default function DownloadStatusToast({
           <button
             type="button"
             onClick={onView}
-            className="shrink-0 font-semibold text-purple-400 hover:text-purple-300"
+            className="shrink-0 font-semibold text-purple/60 hover:text-purple/45"
           >
             View download
           </button>

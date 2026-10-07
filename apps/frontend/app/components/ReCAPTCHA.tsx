@@ -266,11 +266,11 @@ export const ReCAPTCHA = forwardRef<ReCAPTCHAHandle, ReCAPTCHAProps>(({
 
   if (loadError) {
     return (
-      <div className="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-600 text-sm mb-2">{loadError}</p>
+      <div className="text-center p-4 bg-purple/15 border border-purple/30 rounded-lg">
+        <p className="text-purple/85 text-sm mb-2">{loadError}</p>
         <button
           onClick={() => window.location.reload()}
-          className="text-red-600 hover:text-red-800 text-sm underline"
+          className="text-purple/85 hover:text-purple/95 text-sm underline"
         >
           Reload page
         </button>
@@ -284,7 +284,7 @@ export const ReCAPTCHA = forwardRef<ReCAPTCHAHandle, ReCAPTCHAProps>(({
       {isLoaded && (
         <button
           onClick={resetReCAPTCHA}
-          className="mt-2 text-sm text-gray-500 hover:text-gray-700 underline"
+          className="mt-2 text-sm text-white/60 hover:text-white/80 underline"
           type="button"
         >
           Reset reCAPTCHA

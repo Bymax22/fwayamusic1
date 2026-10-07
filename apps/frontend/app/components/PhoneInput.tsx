@@ -53,7 +53,7 @@ export function PhoneInput({
 
   return (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-300 mb-2">
+      <label className="block text-sm font-medium text-white/90 mb-2">
         {label}
       </label>
       <div className="flex gap-2">
@@ -62,14 +62,14 @@ export function PhoneInput({
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="w-full px-3 py-2.5 bg-[#1f1f1f] text-white text-sm flex items-center justify-center gap-1 rounded-3xl ring-1 ring-white/10 hover:ring-purple-500 focus:outline-none transition-all"
+            className="w-full px-3 py-2.5 bg-[#000000] text-white text-sm flex items-center justify-center gap-1 rounded-3xl ring-1 ring-white/10 hover:ring-purple/75 focus:outline-none transition-all"
           >
             <span className="text-lg">{selectedCountry.flag}</span>
             <FaChevronDown className="text-xs" />
           </button>
 
           {isOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1f1f] ring-1 ring-purple-500/30 z-50 max-h-64 overflow-hidden flex flex-col w-48 rounded-3xl">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[#000000] ring-1 ring-purple/30 z-50 max-h-64 overflow-hidden flex flex-col w-48 rounded-3xl">
               <div className="p-2">
                 <input
                   ref={inputRef}
@@ -77,7 +77,7 @@ export function PhoneInput({
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#0f0f0f] text-white text-xs placeholder-gray-500 focus:outline-none rounded-2xl"
+                  className="w-full px-3 py-2 bg-[#000000] text-white text-xs placeholder-white/60 focus:outline-none rounded-2xl"
                 />
               </div>
               <div className="overflow-y-auto">
@@ -90,8 +90,8 @@ export function PhoneInput({
                       setIsOpen(false);
                       setSearchTerm('');
                     }}
-                    className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-gray-800 transition-colors text-xs ${
-                      countryCode === country.code ? 'bg-purple-600' : ''
+                    className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-charcoal transition-colors text-xs ${
+                      countryCode === country.code ? 'bg-purple/85' : ''
                     }`}
                   >
                     <span className="text-base">{country.flag}</span>
@@ -113,16 +113,16 @@ export function PhoneInput({
               const phoneNumber = e.target.value.replace(/\D/g, '');
               onPhoneChange(phoneNumber);
             }}
-            className={`w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none transition-colors ring-1 ${
+            className={`w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none transition-colors ring-1 ${
               error
-                ? 'ring-red-500 focus:ring-red-500'
-                : 'ring-white/10 focus:ring-purple-500'
+                ? 'ring-purple/75 focus:ring-purple/75'
+                : 'ring-white/10 focus:ring-purple/75'
             }`}
           />
         </div>
       </div>
       {error && (
-        <p className="text-xs text-red-500 mt-1">{error}</p>
+        <p className="text-xs text-purple/75 mt-1">{error}</p>
       )}
     </div>
   );

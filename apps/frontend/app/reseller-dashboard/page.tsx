@@ -385,12 +385,12 @@ export default function ResellerDashboard() {
     });
     alert('Demo payout method added!');
   }}
-  className="w-full flex items-center gap-3 p-4 bg-[#0a3747] hover:bg-[#0a3747]/80 rounded-lg transition-colors text-left border-2 border-dashed border-[#0a3747]"
+  className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg transition-colors text-left border-2 border-dashed border-[#36454F]"
 >
-  <Plus className="w-5 h-5 text-[#e51f48]" />
+  <Plus className="w-5 h-5 text-[#36454F]" />
   <div>
     <p className="font-medium text-white">Add Payout Method</p>
-    <p className="text-sm text-gray-400">Add mobile money or bank account</p>
+    <p className="text-sm text-white/60">Add mobile money or bank account</p>
   </div>
 </button>
   const startKYCVerification = async () => {
@@ -411,17 +411,17 @@ export default function ResellerDashboard() {
   const getProviderIcon = (provider: string) => {
     switch (provider) {
       case 'MTN_MONEY':
-        return <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
+        return <div className="w-8 h-8 bg-gradient-to-br from-purple/75 to-purple/75 rounded-lg flex items-center justify-center">
           <span className="text-white font-bold text-xs">MTN</span>
         </div>;
       case 'AIRTEL_MONEY':
-        return <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
+        return <div className="w-8 h-8 bg-gradient-to-br from-purple/75 to-purple/75 rounded-lg flex items-center justify-center">
           <span className="text-white font-bold text-xs">ATL</span>
         </div>;
       case 'BANK':
-        return <BanknoteIcon className="w-6 h-6 text-blue-400" />;
+        return <BanknoteIcon className="w-6 h-6 text-purple/60" />;
       default:
-        return <CreditCard className="w-6 h-6 text-gray-400" />;
+        return <CreditCard className="w-6 h-6 text-white/60" />;
     }
   };
 
@@ -430,15 +430,15 @@ export default function ResellerDashboard() {
       case 'PAID':
       case 'APPROVED':
       case 'ACTIVE':
-        return 'bg-green-500/20 text-green-400';
+        return 'bg-purple/20 text-purple/60';
       case 'PENDING':
-        return 'bg-yellow-500/20 text-yellow-400';
+        return 'bg-purple/20 text-purple/60';
       case 'FAILED':
       case 'REJECTED':
       case 'SUSPENDED':
-        return 'bg-red-500/20 text-red-400';
+        return 'bg-purple/20 text-purple/60';
       default:
-        return 'bg-gray-500/20 text-gray-400';
+        return 'bg-charcoal/20 text-white/60';
     }
   };
 
@@ -463,13 +463,13 @@ export default function ResellerDashboard() {
                 repeatType: "reverse",
               },
             }}
-            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#e51f48]"
+            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#36454F]"
             style={{
               background: `conic-gradient(
                 from 0deg at 50% 50%,
-                rgba(229, 31, 72, 0) 0deg,
-                rgba(229, 31, 72, 0.3) 120deg,
-                rgba(229, 31, 72, 0) 240deg
+                rgba(54, 69, 79, 0) 0deg,
+                rgba(54, 69, 79, 0.3) 120deg,
+                rgba(54, 69, 79, 0) 240deg
               )`,
             }}
           />
@@ -477,9 +477,9 @@ export default function ResellerDashboard() {
             animate={{
               scale: [1, 1.1, 1],
               boxShadow: [
-                '0 0 0 0 rgba(229, 31, 72, 0.4)',
-                '0 0 0 15px rgba(229, 31, 72, 0)',
-                '0 0 0 30px rgba(229, 31, 72, 0)'
+                '0 0 0 0 rgba(54, 69, 79, 0.4)',
+                '0 0 0 15px rgba(54, 69, 79, 0)',
+                '0 0 0 30px rgba(54, 69, 79, 0)'
               ]
             }}
             transition={{
@@ -487,7 +487,7 @@ export default function ResellerDashboard() {
               repeat: Infinity,
               ease: "easeOut"
             }}
-            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] flex items-center justify-center"
+            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#36454F] to-[#9B5DE5] flex items-center justify-center"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
               <path 
@@ -506,7 +506,7 @@ export default function ResellerDashboard() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#e51f48]"
+            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#36454F]"
           >
             Loading...
           </motion.span>
@@ -524,22 +524,22 @@ export default function ResellerDashboard() {
     <ThemeProvider>
       <AuthProvider>
         <PaymentProvider>
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen pb-32">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Reseller Dashboard</h1>
-          <p className="text-gray-400">Track your earnings and manage your reseller links</p>
+          <p className="text-white/60">Track your earnings and manage your reseller links</p>
         </div>
         <div className="flex items-center gap-4">
           {/* KYC Status Badge */}
           {kycStatus && (
             <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
               kycStatus.isVerified 
-                ? 'bg-green-500/20 text-green-400' 
+                ? 'bg-purple/20 text-purple/60'
                 : kycStatus.status === 'PENDING'
-                ? 'bg-yellow-500/20 text-yellow-400'
-                : 'bg-red-500/20 text-red-400'
+                ? 'bg-purple/20 text-purple/60'
+                : 'bg-purple/20 text-purple/60'
             }`}>
               <Shield className="w-4 h-4" />
               <span className="text-sm font-medium">
@@ -551,7 +551,7 @@ export default function ResellerDashboard() {
           <button
             onClick={handlePayoutRequest}
             disabled={!kycStatus?.isVerified || stats.pendingCommission < 10}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#e51f48] to-[#ff4d6d] disabled:from-gray-600 disabled:to-gray-600 text-white rounded-xl hover:shadow-lg transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#36454F] to-[#9B5DE5] disabled:from-charcoal/50 disabled:to-charcoal/50 text-white rounded-xl hover:shadow-lg transition-all"
           >
             <Wallet className="w-5 h-5" />
             Request Payout
@@ -560,15 +560,15 @@ export default function ResellerDashboard() {
       </div>
 
        {/* Navigation Tabs */}
-<div className="flex gap-4 border-b border-[#0a3747] pb-2 mb-6 overflow-x-auto">
+<div className="flex gap-4 border-b border-[#36454F] pb-2 mb-6 overflow-x-auto">
   {tabs.map(tab => (
     <button
       key={tab.id}
       onClick={() => setActiveTab(tab.id)}
       className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${
         activeTab === tab.id 
-          ? 'text-[#e51f48] border-b-2 border-[#e51f48]' 
-          : 'text-gray-400 hover:text-gray-300'
+          ? 'text-[#36454F] border-b-2 border-[#36454F]'
+          : 'text-white/60 hover:text-white/90'
       }`}
     >
       {tab.icon}
@@ -579,62 +579,62 @@ export default function ResellerDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-[#0a3747]/70 rounded-xl p-6 border-l-4 border-green-500">
+        <div className="bg-[#36454F]/70 rounded-xl p-6 border-l-4 border-purple/75">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-gray-400 text-sm mb-1">Total Earnings</p>
+              <p className="text-white/60 text-sm mb-1">Total Earnings</p>
               <p className="text-2xl font-bold text-white">${stats.totalCommission.toFixed(2)}</p>
             </div>
-            <div className="p-2 bg-green-500/20 rounded-lg">
-              <DollarSign className="w-6 h-6 text-green-400" />
+            <div className="p-2 bg-purple/20 rounded-lg">
+              <DollarSign className="w-6 h-6 text-purple/60" />
             </div>
           </div>
-          <div className="flex items-center gap-1 text-green-400 text-sm">
+          <div className="flex items-center gap-1 text-purple/60 text-sm">
             <ArrowUpRight className="w-4 h-4" />
             <span>+{stats.monthlyGrowth}% this month</span>
           </div>
         </div>
 
-        <div className="bg-[#0a3747]/70 rounded-xl p-6 border-l-4 border-blue-500">
+        <div className="bg-[#36454F]/70 rounded-xl p-6 border-l-4 border-purple/75">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-gray-400 text-sm mb-1">Pending Earnings</p>
+              <p className="text-white/60 text-sm mb-1">Pending Earnings</p>
               <p className="text-2xl font-bold text-white">${stats.pendingCommission.toFixed(2)}</p>
             </div>
-            <div className="p-2 bg-blue-500/20 rounded-lg">
-              <Wallet className="w-6 h-6 text-blue-400" />
+            <div className="p-2 bg-purple/20 rounded-lg">
+              <Wallet className="w-6 h-6 text-purple/60" />
             </div>
           </div>
-          <p className="text-blue-400 text-sm">Available for payout</p>
+          <p className="text-purple/60 text-sm">Available for payout</p>
         </div>
 
-        <div className="bg-[#0a3747]/70 rounded-xl p-6 border-l-4 border-purple-500">
+        <div className="bg-[#36454F]/70 rounded-xl p-6 border-l-4 border-purple/75">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-gray-400 text-sm mb-1">Total Sales</p>
+              <p className="text-white/60 text-sm mb-1">Total Sales</p>
               <p className="text-2xl font-bold text-white">{stats.totalSales}</p>
             </div>
-            <div className="p-2 bg-purple-500/20 rounded-lg">
-              <ShoppingCart className="w-6 h-6 text-purple-400" />
+            <div className="p-2 bg-purple/20 rounded-lg">
+              <ShoppingCart className="w-6 h-6 text-purple/60" />
             </div>
           </div>
-          <div className="flex items-center gap-1 text-purple-400 text-sm">
+          <div className="flex items-center gap-1 text-purple/60 text-sm">
             <TrendingUp className="w-4 h-4" />
             <span>{stats.conversionRate}% conversion rate</span>
           </div>
         </div>
 
-        <div className="bg-[#0a3747]/70 rounded-xl p-6 border-l-4 border-orange-500">
+        <div className="bg-[#36454F]/70 rounded-xl p-6 border-l-4 border-purple/75">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-gray-400 text-sm mb-1">Active Links</p>
+              <p className="text-white/60 text-sm mb-1">Active Links</p>
               <p className="text-2xl font-bold text-white">{stats.activeLinks}</p>
             </div>
-            <div className="p-2 bg-orange-500/20 rounded-lg">
-              <Link className="w-6 h-6 text-orange-400" />
+            <div className="p-2 bg-purple/20 rounded-lg">
+              <Link className="w-6 h-6 text-purple/60" />
             </div>
           </div>
-          <p className="text-orange-400 text-sm">Generating commissions</p>
+          <p className="text-purple/60 text-sm">Generating commissions</p>
         </div>
       </div>
 
@@ -642,27 +642,27 @@ export default function ResellerDashboard() {
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Commissions */}
-          <div className="lg:col-span-2 bg-[#0a3747]/70 rounded-xl p-6">
+          <div className="lg:col-span-2 bg-[#36454F]/70 rounded-xl p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-white">Recent Commissions</h2>
               <button 
                 onClick={() => setActiveTab('commissions')}
-                className="text-[#e51f48] hover:text-[#ff4d6d] text-sm"
+                className="text-[#36454F] hover:text-[#9B5DE5] text-sm"
               >
                 View all
               </button>
             </div>
             <div className="space-y-4">
               {commissions.slice(0, 5).map(commission => (
-                <div key={commission.id} className="flex items-center justify-between p-4 bg-[#0a3747] rounded-lg">
+                <div key={commission.id} className="flex items-center justify-between p-4 bg-[#36454F] rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${
-                      commission.status === 'PAID' ? 'bg-green-500' : 
-                      commission.status === 'PENDING' ? 'bg-yellow-500' : 'bg-red-500'
+                      commission.status === 'PAID' ? 'bg-purple/75' :
+                      commission.status === 'PENDING' ? 'bg-purple/75' : 'bg-purple/75'
                     }`}></div>
                     <div>
                       <p className="font-medium text-white">{commission.media.title}</p>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-white/60">
                         {commission.transaction.user.displayName || commission.transaction.user.username}
                       </p>
                     </div>
@@ -671,7 +671,7 @@ export default function ResellerDashboard() {
                     <p className="font-bold text-white">
                       {commission.currency} {commission.amount.toFixed(2)}
                     </p>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-white/60">
                       {formatDistanceToNow(new Date(commission.createdAt), { addSuffix: true })}
                     </p>
                   </div>
@@ -683,25 +683,25 @@ export default function ResellerDashboard() {
           {/* Quick Actions & KYC Status */}
           <div className="space-y-6">
             {/* KYC Status Card */}
-            <div className="bg-[#0a3747]/70 rounded-xl p-6">
+            <div className="bg-[#36454F]/70 rounded-xl p-6">
               <h2 className="text-xl font-bold text-white mb-4">Verification Status</h2>
               {kycStatus ? (
                 <div className="space-y-4">
                   <div className={`p-4 rounded-lg ${
-                    kycStatus.isVerified ? 'bg-green-500/20' :
-                    kycStatus.status === 'PENDING' ? 'bg-yellow-500/20' : 'bg-red-500/20'
+                    kycStatus.isVerified ? 'bg-purple/20' :
+                    kycStatus.status === 'PENDING' ? 'bg-purple/20' : 'bg-purple/20'
                   }`}>
                     <div className="flex items-center gap-3">
                       <Shield className={`w-6 h-6 ${
-                        kycStatus.isVerified ? 'text-green-400' :
-                        kycStatus.status === 'PENDING' ? 'text-yellow-400' : 'text-red-400'
+                        kycStatus.isVerified ? 'text-purple/60' :
+                        kycStatus.status === 'PENDING' ? 'text-purple/60' : 'text-purple/60'
                       }`} />
                       <div>
                         <p className="font-medium text-white">
                           {kycStatus.isVerified ? 'Identity Verified' :
                            kycStatus.status === 'PENDING' ? 'Under Review' : 'Verification Required'}
                         </p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-white/60">
                           {kycStatus.isVerified ? 
                             `Verified on ${new Date(kycStatus.verifiedAt!).toLocaleDateString()}` :
                            kycStatus.status === 'PENDING' ? 
@@ -715,7 +715,7 @@ export default function ResellerDashboard() {
                   {!kycStatus.isVerified && kycStatus.status !== 'PENDING' && (
                     <button
                       onClick={startKYCVerification}
-                      className="w-full py-3 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors font-medium"
+                      className="w-full py-3 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors font-medium"
                     >
                       Start Verification
                     </button>
@@ -723,44 +723,44 @@ export default function ResellerDashboard() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <UserCheck className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-400">Verification status unavailable</p>
+                  <UserCheck className="w-12 h-12 text-white/60 mx-auto mb-4" />
+                  <p className="text-white/60">Verification status unavailable</p>
                 </div>
               )}
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-[#0a3747]/70 rounded-xl p-6">
+            <div className="bg-[#36454F]/70 rounded-xl p-6">
               <h2 className="text-xl font-bold text-white mb-6">Quick Actions</h2>
               <div className="space-y-4">
                 <button 
                   onClick={() => setActiveTab('links')}
-                  className="w-full flex items-center gap-3 p-4 bg-[#0a3747] hover:bg-[#0a3747]/80 rounded-lg transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg transition-colors text-left"
                 >
-                  <Plus className="w-5 h-5 text-[#e51f48]" />
+                  <Plus className="w-5 h-5 text-[#36454F]" />
                   <div>
                     <p className="font-medium text-white">Create New Link</p>
-                    <p className="text-sm text-gray-400">Generate reseller link for a track</p>
+                    <p className="text-sm text-white/60">Generate reseller link for a track</p>
                   </div>
                 </button>
 
                 <button 
                   onClick={handlePayoutRequest}
                   disabled={!kycStatus?.isVerified || stats.pendingCommission < 10}
-                  className="w-full flex items-center gap-3 p-4 bg-[#0a3747] hover:bg-[#0a3747]/80 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors text-left"
                 >
-                  <Wallet className="w-5 h-5 text-[#e51f48]" />
+                  <Wallet className="w-5 h-5 text-[#36454F]" />
                   <div>
                     <p className="font-medium text-white">Request Payout</p>
-                    <p className="text-sm text-gray-400">Withdraw earnings to your account</p>
+                    <p className="text-sm text-white/60">Withdraw earnings to your account</p>
                   </div>
                 </button>
 
-                <button className="w-full flex items-center gap-3 p-4 bg-[#0a3747] hover:bg-[#0a3747]/80 rounded-lg transition-colors text-left">
-                  <Download className="w-5 h-5 text-[#e51f48]" />
+                <button className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg transition-colors text-left">
+                  <Download className="w-5 h-5 text-[#36454F]" />
                   <div>
                     <p className="font-medium text-white">Export Reports</p>
-                    <p className="text-sm text-gray-400">Download sales and earnings data</p>
+                    <p className="text-sm text-white/60">Download sales and earnings data</p>
                   </div>
                 </button>
               </div>
@@ -772,13 +772,13 @@ export default function ResellerDashboard() {
       {activeTab === 'links' && (
         <div className="space-y-6">
           {/* Create New Link */}
-          <div className="bg-[#0a3747]/70 rounded-xl p-6">
+          <div className="bg-[#36454F]/70 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Generate Reseller Link</h2>
             <div className="flex gap-4">
               <select 
                 value={selectedMedia || ''}
                 onChange={(e) => setSelectedMedia(Number(e.target.value))}
-                className="flex-1 px-4 py-3 bg-[#0a3747] border border-[#0a3747] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent"
+                className="flex-1 px-4 py-3 bg-[#36454F] border border-[#36454F] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#36454F] focus:border-transparent"
               >
                 <option value="">Select a track to promote</option>
                 {availableMedia.map(media => (
@@ -790,35 +790,35 @@ export default function ResellerDashboard() {
               <button
                 onClick={() => selectedMedia && generateResellerLink(selectedMedia)}
                 disabled={!selectedMedia}
-                className="px-6 py-3 bg-[#e51f48] hover:bg-[#ff4d6d] disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
+                className="px-6 py-3 bg-[#36454F] hover:bg-[#9B5DE5] disabled:bg-charcoal disabled:cursor-not-allowed text-white rounded-xl transition-colors"
               >
                 Generate Link
               </button>
             </div>
             {/* Selected media details and pricing snapshot */}
             {selectedMediaDetails && (
-              <div className="mt-4 p-4 bg-[#071a1f]/50 rounded-lg border border-[#0a3747] text-sm text-gray-300">
+              <div className="mt-4 p-4 bg-[#000000]/50 rounded-lg border border-[#36454F] text-sm text-white/90">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-white">{selectedMediaDetails.title}</p>
-                    <p className="text-xs text-gray-400">by {selectedMediaDetails.user?.displayName}</p>
+                    <p className="text-xs text-white/60">by {selectedMediaDetails.user?.displayName}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-white font-semibold">${selectedMediaDetails.price}</p>
-                    <p className="text-xs text-gray-400">{selectedMediaDetails.allowReselling ? 'Resellable' : 'Not resellable'}</p>
+                    <p className="text-xs text-white/60">{selectedMediaDetails.allowReselling ? 'Resellable' : 'Not resellable'}</p>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between">
                   <div>
                     {selectedMediaDetails.acceptedPricingSnapshotId ? (
-                      <span className="px-2 py-1 bg-green-600/20 rounded">Pricing accepted</span>
+                      <span className="px-2 py-1 bg-purple/20 rounded">Pricing accepted</span>
                     ) : (
-                      <span className="px-2 py-1 bg-yellow-600/20 rounded">No accepted pricing</span>
+                      <span className="px-2 py-1 bg-purple/20 rounded">No accepted pricing</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
                     {selectedMediaDetails.acceptedPricingSnapshotId && (
-                      <button onClick={() => viewPricingSnapshot(selectedMediaDetails.id)} className="text-sm text-[#e51f48]">View snapshot</button>
+                      <button onClick={() => viewPricingSnapshot(selectedMediaDetails.id)} className="text-sm text-[#36454F]">View snapshot</button>
                     )}
                     {!selectedMediaDetails.acceptedPricingSnapshotId && selectedMediaDetails.allowReselling && (
                       <button onClick={() => generateResellerLink(selectedMediaDetails.id)} className="text-sm text-white/90 bg-white/5 px-2 py-1 rounded">Create reseller link</button>
@@ -830,14 +830,14 @@ export default function ResellerDashboard() {
           </div>
 
           {/* Active Links */}
-          <div className="bg-[#0a3747]/70 rounded-xl p-6">
+          <div className="bg-[#36454F]/70 rounded-xl p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-white">Your Reseller Links</h2>
               <div className="flex gap-2">
-                <button className="p-2 bg-[#0a3747] rounded-lg text-gray-400 hover:text-white transition-colors">
+                <button className="p-2 bg-[#36454F] rounded-lg text-white/60 hover:text-white transition-colors">
                   <Filter className="w-4 h-4" />
                 </button>
-                <button className="p-2 bg-[#0a3747] rounded-lg text-gray-400 hover:text-white transition-colors">
+                <button className="p-2 bg-[#36454F] rounded-lg text-white/60 hover:text-white transition-colors">
                   <Download className="w-4 h-4" />
                 </button>
               </div>
@@ -845,7 +845,7 @@ export default function ResellerDashboard() {
 
             <div className="space-y-4">
               {resellerLinks.map(link => (
-                <div key={link.id} className="bg-[#0a3747] rounded-lg p-4">
+                <div key={link.id} className="bg-[#36454F] rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       {link.media.artCoverUrl ? (
@@ -855,16 +855,16 @@ export default function ResellerDashboard() {
                           className="w-12 h-12 rounded-lg object-cover"
                         />
                       ) : (
-                        <div className="w-12 h-12 bg-gradient-to-br from-[#e51f48] to-[#ff4d6d] rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-[#36454F] to-[#9B5DE5] rounded-lg flex items-center justify-center">
                           <Link className="w-6 h-6 text-white" />
                         </div>
                       )}
                       <div>
                         <p className="font-medium text-white">{link.media.title}</p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-white/60">
                           by {link.media.user.displayName}
                         </p>
-                        <div className="flex items-center gap-4 mt-1 text-xs text-gray-400">
+                        <div className="flex items-center gap-4 mt-1 text-xs text-white/60">
                           <span className="flex items-center gap-1">
                             <Eye className="w-3 h-3" />
                             {link.clickCount} clicks
@@ -883,24 +883,24 @@ export default function ResellerDashboard() {
                     
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <p className="text-sm text-gray-400">Your Link:</p>
+                        <p className="text-sm text-white/60">Your Link:</p>
                         <div className="flex items-center gap-2">
-                          <code className="text-white bg-[#0a1f29] px-2 py-1 rounded text-sm">
+                          <code className="text-white bg-[#000000] px-2 py-1 rounded text-sm">
                             {getResellerLinkUrl(link.code)}
                           </code>
                           <button
                             onClick={() => copyToClipboard(getResellerLinkUrl(link.code))}
-                            className="p-1 text-gray-400 hover:text-[#e51f48] transition-colors"
+                            className="p-1 text-white/60 hover:text-[#36454F] transition-colors"
                           >
                             {copiedLink === getResellerLinkUrl(link.code) ? (
-                              <Check className="w-4 h-4 text-green-500" />
+                              <Check className="w-4 h-4 text-purple/75" />
                             ) : (
                               <Copy className="w-4 h-4" />
                             )}
                           </button>
                         </div>
                       </div>
-                      <button className="p-2 bg-[#0a1f29] text-gray-400 hover:text-white rounded-lg transition-colors">
+                      <button className="p-2 bg-[#000000] text-white/60 hover:text-white rounded-lg transition-colors">
                         <Share2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -913,16 +913,16 @@ export default function ResellerDashboard() {
       )}
 
       {activeTab === 'commissions' && (
-        <div className="bg-[#0a3747]/70 rounded-xl p-6">
+        <div className="bg-[#36454F]/70 rounded-xl p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-white">Commission History</h2>
             <div className="flex gap-2">
-              <select className="px-3 py-2 bg-[#0a3747] border border-[#0a3747] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e51f48] focus:border-transparent">
+              <select className="px-3 py-2 bg-[#36454F] border border-[#36454F] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#36454F] focus:border-transparent">
                 <option>All Time</option>
                 <option>This Month</option>
                 <option>Last Month</option>
               </select>
-              <button className="p-2 bg-[#0a3747] rounded-lg text-gray-400 hover:text-white transition-colors">
+              <button className="p-2 bg-[#36454F] rounded-lg text-white/60 hover:text-white transition-colors">
                 <Download className="w-4 h-4" />
               </button>
             </div>
@@ -931,19 +931,19 @@ export default function ResellerDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#0a3747]">
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Track</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Customer</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Amount</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Status</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Date</th>
+                <tr className="border-b border-[#36454F]">
+                  <th className="text-left py-3 px-4 text-white/60 font-medium">Track</th>
+                  <th className="text-left py-3 px-4 text-white/60 font-medium">Customer</th>
+                  <th className="text-left py-3 px-4 text-white/60 font-medium">Amount</th>
+                  <th className="text-left py-3 px-4 text-white/60 font-medium">Status</th>
+                  <th className="text-left py-3 px-4 text-white/60 font-medium">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {commissions.map(commission => (
-                  <tr key={commission.id} className="border-b border-[#0a3747] hover:bg-[#0a3747]/50">
+                  <tr key={commission.id} className="border-b border-[#36454F] hover:bg-[#36454F]/50">
                     <td className="py-3 px-4 text-white">{commission.media.title}</td>
-                    <td className="py-3 px-4 text-gray-400">
+                    <td className="py-3 px-4 text-white/60">
                       {commission.transaction.user.displayName || commission.transaction.user.username}
                     </td>
                     <td className="py-3 px-4 text-white font-bold">
@@ -954,7 +954,7 @@ export default function ResellerDashboard() {
                         {commission.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-gray-400">
+                    <td className="py-3 px-4 text-white/60">
                       {formatDistanceToNow(new Date(commission.createdAt), { addSuffix: true })}
                     </td>
                   </tr>
@@ -968,35 +968,35 @@ export default function ResellerDashboard() {
       {activeTab === 'payouts' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Payout Methods */}
-          <div className="lg:col-span-2 bg-[#0a3747]/70 rounded-xl p-6">
+          <div className="lg:col-span-2 bg-[#36454F]/70 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Payout Methods</h2>
             <div className="space-y-4">
               {paymentAccounts.map(account => (
-                <div key={account.id} className="flex items-center justify-between p-4 bg-[#0a3747] rounded-lg">
+                <div key={account.id} className="flex items-center justify-between p-4 bg-[#36454F] rounded-lg">
                   <div className="flex items-center gap-3">
                     {getProviderIcon(account.provider)}
                     <div>
                       <p className="font-medium text-white">
                         {account.provider.replace('_', ' ')}
                         {account.isDefault && (
-                          <span className="ml-2 text-green-400 text-sm">Primary</span>
+                          <span className="ml-2 text-purple/60 text-sm">Primary</span>
                         )}
                       </p>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-white/60">
                         {account.accountNumber} • {account.currency}
                         {!account.isVerified && (
-                          <span className="ml-2 text-yellow-400 text-sm">Pending Verification</span>
+                          <span className="ml-2 text-purple/60 text-sm">Pending Verification</span>
                         )}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     {!account.isDefault && (
-                      <button className="text-[#e51f48] hover:text-[#ff4d6d] text-sm">
+                      <button className="text-[#36454F] hover:text-[#9B5DE5] text-sm">
                         Set Primary
                       </button>
                     )}
-                    <button className="text-gray-400 hover:text-white text-sm">
+                    <button className="text-white/60 hover:text-white text-sm">
                       Edit
                     </button>
                   </div>
@@ -1005,37 +1005,37 @@ export default function ResellerDashboard() {
 
               <button 
                 onClick={() => {/* Open add account modal */}}
-                className="w-full flex items-center gap-3 p-4 bg-[#0a3747] hover:bg-[#0a3747]/80 rounded-lg transition-colors text-left border-2 border-dashed border-[#0a3747]"
+                className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg transition-colors text-left border-2 border-dashed border-[#36454F]"
               >
-                <Plus className="w-5 h-5 text-[#e51f48]" />
+                <Plus className="w-5 h-5 text-[#36454F]" />
                 <div>
                   <p className="font-medium text-white">Add Payout Method</p>
-                  <p className="text-sm text-gray-400">Add mobile money or bank account</p>
+                  <p className="text-sm text-white/60">Add mobile money or bank account</p>
                 </div>
               </button>
             </div>
           </div>
 
           {/* Payout Summary */}
-          <div className="bg-[#0a3747]/70 rounded-xl p-6">
+          <div className="bg-[#36454F]/70 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Payout Summary</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Available Balance</span>
+                <span className="text-white/60">Available Balance</span>
                 <span className="text-white font-bold">${stats.pendingCommission.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Minimum Payout</span>
+                <span className="text-white/60">Minimum Payout</span>
                 <span className="text-white">$10.00</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Next Payout Date</span>
+                <span className="text-white/60">Next Payout Date</span>
                 <span className="text-white">Instant</span>
               </div>
               
               {!kycStatus?.isVerified && (
-                <div className="p-4 bg-yellow-500/20 rounded-lg">
-                  <div className="flex items-center gap-2 text-yellow-400">
+                <div className="p-4 bg-purple/20 rounded-lg">
+                  <div className="flex items-center gap-2 text-purple/60">
                     <AlertTriangle className="w-4 h-4" />
                     <span className="text-sm">Complete KYC verification to enable payouts</span>
                   </div>
@@ -1045,13 +1045,13 @@ export default function ResellerDashboard() {
               <button
                 onClick={handlePayoutRequest}
                 disabled={!kycStatus?.isVerified || stats.pendingCommission < 10}
-                className="w-full mt-4 py-3 bg-[#e51f48] hover:bg-[#ff4d6d] disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium"
+                className="w-full mt-4 py-3 bg-[#36454F] hover:bg-[#9B5DE5] disabled:bg-charcoal disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium"
               >
                 Request Payout (${stats.pendingCommission.toFixed(2)})
               </button>
               
               {stats.pendingCommission < 10 && (
-                <p className="text-yellow-400 text-sm text-center mt-2">
+                <p className="text-purple/60 text-sm text-center mt-2">
                   Minimum $10 required for payout
                 </p>
               )}
@@ -1061,10 +1061,10 @@ export default function ResellerDashboard() {
       )}
 
       {activeTab === 'verification' && (
-        <div className="bg-[#0a3747]/70 rounded-xl p-6">
+        <div className="bg-[#36454F]/70 rounded-xl p-6">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold text-white mb-2">Identity Verification</h2>
-            <p className="text-gray-400 mb-8">
+            <p className="text-white/60 mb-8">
               Complete KYC verification to enable payouts and access all reseller features
             </p>
 
@@ -1072,18 +1072,18 @@ export default function ResellerDashboard() {
               <div className="space-y-6">
                 {/* Status Overview */}
                 <div className={`p-6 rounded-xl ${
-                  kycStatus.isVerified ? 'bg-green-500/20 border border-green-500/30' :
-                  kycStatus.status === 'PENDING' ? 'bg-yellow-500/20 border border-yellow-500/30' :
-                  'bg-red-500/20 border border-red-500/30'
+                  kycStatus.isVerified ? 'bg-purple/20 border border-purple/30' :
+                  kycStatus.status === 'PENDING' ? 'bg-purple/20 border border-purple/30' :
+                  'bg-purple/20 border border-purple/30'
                 }`}>
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-lg ${
-                      kycStatus.isVerified ? 'bg-green-500/30' :
-                      kycStatus.status === 'PENDING' ? 'bg-yellow-500/30' : 'bg-red-500/30'
+                      kycStatus.isVerified ? 'bg-purple/30' :
+                      kycStatus.status === 'PENDING' ? 'bg-purple/30' : 'bg-purple/30'
                     }`}>
                       <Shield className={`w-8 h-8 ${
-                        kycStatus.isVerified ? 'text-green-400' :
-                        kycStatus.status === 'PENDING' ? 'text-yellow-400' : 'text-red-400'
+                        kycStatus.isVerified ? 'text-purple/60' :
+                        kycStatus.status === 'PENDING' ? 'text-purple/60' : 'text-purple/60'
                       }`} />
                     </div>
                     <div>
@@ -1091,7 +1091,7 @@ export default function ResellerDashboard() {
                         {kycStatus.isVerified ? 'Verification Complete' :
                          kycStatus.status === 'PENDING' ? 'Under Review' : 'Verification Required'}
                       </h3>
-                      <p className="text-gray-400">
+                      <p className="text-white/60">
                         {kycStatus.isVerified ? 
                           `Your identity was verified on ${new Date(kycStatus.verifiedAt!).toLocaleDateString()}` :
                          kycStatus.status === 'PENDING' ? 
@@ -1100,7 +1100,7 @@ export default function ResellerDashboard() {
                         }
                       </p>
                       {kycStatus.rejectionReason && (
-                        <p className="text-red-400 mt-2">
+                        <p className="text-purple/60 mt-2">
                           <strong>Reason: </strong>{kycStatus.rejectionReason}
                         </p>
                       )}
@@ -1113,11 +1113,11 @@ export default function ResellerDashboard() {
                   <div className="text-center">
                     <button
                       onClick={startKYCVerification}
-                      className="px-8 py-4 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors font-medium text-lg"
+                      className="px-8 py-4 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors font-medium text-lg"
                     >
                       Start Verification Process
                     </button>
-                    <p className="text-gray-400 mt-4 text-sm">
+                    <p className="text-white/60 mt-4 text-sm">
                       You&apos;ll need a government-issued ID and a selfie
                     </p>
                   </div>
@@ -1129,15 +1129,15 @@ export default function ResellerDashboard() {
       <h4 className="text-lg font-bold text-white mb-4">Document Status</h4>
       <div className="space-y-3">
         {kycStatus.documents.map((doc: KYCStatus['documents'][number], index: number) => (
-          <div key={index} className="flex items-center justify-between p-4 bg-[#0a3747] rounded-lg">
+          <div key={index} className="flex items-center justify-between p-4 bg-[#36454F] rounded-lg">
             <div>
               <p className="font-medium text-white">{doc.type}</p>
-              <p className="text-sm text-gray-400">{doc.status}</p>
+              <p className="text-sm text-white/60">{doc.status}</p>
             </div>
             <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-              doc.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
-              doc.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400' :
-              'bg-red-500/20 text-red-400'
+              doc.status === 'APPROVED' ? 'bg-purple/20 text-purple/60' :
+              doc.status === 'PENDING' ? 'bg-purple/20 text-purple/60' :
+              'bg-purple/20 text-purple/60'
             }`}>
               {doc.status}
             </span>
@@ -1148,23 +1148,23 @@ export default function ResellerDashboard() {
   )}
 
                 {/* Benefits */}
-                <div className="bg-[#0a3747] rounded-xl p-6">
+                <div className="bg-[#36454F] rounded-xl p-6">
                   <h4 className="text-lg font-bold text-white mb-4">Benefits of Verification</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-center gap-3">
-                      <Wallet className="w-5 h-5 text-green-400" />
+                      <Wallet className="w-5 h-5 text-purple/60" />
                       <span className="text-white">Instant payouts</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <DollarSign className="w-5 h-5 text-green-400" />
+                      <DollarSign className="w-5 h-5 text-purple/60" />
                       <span className="text-white">Higher commission rates</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Shield className="w-5 h-5 text-green-400" />
+                      <Shield className="w-5 h-5 text-purple/60" />
                       <span className="text-white">Enhanced security</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <TrendingUp className="w-5 h-5 text-green-400" />
+                      <TrendingUp className="w-5 h-5 text-purple/60" />
                       <span className="text-white">Priority support</span>
                     </div>
                   </div>
@@ -1172,11 +1172,11 @@ export default function ResellerDashboard() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <UserCheck className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-400">Unable to load verification status</p>
+                <UserCheck className="w-16 h-16 text-white/60 mx-auto mb-4" />
+                <p className="text-white/60">Unable to load verification status</p>
                 <button
                   onClick={fetchDashboardData}
-                  className="mt-4 px-6 py-3 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors"
+                  className="mt-4 px-6 py-3 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors"
                 >
                   Retry
                 </button>

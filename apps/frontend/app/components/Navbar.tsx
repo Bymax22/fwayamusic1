@@ -10,7 +10,7 @@ export default function Navbar({ currentTrack }: { currentTrack: any }) {
   const { user } = useAuth();
 
   return (
-    <nav className="hidden lg:flex fixed top-0 left-0 right-0 w-full h-14 items-center bg-[#0f0f2a]/60 backdrop-blur-xl border-b border-white/10 z-50">
+    <nav className="hidden lg:flex fixed top-0 left-0 right-0 w-full h-14 items-center bg-[#000000]/60 backdrop-blur-xl border-b border-white/10 z-50">
       <div className="flex items-center w-full h-full max-w-7xl mx-auto">
         <div className="w-[260px] flex items-center h-full px-6 border-r border-white/10">
           <div className="flex items-center gap-3">
@@ -39,22 +39,22 @@ export default function Navbar({ currentTrack }: { currentTrack: any }) {
 
         <div className="w-[340px] flex items-center h-full justify-end px-6 gap-4">
           <NotificationBell />
-          <Link href="/settings" className="text-gray-400 hover:text-white transition" aria-label="Settings">
+          <Link href="/settings" className="text-white/60 hover:text-white transition" aria-label="Settings">
             <Settings size={20} />
           </Link>
           {/* Premium CTA: full button for guests, icon-only filled button for logged-in users */}
           {user ? (
-            <Link href="/premium" aria-label="Premium" className="p-2 rounded-full bg-purple-600 text-white hover:bg-purple-500 transition mr-2">
+            <Link href="/premium" aria-label="Premium" className="p-2 rounded-full bg-purple/85 text-white hover:bg-purple/75 transition mr-2">
               <Crown size={18} />
             </Link>
           ) : (
-            <Link href="/premium" className="px-4 py-2 bg-purple-600 rounded-full text-sm font-medium hover:bg-purple-700 transition mr-2">
+            <Link href="/premium" className="px-4 py-2 bg-purple/85 rounded-full text-sm font-medium hover:bg-purple/90 transition mr-2">
               Go Premium
             </Link>
           )}
           {user ? (
             <div className="flex items-center gap-2 cursor-pointer hover:bg-white/10 px-3 py-1.5 rounded-full transition">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple/75 to-purple/75 flex items-center justify-center">
                 <User size={16} />
               </div>
               <span className="text-sm font-medium hidden xl:inline">
@@ -67,7 +67,7 @@ export default function Navbar({ currentTrack }: { currentTrack: any }) {
               <Link href="/auth/user/signin" aria-label="Login" className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10 transition">
                 <LogIn size={18} />
               </Link>
-              <Link href="/auth/user/signup" aria-label="Register" className="p-2 rounded-full bg-purple-600 text-white hover:bg-purple-500 transition">
+              <Link href="/auth/user/signup" aria-label="Register" className="p-2 rounded-full bg-purple/85 text-white hover:bg-purple/75 transition">
                 <UserPlus size={18} />
               </Link>
             </div>

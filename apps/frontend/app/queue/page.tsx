@@ -126,22 +126,22 @@ export default function QueuePage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen pb-32">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Queue</h1>
-          <p className="text-gray-400">Currently playing and up next</p>
+          <p className="text-white/60">Currently playing and up next</p>
         </div>
         <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#0a3747] hover:bg-[#0a3747]/80 text-gray-300 rounded-xl transition-colors">
+          <button className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#36454F]/80 text-white/90 rounded-xl transition-colors">
             <Shuffle className="w-4 h-4" />
             Shuffle
           </button>
           {upNext.length > 0 && (
             <button 
               onClick={clearQueue}
-              className="flex items-center gap-2 px-4 py-2 bg-[#0a3747] hover:bg-[#ff4d6d] text-gray-300 hover:text-white rounded-xl transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#9B5DE5] text-white/90 hover:text-white rounded-xl transition-colors"
             >
               <X className="w-4 h-4" />
               Clear Queue
@@ -154,12 +154,12 @@ export default function QueuePage() {
         {/* Now Playing */}
         <div className="lg:col-span-1">
           <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <Play className="w-5 h-5 text-[#e51f48]" />
+            <Play className="w-5 h-5 text-[#36454F]" />
             Now Playing
           </h2>
           
           {queue.length > 0 ? (
-            <div className="bg-[#0a3747]/70 rounded-xl p-4">
+            <div className="bg-[#36454F]/70 rounded-xl p-4">
               {queue.map(track => (
                 <div key={track.id} className="text-center">
                   <Image 
@@ -171,13 +171,13 @@ export default function QueuePage() {
                     }}
                   />
                   <h3 className="font-bold text-white text-lg mb-1">{track.title}</h3>
-                  <p className="text-gray-400 mb-2">{track.artist}</p>
-                  <p className="text-gray-500 text-sm">{track.genre}</p>
+                  <p className="text-white/60 mb-2">{track.artist}</p>
+                  <p className="text-white/60 text-sm">{track.genre}</p>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-[#0a3747]/70 rounded-xl p-8 text-center text-gray-400">
+            <div className="bg-[#36454F]/70 rounded-xl p-8 text-center text-white/60">
               <List className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p>Nothing playing right now</p>
             </div>
@@ -188,20 +188,20 @@ export default function QueuePage() {
         <div className="lg:col-span-2">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <List className="w-5 h-5 text-[#e51f48]" />
+              <List className="w-5 h-5 text-[#36454F]" />
               Up Next ({upNext.length})
             </h2>
           </div>
 
-          <div className="bg-[#0a3747]/70 rounded-xl overflow-hidden">
+          <div className="bg-[#36454F]/70 rounded-xl overflow-hidden">
             {upNext.length > 0 ? (
-              <div className="divide-y divide-[#0a3747]">
+              <div className="divide-y divide-[#36454F]">
                 {upNext.map((track, index) => (
                   <div 
                     key={track.id} 
-                    className="flex items-center gap-4 p-4 hover:bg-[#0a3747]/50 transition-colors group"
+                    className="flex items-center gap-4 p-4 hover:bg-[#36454F]/50 transition-colors group"
                   >
-                    <div className="text-gray-400 w-6 text-center">
+                    <div className="text-white/60 w-6 text-center">
                       {index + 1}
                     </div>
                     
@@ -223,28 +223,28 @@ export default function QueuePage() {
                           <span>{track.title}</span>
                         </span>
                       </ScrollingTrackTitle>
-                      <p className="text-sm text-gray-400 truncate">{track.artist}</p>
+                      <p className="text-sm text-white/60 truncate">{track.artist}</p>
                     </div>
                     
                     <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={() => handlePlay(track)}
-                        className="text-gray-400 hover:text-[#e51f48] transition-colors"
+                        className="text-white/60 hover:text-[#36454F] transition-colors"
                       >
                         <Play className="w-4 h-4" />
                       </button>
-                      <button className="text-gray-400 hover:text-[#e51f48] transition-colors">
+                      <button className="text-white/60 hover:text-[#36454F] transition-colors">
                         <Heart className="w-4 h-4" />
                       </button>
                     </div>
                     
                     <div className="flex items-center gap-3">
-                      <span className="text-gray-400 text-sm">
+                      <span className="text-white/60 text-sm">
                         {formatDuration(track.duration)}
                       </span>
                       <button 
                         onClick={() => removeFromQueue(track.id)}
-                        className="text-gray-400 hover:text-[#ff4d6d] transition-colors"
+                        className="text-white/60 hover:text-[#9B5DE5] transition-colors"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -253,7 +253,7 @@ export default function QueuePage() {
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center text-gray-400">
+              <div className="p-8 text-center text-white/60">
                 <List className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p className="text-lg mb-2">Queue is empty</p>
                 <p>Add songs to see them here</p>

@@ -273,14 +273,14 @@ export default function SignUp() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-[#0d0d0d] w-full max-w-3xl rounded-[32px] p-8 pb-10 shadow-[0_25px_70px_rgba(0,0,0,0.55)] border border-white/10"
+        className="relative bg-[#000000] w-full max-w-3xl rounded-[32px] p-8 pb-10 shadow-[0_25px_70px_rgba(0, 0, 0, 0.55)] border border-white/10"
       >
         <div className="flex items-center justify-between mb-6">
           <button
             type="button"
             onClick={handleBack}
             disabled={step === 'role'}
-            className="flex items-center gap-2 text-gray-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 text-white/90 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <FaChevronLeft className="w-5 h-5" />
             <span className="hidden sm:inline text-sm">Back</span>
@@ -288,14 +288,14 @@ export default function SignUp() {
           <button
             type="button"
             onClick={() => router.push('/')}
-            className="rounded-full bg-[#1f1f1f] text-white/90 ring-1 ring-white/10 hover:bg-[#2a2a2a] p-2 transition-colors shadow-sm"
+            className="rounded-full bg-[#000000] text-white/90 ring-1 ring-white/10 hover:bg-[#36454F] p-2 transition-colors shadow-sm"
           >
             <FaTimes className="w-5 h-5" />
           </button>
         </div>
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Join Fwaya</h1>
-          <p className="text-gray-400">Create your account and start your musical journey</p>
+          <p className="text-white/60">Create your account and start your musical journey</p>
         </div>
 
         <AuthErrorBanner error={authError} />
@@ -311,10 +311,10 @@ export default function SignUp() {
                   <div
                     className={`w-8 h-8 flex items-center justify-center text-sm font-semibold ${
                       step === s
-                        ? 'bg-purple-600 text-white'
+                        ? 'bg-purple/85 text-white'
                         : index < currentIndex
-                        ? 'bg-[#1f1f1f] text-white'
-                        : 'bg-[#1f1f1f] text-gray-400'
+                        ? 'bg-[#000000] text-white'
+                        : 'bg-[#000000] text-white/60'
                     }`}
                   >
                     {index < currentIndex ? (
@@ -323,14 +323,14 @@ export default function SignUp() {
                       index + 1
                     )}
                   </div>
-                  <span className="text-xs text-gray-400 mt-2 capitalize">{s}</span>
+                  <span className="text-xs text-white/60 mt-2 capitalize">{s}</span>
                 </div>
               );
             })}
           </div>
-          <div className="w-full bg-[#1f1f1f] h-1 rounded-full">
+          <div className="w-full bg-[#000000] h-1 rounded-full">
             <div
-              className="bg-purple-600 h-1 rounded-full transition-all duration-300"
+              className="bg-purple/85 h-1 rounded-full transition-all duration-300"
               style={{
                 width: `${(['role', 'details', 'kyc', 'consent', 'verification'].indexOf(step) + 1) * 20}%`,
               }}
@@ -357,8 +357,8 @@ export default function SignUp() {
                     onClick={() => setFormData({ ...formData, role: role.id as SignupRole })}
                     className={`p-6 rounded-3xl transition-all ${
                       formData.role === role.id
-                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20 border border-purple-500/30'
-                        : 'bg-[#1f1f1f] text-gray-300 hover:bg-[#252525] border border-white/10'
+                        ? 'bg-purple/85 text-white shadow-lg shadow-purple/20 border border-purple/30'
+                        : 'bg-[#000000] text-white/90 hover:bg-[#36454F] border border-white/10'
                     }`}
                   >
                     <Icon className="w-8 h-8 mb-3" />
@@ -371,7 +371,7 @@ export default function SignUp() {
             <div className="flex justify-end">
               <button
                 onClick={handleNext}
-                className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-colors font-semibold"
+                className="px-8 py-3 bg-purple/85 text-white hover:bg-purple/90 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -417,7 +417,7 @@ export default function SignUp() {
               error={errors.username}
             />
             {formData.email && emailStatus !== 'available' && (
-              <p className={`text-xs mt-1 ${emailStatus === 'taken' ? 'text-red-500' : 'text-gray-400'}`}>
+              <p className={`text-xs mt-1 ${emailStatus === 'taken' ? 'text-purple/75' : 'text-white/60'}`}>
                 {emailStatus === 'taken'
                   ? 'This email is already in use. Please choose a different address.'
                   : emailStatus === 'checking'
@@ -427,61 +427,61 @@ export default function SignUp() {
             )}
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-300 mb-2">Display Name</label>
+              <label className="block text-sm font-medium text-white/90 mb-2">Display Name</label>
               <input
                 type="text"
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                 placeholder="Your display name"
-                className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <label className="block text-sm font-medium text-white/90 mb-2">Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-10"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white"
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
-                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                {errors.password && <p className="text-purple/75 text-xs mt-1">{errors.password}</p>}
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                <label className="block text-sm font-medium text-white/90 mb-2">Confirm Password</label>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 />
-                {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-purple/75 text-xs mt-1">{errors.confirmPassword}</p>}
               </div>
             </div>
 
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#000000] text-white/90 hover:bg-[#000000] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleNext}
-                className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-colors font-semibold"
+                className="px-8 py-3 bg-purple/85 text-white hover:bg-purple/90 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -500,13 +500,13 @@ export default function SignUp() {
               Additional Information
             </h2>
 
-            <div className="bg-[#1f1f1f] border border-white/10 rounded-3xl p-5 space-y-5">
+            <div className="bg-[#000000] border border-white/10 rounded-3xl p-5 space-y-5">
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-purple-300">Contact</p>
+                  <p className="text-xs uppercase tracking-[0.24em] text-purple/45">Contact</p>
                   <h3 className="text-lg font-semibold text-white">Country & phone</h3>
                 </div>
-                <p className="text-xs text-gray-400">Dropdown selection on mobile and desktop</p>
+                <p className="text-xs text-white/60">Dropdown selection on mobile and desktop</p>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
@@ -529,64 +529,64 @@ export default function SignUp() {
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-300 mb-2">Date of Birth</label>
+              <label className="block text-sm font-medium text-white/90 mb-2">Date of Birth</label>
               <input
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               />
-              {errors.dateOfBirth && <p className="text-red-500 text-xs mt-1">{errors.dateOfBirth}</p>}
+              {errors.dateOfBirth && <p className="text-purple/75 text-xs mt-1">{errors.dateOfBirth}</p>}
             </div>
 
             {formData.role === 'ARTIST' && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Artist Name</label>
+                    <label className="block text-sm font-medium text-white/90 mb-2">Artist Name</label>
                     <input
                       type="text"
                       value={formData.artistName}
                       onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
                       placeholder="Your official artist name"
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                     />
-                    {errors.artistName && <p className="text-red-500 text-xs mt-1">{errors.artistName}</p>}
+                    {errors.artistName && <p className="text-purple/75 text-xs mt-1">{errors.artistName}</p>}
                   </div>
 
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Stage Name</label>
+                    <label className="block text-sm font-medium text-white/90 mb-2">Stage Name</label>
                     <input
                       type="text"
                       value={formData.stageName}
                       onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
                       placeholder="Your performance name"
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                     />
-                    {errors.stageName && <p className="text-red-500 text-xs mt-1">{errors.stageName}</p>}
+                    {errors.stageName && <p className="text-purple/75 text-xs mt-1">{errors.stageName}</p>}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Bio (Optional)</label>
+                    <label className="block text-sm font-medium text-white/90 mb-2">Bio (Optional)</label>
                     <textarea
                       value={formData.bio}
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       placeholder="Tell us about yourself and your music..."
                       rows={3}
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                     />
                   </div>
 
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Website (Optional)</label>
+                    <label className="block text-sm font-medium text-white/90 mb-2">Website (Optional)</label>
                     <input
                       type="url"
                       value={formData.website}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                       placeholder="https://yourwebsite.com"
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -596,23 +596,23 @@ export default function SignUp() {
             {formData.role === 'RESELLER' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Business Name</label>
+                  <label className="block text-sm font-medium text-white/90 mb-2">Business Name</label>
                   <input
                     type="text"
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                     placeholder="Your business name"
-                    className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   />
-                  {errors.businessName && <p className="text-red-500 text-xs mt-1">{errors.businessName}</p>}
+                  {errors.businessName && <p className="text-purple/75 text-xs mt-1">{errors.businessName}</p>}
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Business Type</label>
+                  <label className="block text-sm font-medium text-white/90 mb-2">Business Type</label>
                   <select
                     value={formData.businessType}
                     onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-3xl bg-[#1f1f1f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   >
                     <option value="">Select business type</option>
                     <option value="INDIVIDUAL">Individual</option>
@@ -620,7 +620,7 @@ export default function SignUp() {
                     <option value="PARTNERSHIP">Partnership</option>
                     <option value="NON_PROFIT">Non-Profit</option>
                   </select>
-                  {errors.businessType && <p className="text-red-500 text-xs mt-1">{errors.businessType}</p>}
+                  {errors.businessType && <p className="text-purple/75 text-xs mt-1">{errors.businessType}</p>}
                 </div>
               </div>
             )}
@@ -628,13 +628,13 @@ export default function SignUp() {
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#101010] text-gray-300 hover:bg-[#1f1f1f] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#000000] text-white/90 hover:bg-[#000000] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleNext}
-                className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-colors font-semibold"
+                className="px-8 py-3 bg-purple/85 text-white hover:bg-purple/90 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -653,20 +653,20 @@ export default function SignUp() {
               Terms & Consent
             </h2>
 
-            <div className="bg-[#1f1f1f] p-6 space-y-4 rounded-3xl">
+            <div className="bg-[#000000] p-6 space-y-4 rounded-3xl">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
                 />
-                <label htmlFor="terms" className="text-gray-300 text-sm">
-                  I agree to the <a href="/terms" className="text-purple-500 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple-500 hover:underline">Privacy Policy</a>
+                <label htmlFor="terms" className="text-white/90 text-sm">
+                  I agree to the <a href="/terms" className="text-purple/75 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple/75 hover:underline">Privacy Policy</a>
                 </label>
               </div>
-              {errors.acceptedTerms && <p className="text-red-500 text-xs">{errors.acceptedTerms}</p>}
+              {errors.acceptedTerms && <p className="text-purple/75 text-xs">{errors.acceptedTerms}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -674,13 +674,13 @@ export default function SignUp() {
                   id="privacy"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
                 />
-                <label htmlFor="privacy" className="text-gray-300 text-sm">
+                <label htmlFor="privacy" className="text-white/90 text-sm">
                   I acknowledge that I have read and understood how my personal data will be processed
                 </label>
               </div>
-              {errors.acceptedPrivacy && <p className="text-red-500 text-xs">{errors.acceptedPrivacy}</p>}
+              {errors.acceptedPrivacy && <p className="text-purple/75 text-xs">{errors.acceptedPrivacy}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -688,13 +688,13 @@ export default function SignUp() {
                   id="cookies"
                   checked={formData.acceptedCookies}
                   onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
                 />
-                <label htmlFor="cookies" className="text-gray-300 text-sm">
+                <label htmlFor="cookies" className="text-white/90 text-sm">
                   I agree to the use of cookies for analytics and personalization.
                 </label>
               </div>
-              {errors.acceptedCookies && <p className="text-red-500 text-xs">{errors.acceptedCookies}</p>}
+              {errors.acceptedCookies && <p className="text-purple/75 text-xs">{errors.acceptedCookies}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -702,9 +702,9 @@ export default function SignUp() {
                   id="marketing"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
                 />
-                <label htmlFor="marketing" className="text-gray-300 text-sm">
+                <label htmlFor="marketing" className="text-white/90 text-sm">
                   I agree to receive marketing emails and promotional offers
                 </label>
               </div>
@@ -715,9 +715,9 @@ export default function SignUp() {
                   id="dataSharing"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-[#101010] border-transparent rounded focus:ring-purple-600"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
                 />
-                <label htmlFor="dataSharing" className="text-gray-300 text-sm">
+                <label htmlFor="dataSharing" className="text-white/90 text-sm">
                   I consent to my data being shared with trusted partners for service improvement
                 </label>
               </div>
@@ -730,19 +730,19 @@ export default function SignUp() {
                 onError={() => setErrors({ ...errors, recaptcha: 'reCAPTCHA error occurred' })}
               />
             </div>
-            {errors.recaptcha && <p className="text-red-500 text-xs text-center">{errors.recaptcha}</p>}
+            {errors.recaptcha && <p className="text-purple/75 text-xs text-center">{errors.recaptcha}</p>}
 
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#1f1f1f] text-gray-200 hover:bg-[#272727] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-[#000000] text-white/90 hover:bg-[#36454F] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                className="px-8 py-3 bg-purple/85 text-white hover:bg-purple/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
@@ -757,7 +757,7 @@ export default function SignUp() {
             animate={{ opacity: 1, x: 0 }}
             className="text-center space-y-6"
           >
-            <div className="w-20 h-20 bg-green-600 flex items-center justify-center mx-auto">
+            <div className="w-20 h-20 bg-purple/85 flex items-center justify-center mx-auto">
               <FaCheck className="w-10 h-10 text-white" />
             </div>
             
@@ -766,36 +766,36 @@ export default function SignUp() {
                 Check Your Email!
               </h2>
               {verificationError && (
-                <div className="bg-red-500/10 rounded-3xl p-3 mb-3 text-left">
-                  <p className="text-red-200 text-sm font-semibold">Verification email failed to send.</p>
-                  <p className="text-red-100 text-xs break-words">{verificationError}</p>
+                <div className="bg-purple/10 rounded-3xl p-3 mb-3 text-left">
+                  <p className="text-purple/30 text-sm font-semibold">Verification email failed to send.</p>
+                  <p className="text-purple/20 text-xs break-words">{verificationError}</p>
                 </div>
               )}
-              <p className="text-gray-300 mb-2">
+              <p className="text-white/90 mb-2">
                 We&lsquo;ve sent a verification link to <strong>{formData.email}</strong>
               </p>
-              <p className="text-gray-400 text-sm">
+              <p className="text-white/60 text-sm">
                 Click the link in the email to verify your account and complete your registration.
               </p>
               <button
                 type="button"
                 onClick={handleResendVerificationEmail}
                 disabled={resendLoading}
-                className="mt-4 px-5 py-2 bg-[#1f1f1f] text-white hover:bg-[#2a2a2a] transition-colors disabled:opacity-50"
+                className="mt-4 px-5 py-2 bg-[#000000] text-white hover:bg-[#36454F] transition-colors disabled:opacity-50"
               >
                 {resendLoading ? 'Resending…' : 'Resend verification email'}
               </button>
             </div>
 
-            <div className="bg-yellow-600/10 rounded-3xl p-4">
-              <p className="text-yellow-400 text-sm">
+            <div className="bg-purple/10 rounded-3xl p-4">
+              <p className="text-purple/60 text-sm">
                 <strong>Note for Artists & Resellers:</strong> After email verification, you&lsquo;ll need to complete KYC document verification to access all platform features.
               </p>
             </div>
 
             <button
               onClick={() => window.location.href = '/auth/signin'}
-              className="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 transition-colors font-semibold"
+              className="px-8 py-3 bg-purple/85 text-white hover:bg-purple/90 transition-colors font-semibold"
             >
               Go to Sign In
             </button>

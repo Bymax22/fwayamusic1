@@ -70,27 +70,27 @@ function VideoPageSkeleton({ onBack }: { onBack: () => void }) {
     <div className="min-h-screen px-4 pb-24 pt-6 lg:px-10">
       <div className="max-w-7xl mx-auto space-y-6">
         <button
-          className="mb-6 rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
+          className="mb-6 rounded-full bg-purple/85 px-4 py-2 text-sm text-white transition hover:bg-purple/75"
           onClick={onBack}
         >
           Back
         </button>
-        <div className="h-[420px] rounded-3xl bg-[#11131a] animate-pulse" />
-        <div className="space-y-4 rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
-          <div className="h-6 w-2/5 rounded-full bg-[#11131a] animate-pulse" />
-          <div className="h-4 w-3/5 rounded-full bg-[#11131a] animate-pulse" />
+        <div className="h-[420px] rounded-3xl bg-[#000000] animate-pulse" />
+        <div className="space-y-4 rounded-3xl bg-[#000000] p-6 shadow-lg shadow-black/20">
+          <div className="h-6 w-2/5 rounded-full bg-[#000000] animate-pulse" />
+          <div className="h-4 w-3/5 rounded-full bg-[#000000] animate-pulse" />
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="h-28 rounded-3xl bg-[#11131a] animate-pulse" />
-            <div className="h-28 rounded-3xl bg-[#11131a] animate-pulse" />
+            <div className="h-28 rounded-3xl bg-[#000000] animate-pulse" />
+            <div className="h-28 rounded-3xl bg-[#000000] animate-pulse" />
           </div>
         </div>
         <div className="grid gap-4 lg:grid-cols-[1.5fr_0.9fr]">
           <div className="space-y-4">
-            <div className="h-20 rounded-3xl bg-[#11131a] animate-pulse" />
-            <div className="h-80 rounded-3xl bg-[#11131a] animate-pulse" />
+            <div className="h-20 rounded-3xl bg-[#000000] animate-pulse" />
+            <div className="h-80 rounded-3xl bg-[#000000] animate-pulse" />
           </div>
           <div className="space-y-4">
-            <div className="h-96 rounded-3xl bg-[#11131a] animate-pulse" />
+            <div className="h-96 rounded-3xl bg-[#000000] animate-pulse" />
           </div>
         </div>
       </div>
@@ -440,7 +440,7 @@ export default function VideoWatchPage() {
     <div className="min-h-screen px-4 pb-24 pt-6 lg:px-10">
       <div className="max-w-7xl mx-auto">
         <button
-            className="mb-6 rounded-full bg-purple-600 px-4 py-2 text-sm text-white transition hover:bg-purple-500"
+            className="mb-6 rounded-full bg-purple/85 px-4 py-2 text-sm text-white transition hover:bg-purple/75"
             onClick={() => router.back()}
         >
           Back
@@ -449,13 +449,13 @@ export default function VideoWatchPage() {
 
 
         {error ? (
-          <div className="rounded-3xl bg-[#181b20] border border-white/10 p-6 text-sm text-red-300">{error}</div>
+          <div className="rounded-3xl bg-[#000000] border border-white/10 p-6 text-sm text-purple/45">{error}</div>
         ) : loading || !video ? (
           <VideoPageSkeleton onBack={() => router.back()} />
         ) : (
           <div className="grid gap-8 lg:grid-cols-[1.5fr_0.9fr]">
             <div className="space-y-6">
-              <div className="rounded-3xl bg-[#0f1115] p-4 shadow-lg shadow-black/20">
+              <div className="rounded-3xl bg-[#000000] p-4 shadow-lg shadow-black/20">
                 <VideoWatchPlayer
                   trackId={video.id}
                   videoUrl={video.videoUrl}
@@ -470,9 +470,9 @@ export default function VideoWatchPage() {
 
                 <div className="mt-3 space-y-2 sm:mt-4">
                   <p className="text-base font-semibold text-white sm:hidden">{video.title}</p>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
-                    <span className="inline-flex items-center gap-1.5 text-slate-300">
-                      <FaEye className="text-slate-400" />
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
+                    <span className="inline-flex items-center gap-1.5 text-white/90">
+                      <FaEye className="text-white/60" />
                       {video.views.toLocaleString()} views
                     </span>
                     <span>{relativeTime}</span>
@@ -494,14 +494,14 @@ export default function VideoWatchPage() {
                           <VerifiedBadge size="md" title="Verified user" />
                         )}
                       </div>
-                      <p className="text-xs text-slate-400">{(video.followerCount || 0).toLocaleString()} followers</p>
+                      <p className="text-xs text-white/60">{(video.followerCount || 0).toLocaleString()} followers</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={handleFollow}
                     disabled={followLoading || !video.channelId}
-                    className="rounded-full bg-purple-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="rounded-full bg-purple/85 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-purple/75 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {video.isFollowing ? 'Following' : 'Follow'}
                   </button>
@@ -513,7 +513,7 @@ export default function VideoWatchPage() {
                     onClick={() => {
                       setShowShareModal(true);
                     }}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-black text-white transition hover:bg-neutral-800"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-black text-white transition hover:bg-charcoal"
                     aria-label="Share"
                     title="Share"
                   >
@@ -525,7 +525,7 @@ export default function VideoWatchPage() {
                       setIsLiked((prev) => !prev);
                       if (isDisliked) setIsDisliked(false);
                     }}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isLiked ? 'bg-black text-white' : 'bg-black text-slate-200 hover:bg-neutral-800'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isLiked ? 'bg-black text-white' : 'bg-black text-white/90 hover:bg-charcoal'}`}
                     aria-label="Like"
                     title="Like"
                   >
@@ -537,7 +537,7 @@ export default function VideoWatchPage() {
                       setIsDisliked((prev) => !prev);
                       if (isLiked) setIsLiked(false);
                     }}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isDisliked ? 'bg-black text-white' : 'bg-black text-slate-200 hover:bg-neutral-800'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isDisliked ? 'bg-black text-white' : 'bg-black text-white/90 hover:bg-charcoal'}`}
                     aria-label="Dislike"
                     title="Dislike"
                   >
@@ -546,7 +546,7 @@ export default function VideoWatchPage() {
                   <button
                     type="button"
                     onClick={() => setShowPlaylistModal(true)}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isInPlaylist ? 'bg-black text-white' : 'bg-black text-slate-200 hover:bg-neutral-800'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isInPlaylist ? 'bg-black text-white' : 'bg-black text-white/90 hover:bg-charcoal'}`}
                     aria-label="Add to playlist"
                     title="Add to playlist"
                   >
@@ -575,7 +575,7 @@ export default function VideoWatchPage() {
                         alert('Unable to save this video yet.');
                       }
                     }}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isSaved ? 'bg-black text-white' : 'bg-black text-slate-200 hover:bg-neutral-800'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isSaved ? 'bg-black text-white' : 'bg-black text-white/90 hover:bg-charcoal'}`}
                     aria-label="Save"
                     title="Save"
                   >
@@ -595,23 +595,23 @@ export default function VideoWatchPage() {
                 shareText={video ? `Watch ${video.title} by ${video.artist} on Fwaya.\n${window.location.origin}/videos/${createMediaSlug(video.title, video.id)}` : undefined}
               />
 
-              <div className="rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
+              <div className="rounded-3xl bg-[#000000] p-6 shadow-lg shadow-black/20">
                 <div className="flex items-center gap-3">
-                  <div className="h-14 w-14 rounded-full bg-[#090b10]" />
+                  <div className="h-14 w-14 rounded-full bg-[#000000]" />
                   <div>
                     <p className="text-sm font-semibold text-white">{video.channelName}</p>
-                    <p className="text-xs text-slate-400">Channel</p>
+                    <p className="text-xs text-white/60">Channel</p>
                   </div>
                 </div>
-                <div className="mt-6 text-sm leading-7 text-slate-300">{video.description}</div>
+                <div className="mt-6 text-sm leading-7 text-white/90">{video.description}</div>
               </div>
 
-              <div className="rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
+              <div className="rounded-3xl bg-[#000000] p-6 shadow-lg shadow-black/20">
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-lg font-semibold text-white">Comments</h2>
-                      <p className="text-sm text-slate-500">{comments.length} discussion{comments.length === 1 ? '' : 's'}</p>
+                      <p className="text-sm text-white/60">{comments.length} discussion{comments.length === 1 ? '' : 's'}</p>
                     </div>
                   </div>
 
@@ -621,12 +621,12 @@ export default function VideoWatchPage() {
                       onChange={(e) => setNewComment(e.target.value)}
                       rows={4}
                       placeholder="Write a comment..."
-                      className="w-full rounded-3xl border border-white/10 bg-[#121418] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-purple-500 focus:outline-none"
+                      className="w-full rounded-3xl border border-white/10 bg-[#000000] px-4 py-3 text-sm text-white placeholder:text-white/60 focus:border-purple/75 focus:outline-none"
                     />
                     <button
                       onClick={handlePostComment}
                       disabled={commentLoading || !newComment.trim()}
-                      className="inline-flex items-center justify-center rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center justify-center rounded-full bg-purple/85 px-5 py-2 text-sm font-semibold text-white transition hover:bg-purple/75 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {commentLoading ? 'Posting...' : 'Post comment'}
                     </button>
@@ -634,39 +634,39 @@ export default function VideoWatchPage() {
 
                   <div className="space-y-4 pt-4">
                     {comments.length === 0 ? (
-                      <div className="rounded-3xl bg-[#121418] p-4 text-sm text-slate-400">
+                      <div className="rounded-3xl bg-[#000000] p-4 text-sm text-white/60">
                         No comments yet. Be the first to share your thoughts.
                       </div>
                     ) : (
                       comments.map((comment) => (
-                        <div key={comment.id} className="rounded-3xl bg-[#121418] p-4">
+                        <div key={comment.id} className="rounded-3xl bg-[#000000] p-4">
                           <div className="flex items-start gap-3">
                             <img
                               src={comment.userAvatar}
                               alt={comment.userName}
-                              className="h-10 w-10 rounded-full object-cover bg-slate-800"
+                              className="h-10 w-10 rounded-full object-cover bg-charcoal"
                             />
                             <div className="flex-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm font-semibold text-white">{comment.userName}</p>
                                   {comment.isVerified && (
-                                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified user">
+                                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple/85 text-white shadow-sm shadow-purple/20" title="Verified user">
                                       <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
                                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
                                       </svg>
                                     </span>
                                   )}
                                 </div>
-                                {comment.isVerified && <FaCheckCircle className="h-4 w-4 text-sky-400" />}
-                                <span className="text-xs text-slate-500">{formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}</span>
+                                {comment.isVerified && <FaCheckCircle className="h-4 w-4 text-purple/60" />}
+                                <span className="text-xs text-white/60">{formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}</span>
                               </div>
-                              <p className="mt-3 text-sm leading-6 text-slate-300">{comment.content}</p>
-                              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+                              <p className="mt-3 text-sm leading-6 text-white/90">{comment.content}</p>
+                              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-white/60">
                                 <button
                                   type="button"
                                   onClick={() => handleToggleCommentLike(comment.id)}
-                                  className={`inline-flex items-center gap-2 ${likedComments.includes(comment.id) ? 'text-red-400' : 'text-slate-300 hover:text-white'}`}
+                                  className={`inline-flex items-center gap-2 ${likedComments.includes(comment.id) ? 'text-purple/60' : 'text-white/90 hover:text-white'}`}
                                 >
                                   <FaHeart size={14} />
                                   {comment.likes}
@@ -674,7 +674,7 @@ export default function VideoWatchPage() {
                                 <button
                                   type="button"
                                   onClick={() => setReplyingTo(comment.id)}
-                                  className="inline-flex items-center gap-2 text-slate-300 hover:text-white"
+                                  className="inline-flex items-center gap-2 text-white/90 hover:text-white"
                                 >
                                   <FaReply size={14} />
                                   Reply
@@ -682,31 +682,31 @@ export default function VideoWatchPage() {
                               </div>
 
                               {comment.replies && comment.replies.length > 0 && (
-                                <div className="mt-4 space-y-4 rounded-3xl bg-[#121418] p-4">
+                                <div className="mt-4 space-y-4 rounded-3xl bg-[#000000] p-4">
                                   {comment.replies.map((reply) => (
-                                    <div key={reply.id} className="rounded-3xl bg-[#14161b] p-4">
+                                    <div key={reply.id} className="rounded-3xl bg-[#000000] p-4">
                                       <div className="flex items-start gap-3">
                                         <img
                                           src={reply.userAvatar}
                                           alt={reply.userName}
-                                          className="h-10 w-10 rounded-full object-cover bg-slate-800"
+                                          className="h-10 w-10 rounded-full object-cover bg-charcoal"
                                         />
                                         <div className="flex-1">
                                           <div className="flex flex-wrap items-center gap-2">
                                             <div className="flex items-center gap-2">
                                               <p className="text-sm font-semibold text-white">{reply.userName}</p>
                                               {reply.isVerified && (
-                                                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified user">
+                                                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple/85 text-white shadow-sm shadow-purple/20" title="Verified user">
                                                   <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
                                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
                                                   </svg>
                                                 </span>
                                               )}
                                             </div>
-                                            {reply.isVerified && <FaCheckCircle className="h-4 w-4 text-sky-400" />}
-                                            <span className="text-xs text-slate-500">{formatDistanceToNow(new Date(reply.timestamp), { addSuffix: true })}</span>
+                                            {reply.isVerified && <FaCheckCircle className="h-4 w-4 text-purple/60" />}
+                                            <span className="text-xs text-white/60">{formatDistanceToNow(new Date(reply.timestamp), { addSuffix: true })}</span>
                                           </div>
-                                          <p className="mt-2 text-sm leading-6 text-slate-300">{reply.content}</p>
+                                          <p className="mt-2 text-sm leading-6 text-white/90">{reply.content}</p>
                                         </div>
                                       </div>
                                     </div>
@@ -721,13 +721,13 @@ export default function VideoWatchPage() {
                                     onChange={(e) => setReplyText(e.target.value)}
                                     rows={3}
                                     placeholder="Write a reply..."
-                                    className="w-full rounded-3xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-purple-500 focus:outline-none"
+                                    className="w-full rounded-3xl border border-charcoal/50 bg-charcoal px-4 py-3 text-sm text-white placeholder:text-white/60 focus:border-purple/75 focus:outline-none"
                                   />
                                   <div className="flex gap-2">
                                     <button
                                       type="button"
                                       onClick={() => handleReply(comment.id)}
-                                      className="inline-flex items-center justify-center rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-500"
+                                      className="inline-flex items-center justify-center rounded-full bg-purple/85 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple/75"
                                     >
                                       Reply
                                     </button>
@@ -737,7 +737,7 @@ export default function VideoWatchPage() {
                                         setReplyingTo(null);
                                         setReplyText('');
                                       }}
-                                      className="inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                                      className="inline-flex items-center justify-center rounded-full bg-charcoal px-4 py-2 text-sm text-white transition hover:bg-charcoal"
                                     >
                                       Cancel
                                     </button>
@@ -755,10 +755,10 @@ export default function VideoWatchPage() {
             </div>
 
             <aside className="space-y-4">
-              <div className="rounded-3xl bg-[#0f1115] p-6 shadow-lg shadow-black/20">
+              <div className="rounded-3xl bg-[#000000] p-6 shadow-lg shadow-black/20">
                 <div className="mb-4 flex items-center justify-between">
-                  <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Related videos</p>
-                  <button className="text-sm text-purple-400 hover:text-purple-300">See all</button>
+                  <p className="text-sm uppercase tracking-[0.2em] text-white/60">Related videos</p>
+                  <button className="text-sm text-purple/60 hover:text-purple/45">See all</button>
                 </div>
                 <div className="space-y-4">
                   {video.related.map((relatedItem) => (

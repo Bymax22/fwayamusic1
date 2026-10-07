@@ -72,7 +72,7 @@ const InviteButton = () => {
   const shareMethods = [
     {
       name: "WhatsApp",
-      icon: <FaWhatsapp className="text-green-500" size={20} />,
+      icon: <FaWhatsapp className="text-purple/75" size={20} />,
       action: () => {
         window.open(`https://wa.me/?text=Join%20Fwaya%20Music%20with%20my%20referral%20link:%20${referralLink}`);
         trackEvent('referral_share_whatsapp');
@@ -80,7 +80,7 @@ const InviteButton = () => {
     },
     {
       name: "Facebook",
-      icon: <FaFacebook className="text-blue-600" size={20} />,
+      icon: <FaFacebook className="text-purple/85" size={20} />,
       action: () => {
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`);
         trackEvent('referral_share_facebook');
@@ -88,7 +88,7 @@ const InviteButton = () => {
     },
     {
       name: "Twitter",
-      icon: <FaTwitter className="text-blue-400" size={20} />,
+      icon: <FaTwitter className="text-purple/60" size={20} />,
       action: () => {
         window.open(`https://twitter.com/intent/tweet?text=Join%20Fwaya%20Music%20-%20the%20best%20Zambian%20music%20platform!%20${referralLink}`);
         trackEvent('referral_share_twitter');
@@ -96,7 +96,7 @@ const InviteButton = () => {
     },
     {
       name: "Telegram",
-      icon: <FaTelegram className="text-blue-500" size={20} />,
+      icon: <FaTelegram className="text-purple/75" size={20} />,
       action: () => {
         window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=Check%20out%20Fwaya%20Music`);
         trackEvent('referral_share_telegram');
@@ -104,7 +104,7 @@ const InviteButton = () => {
     },
     {
       name: "Email",
-      icon: <HiOutlineMail className="text-gray-600" size={20} />,
+      icon: <HiOutlineMail className="text-white/60" size={20} />,
       action: () => {
         window.open(`mailto:?subject=Join%20Fwaya%20Music&body=Sign%20up%20using%20my%20referral%20link:%20${referralLink}`);
         trackEvent('referral_share_email');
@@ -128,12 +128,12 @@ const InviteButton = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center p-2 bg-[#e51f48] rounded-full text-white hover:bg-[#ff4d6d] transition-all relative"
+        className="flex items-center justify-center p-2 bg-[#36454F] rounded-full text-white hover:bg-[#9B5DE5] transition-all relative"
         aria-label="Invite friends"
       >
         <HiUserAdd size={20} />
         {referralData && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-[#e51f48] text-[10px] font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-[#36454F] text-[10px] font-bold rounded-full flex items-center justify-center">
             {referralData.invites}
           </span>
         )}
@@ -146,28 +146,28 @@ const InviteButton = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="absolute right-0 mt-2 w-72 bg-[#0f2d3d] rounded-lg shadow-xl border border-[#1e293b] z-50 overflow-hidden"
+            className="absolute right-0 mt-2 w-72 bg-[#36454F] rounded-lg shadow-xl border border-[#36454F] z-50 overflow-hidden"
           >
             <div className="p-4">
               <h3 className="font-bold text-white flex items-center gap-2">
                 <HiUserAdd size={18} />
                 Invite Friends
               </h3>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-white/60 mt-1">
                 Earn ZMW 5 for each friend who joins and subscribes
               </p>
 
               {isLoading ? (
                 <div className="mt-4 space-y-2">
-                  <div className="h-4 bg-[#1a5a72] rounded animate-pulse"></div>
-                  <div className="h-8 bg-[#1a5a72] rounded animate-pulse"></div>
+                  <div className="h-4 bg-[#36454F] rounded animate-pulse"></div>
+                  <div className="h-8 bg-[#36454F] rounded animate-pulse"></div>
                 </div>
               ) : (
                 <>
-                  <div className="mt-4 bg-[#1a5a72] bg-opacity-30 p-3 rounded-lg">
+                  <div className="mt-4 bg-[#36454F] bg-opacity-30 p-3 rounded-lg">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-300">Your Code:</span>
-                      <span className="font-mono font-bold text-[#e51f48]">
+                      <span className="text-xs text-white/90">Your Code:</span>
+                      <span className="font-mono font-bold text-[#36454F]">
                         {referralData?.code}
                       </span>
                     </div>
@@ -176,11 +176,11 @@ const InviteButton = () => {
                         type="text"
                         value={referralLink}
                         readOnly
-                        className="flex-1 bg-[#0a3747] text-xs p-2 rounded-l text-gray-300 truncate"
+                        className="flex-1 bg-[#36454F] text-xs p-2 rounded-l text-white/90 truncate"
                       />
                       <button
                         onClick={handleCopy}
-                        className="bg-[#e51f48] hover:bg-[#ff4d6d] px-3 rounded-r flex items-center"
+                        className="bg-[#36454F] hover:bg-[#9B5DE5] px-3 rounded-r flex items-center"
                       >
                         {copied ? (
                           <HiCheck size={16} className="text-white" />
@@ -192,15 +192,15 @@ const InviteButton = () => {
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 gap-2">
-                    <div className="bg-[#1a5a72] bg-opacity-30 p-2 rounded text-center">
-                      <p className="text-xs text-gray-400">Earned</p>
-                      <p className="font-bold text-[#e51f48]">
+                    <div className="bg-[#36454F] bg-opacity-30 p-2 rounded text-center">
+                      <p className="text-xs text-white/60">Earned</p>
+                      <p className="font-bold text-[#36454F]">
                         ZMW {referralData?.earned.toFixed(2)}
                       </p>
                     </div>
-                    <div className="bg-[#1a5a72] bg-opacity-30 p-2 rounded text-center">
-                      <p className="text-xs text-gray-400">Pending</p>
-                      <p className="font-bold text-[#e51f48]">
+                    <div className="bg-[#36454F] bg-opacity-30 p-2 rounded text-center">
+                      <p className="text-xs text-white/60">Pending</p>
+                      <p className="font-bold text-[#36454F]">
                         ZMW {referralData?.pending.toFixed(2)}
                       </p>
                     </div>
@@ -209,8 +209,8 @@ const InviteButton = () => {
               )}
             </div>
 
-            <div className="border-t border-[#1e293b] p-3 bg-[#0a3747]">
-              <h4 className="text-xs font-medium text-gray-400 mb-2 flex items-center gap-1">
+            <div className="border-t border-[#36454F] p-3 bg-[#36454F]">
+              <h4 className="text-xs font-medium text-white/60 mb-2 flex items-center gap-1">
                 <HiOutlineShare size={14} />
                 Share via
               </h4>
@@ -219,7 +219,7 @@ const InviteButton = () => {
                   <button
                     key={method.name}
                     onClick={method.action}
-                    className="p-2 hover:bg-[#1a5a72] rounded-full transition-colors"
+                    className="p-2 hover:bg-[#36454F] rounded-full transition-colors"
                     aria-label={`Share via ${method.name}`}
                   >
                     {method.icon}

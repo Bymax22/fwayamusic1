@@ -46,17 +46,17 @@ function getReleaseBadge(releaseDate: string) {
   const now = new Date();
   const release = new Date(releaseDate);
   if (Number.isNaN(release.getTime())) {
-    return { text: 'Date unavailable', color: 'bg-gray-600' };
+    return { text: 'Date unavailable', color: 'bg-charcoal' };
   }
   const diffTime = release.getTime() - now.getTime();
-  if (diffTime > 0) return { text: 'Upcoming', color: 'bg-cyan-600' };
+  if (diffTime > 0) return { text: 'Upcoming', color: 'bg-purple/85' };
   const diffDays = Math.ceil(Math.abs(diffTime) / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return { text: 'Just Released', color: 'bg-purple-600' };
-  if (diffDays === 1) return { text: 'Yesterday', color: 'bg-purple-500' };
-  if (diffDays <= 7) return { text: 'This Week', color: 'bg-purple-500' };
-  if (diffDays <= 30) return { text: 'This Month', color: 'bg-purple-400' };
-  return { text: 'New', color: 'bg-gray-500' };
+  if (diffDays === 0) return { text: 'Just Released', color: 'bg-purple/85' };
+  if (diffDays === 1) return { text: 'Yesterday', color: 'bg-purple/75' };
+  if (diffDays <= 7) return { text: 'This Week', color: 'bg-purple/75' };
+  if (diffDays <= 30) return { text: 'This Month', color: 'bg-purple/60' };
+  return { text: 'New', color: 'bg-charcoal' };
 }
 
 export default function NewReleasesPage() {
@@ -129,10 +129,10 @@ export default function NewReleasesPage() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
-              <Calendar className="w-8 h-8 text-purple-400" />
+              <Calendar className="w-8 h-8 text-purple/60" />
               New Releases
             </h1>
-            <p className="text-gray-400">Fresh music just dropped</p>
+            <p className="text-white/60">Fresh music just dropped</p>
           </div>
           
           <div className="flex flex-wrap gap-2 bg-white/5 rounded-full p-1">
@@ -142,8 +142,8 @@ export default function NewReleasesPage() {
                 onClick={() => setFilter(timeFilter)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   filter === timeFilter
-                    ? 'bg-purple-600 text-white'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-purple/85 text-white'
+                    : 'text-white/60 hover:text-white'
                 }`}
               >
                 {timeFilter.split('-').map(word => 
@@ -157,7 +157,7 @@ export default function NewReleasesPage() {
 
       {/* New Releases Grid */}
       {loading ? (
-        <div className="py-20 text-center text-gray-400">Loading new releases...</div>
+        <div className="py-20 text-center text-white/60">Loading new releases...</div>
       ) : filteredReleases.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredReleases.map(release => {
@@ -166,7 +166,7 @@ export default function NewReleasesPage() {
             return (
               <div 
                 key={release.id} 
-                className="bg-[#111827] rounded-3xl overflow-hidden transition-colors group"
+                className="bg-[#000000] rounded-3xl overflow-hidden transition-colors group"
               >
                 <div className="relative">
                   <Image 
@@ -182,7 +182,7 @@ export default function NewReleasesPage() {
                       onClick={() => handlePlay(release)}
                       className={`transform transition-all ${currentTrack?.id === release.id && isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 group-hover:opacity-100 group-hover:translate-y-0'}`}
                     >
-                      <div className="w-12 h-12 rounded-full bg-[#e51f48] flex items-center justify-center shadow-lg">
+                      <div className="w-12 h-12 rounded-full bg-[#36454F] flex items-center justify-center shadow-lg">
                         {currentTrack?.id === release.id && isPlaying ? (
                           <Waveform playing className="h-5 w-5" />
                         ) : (
@@ -199,7 +199,7 @@ export default function NewReleasesPage() {
                   
                   {/* Explicit Badge */}
                   {release.isExplicit && (
-                    <div className="absolute top-3 right-3 bg-gray-600 text-white text-xs px-2 py-1 rounded font-medium">
+                    <div className="absolute top-3 right-3 bg-charcoal text-white text-xs px-2 py-1 rounded font-medium">
                       E
                     </div>
                   )}
@@ -207,8 +207,8 @@ export default function NewReleasesPage() {
                 
                 <div className="p-4">
                   <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(release.id) && isPlaying} className="mb-1 font-medium text-white">{release.title}</ScrollingTrackTitle>
-                  <p className="text-sm text-gray-400 truncate mb-2">{release.artist}</p>
-                  <div className="flex justify-between items-center text-xs text-gray-500">
+                  <p className="text-sm text-white/60 truncate mb-2">{release.artist}</p>
+                  <div className="flex justify-between items-center text-xs text-white/60">
                     <span>{release.genre}</span>
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -216,10 +216,10 @@ export default function NewReleasesPage() {
                     </div>
                   </div>
                   <div className="flex justify-between items-center mt-3">
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-white/60">
                       {formatAddedTime(release)}
                     </span>
-                    <button className="text-gray-400 hover:text-purple-400 transition-colors">
+                    <button className="text-white/60 hover:text-purple/60 transition-colors">
                       <Heart className="w-4 h-4" />
                     </button>
                   </div>
@@ -229,7 +229,7 @@ export default function NewReleasesPage() {
           })}
         </div>
       ) : (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-white/60">
           <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50" />
           <p className="text-lg mb-2">No new releases found</p>
           <p>Check back later for fresh music</p>
@@ -239,7 +239,7 @@ export default function NewReleasesPage() {
       {/* Load More Button */}
       {filteredReleases.length > 0 && (
         <div className="mt-8 flex justify-center">
-          <button className="px-6 py-3 bg-[#0a3747] hover:bg-[#0a3747]/80 text-white rounded-xl transition-colors">
+          <button className="px-6 py-3 bg-[#36454F] hover:bg-[#36454F]/80 text-white rounded-xl transition-colors">
             Load More Releases
           </button>
         </div>

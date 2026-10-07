@@ -15,9 +15,8 @@
 ================================= */
 :root {
   /* 🎯 Core Colors (RGB for opacity control) */
-  --purple-deep: 91, 14, 166;
+  --purple-deep: 155, 93, 229;
   --purple-bright: 155, 93, 229;
-  --orange-accent: 255, 122, 0;
 
   /* 🌌 Background */
   --bg-dark: 54, 69, 79;
@@ -29,7 +28,7 @@
 
   /* 📝 Text */
   --text-primary: 255, 255, 255;
-  --text-muted: 180, 180, 200;
+  --text-muted: 255, 255, 255;
 
   /* 📐 Layout */
   --radius-lg: 24px;
@@ -44,12 +43,19 @@
   --background: 0, 0, 0;
   --foreground: 255, 255, 255;
   --primary-accent: 155, 93, 229;
-  --primary-dark: 91, 14, 166;
+  --primary-dark: 0, 0, 0;
+  --primary-dark-darker: 0, 0, 0;
+  --primary-light: 155, 93, 229;
+  --accent-light: 155, 93, 229;
+  --dark-bg: 0, 0, 0;
+  --light-bg: 255, 255, 255;
   --card: 54, 69, 79;
   --card-foreground: 255, 255, 255;
   --border: 54, 69, 79;
   --input: 54, 69, 79;
   --ring: 155, 93, 229;
+  --muted: 54, 69, 79;
+  --muted-foreground: 255, 255, 255;
 }
 
 /* Scrollbar Hide Utility */
@@ -178,7 +184,7 @@ html {
     gap: 12px;
     padding: 12px 14px;
     border-radius: var(--radius-sm);
-    color: rgba(var(--text-muted));
+    color: rgba(var(--text-muted), 0.65);
     transition: all 0.25s ease;
     cursor: pointer;
   }
@@ -237,8 +243,8 @@ html {
     justify-content: space-between;
     background: linear-gradient(
       90deg,
-      rgba(91,14,166,0.6),
-      rgba(155,93,229,0.2)
+      rgba(54, 69, 79, 0.6),
+      rgba(155, 93, 229, 0.2)
     );
     backdrop-filter: blur(20px);
     border-radius: var(--radius-lg);
@@ -284,14 +290,14 @@ html {
     width: 32px;
     font-size: 18px;
     font-weight: 600;
-    color: rgba(var(--text-muted));
+    color: rgba(var(--text-muted), 0.65);
   }
 
   .genre-pill {
     padding: 8px 20px;
     border-radius: 999px;
     background: rgba(var(--glass), 0.08);
-    color: rgba(var(--text-muted));
+    color: rgba(var(--text-muted), 0.65);
     transition: 0.2s;
     cursor: pointer;
     font-size: 14px;
@@ -351,7 +357,7 @@ html {
   }
 
   .nav-link {
-    color: rgba(var(--text-muted));
+    color: rgba(var(--text-muted), 0.65);
     transition: 0.2s;
     cursor: pointer;
     font-weight: 500;
@@ -467,7 +473,7 @@ html {
 
 /* Show on hover */
 .scrollbar-modern:hover::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.6); /* purple */
+  background: rgba(155, 93, 229, 0.6); /* purple */
 }
 
 /* Firefox */
@@ -477,5 +483,5 @@ html {
 }
 
 .scrollbar-modern:hover {
-  scrollbar-color: rgba(168, 85, 247, 0.6) transparent;
+  scrollbar-color: rgba(155, 93, 229, 0.6) transparent;
 }

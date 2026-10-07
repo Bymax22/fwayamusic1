@@ -15,7 +15,7 @@ interface MobileMenuProps {
 
 // Custom icon wrapper with purple color
 const Icon = ({ children }: { children: React.ReactNode }) => (
-  <span className="text-purple-400">{children}</span>
+  <span className="text-purple/60">{children}</span>
 );
 
 // Removed floating particle component - using clean design instead
@@ -132,7 +132,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   const MenuSection = ({ title, items }: { title: string; items: { title: string; icon: ReactNode; href: string; description: string }[] }) => (
     <div className="space-y-4">
-      <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wider px-4 py-2 bg-white/5 rounded-r-2xl">
+      <h3 className="text-xs font-bold text-purple/45 uppercase tracking-wider px-4 py-2 bg-white/5 rounded-r-2xl">
         {title}
       </h3>
       <div className="space-y-2">
@@ -147,9 +147,9 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold truncate">{item.title}</p>
-              <p className="text-xs text-gray-400 truncate">{item.description}</p>
+              <p className="text-xs text-white/60 truncate">{item.description}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-purple-300 group-hover:text-white transition-colors flex-shrink-0" />
+            <ChevronRight className="w-4 h-4 text-purple/45 group-hover:text-white transition-colors flex-shrink-0" />
           </Link>
         ))}
       </div>
@@ -204,13 +204,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
                   <motion.div 
-                    className="w-12 h-12 rounded-3xl bg-purple-500 flex items-center justify-center"
+                    className="w-12 h-12 rounded-3xl bg-purple/75 flex items-center justify-center"
                   >
                     <Music className="w-6 h-6 text-white" />
                   </motion.div>
                   <div>
                     <h2 className="text-xl font-bold text-white">Fwaya Menu</h2>
-                    <p className="text-sm text-purple-300">Discover</p>
+                    <p className="text-sm text-purple/45">Discover</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -218,7 +218,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     onClick={() => setIsDarkMode(!isDarkMode)}
                     className="p-2 rounded-full bg-white/10 text-white hover:bg-white/15 transition-colors"
                   >
-                    {isDarkMode ? <Sun className="w-5 h-5 text-yellow-300" /> : <Moon className="w-5 h-5 text-purple-300" />}
+                    {isDarkMode ? <Sun className="w-5 h-5 text-purple/45" /> : <Moon className="w-5 h-5 text-purple/45" />}
                   </button>
                   <button
                     onClick={onClose}
@@ -244,7 +244,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   {searchQuery && (
                     <button 
                       onClick={() => setSearchQuery("")}
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="text-white/60 hover:text-white transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -268,12 +268,12 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 30, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 240, damping: 22 }}
-                    className="w-full max-w-md overflow-hidden rounded-2xl bg-[#0a0a0f] shadow-2xl shadow-black/40"
+                    className="w-full max-w-md overflow-hidden rounded-2xl bg-[#000000] shadow-2xl shadow-black/40"
                     onClick={(event) => event.stopPropagation()}
                   >
                     <div className="flex items-center justify-between gap-4 bg-white/[0.02] px-4 py-3 sm:px-5">
                       <div>
-                        <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-purple-300">Account</p>
+                        <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-purple/45">Account</p>
                         <h3 className="mt-1 text-lg font-semibold text-white">
                           {authModalMode === 'signin' ? 'Sign in' : 'Create account'}
                         </h3>
@@ -288,7 +288,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     </div>
 
                     <div className="p-4 sm:p-5">
-                      <p className="mb-4 text-sm text-gray-400">
+                      <p className="mb-4 text-sm text-white/60">
                         Pick the account type that fits your experience on Fwaya.
                       </p>
 
@@ -303,13 +303,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                             <div className="flex items-center justify-between gap-3">
                               <div className="min-w-0">
                                 <p className="truncate text-base font-semibold text-white">{option.title}</p>
-                                <p className="mt-1 truncate text-xs text-gray-400">{option.subtitle}</p>
+                                <p className="mt-1 truncate text-xs text-white/60">{option.subtitle}</p>
                               </div>
-                              <div className="rounded-full bg-purple-500/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white">
+                              <div className="rounded-full bg-purple/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white">
                                 {authModalMode === 'signin' ? 'Sign In' : 'Sign Up'}
                               </div>
                             </div>
-                            <p className="mt-2 text-xs leading-5 text-gray-400">{option.description}</p>
+                            <p className="mt-2 text-xs leading-5 text-white/60">{option.description}</p>
                           </Link>
                         ))}
                       </div>
@@ -324,29 +324,29 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               <div className="flex-shrink-0 px-6 py-4 bg-black">
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3 bg-white/5 rounded-3xl p-3">
-                    <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-bold">
+                    <div className="w-10 h-10 rounded-full bg-purple/75 flex items-center justify-center text-white text-sm font-bold">
                       {(user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username))?.charAt(0) || "U"}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-white truncate">
                         {user.role === 'ARTIST' ? (user.artistName || user.stageName || user.displayName || user.username) : (user.displayName || user.username)}
                       </p>
-                      <p className="text-xs text-purple-300 truncate">{user.email}</p>
+                      <p className="text-xs text-purple/45 truncate">{user.email}</p>
                     </div>
-                    <button className="p-2 rounded-full hover:bg-purple-600/20 transition-colors">
+                    <button className="p-2 rounded-full hover:bg-purple/20 transition-colors">
                       <NotificationBell />
                     </button>
                   </div>
                   <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <Crown className={`h-5 w-5 ${hasActivePremium ? 'text-amber-300' : 'text-gray-400'}`} />
+                    <Crown className={`h-5 w-5 ${hasActivePremium ? 'text-purple/45' : 'text-white/60'}`} />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-white">{hasActivePremium ? 'Premium Plan' : 'Free Plan'}</p>
-                      <p className="text-xs text-gray-400">{hasActivePremium ? `Active until ${new Date(user.premiumUntil as string).toLocaleDateString()}` : 'Upgrade for premium listening'}</p>
+                      <p className="text-xs text-white/60">{hasActivePremium ? `Active until ${new Date(user.premiumUntil as string).toLocaleDateString()}` : 'Upgrade for premium listening'}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setSubscriptionOpen(true)}
-                      className="rounded-full bg-purple-500 px-3 py-2 text-xs font-semibold text-white hover:bg-purple-400"
+                      className="rounded-full bg-purple/75 px-3 py-2 text-xs font-semibold text-white hover:bg-purple/60"
                     >
                       {hasActivePremium ? 'Change plan' : 'Subscribe'}
                     </button>
@@ -360,21 +360,21 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   <div className="flex items-center justify-between bg-white/5 rounded-2xl p-3">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                        <User className="w-4 h-4 text-gray-300" />
+                        <User className="w-4 h-4 text-white/90" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-white">Guest Plan</p>
-                        <p className="text-xs text-gray-400">Limited access</p>
+                        <p className="text-xs text-white/60">Limited access</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-gray-400">Free</p>
+                      <p className="text-xs text-white/60">Free</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setAuthModalMode('signin')}
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-purple-500 py-2.5 text-sm font-semibold text-white hover:bg-purple-400"
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-purple/75 py-2.5 text-sm font-semibold text-white hover:bg-purple/60"
                   >
                     <Crown className="h-4 w-4" /> Subscribe to Premium
                   </button>
@@ -391,7 +391,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <button
                       type="button"
                       onClick={() => setAuthModalMode('signup')}
-                      className="py-2.5 px-3 rounded-full bg-purple-500 text-white text-sm font-medium hover:bg-purple-400 transition-colors"
+                      className="py-2.5 px-3 rounded-full bg-purple/75 text-white text-sm font-medium hover:bg-purple/60 transition-colors"
                     >
                       Sign Up
                     </button>
@@ -413,8 +413,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       onClick={() => setActiveMenuTab(tab.id)}
                       className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-sm font-medium transition-colors ${
                         isActive 
-                          ? "bg-purple-500 text-white" 
-                          : "text-gray-400 hover:text-white hover:bg-white/10"
+                          ? "bg-purple/75 text-white"
+                          : "text-white/60 hover:text-white hover:bg-white/10"
                       }`}
                     >
                       <Icon size={18} />
@@ -439,9 +439,9 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     {activeItems.length > 0 ? (
                       <MenuSection title={currentSectionLabel} items={activeItems} />
                     ) : (
-                      <div className="mx-2 rounded-3xl bg-white/5 p-6 text-center text-gray-400">
+                      <div className="mx-2 rounded-3xl bg-white/5 p-6 text-center text-white/60">
                         <p className="text-sm font-semibold text-white mb-2">No menu items found.</p>
-                        <p className="text-sm text-gray-400">Try a different search or switch to another section.</p>
+                        <p className="text-sm text-white/60">Try a different search or switch to another section.</p>
                       </div>
                     )}
                   </motion.div>
@@ -450,8 +450,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 {/* Footer with enhanced styling */}
                 <div className="mt-8 text-center">
                   <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white/5">
-                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                    <p className="text-xs text-gray-400">
+                    <div className="w-2 h-2 rounded-full bg-purple/60 animate-pulse"></div>
+                    <p className="text-xs text-white/60">
                       Fwaya v1.5.3 • Developed by Bymax Zambia
                     </p>
                   </div>

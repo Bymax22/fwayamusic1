@@ -95,7 +95,7 @@ export default function ShareModal({
           <div>
             <h3 className="text-xl font-bold text-white">Share Track</h3>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <button onClick={onClose} className="text-white/60 hover:text-white">
             <FaTimes size={20} />
           </button>
         </div>
@@ -113,37 +113,37 @@ export default function ShareModal({
 
           <div className="space-y-3">
             <div>
-              <p className="text-sm text-gray-400">Track</p>
+              <p className="text-sm text-white/60">Track</p>
               <p className="text-lg font-semibold text-white">{title}</p>
             </div>
             {artist && (
               <div>
-                <p className="text-sm text-gray-400">Artist</p>
+                <p className="text-sm text-white/60">Artist</p>
                 <p className="text-white">{artist}</p>
               </div>
             )}
-            <div className="grid grid-cols-2 gap-2 text-sm text-gray-300">
+            <div className="grid grid-cols-2 gap-2 text-sm text-white/90">
               {genre && (
                 <div>
-                  <p className="text-gray-500">Genre</p>
+                  <p className="text-white/60">Genre</p>
                   <p>{genre}</p>
                 </div>
               )}
               {duration && (
                 <div>
-                  <p className="text-gray-500">Duration</p>
+                  <p className="text-white/60">Duration</p>
                   <p>{duration}</p>
                 </div>
               )}
             </div>
-            {description && <p className="text-sm text-gray-300 line-clamp-3">{description}</p>}
+            {description && <p className="text-sm text-white/90 line-clamp-3">{description}</p>}
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-2 mb-4 sm:grid-cols-5">
           <button
             onClick={handleWhatsApp}
-            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple/45"
             aria-label="Share on WhatsApp"
           >
             <RiWhatsappLine size={18} />
@@ -172,35 +172,35 @@ export default function ShareModal({
                 }
               }
             }}
-            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple/45"
             aria-label="Share via device"
           >
             <RiFileCopyLine size={18} />
           </button>
           <button
             onClick={handleFacebook}
-            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple/45"
             aria-label="Share on Facebook"
           >
             <RiFacebookLine size={18} />
           </button>
           <button
             onClick={handleInstagram}
-            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple/45"
             aria-label="Share on Instagram"
           >
             <AiFillInstagram size={18} />
           </button>
           <button
             onClick={handleTikTok}
-            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple/45"
             aria-label="Share on TikTok"
           >
             <AiFillTikTok size={18} />
           </button>
           <button
             onClick={handleEmail}
-            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple-300"
+            className="flex items-center justify-center rounded-2xl bg-white/5 p-2 text-white transition hover:bg-white/10 hover:text-purple/45"
             aria-label="Share via Email"
           >
             <RiMailLine size={18} />
@@ -209,7 +209,7 @@ export default function ShareModal({
         <div className="mb-4">
           <button
             onClick={handleCopyLink}
-            className="w-full rounded-2xl bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 hover:text-purple-300"
+            className="w-full rounded-2xl bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 hover:text-purple/45"
           >
             Copy link
           </button>

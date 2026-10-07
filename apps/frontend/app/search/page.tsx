@@ -142,9 +142,9 @@ export default function SearchPage() {
             <div className="rounded-[2rem] bg-black p-6">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
-                  <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Search</p>
+                  <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple/45">Search</p>
                   <h1 className="text-4xl font-semibold tracking-tight">Find the track, artist, or mood you want.</h1>
-                  <p className="max-w-2xl text-gray-400">Your favouritn tracks, artists and news awaits you.</p>
+                  <p className="max-w-2xl text-white/60">Your favouritn tracks, artists and news awaits you.</p>
                 </div>
                 <div className="relative mt-4">
                   <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40 w-5 h-5" />
@@ -153,7 +153,7 @@ export default function SearchPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search for songs, artists, playlists..."
-                    className="w-full rounded-full bg-white/5 py-4 pl-12 pr-4 text-white placeholder:text-white/40 outline-none transition focus:ring-2 focus:ring-purple-400/20"
+                    className="w-full rounded-full bg-white/5 py-4 pl-12 pr-4 text-white placeholder:text-white/40 outline-none transition focus:ring-2 focus:ring-purple/20"
                   />
                 </div>
                 <div className="flex flex-wrap gap-3">
@@ -164,7 +164,7 @@ export default function SearchPage() {
                         key={tab}
                         onClick={() => setActiveTab(tabKey)}
                         className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                          activeTab === tabKey ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20' : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                          activeTab === tabKey ? 'bg-purple/75 text-white shadow-lg shadow-purple/20' : 'bg-white/10 text-white/90 hover:bg-white/15'
                         }`}
                       >
                         {tab}
@@ -185,7 +185,7 @@ export default function SearchPage() {
                       onClick={() => setSearchQuery(genre)}
                       className="flex items-center gap-3 rounded-3xl bg-white/10 px-4 py-3 text-left text-white transition hover:bg-white/15"
                     >
-                      <Disc className="w-5 h-5 text-purple-300" />
+                      <Disc className="w-5 h-5 text-purple/45" />
                       <span className="font-medium text-sm">{genre}</span>
                     </button>
                   ))}
@@ -212,7 +212,7 @@ export default function SearchPage() {
                       />
                       <div>
                         <div className="font-medium text-white">{artist.name}</div>
-                        <div className="text-sm text-gray-400">{artist.followers.toLocaleString()} followers</div>
+                        <div className="text-sm text-white/60">{artist.followers.toLocaleString()} followers</div>
                       </div>
                     </button>
                   ))}
@@ -227,18 +227,18 @@ export default function SearchPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-semibold">Songs</h2>
-                    <span className="text-sm text-gray-400">{searchResults.length} results</span>
+                    <span className="text-sm text-white/60">{searchResults.length} results</span>
                   </div>
                   <div className="grid gap-4 xl:grid-cols-2">
                     {searchResults.map((file) => (
                       <div
                         key={file.id}
                         className={`group rounded-[2rem] bg-black p-5 transition hover:bg-white/5 ${
-                          currentTrack?.id === file.id ? 'ring-1 ring-purple-400/30' : ''
+                          currentTrack?.id === file.id ? 'ring-1 ring-purple/30' : ''
                         }`}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="relative h-20 w-20 overflow-hidden rounded-3xl bg-[#121016]">
+                          <div className="relative h-20 w-20 overflow-hidden rounded-3xl bg-[#000000]">
                             <Image
                               src={file.coverArt}
                               alt={file.title}
@@ -253,11 +253,11 @@ export default function SearchPage() {
                             <div className="flex items-center justify-between gap-3">
                               <div>
                                 <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="text-lg font-semibold text-white">{file.title}</ScrollingTrackTitle>
-                                <p className="text-sm text-gray-400 truncate">{file.artist}</p>
+                                <p className="text-sm text-white/60 truncate">{file.artist}</p>
                               </div>
                               <button
                                 onClick={() => handlePlay(file)}
-                                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500"
+                                className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-purple/85 text-white transition hover:bg-purple/75"
                               >
                                 {currentTrack?.id === file.id && isPlaying ? (
                                   <Waveform playing className="h-5 w-5" />
@@ -266,10 +266,10 @@ export default function SearchPage() {
                                 )}
                               </button>
                             </div>
-                            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-gray-400">
+                            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-white/60">
                               <span>{formatDuration(file.duration)}</span>
                                 <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs text-white/80">
-                                <Disc className="w-4 h-4 text-purple-300" />
+                                <Disc className="w-4 h-4 text-purple/45" />
                                 {file.genre || 'Genre'}
                               </span>
                             </div>
@@ -285,12 +285,12 @@ export default function SearchPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-semibold">Artists</h2>
-                    <span className="text-sm text-gray-400">{artistResults.length} results</span>
+                    <span className="text-sm text-white/60">{artistResults.length} results</span>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {artistResults.map((artist) => (
                       <div key={artist.id} className="rounded-[2rem] bg-black p-5 text-center transition hover:bg-white/5">
-                        <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-[#121016]">
+                        <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-[#000000]">
                           <Image
                             src={artist.avatar}
                             alt={artist.name}
@@ -302,7 +302,7 @@ export default function SearchPage() {
                           />
                         </div>
                         <h3 className="text-lg font-semibold text-white">{artist.name}</h3>
-                        <p className="mt-2 text-sm text-gray-400">{artist.followers.toLocaleString()} followers</p>
+                        <p className="mt-2 text-sm text-white/60">{artist.followers.toLocaleString()} followers</p>
                       </div>
                     ))}
                   </div>
@@ -310,10 +310,10 @@ export default function SearchPage() {
               )}
 
               {searchQuery.trim() && getFilteredResults().length === 0 && artistResults.length === 0 && (
-                <div className="rounded-[2rem] bg-[#09080f]/90 p-12 text-center text-gray-400">
-                  <Search className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+                <div className="rounded-[2rem] bg-[#000000]/90 p-12 text-center text-white/60">
+                  <Search className="mx-auto mb-4 h-16 w-16 text-white/60" />
                   <h3 className="text-2xl font-semibold text-white mb-2">No results found</h3>
-                  <p className="text-sm text-gray-400">Try different keywords or refine your search.</p>
+                  <p className="text-sm text-white/60">Try different keywords or refine your search.</p>
                 </div>
               )}
             </div>

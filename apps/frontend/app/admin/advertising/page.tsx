@@ -200,16 +200,16 @@ export default function AdvertisingAdminPage() {
     return <main className="p-8 text-white">Access denied.</main>;
 
   return (
-    <main className="min-h-screen bg-[#f5f6f8] p-6 text-slate-950 md:p-10">
+    <main className="min-h-screen bg-[#FFFFFF] p-6 text-black md:p-10">
       <div className="mx-auto max-w-6xl space-y-8">
         <div>
           <h1 className="text-3xl font-bold">Advertising</h1>
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-white/60">
             Manage scheduled sponsored campaigns for free listeners.
           </p>
         </div>
         {message && (
-          <p className="rounded-xl bg-purple-500/10 px-4 py-3 text-sm text-purple-200">
+          <p className="rounded-xl bg-purple/10 px-4 py-3 text-sm text-purple/30">
             {message}
           </p>
         )}
@@ -221,20 +221,20 @@ export default function AdvertisingAdminPage() {
               placeholder="Campaign name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="rounded-xl bg-slate-100 px-3 py-2 text-slate-950"
+              className="rounded-xl bg-white/10 px-3 py-2 text-black"
             />
             <input
               required
               type="datetime-local"
               value={form.startAt}
               onChange={(e) => setForm({ ...form, startAt: e.target.value })}
-              className="rounded-xl bg-slate-100 px-3 py-2 text-slate-950"
+              className="rounded-xl bg-white/10 px-3 py-2 text-black"
             />
             <input
               type="datetime-local"
               value={form.endAt}
               onChange={(e) => setForm({ ...form, endAt: e.target.value })}
-              className="rounded-xl bg-slate-100 px-3 py-2 text-slate-950"
+              className="rounded-xl bg-white/10 px-3 py-2 text-black"
             />
             <input
               min="1"
@@ -244,16 +244,16 @@ export default function AdvertisingAdminPage() {
               onChange={(e) =>
                 setForm({ ...form, frequencyCap: Number(e.target.value) })
               }
-              className="rounded-xl bg-slate-100 px-3 py-2 text-slate-950"
+              className="rounded-xl bg-white/10 px-3 py-2 text-black"
             />
             <button
               disabled={busy}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 font-semibold hover:bg-purple-500 disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-purple/85 px-4 py-2 font-semibold hover:bg-purple/75 disabled:opacity-50"
             >
               <Plus size={17} /> Create
             </button>
           </form>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-white/60">
             Frequency cap is per browser. Cooldown is 300 seconds by default.
           </p>
         </section>
@@ -266,7 +266,7 @@ export default function AdvertisingAdminPage() {
               onChange={(e) =>
                 setCreative({ ...creative, campaignId: e.target.value })
               }
-              className="rounded-xl bg-slate-100 px-3 py-2 text-slate-950"
+              className="rounded-xl bg-white/10 px-3 py-2 text-black"
             >
               <option value="">Choose campaign</option>
               {campaigns.map((c) => (
@@ -282,7 +282,7 @@ export default function AdvertisingAdminPage() {
               onChange={(e) =>
                 setCreative({ ...creative, title: e.target.value })
               }
-              className="rounded-xl bg-slate-100 px-3 py-2 text-slate-950"
+              className="rounded-xl bg-white/10 px-3 py-2 text-black"
             />
             <input
               placeholder="Click-through URL"
@@ -290,14 +290,14 @@ export default function AdvertisingAdminPage() {
               onChange={(e) =>
                 setCreative({ ...creative, clickUrl: e.target.value })
               }
-              className="rounded-xl bg-slate-100 px-3 py-2 text-slate-950"
+              className="rounded-xl bg-white/10 px-3 py-2 text-black"
             />
             <select
               value={creative.mediaType}
               onChange={(e) =>
                 setCreative({ ...creative, mediaType: e.target.value })
               }
-              className="rounded-xl bg-slate-100 px-3 py-2 text-slate-950"
+              className="rounded-xl bg-white/10 px-3 py-2 text-black"
             >
               <option value="IMAGE">Image</option>
               <option value="VIDEO">Video</option>
@@ -305,13 +305,13 @@ export default function AdvertisingAdminPage() {
             <select
               name="placement"
               defaultValue="HOME_BANNER"
-              className="rounded-xl bg-slate-100 px-3 py-2 text-slate-950"
+              className="rounded-xl bg-white/10 px-3 py-2 text-black"
             >
               <option value="HOME_BANNER">Home banner</option>
               <option value="DISCOVER_BANNER">Discover banner</option>
               <option value="PLAYER_BANNER">Player banner</option>
             </select>
-            <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-slate-100 px-3 py-2 text-slate-700 hover:bg-purple-100">
+            <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-white/80 hover:bg-purple/20">
               <Upload size={17} /> {creative.file?.name || "Choose file"}
               <input
                 required
@@ -328,7 +328,7 @@ export default function AdvertisingAdminPage() {
             </label>
             <button
               disabled={busy}
-              className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold hover:bg-emerald-500 disabled:opacity-50 md:col-span-6"
+              className="rounded-lg bg-purple/85 px-4 py-2 font-semibold hover:bg-purple/75 disabled:opacity-50 md:col-span-6"
             >
               Upload creative
             </button>
@@ -343,7 +343,7 @@ export default function AdvertisingAdminPage() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="font-semibold">{campaign.name}</h2>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-white/60">
                     {new Date(campaign.startAt).toLocaleString()}{" "}
                     {campaign.endAt
                       ? `to ${new Date(campaign.endAt).toLocaleString()}`
@@ -352,12 +352,12 @@ export default function AdvertisingAdminPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="text-right text-xs text-slate-500">
-                    <span className="text-emerald-300">
+                  <div className="text-right text-xs text-white/60">
+                    <span className="text-purple/45">
                       {analytics[campaign.id]?.impressions || 0}
                     </span>{" "}
                     impressions ·{" "}
-                    <span className="text-sky-300">
+                    <span className="text-purple/45">
                       {analytics[campaign.id]?.clicks || 0}
                     </span>{" "}
                     clicks · {analytics[campaign.id]?.clickThroughRate || 0}%
@@ -376,7 +376,7 @@ export default function AdvertisingAdminPage() {
                   </button>
                   <button
                     onClick={() => removeCampaign(campaign.id)}
-                    className="rounded-xl bg-red-100 p-2 text-red-700"
+                    className="rounded-xl bg-purple/20 p-2 text-purple/90"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -386,7 +386,7 @@ export default function AdvertisingAdminPage() {
                 {campaign.ads.map((ad) => (
                   <div
                     key={ad.id}
-                    className="overflow-hidden rounded-xl bg-slate-100"
+                    className="overflow-hidden rounded-xl bg-white/10"
                   >
                     {ad.mediaType === "VIDEO" ? (
                       <video
@@ -408,7 +408,7 @@ export default function AdvertisingAdminPage() {
                       </span>
                       <button
                         onClick={() => removeCreative(ad.id)}
-                        className="p-1 text-red-300"
+                        className="p-1 text-purple/45"
                       >
                         <Trash2 size={14} />
                       </button>

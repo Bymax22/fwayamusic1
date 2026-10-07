@@ -325,13 +325,13 @@ export default function ProfilePage() {
   const getActivityColor = (type: ActivityType) => {
     switch (type) {
       case 'played':
-        return 'text-blue-400';
+        return 'text-purple/60';
       case 'liked':
-        return 'text-red-400';
+        return 'text-purple/60';
       case 'created':
-        return 'text-green-400';
+        return 'text-purple/60';
       default:
-        return 'text-gray-400';
+        return 'text-white/60';
     }
   };
 
@@ -354,7 +354,7 @@ export default function ProfilePage() {
       />
 
       {/* Cover Image */}
-      <div className="relative h-64 bg-gradient-to-r from-purple-600 to-purple-500">
+      <div className="relative h-64 bg-gradient-to-r from-purple/85 to-purple/75">
         <Image
           src={coverPreview || profile.coverImage}
           alt="Cover"
@@ -380,7 +380,7 @@ export default function ProfilePage() {
       {/* Profile Content */}
       <div className="px-6 -mt-16 relative z-10">
         {/* Profile Header */}
-        <div className="rounded-[2rem] bg-[#111827]/90 p-8 shadow-xl shadow-slate-900/20 mb-8">
+        <div className="rounded-[2rem] bg-[#000000]/90 p-8 shadow-xl shadow-charcoal/20 mb-8">
         <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-end">
         {/* Avatar */}
           <div className="relative">
@@ -395,7 +395,7 @@ export default function ProfilePage() {
               <button
                 onClick={() => avatarInputRef.current?.click()}
                 disabled={uploadingAvatar}
-                className="absolute bottom-2 right-2 w-8 h-8 bg-[#e51f48] hover:bg-[#ff4d6d] rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-colors"
+                className="absolute bottom-2 right-2 w-8 h-8 bg-[#36454F] hover:bg-[#9B5DE5] rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-colors"
               >
                 {uploadingAvatar ? <Loader className="w-4 h-4 animate-spin" /> : <Edit3 className="w-4 h-4" />}
               </button>
@@ -411,12 +411,12 @@ export default function ProfilePage() {
                     type="text"
                     value={editForm.displayName}
                     onChange={(e) => setEditForm((p) => ({ ...p, displayName: e.target.value }))}
-                    className="text-3xl font-bold bg-white/5 rounded-2xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="text-3xl font-bold bg-white/5 rounded-2xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple/75"
                   />
                 ) : (
                   <h1 className="text-3xl font-bold">{profile.displayName}</h1>
                 )}
-                <p className="text-gray-400">@{profile.username}</p>
+                <p className="text-white/60">@{profile.username}</p>
               </div>
 
               <div className="flex gap-2 mt-4 lg:mt-0">
@@ -424,22 +424,22 @@ export default function ProfilePage() {
                   <>
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-[#0a3747] hover:bg-[#0a3747]/80 text-white rounded-xl transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#36454F]/80 text-white rounded-xl transition-colors"
                     >
                       <Edit3 className="w-4 h-4" />
                       Edit Profile
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-[#0a3747] hover:bg-[#0a3747]/80 text-white rounded-xl transition-colors">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#36454F]/80 text-white rounded-xl transition-colors">
                       <Settings className="w-4 h-4" />
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={handleSaveProfile} disabled={saving} className="px-4 py-2 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
+                    <button onClick={handleSaveProfile} disabled={saving} className="px-4 py-2 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
                       {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
                       {saving ? 'Saving...' : 'Save'}
                     </button>
-                    <button onClick={() => { setIsEditing(false); setEditForm({ displayName: profile.displayName, bio: profile.bio, location: profile.location, website: profile.website }); }} className="px-4 py-2 bg-[#0a3747] hover:bg-[#0a3747]/80 text-white rounded-xl transition-colors">
+                    <button onClick={() => { setIsEditing(false); setEditForm({ displayName: profile.displayName, bio: profile.bio, location: profile.location, website: profile.website }); }} className="px-4 py-2 bg-[#36454F] hover:bg-[#36454F]/80 text-white rounded-xl transition-colors">
                       Cancel
                     </button>
                   </>
@@ -453,14 +453,14 @@ export default function ProfilePage() {
                 <textarea
                   value={editForm.bio}
                   onChange={(e) => setEditForm((p) => ({ ...p, bio: e.target.value }))}
-                  className="w-full bg-white/5 rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  className="w-full bg-white/5 rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-purple/75 resize-none"
                   rows={3}
                 />
               ) : (
-                <p className="text-gray-300">{profile.bio}</p>
+                <p className="text-white/90">{profile.bio}</p>
               )}
 
-              <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+              <div className="flex flex-wrap gap-4 text-sm text-white/60">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
                   {isEditing ? (
@@ -468,7 +468,7 @@ export default function ProfilePage() {
                       type="text"
                       value={editForm.location}
                       onChange={(e) => setEditForm((p) => ({ ...p, location: e.target.value }))}
-                      className="bg-white/5 rounded-2xl px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="bg-white/5 rounded-2xl px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple/75"
                     />
                   ) : (
                     <span>{profile.location}</span>
@@ -482,10 +482,10 @@ export default function ProfilePage() {
                       type="text"
                       value={editForm.website}
                       onChange={(e) => setEditForm((p) => ({ ...p, website: e.target.value }))}
-                      className="bg-white/5 rounded-2xl px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="bg-white/5 rounded-2xl px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple/75"
                     />
                   ) : (
-                    <a href={profile.website ? `https://${profile.website}` : '#'} className="hover:text-purple-400 transition-colors">
+                    <a href={profile.website ? `https://${profile.website}` : '#'} className="hover:text-purple/60 transition-colors">
                       {profile.website || '—'}
                     </a>
                   )}
@@ -503,7 +503,7 @@ export default function ProfilePage() {
               {Object.entries(profile.stats).map(([key, value]) => (
                 <div key={key} className="text-center">
                   <div className="text-white font-bold text-lg">{(value as number).toLocaleString()}</div>
-                  <div className="text-gray-400 text-sm capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                  <div className="text-white/60 text-sm capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</div>
                 </div>
               ))}
             </div>
@@ -518,11 +518,11 @@ export default function ProfilePage() {
           <div className="lg:col-span-2">
             <h2 className="text-2xl font-bold text-white mb-6">Recent Activity</h2>
 
-            <div className="rounded-[2rem] bg-[#111827]/90 p-6 shadow-xl shadow-slate-900/20">
+            <div className="rounded-[2rem] bg-[#000000]/90 p-6 shadow-xl shadow-charcoal/20">
               {profile.recentActivity.length > 0 ? (
                 <div className="space-y-4">
                   {profile.recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-center gap-4 p-3 bg-[#111827] rounded-3xl">
+                    <div key={activity.id} className="flex items-center gap-4 p-3 bg-[#000000] rounded-3xl">
                       <div className={`p-2 rounded-lg ${getActivityColor(activity.type)} bg-opacity-20`}>
                         {getActivityIcon(activity.type)}
                       </div>
@@ -532,14 +532,14 @@ export default function ProfilePage() {
                           {activity.type === 'liked' && `Liked "${activity.title}"`}
                           {activity.type === 'created' && `Created "${activity.title}"`}
                         </p>
-                        {activity.artist && <p className="text-gray-400 text-sm">{activity.artist}</p>}
-                        <p className="text-gray-500 text-xs">{new Date(activity.timestamp).toLocaleDateString()} • {new Date(activity.timestamp).toLocaleTimeString()}</p>
+                        {activity.artist && <p className="text-white/60 text-sm">{activity.artist}</p>}
+                        <p className="text-white/60 text-xs">{new Date(activity.timestamp).toLocaleDateString()} • {new Date(activity.timestamp).toLocaleTimeString()}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-white/60">
                   <Headphones className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>No recent activity</p>
                 </div>
@@ -550,39 +550,39 @@ export default function ProfilePage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Stats */}
-            <div className="rounded-[2rem] bg-[#111827]/90 p-6 shadow-xl shadow-slate-900/20">
+            <div className="rounded-[2rem] bg-[#000000]/90 p-6 shadow-xl shadow-charcoal/20">
               <h3 className="text-lg font-bold text-white mb-4">Listening Stats</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Total Listening Time</span>
+                  <span className="text-white/60">Total Listening Time</span>
                   <span className="text-white font-medium">124 hours</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Top Genre</span>
+                  <span className="text-white/60">Top Genre</span>
                   <span className="text-white font-medium">Afrobeats</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Most Played Track</span>
+                  <span className="text-white/60">Most Played Track</span>
                   <span className="text-white font-medium">CEO Wandi</span>
                 </div>
               </div>
             </div>
 
             {/* Account Details */}
-            <div className="rounded-[2rem] bg-[#111827]/90 p-6 shadow-xl shadow-slate-900/20">
+            <div className="rounded-[2rem] bg-[#000000]/90 p-6 shadow-xl shadow-charcoal/20">
               <h3 className="text-lg font-bold text-white mb-4">Account Details</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <Mail className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-300">{profile.email}</span>
+                  <Mail className="w-4 h-4 text-white/60" />
+                  <span className="text-white/90">{profile.email}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-300">Premium Member</span>
+                  <User className="w-4 h-4 text-white/60" />
+                  <span className="text-white/90">Premium Member</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Download className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-300">45 Downloads</span>
+                  <Download className="w-4 h-4 text-white/60" />
+                  <span className="text-white/90">45 Downloads</span>
                 </div>
               </div>
             </div>

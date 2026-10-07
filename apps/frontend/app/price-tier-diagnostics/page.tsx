@@ -11,10 +11,10 @@ export default function PriceTierDiagnosticsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
+      <div className="min-h-screen bg-charcoal text-white/90 p-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-4">Price Tier Diagnostics</h1>
-          <p className="text-red-400">You must be logged in to access this page.</p>
+          <p className="text-purple/60">You must be logged in to access this page.</p>
         </div>
       </div>
     );
@@ -66,16 +66,16 @@ export default function PriceTierDiagnosticsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
+    <div className="min-h-screen bg-charcoal text-white/90 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-4">Price Tier Diagnostics</h1>
-        <p className="text-gray-400 mb-6">Use these tools to diagnose and fix price tier issues.</p>
+        <p className="text-white/60 mb-6">Use these tools to diagnose and fix price tier issues.</p>
 
         <div className="space-y-4 mb-8">
           <button
             onClick={fetchTiers}
             disabled={loading}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg font-semibold"
+            className="px-6 py-3 bg-purple/85 hover:bg-purple/90 disabled:bg-charcoal rounded-lg font-semibold"
           >
             {loading && result?.type === 'tiers' ? 'Fetching...' : 'View Current Tiers'}
           </button>
@@ -83,23 +83,23 @@ export default function PriceTierDiagnosticsPage() {
           <button
             onClick={fixExpiredTiers}
             disabled={loading}
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 rounded-lg font-semibold ml-4"
+            className="px-6 py-3 bg-purple/85 hover:bg-purple/90 disabled:bg-charcoal rounded-lg font-semibold ml-4"
           >
             {loading && result?.type === 'fix' ? 'Fixing...' : 'Fix Expired Tiers'}
           </button>
         </div>
 
         {error && (
-          <div className="bg-red-900/30 border border-red-600 rounded-lg p-4 mb-6">
-            <p className="text-red-400 font-semibold">Error</p>
-            <p className="text-red-300">{error}</p>
+          <div className="bg-purple/30 border border-purple/85 rounded-lg p-4 mb-6">
+            <p className="text-purple/60 font-semibold">Error</p>
+            <p className="text-purple/45">{error}</p>
           </div>
         )}
 
         {result && (
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
-            <p className="text-green-400 font-semibold mb-4">{result.message}</p>
-            <pre className="bg-gray-900 p-4 rounded overflow-auto max-h-96 text-sm text-gray-300">
+          <div className="bg-charcoal border border-charcoal/50 rounded-lg p-6">
+            <p className="text-purple/60 font-semibold mb-4">{result.message}</p>
+            <pre className="bg-charcoal p-4 rounded overflow-auto max-h-96 text-sm text-white/90">
               {JSON.stringify(result.data, null, 2)}
             </pre>
           </div>

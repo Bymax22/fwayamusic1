@@ -59,15 +59,15 @@ export default function SettingsPage() {
         {/* Header */}
         <div className="mb-8 max-w-6xl mx-auto pt-6">
           <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
-            <Settings className="w-8 h-8 text-purple-500" />
+            <Settings className="w-8 h-8 text-purple/75" />
             Settings
           </h1>
-          <p className="text-gray-400">Customize your Fwaya experience</p>
+          <p className="text-white/60">Customize your Fwaya experience</p>
         </div>
 
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
           {/* Sidebar Navigation */}
-          <div className="lg:w-64 rounded-[2rem] bg-[#111827]/90 p-4 ring-1 ring-white/10 shadow-xl shadow-slate-900/20 h-fit">
+          <div className="lg:w-64 rounded-[2rem] bg-[#000000]/90 p-4 ring-1 ring-white/10 shadow-xl shadow-charcoal/20 h-fit">
             <div className="space-y-2">
               {sections.map(section => (
                 <button
@@ -75,8 +75,8 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection(section.id as 'general' | 'audio' | 'privacy' | 'account')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                     activeSection === section.id
-                      ? 'bg-purple-600 text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-white/10'
+                      ? 'bg-purple/85 text-white'
+                      : 'text-white/60 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   {section.icon}
@@ -87,7 +87,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Settings Content */}
-          <div className="flex-1 rounded-[2rem] bg-[#111827]/90 p-8 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+          <div className="flex-1 rounded-[2rem] bg-[#000000]/90 p-8 ring-1 ring-white/10 shadow-xl shadow-charcoal/20">
             {activeSection === 'general' && (
             <div>
               <h2 className="text-2xl font-bold text-white mb-6">General Settings</h2>
@@ -97,12 +97,12 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Theme</p>
-                    <p className="text-gray-400 text-sm">Choose your interface theme</p>
+                    <p className="text-white/60 text-sm">Choose your interface theme</p>
                   </div>
                   <select 
                     value={settings.theme}
                     onChange={(e) => handleSettingChange('theme', e.target.value)}
-                    className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   >
                     <option value="dark">Dark</option>
                     <option value="light">Light</option>
@@ -114,12 +114,12 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Language</p>
-                    <p className="text-gray-400 text-sm">Select your preferred language</p>
+                    <p className="text-white/60 text-sm">Select your preferred language</p>
                   </div>
                   <select 
                     value={settings.language}
                     onChange={(e) => handleSettingChange('language', e.target.value)}
-                    className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   >
                     <option value="en">English</option>
                     <option value="es">Spanish</option>
@@ -131,7 +131,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Auto-play</p>
-                    <p className="text-gray-400 text-sm">Automatically play similar songs when your music ends</p>
+                    <p className="text-white/60 text-sm">Automatically play similar songs when your music ends</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
@@ -140,7 +140,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('autoPlay', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e51f48]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
                   </label>
                 </div>
               </div>
@@ -156,12 +156,12 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Audio Quality</p>
-                    <p className="text-gray-400 text-sm">Streaming quality affects data usage</p>
+                    <p className="text-white/60 text-sm">Streaming quality affects data usage</p>
                   </div>
                   <select 
                     value={settings.audioQuality}
                     onChange={(e) => handleSettingChange('audioQuality', e.target.value)}
-                    className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   >
                     <option value="low">Low (96 kbps)</option>
                     <option value="normal">Normal (160 kbps)</option>
@@ -173,7 +173,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Crossfade</p>
-                    <p className="text-gray-400 text-sm">Smooth transition between songs</p>
+                    <p className="text-white/60 text-sm">Smooth transition between songs</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
@@ -182,7 +182,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('crossfade', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e51f48]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
                   </label>
                 </div>
 
@@ -190,7 +190,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-white font-medium">Crossfade Duration</p>
-                      <p className="text-gray-400 text-sm">Seconds of overlap between songs</p>
+                      <p className="text-white/60 text-sm">Seconds of overlap between songs</p>
                     </div>
                     <input 
                       type="range" 
@@ -208,7 +208,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Volume Normalization</p>
-                    <p className="text-gray-400 text-sm">Keep consistent volume across all tracks</p>
+                    <p className="text-white/60 text-sm">Keep consistent volume across all tracks</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('volumeNormalization', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e51f48]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
                   </label>
                 </div>
               </div>
@@ -233,7 +233,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Allow Explicit Content</p>
-                    <p className="text-gray-400 text-sm">Show songs with explicit lyrics</p>
+                    <p className="text-white/60 text-sm">Show songs with explicit lyrics</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
@@ -242,7 +242,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('explicitContent', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e51f48]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
                   </label>
                 </div>
 
@@ -250,7 +250,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Listening History</p>
-                    <p className="text-gray-400 text-sm">Save your played tracks and playlists</p>
+                    <p className="text-white/60 text-sm">Save your played tracks and playlists</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
@@ -259,7 +259,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('listeningHistory', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e51f48]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
                   </label>
                 </div>
 
@@ -267,7 +267,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Personalized Recommendations</p>
-                    <p className="text-gray-400 text-sm">Get recommendations based on your listening habits</p>
+                    <p className="text-white/60 text-sm">Get recommendations based on your listening habits</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
@@ -276,7 +276,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('personalizedRecommendations', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e51f48]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
                   </label>
                 </div>
               </div>
@@ -292,7 +292,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Email Notifications</p>
-                    <p className="text-gray-400 text-sm">Receive updates and recommendations via email</p>
+                    <p className="text-white/60 text-sm">Receive updates and recommendations via email</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
@@ -301,7 +301,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('emailNotifications', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e51f48]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
                   </label>
                 </div>
 
@@ -309,7 +309,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Push Notifications</p>
-                    <p className="text-gray-400 text-sm">Receive notifications on your devices</p>
+                    <p className="text-white/60 text-sm">Receive notifications on your devices</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
@@ -318,7 +318,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('pushNotifications', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e51f48]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
                   </label>
                 </div>
 
@@ -326,7 +326,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white font-medium">Two-Factor Authentication</p>
-                    <p className="text-gray-400 text-sm">Add an extra layer of security to your account</p>
+                    <p className="text-white/60 text-sm">Add an extra layer of security to your account</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
@@ -335,21 +335,21 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('twoFactorAuth', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e51f48]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
                   </label>
                 </div>
 
                 {/* Account Actions */}
-                <div className="pt-6 border-t border-[#0a3747]">
+                <div className="pt-6 border-t border-[#36454F]">
                   <h3 className="text-lg font-bold text-white mb-4">Account Actions</h3>
                   <div className="space-y-3">
-                    <button className="w-full text-left p-3 bg-[#0a3747] hover:bg-[#0a3747]/80 rounded-lg text-white transition-colors">
+                    <button className="w-full text-left p-3 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg text-white transition-colors">
                       Change Password
                     </button>
-                    <button className="w-full text-left p-3 bg-[#0a3747] hover:bg-[#0a3747]/80 rounded-lg text-white transition-colors">
+                    <button className="w-full text-left p-3 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg text-white transition-colors">
                       Download Your Data
                     </button>
-                    <button className="w-full text-left p-3 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-red-400 transition-colors">
+                    <button className="w-full text-left p-3 bg-purple/20 hover:bg-purple/30 rounded-lg text-purple/60 transition-colors">
                       Delete Account
                     </button>
                   </div>

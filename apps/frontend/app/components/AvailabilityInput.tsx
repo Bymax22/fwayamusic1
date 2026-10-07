@@ -45,8 +45,8 @@ export function AvailabilityInput({
 
   const getStatusIcon = () => {
     if (status === 'checking') return <FaSpinner className="animate-spin" />;
-    if (status === 'available') return <FaCheck className="text-green-500" />;
-    if (status === 'taken') return <FaTimes className="text-red-500" />;
+    if (status === 'available') return <FaCheck className="text-purple/75" />;
+    if (status === 'taken') return <FaTimes className="text-purple/75" />;
     return null;
   };
 
@@ -58,15 +58,15 @@ export function AvailabilityInput({
   };
 
   const statusColor = {
-    unknown: 'text-gray-400',
-    checking: 'text-gray-400',
-    available: 'text-green-500',
-    taken: 'text-red-500',
+    unknown: 'text-white/60',
+    checking: 'text-white/60',
+    available: 'text-purple/75',
+    taken: 'text-purple/75',
   }[status];
 
   return (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-300 mb-2">
+      <label className="block text-sm font-medium text-white/90 mb-2">
         {label}
       </label>
       <div className="relative">
@@ -77,14 +77,14 @@ export function AvailabilityInput({
           onChange={handleChange}
           onBlur={handleBlur}
           disabled={disabled}
-          className={`w-full px-4 py-3 rounded-xl bg-[#0f1112] text-white placeholder-gray-500 focus:outline-none transition-colors ${
+          className={`w-full px-4 py-3 rounded-xl bg-[#000000] text-white placeholder-white/60 focus:outline-none transition-colors ${
             disabled
-              ? 'cursor-not-allowed opacity-70 bg-[#0b0b0b]'
+              ? 'cursor-not-allowed opacity-70 bg-[#000000]'
               : error || status === 'taken'
-              ? 'focus:ring-2 focus:ring-red-500'
+              ? 'focus:ring-2 focus:ring-purple/75'
               : status === 'available'
-              ? 'focus:ring-2 focus:ring-emerald-500'
-              : 'focus:ring-2 focus:ring-purple-500'
+              ? 'focus:ring-2 focus:ring-purple/75'
+              : 'focus:ring-2 focus:ring-purple/75'
           }`}
         />
         {status !== 'unknown' && (
@@ -99,7 +99,7 @@ export function AvailabilityInput({
         )}
       </div>
       {error && (
-        <p className="text-xs text-red-500 mt-1">{error}</p>
+        <p className="text-xs text-purple/75 mt-1">{error}</p>
       )}
     </div>
   );

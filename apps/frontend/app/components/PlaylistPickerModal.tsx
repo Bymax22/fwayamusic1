@@ -44,7 +44,7 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
             toast.dismiss(toastItem.id);
             router.push(`/playlist/${playlistId}`);
           }}
-          className="shrink-0 font-medium text-purple-300 transition hover:text-purple-200"
+          className="shrink-0 font-medium text-purple/45 transition hover:text-purple/30"
         >
           View playlist
         </button>
@@ -255,21 +255,21 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
         <div className="flex items-center justify-between gap-4 mb-4">
           <div>
             <h2 className="text-lg font-semibold text-white">Add to Playlist</h2>
-            <p className="text-sm text-slate-400">Choose one of your playlists to save this item.</p>
+            <p className="text-sm text-white/60">Choose one of your playlists to save this item.</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-slate-300 transition hover:bg-white/10"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white/90 transition hover:bg-white/10"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {loading ? (
-          <div className="rounded-3xl bg-[#0d1120] p-8 text-center text-sm text-slate-400">Loading playlists...</div>
+          <div className="rounded-3xl bg-[#000000] p-8 text-center text-sm text-white/60">Loading playlists...</div>
         ) : error ? (
-          <div className="rounded-3xl bg-[#0d1120] p-4 text-sm text-red-300">{error}</div>
+          <div className="rounded-3xl bg-[#000000] p-4 text-sm text-purple/45">{error}</div>
         ) : (
           <div className="space-y-3 max-h-72 overflow-y-auto">
             {/* Always offer create UI */}
@@ -279,10 +279,10 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
                 onClick={() => setShowCreate((s) => !s)}
                 className="w-full flex items-center gap-3 rounded-2xl bg-white/5 p-3 text-left transition hover:bg-white/10"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-600 text-white">+</div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple/85 text-white">+</div>
                 <div className="min-w-0">
                   <p className="font-medium text-white">Create new playlist</p>
-                  <p className="text-sm text-slate-400">Create a playlist and add this item</p>
+                  <p className="text-sm text-white/60">Create a playlist and add this item</p>
                 </div>
               </button>
 
@@ -292,20 +292,20 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder="Playlist name"
-                    className="w-full rounded-lg bg-[#0b0c12] px-3 py-2 text-white"
+                    className="w-full rounded-lg bg-[#000000] px-3 py-2 text-white"
                   />
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setNewCover(e.target.files ? e.target.files[0] : null)}
-                    className="w-full text-sm text-slate-300"
+                    className="w-full text-sm text-white/90"
                   />
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={handleCreatePlaylist}
                       disabled={submitting}
-                      className="flex-1 rounded-full bg-purple-600 px-4 py-2 text-white"
+                      className="flex-1 rounded-full bg-purple/85 px-4 py-2 text-white"
                     >
                       {submitting ? 'Creating...' : 'Create and add'}
                     </button>
@@ -322,7 +322,7 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
             </div>
 
             {playlists.length === 0 && (
-              <div className="rounded-3xl bg-[#0d1120] p-6 text-center text-sm text-slate-400">
+              <div className="rounded-3xl bg-[#000000] p-6 text-center text-sm text-white/60">
                 You don't have any playlists yet. Use the form above to create one.
               </div>
             )}
@@ -335,12 +335,12 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
                 disabled={submitting}
                 className="w-full flex items-center gap-3 rounded-2xl bg-white/5 p-3 text-left transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-600 text-white">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple/85 text-white">
                   <ListMusic className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
                   <p className="font-medium text-white truncate">{playlist.name}</p>
-                  <p className="text-sm text-slate-400">{playlist.mediaCount ?? 0} tracks</p>
+                  <p className="text-sm text-white/60">{playlist.mediaCount ?? 0} tracks</p>
                 </div>
               </button>
             ))}

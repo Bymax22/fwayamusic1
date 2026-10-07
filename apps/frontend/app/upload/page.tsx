@@ -374,16 +374,16 @@ export default function UploadPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
-        <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg ring-1 ring-gray-200/10">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle className="h-10 w-10 text-green-600 animate-in fade-in zoom-in-75" />
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-purple/15 to-white p-4">
+        <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg ring-1 ring-white/10">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-purple/20">
+            <CheckCircle className="h-10 w-10 text-purple/85 animate-in fade-in zoom-in-75" />
           </div>
 
-          <h1 className="mb-2 text-center text-2xl font-bold text-gray-900">
+          <h1 className="mb-2 text-center text-2xl font-bold text-charcoal">
             Upload Complete!
           </h1>
-          <p className="mb-6 text-center text-gray-600">
+          <p className="mb-6 text-center text-white/60">
             Your media is now available in your library.
           </p>
 
@@ -409,7 +409,7 @@ export default function UploadPage() {
       <h1 className="text-2xl font-bold mb-6">Upload New Media</h1>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-4 p-4 bg-purple/20 border border-purple/60 text-purple/90 rounded">
           {error}
         </div>
       )}
@@ -417,7 +417,7 @@ export default function UploadPage() {
       <div className="space-y-6">
         {/* Media Type Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-white/80 mb-1">
             Media Type *
           </label>
           <div className="grid grid-cols-4 gap-2">
@@ -458,10 +458,10 @@ export default function UploadPage() {
 
         {/* File Upload Section */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-white/80">
             {metadata.type === "VIDEO" ? "Video File" : "Audio File"} *
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+          <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center hover:border-purple/60 transition-colors">
             <input
               type="file"
               id="media-upload"
@@ -475,23 +475,23 @@ export default function UploadPage() {
               className={`cursor-pointer flex flex-col items-center justify-center gap-2 ${uploading ? "opacity-50" : ""}`}
             >
               {metadata.type === "VIDEO" ? (
-                <Video className="h-8 w-8 text-gray-400" />
+                <Video className="h-8 w-8 text-white/60" />
               ) : (
-                <Music className="h-8 w-8 text-gray-400" />
+                <Music className="h-8 w-8 text-white/60" />
               )}
               {file ? (
                 <div className="text-center">
                   <p className="font-medium">{file.name}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-white/60">
                     {(file.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
                 </div>
               ) : (
                 <div className="text-center">
-                  <p className="text-gray-600">
+                  <p className="text-white/60">
                     Drag and drop or click to select
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-white/60">
                     {metadata.type === "VIDEO" 
                       ? "Supports MP4, MOV, AVI (Max 100MB)"
                       : "Supports MP3, WAV, AAC, FLAC (Max 100MB)"}
@@ -504,10 +504,10 @@ export default function UploadPage() {
 
         {/* Cover Image Upload Section */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-white/80">
             Cover Art (Album/Podcast Art)
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+          <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center hover:border-purple/60 transition-colors">
             <input
               type="file"
               id="cover-upload"
@@ -522,7 +522,7 @@ export default function UploadPage() {
             >
               {coverFile ? (
                 <div className="text-center">
-                  <div className="mb-2 w-16 h-16 mx-auto rounded border border-gray-300 overflow-hidden">
+                  <div className="mb-2 w-16 h-16 mx-auto rounded border border-white/20 overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={URL.createObjectURL(coverFile)}
@@ -531,21 +531,21 @@ export default function UploadPage() {
                     />
                   </div>
                   <p className="font-medium text-sm">{coverFile.name}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-white/60">
                     {(coverFile.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
                 </div>
               ) : (
                 <div className="text-center">
-                  <div className="mb-2 w-12 h-12 mx-auto text-gray-400">
+                  <div className="mb-2 w-12 h-12 mx-auto text-white/60">
                     <svg className="w-full h-full" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
                     </svg>
                   </div>
-                  <p className="text-gray-600">
+                  <p className="text-white/60">
                     Click to select cover image
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-white/60">
                     JPEG, PNG, WebP, GIF (Max 5MB)
                   </p>
                 </div>
@@ -557,13 +557,13 @@ export default function UploadPage() {
         {/* Progress Bar */}
         {uploading && (
           <div className="space-y-2">
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div className="w-full bg-white/20 rounded-full h-2.5">
               <div
-                className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                className="bg-purple/85 h-2.5 rounded-full transition-all duration-300"
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
-            <p className="text-xs text-gray-500 text-right">
+            <p className="text-xs text-white/60 text-right">
               {uploadProgress}% Complete
             </p>
           </div>
@@ -572,7 +572,7 @@ export default function UploadPage() {
         {/* Metadata Form */}
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/80 mb-1">
               Title *
             </label>
             <input
@@ -582,12 +582,12 @@ export default function UploadPage() {
                 setMetadata({ ...metadata, title: e.target.value })
               }
               required
-              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-purple/75 focus:border-purple/75"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/80 mb-1">
               Description
             </label>
             <textarea
@@ -596,12 +596,12 @@ export default function UploadPage() {
                 setMetadata({ ...metadata, description: e.target.value })
               }
               rows={3}
-              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-purple/75 focus:border-purple/75"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/80 mb-1">
               Genre *
             </label>
             <select
@@ -610,7 +610,7 @@ export default function UploadPage() {
               onChange={(e: ChangeEvent<HTMLSelectElement>) => 
                 setMetadata({...metadata, genre: e.target.value})
               }
-              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-purple/75 focus:border-purple/75"
             >
               <option value="">Choose a genre</option>
               {MUSIC_GENRE_GROUPS.map((group) => (
@@ -622,7 +622,7 @@ export default function UploadPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/80 mb-1">
               Release Date
             </label>
             <input
@@ -632,7 +632,7 @@ export default function UploadPage() {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setMetadata({ ...metadata, releaseDate: e.target.value })
               }
-              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-purple/75 focus:border-purple/75"
             />
           </div>
 
@@ -645,9 +645,9 @@ export default function UploadPage() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setMetadata({ ...metadata, isPremium: e.target.checked })
                 }
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 rounded border-white/20 text-purple/85 focus:ring-purple/75"
               />
-              <label htmlFor="isPremium" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isPremium" className="text-sm font-medium text-white/80">
                 Premium Content
               </label>
             </div>
@@ -659,9 +659,9 @@ export default function UploadPage() {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setMetadata({ ...metadata, isExplicit: e.target.checked })
                 }
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="h-4 w-4 rounded border-white/20 text-purple/85 focus:ring-purple/75"
               />
-              <label htmlFor="isExplicit" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isExplicit" className="text-sm font-medium text-white/80">
                 Explicit Content
               </label>
             </div>
@@ -670,9 +670,9 @@ export default function UploadPage() {
             {/* Pricing selection for premium content */}
             {metadata.isPremium && (
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">Choose Price Tier</label>
+                <label className="block text-sm font-medium text-white/80">Choose Price Tier</label>
                 {priceTiers.length === 0 ? (
-                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                  <div className="p-3 bg-purple/15 border border-purple/30 rounded text-sm text-purple/95">
                     No price tiers available. Please check if they are configured in the admin panel.
                   </div>
                 ) : (
@@ -680,7 +680,7 @@ export default function UploadPage() {
                     <select
                       value={selectedPriceTierId ?? ''}
                       onChange={(e) => setSelectedPriceTierId(e.target.value ? Number(e.target.value) : null)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full p-2 border rounded focus:ring-2 focus:ring-purple/75 focus:border-purple/75"
                     >
                       <option value="">Select a price</option>
                       {priceTiers
@@ -701,7 +701,7 @@ export default function UploadPage() {
                     </select>
                     {priceTiers.filter((p) => p.active).length > 0 && 
                      priceTiers.filter((p) => p.active).filter((p) => p.productType?.name === productTypeNameForMediaType(metadata.type)).length === 0 && (
-                      <div className="p-3 bg-orange-50 border border-orange-200 rounded text-sm text-orange-800">
+                      <div className="p-3 bg-purple/15 border border-purple/30 rounded text-sm text-purple/95">
                         No price tiers available for {productTypeNameForMediaType(metadata.type)}. Contact admin to create one.
                       </div>
                     )}
@@ -709,7 +709,7 @@ export default function UploadPage() {
                 )}
 
                 {pricingPreview && (
-                  <div className="p-3 border rounded bg-gray-50">
+                  <div className="p-3 border rounded bg-white/5">
                     <p className="text-sm">Price: <strong>{formatAmount(pricingPreview.directPrice)}</strong></p>
                     <p className="text-sm">Shareable Amount: <strong>{formatAmount(pricingPreview.standardShareable)}</strong></p>
                     <p className="text-sm">Artist Payout: <strong>{formatAmount(pricingPreview.protectedArtistPayout)}</strong></p>

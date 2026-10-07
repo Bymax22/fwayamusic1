@@ -126,11 +126,11 @@ export default function ArtistSignIn() {
             className="bg-black rounded-3xl p-8 w-full max-w-md shadow-2xl"
           >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-700 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-purple/90 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaMusic className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Artist Portal</h1>
-          <p className="text-gray-300">Sign in to your artist account</p>
+          <p className="text-white/90">Sign in to your artist account</p>
         </div>
 
         <AuthErrorBanner error={authError} />
@@ -145,10 +145,10 @@ export default function ArtistSignIn() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
                   placeholder="your@email.com"
                 />
-              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-purple/60 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
@@ -160,18 +160,18 @@ export default function ArtistSignIn() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 pr-12"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-purple/60 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <div className="flex items-center justify-between">
@@ -179,7 +179,7 @@ export default function ArtistSignIn() {
                 <input
                   type="checkbox"
                   id="remember"
-                  className="w-4 h-4 text-[#e51f48] bg-transparent border-white/10 rounded focus:ring-[#e51f48] focus:ring-2"
+                  className="w-4 h-4 text-[#36454F] bg-transparent border-white/10 rounded focus:ring-[#36454F] focus:ring-2"
                 />
                 <label htmlFor="remember" className="ml-2 text-sm text-white">
                   Remember me
@@ -193,7 +193,7 @@ export default function ArtistSignIn() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-purple/75 text-white rounded-xl hover:bg-purple/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
@@ -204,9 +204,9 @@ export default function ArtistSignIn() {
 
         {!showOtpModal && (
           <>
-            <div className="mt-8 pt-6 border-t border-purple-500/20">
+            <div className="mt-8 pt-6 border-t border-purple/20">
               <div className="text-center mb-4">
-                <span className="text-gray-300 text-sm">Or continue with</span>
+                <span className="text-white/90 text-sm">Or continue with</span>
               </div>
               <div className="flex gap-4">
                 <button
@@ -218,7 +218,7 @@ export default function ArtistSignIn() {
                 </button>
                 <button
                   onClick={() => handleSocialSignIn('facebook')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/90 transition-colors font-medium"
                 >
                   <FaFacebook className="w-5 h-5" />
                   Facebook
@@ -226,18 +226,18 @@ export default function ArtistSignIn() {
               </div>
             </div>
 
-            <div className="text-center mt-8 pt-6 border-t border-purple-500/20">
-              <p className="text-gray-300">
+            <div className="text-center mt-8 pt-6 border-t border-purple/20">
+              <p className="text-white/90">
                 Don&lsquo;t have an artist account?{' '}
-                <a href="/auth/artist/signup" className="text-[#e51f48] hover:underline font-semibold">
+                <a href="/auth/artist/signup" className="text-[#36454F] hover:underline font-semibold">
                   Sign Up
                 </a>
               </p>
               <div className="mt-4 flex gap-4 justify-center">
-                <a href="/auth/user/signin" className="text-sm text-blue-600 hover:underline">
+                <a href="/auth/user/signin" className="text-sm text-purple/85 hover:underline">
                   Listener Sign In
                 </a>
-                <a href="/auth/reseller/signin" className="text-sm text-green-600 hover:underline">
+                <a href="/auth/reseller/signin" className="text-sm text-purple/85 hover:underline">
                   Reseller Sign In
                 </a>
               </div>

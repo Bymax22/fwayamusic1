@@ -431,7 +431,7 @@ export default function VideoWatchPlayer({
             <button
               type="button"
               onClick={() => setShowQualityMenu((prev) => !prev)}
-              className="absolute left-3 top-3 z-10 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-200 backdrop-blur transition hover:bg-black/85"
+              className="absolute left-3 top-3 z-10 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90 backdrop-blur transition hover:bg-black/85"
             >
               {selectedQuality === "auto" ? "Auto" : selectedQuality}
             </button>
@@ -447,7 +447,7 @@ export default function VideoWatchPlayer({
             disablePictureInPicture
           />
           {playbackError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-6 text-center text-sm text-red-200">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-6 text-center text-sm text-purple/30">
               {playbackError}
             </div>
           )}
@@ -461,9 +461,9 @@ export default function VideoWatchPlayer({
               max={duration || 0}
               value={currentTime}
               onChange={handleSeek}
-              className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple-500"
+              className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple/75"
             />
-            <div className="mt-2 flex items-center justify-between text-xs text-slate-300">
+            <div className="mt-2 flex items-center justify-between text-xs text-white/90">
               <span>{formattedCurrent}</span>
               <span>{formattedDuration}</span>
             </div>
@@ -478,7 +478,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={() => handleSkip(-10)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-charcoal sm:h-11 sm:w-11"
                 aria-label="Rewind 10 seconds"
               >
                 <Rewind size={16} />
@@ -486,7 +486,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={togglePlayPause}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500 sm:h-12 sm:w-12"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple/85 text-white transition hover:bg-purple/75 sm:h-12 sm:w-12"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? <Pause size={20} /> : <Play size={20} />}
@@ -494,7 +494,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={() => handleSkip(10)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-charcoal sm:h-11 sm:w-11"
                 aria-label="Forward 10 seconds"
               >
                 <FastForward size={16} />
@@ -506,7 +506,7 @@ export default function VideoWatchPlayer({
                 <button
                   type="button"
                   onClick={() => setShowQualityMenu((prev) => !prev)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-charcoal sm:h-11 sm:w-11"
                   aria-label="Video quality"
                 >
                   <Settings2 size={16} />
@@ -523,7 +523,7 @@ export default function VideoWatchPlayer({
                         className={`flex w-full items-center justify-between rounded-xl px-2 py-2 text-left text-white transition ${selectedQuality === option.value ? 'bg-white/15' : 'hover:bg-white/10'}`}
                       >
                         <span>{option.label}</span>
-                        {selectedQuality === option.value && <span className="text-purple-400">●</span>}
+                        {selectedQuality === option.value && <span className="text-purple/60">●</span>}
                       </button>
                     ))}
                   </div>
@@ -532,7 +532,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={toggleMute}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-charcoal sm:h-11 sm:w-11"
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
                 {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
@@ -540,7 +540,7 @@ export default function VideoWatchPlayer({
               <button
                 type="button"
                 onClick={handleToggleFullscreen}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-charcoal sm:h-11 sm:w-11"
                 aria-label="Fullscreen"
               >
                 <Maximize2 size={16} />
@@ -577,16 +577,16 @@ export default function VideoWatchPlayer({
                     console.error('VideoWatchPlayer like failed', err);
                   }
                 }}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 sm:h-11 sm:w-11"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-charcoal sm:h-11 sm:w-11"
                 aria-label="Like"
               >
-                {isLiked ? <span className="text-pink-400">❤</span> : <span className="text-white/70">♡</span>}
+                {isLiked ? <span className="text-purple/60">❤</span> : <span className="text-white/70">♡</span>}
               </button>
               <div className="text-sm text-white/70">{likesCount ?? '-'}</div>
             </div>
           <div className="hidden grid-cols-[1.4fr_0.9fr] gap-3 sm:grid">
-            <div className="flex items-center gap-2 rounded-3xl bg-[#0f1115] px-3 py-3 text-sm text-slate-300">
-              <span className="uppercase tracking-[0.2em] text-slate-500">Volume</span>
+            <div className="flex items-center gap-2 rounded-3xl bg-[#000000] px-3 py-3 text-sm text-white/90">
+              <span className="uppercase tracking-[0.2em] text-white/60">Volume</span>
               <input
                 type="range"
                 min={0}
@@ -594,19 +594,19 @@ export default function VideoWatchPlayer({
                 step={0.01}
                 value={volume}
                 onChange={handleVolumeChange}
-                className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple-500"
+                className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-purple/75"
               />
-              <span className="min-w-[40px] text-right text-xs text-slate-400">{Math.round(volume * 100)}%</span>
+              <span className="min-w-[40px] text-right text-xs text-white/60">{Math.round(volume * 100)}%</span>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-3xl bg-[#0f1115] px-3 py-3 text-sm text-slate-300">
-              <span className="uppercase tracking-[0.2em] text-slate-500">Speed</span>
+            <div className="flex items-center justify-between gap-3 rounded-3xl bg-[#000000] px-3 py-3 text-sm text-white/90">
+              <span className="uppercase tracking-[0.2em] text-white/60">Speed</span>
               <select
                 value={playbackRate}
                 onChange={handlePlaybackRateChange}
-                className="rounded-2xl bg-[#090b10] px-3 py-2 text-sm text-white outline-none"
+                className="rounded-2xl bg-[#000000] px-3 py-2 text-sm text-white outline-none"
               >
                 {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
-                  <option key={rate} value={rate} className="bg-[#090b10] text-white">
+                  <option key={rate} value={rate} className="bg-[#000000] text-white">
                     {rate}x
                   </option>
                 ))}
@@ -617,7 +617,7 @@ export default function VideoWatchPlayer({
       </div>
 
       {!isReady && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-sm text-slate-300">Loading video…</div>
+        <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-sm text-white/90">Loading video…</div>
       )}
     </div>
   );

@@ -89,10 +89,10 @@ export default function EnhancedRoleGuard({
   // Show loading state
   if (loading && showLoading) {
     return customLoadingComponent || (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a1f29] to-[#0a3747] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#000000] to-[#36454F] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#e51f48] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Checking permissions...</p>
+          <div className="w-16 h-16 border-4 border-[#36454F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white/60">Checking permissions...</p>
         </div>
       </div>
     );

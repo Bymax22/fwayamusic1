@@ -321,7 +321,7 @@ export default function VideoPlayer({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className={isMinimized && isMobile ? 'w-full overflow-hidden rounded-[20px] bg-black/90 shadow-2xl backdrop-blur' : 'w-full max-w-5xl overflow-hidden rounded-[24px] bg-[#050509]/95 shadow-2xl'}
+            className={isMinimized && isMobile ? 'w-full overflow-hidden rounded-[20px] bg-black/90 shadow-2xl backdrop-blur' : 'w-full max-w-5xl overflow-hidden rounded-[24px] bg-[#000000]/95 shadow-2xl'}
           >
             <div
               className="relative bg-black"
@@ -349,7 +349,7 @@ export default function VideoPlayer({
                 webkit-playsinline="true"
               />
               {playbackError && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-6 text-center text-sm text-red-200">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-6 text-center text-sm text-purple/30">
                   {playbackError}
                 </div>
               )}
@@ -428,7 +428,7 @@ export default function VideoPlayer({
                                   className={`flex w-full items-center justify-between rounded-xl px-2 py-2 text-left text-white transition ${selectedQuality === option.value ? 'bg-white/15' : 'hover:bg-white/10'}`}
                                 >
                                   <span>{option.label}</span>
-                                  {selectedQuality === option.value && <span className="text-purple-400">●</span>}
+                                  {selectedQuality === option.value && <span className="text-purple/60">●</span>}
                                 </button>
                               ))}
                             </div>
@@ -449,7 +449,7 @@ export default function VideoPlayer({
                       max={videoDuration || 0}
                       value={currentTime}
                       onChange={handleSeek}
-                      className="mb-2 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/20 accent-purple-500"
+                      className="mb-2 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/20 accent-purple/75"
                     />
 
                     <div className="flex items-center justify-between text-[11px] text-white/70">
@@ -473,11 +473,11 @@ export default function VideoPlayer({
             </div>
 
             {!isMinimized && (
-              <div className="bg-[#050509] p-3 sm:p-4">
+              <div className="bg-[#000000] p-3 sm:p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white">Related videos</p>
-                    <p className="text-xs text-gray-400">Swipe or scroll to explore more</p>
+                    <p className="text-xs text-white/60">Swipe or scroll to explore more</p>
                   </div>
                 </div>
                 {visibleRelatedVideos.length > 0 ? (
@@ -488,14 +488,14 @@ export default function VideoPlayer({
                         onClick={() => onSelectVideo?.(video)}
                         className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-2 text-left transition hover:bg-white/[0.06]"
                       >
-                        <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                        <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-purple/75 to-purple/75">
                           {video.artCoverUrl || video.thumbnailUrl ? (
                             <img src={video.artCoverUrl || video.thumbnailUrl} alt={video.title} className="h-full w-full object-cover" />
                           ) : null}
                         </div>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium text-white">{video.title}</p>
-                          <p className="truncate text-xs text-gray-400">
+                          <p className="truncate text-xs text-white/60">
                             {video.user?.displayName || video.user?.username || 'Unknown artist'}
                           </p>
                         </div>
@@ -503,7 +503,7 @@ export default function VideoPlayer({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-400">No related videos available right now.</p>
+                  <p className="text-sm text-white/60">No related videos available right now.</p>
                 )}
               </div>
             )}

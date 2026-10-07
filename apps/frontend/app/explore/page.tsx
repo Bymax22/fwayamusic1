@@ -82,12 +82,12 @@ export default function ExplorePage() {
 
         // Mock categories
         const mockCategories: Category[] = [
-          { id: 1, name: 'Top Charts', description: 'Most popular tracks', color: 'from-purple-500 to-fuchsia-500', count: trending.length },
-          { id: 2, name: 'New Releases', description: 'Fresh music just dropped', color: 'from-cyan-500 to-violet-500', count: newReleases.length },
-          { id: 3, name: 'Popular Artists', description: 'Trending creators', color: 'from-violet-500 to-purple-600', count: 24 },
-          { id: 4, name: 'Radio Stations', description: 'Live streaming', color: 'from-purple-600 to-fuchsia-500', count: 12 },
-          { id: 5, name: 'Genres', description: 'Explore by style', color: 'from-indigo-500 to-purple-500', count: 18 },
-          { id: 6, name: 'Mood & Activity', description: 'Music for every moment', color: 'from-purple-500 to-violet-500', count: 15 },
+          { id: 1, name: 'Top Charts', description: 'Most popular tracks', color: 'from-purple/75 to-purple/75', count: trending.length },
+          { id: 2, name: 'New Releases', description: 'Fresh music just dropped', color: 'from-purple/75 to-purple/75', count: newReleases.length },
+          { id: 3, name: 'Popular Artists', description: 'Trending creators', color: 'from-purple/75 to-purple/85', count: 24 },
+          { id: 4, name: 'Radio Stations', description: 'Live streaming', color: 'from-purple/85 to-purple/75', count: 12 },
+          { id: 5, name: 'Genres', description: 'Explore by style', color: 'from-purple/75 to-purple/75', count: 18 },
+          { id: 6, name: 'Mood & Activity', description: 'Music for every moment', color: 'from-purple/75 to-purple/75', count: 15 },
         ];
         setCategories(mockCategories);
       } catch (err) {
@@ -120,11 +120,11 @@ export default function ExplorePage() {
   const popularGenres = Array.from(new Set(mediaFiles.map(file => file.genre))).slice(0, 6);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#1a0a33]/95 to-[#240e47]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#000000]/95 to-[#36454F]/95 min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Explore</h1>
-        <p className="text-gray-400">Discover new music and trending content</p>
+        <p className="text-white/60">Discover new music and trending content</p>
       </div>
 
       {/* Categories Grid */}
@@ -153,10 +153,10 @@ export default function ExplorePage() {
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-purple-300" />
+            <TrendingUp className="w-6 h-6 text-purple/45" />
             Trending Now
           </h2>
-          <button className="text-purple-300 hover:text-purple-100 transition-colors">
+          <button className="text-purple/45 hover:text-purple/20 transition-colors">
             View all
           </button>
         </div>
@@ -165,7 +165,7 @@ export default function ExplorePage() {
           {trendingTracks.map(file => (
             <div 
               key={file.id} 
-              className="bg-[#0a3747]/70 rounded-xl overflow-hidden hover:bg-[#0a3747] transition-colors group"
+              className="bg-[#36454F]/70 rounded-xl overflow-hidden hover:bg-[#36454F] transition-colors group"
             >
               <div className="relative">
                 <Image 
@@ -181,7 +181,7 @@ export default function ExplorePage() {
                     onClick={() => handlePlay(file)}
                     className={`transform transition-all ${currentTrack?.id === file.id && isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 group-hover:opacity-100 group-hover:translate-y-0'}`}
                   >
-                    <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center shadow-lg">
+                    <div className="w-12 h-12 rounded-full bg-purple/75 flex items-center justify-center shadow-lg">
                       {currentTrack?.id === file.id && isPlaying ? (
                         <Waveform playing className="h-5 w-5" />
                       ) : (
@@ -190,18 +190,18 @@ export default function ExplorePage() {
                     </div>
                   </button>
                 </div>
-                <div className="absolute top-3 right-3 bg-[#0f172a]/70 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
+                <div className="absolute top-3 right-3 bg-[#000000]/70 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
                   {file.views} plays
                 </div>
               </div>
               <div className="p-4">
                 <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.id) && isPlaying} className="mb-1 font-medium text-white">{file.title}</ScrollingTrackTitle>
-                <p className="text-sm text-gray-400 truncate mb-2">{file.artist}</p>
-                <div className="flex justify-between items-center text-xs text-gray-500">
+                <p className="text-sm text-white/60 truncate mb-2">{file.artist}</p>
+                <div className="flex justify-between items-center text-xs text-white/60">
                   <span>{file.genre}</span>
                   <span>{formatDuration(file.duration)}</span>
                 </div>
-                <p className="mt-2 text-xs text-gray-500">{formatAddedTime(file)}</p>
+                <p className="mt-2 text-xs text-white/60">{formatAddedTime(file)}</p>
               </div>
             </div>
           ))}
@@ -212,10 +212,10 @@ export default function ExplorePage() {
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Music className="w-6 h-6 text-purple-300" />
+            <Music className="w-6 h-6 text-purple/45" />
             New Releases
           </h2>
-          <button className="text-purple-300 hover:text-purple-100 transition-colors">
+          <button className="text-purple/45 hover:text-purple/20 transition-colors">
             View all
           </button>
         </div>
@@ -224,7 +224,7 @@ export default function ExplorePage() {
           {newReleases.map(file => (
             <div 
               key={file.id} 
-              className="bg-[#111827]/70 rounded-xl overflow-hidden hover:bg-[#111827] transition-colors group"
+              className="bg-[#000000]/70 rounded-xl overflow-hidden hover:bg-[#000000] transition-colors group"
             >
               <div className="relative">
                 <Image 
@@ -240,19 +240,19 @@ export default function ExplorePage() {
                     onClick={() => handlePlay(file)}
                     className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
                   >
-                    <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center shadow-lg">
+                    <div className="w-12 h-12 rounded-full bg-purple/75 flex items-center justify-center shadow-lg">
                       <Play className="w-5 h-5 text-white" />
                     </div>
                   </button>
                 </div>
-                <div className="absolute top-3 left-3 bg-purple-500 rounded-full px-2 py-1 text-xs text-white">
+                <div className="absolute top-3 left-3 bg-purple/75 rounded-full px-2 py-1 text-xs text-white">
                   NEW
                 </div>
               </div>
               <div className="p-4">
                 <h3 className="font-medium text-white truncate mb-1">{file.title}</h3>
-                <p className="text-sm text-gray-400 truncate">{file.artist}</p>
-                <p className="mt-2 text-xs text-gray-500">{formatAddedTime(file)}</p>
+                <p className="text-sm text-white/60 truncate">{file.artist}</p>
+                <p className="mt-2 text-xs text-white/60">{formatAddedTime(file)}</p>
               </div>
             </div>
           ))}
@@ -262,7 +262,7 @@ export default function ExplorePage() {
       {/* Popular Genres */}
       <section>
         <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-          <Mic2 className="w-6 h-6 text-purple-300" />
+          <Mic2 className="w-6 h-6 text-purple/45" />
           Popular Genres
         </h2>
 
@@ -270,13 +270,13 @@ export default function ExplorePage() {
 {popularGenres.map((genre, index) => (
   <div 
     key={genre ?? `unknown-${index}`}
-    className="bg-[#111827]/70 rounded-xl p-4 text-center hover:bg-[#111827] transition-colors cursor-pointer group"
+    className="bg-[#000000]/70 rounded-xl p-4 text-center hover:bg-[#000000] transition-colors cursor-pointer group"
   >
-    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+    <div className="w-12 h-12 bg-gradient-to-br from-purple/75 to-purple/75 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
       <Music className="w-6 h-6 text-white" />
     </div>
     <h3 className="font-medium text-white mb-1">{genre}</h3>
-    <p className="text-xs text-gray-400">{getGenreCount(genre!)} tracks</p>
+    <p className="text-xs text-white/60">{getGenreCount(genre!)} tracks</p>
   </div>
 ))}
         </div>

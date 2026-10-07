@@ -574,27 +574,27 @@ export default function ProducerPage() {
             {/* Header */}
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
               <div className="space-y-3">
-                <p className="inline-flex items-center gap-2 rounded-full bg-purple-500/20 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">
+                <p className="inline-flex items-center gap-2 rounded-full bg-purple/20 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple/45">
                   Producer Dashboard
                 </p>
                 <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
                   Create, Share & Sell Your Beats
                 </h1>
-                <p className="max-w-2xl text-gray-400">
+                <p className="max-w-2xl text-white/60">
                   Manage your beat library, track sales, and grow your fanbase
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={() => router.push('/settings')}
-                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition hover:bg-slate-800"
+                  className="inline-flex items-center gap-2 rounded-full bg-charcoal px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-charcoal/20 transition hover:bg-charcoal"
                 >
                   <Settings className="w-5 h-5" />
                   Settings
                 </button>
                 <button
                   onClick={() => setShowUploadModal(true)}
-                  className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-500"
+                  className="inline-flex items-center gap-2 rounded-full bg-purple/85 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple/20 transition hover:bg-purple/75"
                 >
                   <PlusCircle className="w-5 h-5" />
                   Upload Beat
@@ -616,8 +616,8 @@ export default function ProducerPage() {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
                     activeTab === tab.id
-                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/15'
-                      : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                      ? 'bg-purple/85 text-white shadow-lg shadow-purple/15'
+                      : 'bg-white/10 text-white/90 hover:bg-white/15'
                   }`}
                 >
                   {tab.icon}
@@ -632,46 +632,46 @@ export default function ProducerPage() {
                 {/* Stats Grid */}
                 {stats && (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-2xl bg-gradient-to-br from-purple-600/20 to-purple-900/20 border border-purple-500/30 p-6">
+                    <div className="rounded-2xl bg-gradient-to-br from-purple/20 to-purple/20 border border-purple/30 p-6">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-gray-400 mb-1">Total Beats</p>
+                          <p className="text-sm text-white/60 mb-1">Total Beats</p>
                           <p className="text-3xl font-bold text-white">{stats.totalBeats}</p>
                         </div>
-                        <Music2 className="w-10 h-10 text-purple-500/30" />
+                        <Music2 className="w-10 h-10 text-purple/30" />
                       </div>
                     </div>
 
-                    <div className="rounded-2xl bg-gradient-to-br from-blue-600/20 to-blue-900/20 border border-blue-500/30 p-6">
+                    <div className="rounded-2xl bg-gradient-to-br from-purple/20 to-purple/20 border border-purple/30 p-6">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-gray-400 mb-1">Total Plays</p>
+                          <p className="text-sm text-white/60 mb-1">Total Plays</p>
                           <p className="text-3xl font-bold text-white">{stats.totalPlays.toLocaleString()}</p>
-                          <p className="text-xs text-gray-500 mt-1">{stats.monthlyPlays} this month</p>
+                          <p className="text-xs text-white/60 mt-1">{stats.monthlyPlays} this month</p>
                         </div>
-                        <Eye className="w-10 h-10 text-blue-500/30" />
+                        <Eye className="w-10 h-10 text-purple/30" />
                       </div>
                     </div>
 
-                    <div className="rounded-2xl bg-gradient-to-br from-green-600/20 to-green-900/20 border border-green-500/30 p-6">
+                    <div className="rounded-2xl bg-gradient-to-br from-purple/20 to-purple/20 border border-purple/30 p-6">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-gray-400 mb-1">Total Downloads</p>
+                          <p className="text-sm text-white/60 mb-1">Total Downloads</p>
                           <p className="text-3xl font-bold text-white">{stats.totalDownloads.toLocaleString()}</p>
-                          <p className="text-xs text-gray-500 mt-1">{stats.monthlyDownloads} this month</p>
+                          <p className="text-xs text-white/60 mt-1">{stats.monthlyDownloads} this month</p>
                         </div>
-                        <Download className="w-10 h-10 text-green-500/30" />
+                        <Download className="w-10 h-10 text-purple/30" />
                       </div>
                     </div>
 
-                    <div className="rounded-2xl bg-gradient-to-br from-yellow-600/20 to-yellow-900/20 border border-yellow-500/30 p-6">
+                    <div className="rounded-2xl bg-gradient-to-br from-purple/20 to-purple/20 border border-purple/30 p-6">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-gray-400 mb-1">Total Revenue</p>
+                          <p className="text-sm text-white/60 mb-1">Total Revenue</p>
                           <p className="text-3xl font-bold text-white">{formatZMW(stats.totalRevenue)}</p>
-                          <p className="text-xs text-gray-500 mt-1">{formatZMW(stats.monthlyRevenue)} this month</p>
+                          <p className="text-xs text-white/60 mt-1">{formatZMW(stats.monthlyRevenue)} this month</p>
                         </div>
-                        <DollarSign className="w-10 h-10 text-yellow-500/30" />
+                        <DollarSign className="w-10 h-10 text-purple/30" />
                       </div>
                     </div>
                   </div>
@@ -690,9 +690,9 @@ export default function ProducerPage() {
                         )}
                         <div className="flex-1 min-w-0">
                           <h4 className="text-white font-medium truncate">{beat.title}</h4>
-                          <p className="text-sm text-gray-400">{beat.genre} • {beat.bpm} BPM</p>
+                          <p className="text-sm text-white/60">{beat.genre} • {beat.bpm} BPM</p>
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-400">
+                        <div className="flex items-center gap-4 text-sm text-white/60">
                           <span>{beat.playCount} plays</span>
                           <span>{beat.downloadCount} downloads</span>
                         </div>
@@ -708,12 +708,12 @@ export default function ProducerPage() {
               <div className="grid gap-6">
                 {beats.length === 0 ? (
                   <div className="rounded-2xl bg-black border border-white/10 p-12 text-center">
-                    <Music2 className="w-16 h-16 text-purple-500/30 mx-auto mb-4" />
+                    <Music2 className="w-16 h-16 text-purple/30 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-white mb-2">No beats yet</h3>
-                    <p className="text-gray-400 mb-6">Start by uploading your first beat to get started</p>
+                    <p className="text-white/60 mb-6">Start by uploading your first beat to get started</p>
                     <button
                       onClick={() => setShowUploadModal(true)}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 transition"
                     >
                       <PlusCircle className="w-4 h-4" />
                       Upload Your First Beat
@@ -722,13 +722,13 @@ export default function ProducerPage() {
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {beats.map(beat => (
-                      <div key={beat.id} className="group rounded-2xl bg-black border border-white/10 overflow-hidden hover:border-purple-500/50 transition">
+                      <div key={beat.id} className="group rounded-2xl bg-black border border-white/10 overflow-hidden hover:border-purple/50 transition">
                         {(
-                          <div className="relative h-44 overflow-hidden bg-gradient-to-b from-purple-600/20 to-black">
+                          <div className="relative h-44 overflow-hidden bg-gradient-to-b from-purple/20 to-black">
                             <CoverArtImage src={beat.artCoverUrl} alt={beat.title} fill className="object-cover group-hover:scale-105 transition duration-300" />
                             <button
                               onClick={() => handlePlayBeat(beat)}
-                              className={`absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/25 transition ${currentTrack?.id === beat.id && isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                              className={`absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple/85 text-white shadow-lg shadow-purple/25 transition ${currentTrack?.id === beat.id && isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                             >
                               {currentTrack?.id === beat.id && isPlaying ? <Waveform playing className="h-5 w-5" /> : <Play className="w-5 h-5" />}
                             </button>
@@ -737,17 +737,17 @@ export default function ProducerPage() {
                         <div className="p-4 space-y-3">
                           <div>
                             <ScrollingTrackTitle isPlaying={currentTrack?.id === beat.id && isPlaying} className="font-semibold text-white">{beat.title}</ScrollingTrackTitle>
-                            <p className="text-sm text-gray-400">{beat.genre}</p>
-                            <p className="mt-1 text-xs text-gray-500">{formatAddedTime(beat)}</p>
+                            <p className="text-sm text-white/60">{beat.genre}</p>
+                            <p className="mt-1 text-xs text-white/60">{formatAddedTime(beat)}</p>
                           </div>
                           <div className="flex flex-wrap gap-2 text-xs">
-                            <span className="px-2 py-1 rounded-full bg-purple-500/20 text-purple-300">{beat.bpm} BPM</span>
-                            <span className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-300">{beat.key || 'N/A'}</span>
-                            <span className={`px-2 py-1 rounded-full ${beat.accessType === 'FREE' ? 'bg-green-500/20 text-green-300' : 'bg-yellow-500/20 text-yellow-300'}`}>
+                            <span className="px-2 py-1 rounded-full bg-purple/20 text-purple/45">{beat.bpm} BPM</span>
+                            <span className="px-2 py-1 rounded-full bg-purple/20 text-purple/45">{beat.key || 'N/A'}</span>
+                            <span className={`px-2 py-1 rounded-full ${beat.accessType === 'FREE' ? 'bg-purple/20 text-purple/45' : 'bg-purple/20 text-purple/45'}`}>
                               {beat.accessType === 'FREE' ? 'Free' : beat.accessType}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between text-sm text-gray-400 pt-2 border-t border-white/10">
+                          <div className="flex items-center justify-between text-sm text-white/60 pt-2 border-t border-white/10">
                             <div className="flex gap-3">
                               <span>{beat.playCount} plays</span>
                               <span>{beat.downloadCount} downloads</span>
@@ -756,21 +756,21 @@ export default function ProducerPage() {
                           <div className="flex gap-2 pt-2">
                             <button
                               onClick={() => handleShareBeat(beat)}
-                              className="flex-1 px-3 py-2 text-sm rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 transition flex items-center justify-center gap-1"
+                              className="flex-1 px-3 py-2 text-sm rounded-lg bg-white/5 hover:bg-white/10 text-white/90 transition flex items-center justify-center gap-1"
                             >
                               <Share2 className="w-4 h-4" />
                               Share
                             </button>
                             <button
                               onClick={() => handleComingSoon('Beat editing')}
-                              className="flex-1 px-3 py-2 text-sm rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 transition flex items-center justify-center gap-1"
+                              className="flex-1 px-3 py-2 text-sm rounded-lg bg-white/5 hover:bg-white/10 text-white/90 transition flex items-center justify-center gap-1"
                             >
                               <Edit3 className="w-4 h-4" />
                               Edit
                             </button>
                             <button
                               onClick={() => handleDeleteBeat(beat.id)}
-                              className="flex-1 px-3 py-2 text-sm rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition flex items-center justify-center gap-1"
+                              className="flex-1 px-3 py-2 text-sm rounded-lg bg-purple/10 hover:bg-purple/20 text-purple/60 transition flex items-center justify-center gap-1"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -790,7 +790,7 @@ export default function ProducerPage() {
                   <h2 className="text-2xl font-semibold text-white">Beat Packs</h2>
                   <button
                     onClick={() => setShowPackModal(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple/85 text-white rounded-lg hover:bg-purple/75 transition"
                   >
                     <PlusCircle className="w-4 h-4" />
                     Create Pack
@@ -799,17 +799,17 @@ export default function ProducerPage() {
 
                 {beatPacks.length === 0 ? (
                   <div className="rounded-2xl bg-black border border-white/10 p-12 text-center">
-                    <Package className="w-16 h-16 text-purple-500/30 mx-auto mb-4" />
+                    <Package className="w-16 h-16 text-purple/30 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-white mb-2">No beat packs yet</h3>
-                    <p className="text-gray-400">Bundle your beats into packs for better pricing</p>
+                    <p className="text-white/60">Bundle your beats into packs for better pricing</p>
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {beatPacks.map(pack => (
-                      <div key={pack.id} className="rounded-2xl bg-black border border-white/10 p-6 hover:border-purple-500/50 transition">
+                      <div key={pack.id} className="rounded-2xl bg-black border border-white/10 p-6 hover:border-purple/50 transition">
                         <h4 className="text-white font-semibold mb-2">{pack.title}</h4>
-                        <p className="text-sm text-gray-400 mb-4">{pack.description}</p>
-                        <div className="flex items-center justify-between text-sm text-gray-400">
+                        <p className="text-sm text-white/60 mb-4">{pack.description}</p>
+                        <div className="flex items-center justify-between text-sm text-white/60">
                           <span>{pack.beatCount} beats</span>
                           <span>{formatZMW(pack.price)}</span>
                         </div>
@@ -825,7 +825,7 @@ export default function ProducerPage() {
               <div className="grid gap-6">
                 <div className="rounded-2xl bg-black border border-white/10 p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Performance Analytics</h3>
-                  <p className="text-gray-400">Detailed analytics coming soon</p>
+                  <p className="text-white/60">Detailed analytics coming soon</p>
                 </div>
               </div>
             )}
@@ -837,7 +837,7 @@ export default function ProducerPage() {
                   <h2 className="text-2xl font-semibold text-white">Sound Resources</h2>
                   <button
                     onClick={() => setShowResourceModal(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple/85 text-white rounded-lg hover:bg-purple/75 transition"
                   >
                     <PlusCircle className="w-4 h-4" />
                     Add Resource
@@ -846,20 +846,20 @@ export default function ProducerPage() {
 
                 {soundResources.length === 0 ? (
                   <div className="rounded-2xl bg-black border border-white/10 p-12 text-center">
-                    <Zap className="w-16 h-16 text-purple-500/30 mx-auto mb-4" />
+                    <Zap className="w-16 h-16 text-purple/30 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-white mb-2">No resources yet</h3>
-                    <p className="text-gray-400">Share sample packs, presets, and sound kits</p>
+                    <p className="text-white/60">Share sample packs, presets, and sound kits</p>
                   </div>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {soundResources.map(resource => (
                       <div key={resource.id} className="rounded-2xl bg-black border border-white/10 p-6">
                         <h4 className="text-white font-semibold mb-2">{resource.title}</h4>
-                        <p className="text-xs text-purple-400 mb-2 capitalize">{resource.type}</p>
-                        <p className="text-sm text-gray-400 mb-4">{resource.description}</p>
+                        <p className="text-xs text-purple/60 mb-2 capitalize">{resource.type}</p>
+                        <p className="text-sm text-white/60 mb-4">{resource.description}</p>
                         <div className="flex items-center justify-between">
                           <span className="text-white font-semibold">{formatZMW(resource.price)}</span>
-                          <span className="text-xs text-gray-400">{resource.downloads} downloads</span>
+                          <span className="text-xs text-white/60">{resource.downloads} downloads</span>
                         </div>
                       </div>
                     ))}
@@ -891,7 +891,7 @@ export default function ProducerPage() {
                     onClick={() => setShowUploadModal(false)}
                     className="p-2 hover:bg-white/10 rounded-lg transition"
                   >
-                    <X className="w-6 h-6 text-gray-400" />
+                    <X className="w-6 h-6 text-white/60" />
                   </button>
                 </div>
 
@@ -902,7 +902,7 @@ export default function ProducerPage() {
                       type="text"
                       value={newBeat.title}
                       onChange={(e) => setNewBeat({ ...newBeat, title: e.target.value })}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
                       placeholder="e.g., Trap Beat Vol.1"
                     />
                   </div>
@@ -913,7 +913,7 @@ export default function ProducerPage() {
                       value={newBeat.description}
                       onChange={(e) => setNewBeat({ ...newBeat, description: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
                       placeholder="Describe your beat..."
                     />
                   </div>
@@ -926,7 +926,7 @@ export default function ProducerPage() {
                       required
                       value={newBeat.releaseDate}
                       onChange={(e) => setNewBeat({ ...newBeat, releaseDate: e.target.value })}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                     />
                   </div>
 
@@ -936,7 +936,7 @@ export default function ProducerPage() {
                       <select
                         value={newBeat.genre}
                         onChange={(e) => setNewBeat({ ...newBeat, genre: e.target.value })}
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                         required
                       >
                         <option value="">Select Genre</option>
@@ -954,7 +954,7 @@ export default function ProducerPage() {
                         type="number"
                         value={newBeat.bpm}
                         onChange={(e) => setNewBeat({ ...newBeat, bpm: e.target.value })}
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                         placeholder="e.g., 140"
                       />
                     </div>
@@ -967,7 +967,7 @@ export default function ProducerPage() {
                         type="text"
                         value={newBeat.key}
                         onChange={(e) => setNewBeat({ ...newBeat, key: e.target.value })}
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                         placeholder="e.g., C Minor"
                       />
                     </div>
@@ -977,7 +977,7 @@ export default function ProducerPage() {
                       <select
                         value={newBeat.accessType}
                         onChange={(e) => setNewBeat({ ...newBeat, accessType: e.target.value as any })}
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                       >
                         <option value="FREE">Free</option>
                         <option value="PREMIUM">Premium</option>
@@ -990,7 +990,7 @@ export default function ProducerPage() {
                     <div>
                       <label className="block text-sm font-medium text-white mb-2">Price Tier</label>
                       {priceTiers.filter((tier) => tier.active && (tier.productType?.name || tier.productTypeName) === 'Single Song').length === 0 ? (
-                        <p className="p-3 bg-yellow-900/40 border border-yellow-700 rounded text-sm text-yellow-200">
+                        <p className="p-3 bg-purple/40 border border-purple/90 rounded text-sm text-purple/30">
                           No active Single Song price tiers are available.
                         </p>
                       ) : (
@@ -1002,7 +1002,7 @@ export default function ProducerPage() {
                             setSelectedPriceTierId(tierId);
                             setNewBeat((prev) => ({ ...prev, price: tier ? String(tier.directPrice) : '' }));
                           }}
-                          className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                           required
                         >
                           <option value="">Select a price tier</option>
@@ -1020,10 +1020,10 @@ export default function ProducerPage() {
                     <label className="block text-sm font-medium text-white mb-2">Beat File *</label>
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="border-2 border-dashed border-purple-500/30 rounded-lg p-6 text-center cursor-pointer hover:border-purple-500/50 transition"
+                      className="border-2 border-dashed border-purple/30 rounded-lg p-6 text-center cursor-pointer hover:border-purple/50 transition"
                     >
-                      <Upload className="w-8 h-8 text-purple-500/50 mx-auto mb-2" />
-                      <p className="text-sm text-gray-300">
+                      <Upload className="w-8 h-8 text-purple/50 mx-auto mb-2" />
+                      <p className="text-sm text-white/90">
                         {newBeat.file ? newBeat.file.name : 'Click to upload or drag and drop'}
                       </p>
                       <input
@@ -1040,7 +1040,7 @@ export default function ProducerPage() {
                     <label className="block text-sm font-medium text-white mb-2">Cover Art</label>
                     <div
                       onClick={() => coverInputRef.current?.click()}
-                      className="border-2 border-dashed border-purple-500/30 rounded-lg p-6 text-center cursor-pointer hover:border-purple-500/50 transition"
+                      className="border-2 border-dashed border-purple/30 rounded-lg p-6 text-center cursor-pointer hover:border-purple/50 transition"
                     >
                       {newBeat.coverPreview ? (
                         <div className="relative w-24 h-24 mx-auto">
@@ -1048,8 +1048,8 @@ export default function ProducerPage() {
                         </div>
                       ) : (
                         <>
-                          <Upload className="w-8 h-8 text-purple-500/50 mx-auto mb-2" />
-                          <p className="text-sm text-gray-300">Click to upload cover art</p>
+                          <Upload className="w-8 h-8 text-purple/50 mx-auto mb-2" />
+                          <p className="text-sm text-white/90">Click to upload cover art</p>
                         </>
                       )}
                       <input
@@ -1072,7 +1072,7 @@ export default function ProducerPage() {
                     <button
                       onClick={handleUploadBeat}
                       disabled={isUploading}
-                      className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 disabled:opacity-50 transition"
+                      className="flex-1 px-4 py-2 bg-purple/85 text-white rounded-lg hover:bg-purple/75 disabled:opacity-50 transition"
                     >
                       {isUploading ? `Uploading... ${uploadProgress}%` : 'Upload Beat'}
                     </button>

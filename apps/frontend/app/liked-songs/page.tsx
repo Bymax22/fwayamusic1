@@ -151,10 +151,10 @@ export default function LikedSongsPage() {
     return (
       <div className="p-6 max-w-7xl mx-auto bg-black min-h-screen">
         <div className="animate-pulse space-y-6">
-          <div className="h-48 bg-[#111827] rounded-[2rem] mb-8"></div>
+          <div className="h-48 bg-[#000000] rounded-[2rem] mb-8"></div>
           <div className="space-y-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-16 bg-[#111827] rounded-2xl"></div>
+              <div key={i} className="h-16 bg-[#000000] rounded-2xl"></div>
             ))}
           </div>
         </div>
@@ -167,13 +167,13 @@ export default function LikedSongsPage() {
       <div className="min-h-screen bg-black text-white pb-32">
         <div className="px-6 max-w-7xl mx-auto">
           {/* Header */}
-          <div className="rounded-[2rem] bg-[#111827] p-8 mb-8 mt-6">
+          <div className="rounded-[2rem] bg-[#000000] p-8 mb-8 mt-6">
             <div className="flex flex-col lg:flex-row items-start lg:items-end gap-6">
-              <div className="w-48 h-48 bg-[#0f1720] rounded-[2rem] flex items-center justify-center">
-                <Heart className="w-16 h-16 text-purple-400" fill="currentColor" />
+              <div className="w-48 h-48 bg-[#000000] rounded-[2rem] flex items-center justify-center">
+                <Heart className="w-16 h-16 text-purple/60" fill="currentColor" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium mb-2 text-purple-300">PLAYLIST</p>
+                <p className="text-sm font-medium mb-2 text-purple/45">PLAYLIST</p>
                 <h1 className="text-4xl font-bold mb-4">Liked Songs</h1>
                 <div className="flex flex-wrap items-center gap-2 text-white/80 text-sm">
                   <span className="font-medium">Your favorites</span>
@@ -190,25 +190,25 @@ export default function LikedSongsPage() {
           <div className="flex flex-wrap items-center gap-4 mb-8">
             <button 
               onClick={handlePlayAll}
-              className="w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center transition-colors"
+              className="w-14 h-14 rounded-full bg-purple/85 hover:bg-purple/75 flex items-center justify-center transition-colors"
             >
               <Play className="w-6 h-6 text-white" fill="currentColor" />
             </button>
             
             <button className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-              <Shuffle className="w-5 h-5 text-gray-400" />
+              <Shuffle className="w-5 h-5 text-white/60" />
             </button>
 
             <button className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-              <Share2 className="w-5 h-5 text-gray-400" />
+              <Share2 className="w-5 h-5 text-white/60" />
             </button>
           </div>
 
           {/* Songs List */}
           {likedSongs.length > 0 ? (
-            <div className="rounded-[2rem] bg-[#111827] overflow-hidden">
+            <div className="rounded-[2rem] bg-[#000000] overflow-hidden">
               {/* Table Header */}
-              <div className="grid grid-cols-12 gap-4 items-center p-6 border-b border-white/5 text-gray-400 text-sm font-medium">
+              <div className="grid grid-cols-12 gap-4 items-center p-6 border-b border-white/5 text-white/60 text-sm font-medium">
                 <div className="col-span-1">#</div>
                 <div className="col-span-5">TITLE</div>
                 <div className="col-span-3">ARTIST</div>
@@ -229,14 +229,14 @@ export default function LikedSongsPage() {
                         : 'hover:bg-white/5'
                     }`}
                   >
-                    <div className="col-span-1 text-gray-400">
+                    <div className="col-span-1 text-white/60">
                       {currentTrack?.id === song.id && isPlaying ? (
                         <button onClick={() => handlePlay(song)} aria-label={`Pause ${song.title}`}>
                           <Waveform playing className="h-5 w-5" />
                         </button>
                       ) : (
                         <span 
-                          className="cursor-pointer hover:text-purple-500 transition-colors"
+                          className="cursor-pointer hover:text-purple/75 transition-colors"
                           onClick={() => handlePlay(song)}
                         >
                           {index + 1}
@@ -257,20 +257,20 @@ export default function LikedSongsPage() {
                       />
                       <div>
                         <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(song.id) && isPlaying} className={`font-medium ${
-                          currentTrack?.id === song.id ? 'text-purple-400' : 'text-white'
+                          currentTrack?.id === song.id ? 'text-purple/60' : 'text-white'
                         }`}>
                           {song.title}
                         </ScrollingTrackTitle>
-                        <p className="text-sm text-gray-400">{song.genre}</p>
+                        <p className="text-sm text-white/60">{song.genre}</p>
                       </div>
                     </div>
                     
-                    <div className="col-span-3 text-gray-300">
+                    <div className="col-span-3 text-white/90">
                       {song.artist}
                     </div>
                     
                     <div className="col-span-2">
-                      <span className="px-3 py-1 bg-white/5 text-gray-300 rounded-full text-xs">
+                      <span className="px-3 py-1 bg-white/5 text-white/90 rounded-full text-xs">
                         {song.genre}
                       </span>
                     </div>
@@ -278,12 +278,12 @@ export default function LikedSongsPage() {
                     <div className="col-span-1 flex justify-end gap-3">
                       <button 
                         onClick={() => handleUnlike(song.id)}
-                        className="text-purple-500 hover:text-purple-400 transition-colors"
+                        className="text-purple/75 hover:text-purple/60 transition-colors"
                         aria-label="Unlike"
                       >
                         <Heart className="w-5 h-5" fill="currentColor" />
                       </button>
-                      <span className="text-gray-400 text-sm w-12 text-right">
+                      <span className="text-white/60 text-sm w-12 text-right">
                         {formatDuration(song.duration)}
                       </span>
                     </div>
@@ -293,9 +293,9 @@ export default function LikedSongsPage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <Music className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-medium text-gray-400 mb-2">No liked songs yet</h3>
-              <p className="text-gray-500">Like some songs to see them here</p>
+              <Music className="w-16 h-16 text-white/60 mx-auto mb-4" />
+              <h3 className="text-xl font-medium text-white/60 mb-2">No liked songs yet</h3>
+              <p className="text-white/60">Like some songs to see them here</p>
             </div>
               )}
         </div>

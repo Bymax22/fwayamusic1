@@ -111,13 +111,13 @@ export default function ResellerSignIn() {
         className="bg-black rounded-3xl p-8 w-full max-w-md shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-700 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-purple/90 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaStore className="w-8 h-8 text-white" />
           </div>
 
             {step === 'credentials' && <AuthErrorBanner error={authError} />}
           <h1 className="text-3xl font-bold text-white mb-2">Reseller Portal</h1>
-          <p className="text-gray-300">Sign in to your reseller account</p>
+          <p className="text-white/90">Sign in to your reseller account</p>
         </div>
 
         {step === 'credentials' ? (
@@ -130,10 +130,10 @@ export default function ResellerSignIn() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
                 placeholder="your@email.com"
               />
-              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-purple/60 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
@@ -145,18 +145,18 @@ export default function ResellerSignIn() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 pr-12"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-purple/60 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <div className="flex items-center justify-between">
@@ -164,7 +164,7 @@ export default function ResellerSignIn() {
                 <input
                   type="checkbox"
                   id="remember-reseller"
-                  className="w-4 h-4 text-white bg-gray-100 border-green-500/40 rounded focus:ring-green-500 focus:ring-2"
+                  className="w-4 h-4 text-white bg-white/10 border-purple/40 rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="remember-reseller" className="ml-2 text-sm text-white">
                   Remember me
@@ -178,7 +178,7 @@ export default function ResellerSignIn() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-purple/75 text-white rounded-xl hover:bg-purple/60 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
@@ -189,10 +189,10 @@ export default function ResellerSignIn() {
           <form onSubmit={handleOTPSubmit} className="space-y-6">
             <div className="text-center">
               <h2 className="text-xl font-semibold text-white mb-2">Business Verification</h2>
-              <p className="text-gray-300 mb-4">
+              <p className="text-white/90 mb-4">
                 We sent a verification code to {formData.email}
               </p>
-              <p className="text-white text-sm bg-green-50 p-3 rounded-lg">
+              <p className="text-white text-sm bg-purple/15 p-3 rounded-lg">
                 Enhanced security for business accounts
               </p>
             </div>
@@ -205,11 +205,11 @@ export default function ResellerSignIn() {
                 type="text"
                 value={formData.otp}
                 onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0a3747] border border-green-500/40 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg font-mono"
+                className="w-full px-4 py-3 bg-[#36454F] border border-purple/40 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent text-center text-lg font-mono"
                 placeholder="123456"
                 maxLength={6}
               />
-              {errors.otp && <p className="text-red-400 text-sm mt-1">{errors.otp}</p>}
+              {errors.otp && <p className="text-purple/60 text-sm mt-1">{errors.otp}</p>}
             </div>
 
             <div className="text-center">
@@ -226,7 +226,7 @@ export default function ResellerSignIn() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-gradient-to-r from-purple/85 to-purple/85 text-white rounded-xl hover:from-purple/90 hover:to-purple/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Verifying...' : 'Verify & Continue'}
             </button>
@@ -234,7 +234,7 @@ export default function ResellerSignIn() {
             <button
               type="button"
               onClick={() => setStep('credentials')}
-              className="w-full px-6 py-3 border border-green-500/40 text-white rounded-xl hover:bg-[#0a3747] transition-colors"
+              className="w-full px-6 py-3 border border-purple/40 text-white rounded-xl hover:bg-[#36454F] transition-colors"
             >
               Back to Sign In
             </button>
@@ -243,21 +243,21 @@ export default function ResellerSignIn() {
 
         {step === 'credentials' && (
           <>
-            <div className="mt-8 pt-6 border-t border-green-500/20">
+            <div className="mt-8 pt-6 border-t border-purple/20">
               <div className="text-center mb-4">
-                <span className="text-gray-300 text-sm">Or continue with</span>
+                <span className="text-white/90 text-sm">Or continue with</span>
               </div>
               <div className="flex gap-4">
                 <button
                   onClick={() => handleSocialSignIn('google')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0a3747] text-gray-800 rounded-xl hover:bg-[#0a3747] transition-colors font-medium border border-green-500/40"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#36454F] text-charcoal rounded-xl hover:bg-[#36454F] transition-colors font-medium border border-purple/40"
                 >
                   <FaGoogle className="w-5 h-5" />
                   Google
                 </button>
                 <button
                   onClick={() => handleSocialSignIn('facebook')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/90 transition-colors font-medium"
                 >
                   <FaFacebook className="w-5 h-5" />
                   Facebook
@@ -266,7 +266,7 @@ export default function ResellerSignIn() {
             </div>
 
             <div className="text-center mt-8 pt-6">
-              <p className="text-gray-300">
+              <p className="text-white/90">
                 Don&lsquo;t have a reseller account?{' '}
                 <Link href="/auth/reseller/signup" className="text-white hover:underline font-semibold">
                   Sign Up
@@ -285,9 +285,9 @@ export default function ResellerSignIn() {
         )}
         {/* Business Benefits Section */}
         {step === 'credentials' && (
-          <div className="mt-8 bg-purple-900/40 rounded-xl p-4">
-            <h3 className="font-semibold text-purple-200 mb-2">Reseller Benefits</h3>
-            <ul className="text-purple-100 text-sm space-y-1">
+          <div className="mt-8 bg-purple/40 rounded-xl p-4">
+            <h3 className="font-semibold text-purple/30 mb-2">Reseller Benefits</h3>
+            <ul className="text-purple/20 text-sm space-y-1">
               <li>• Earn commissions on music sales</li>
               <li>• Access exclusive reseller tools</li>
               <li>• Track your sales performance</li>

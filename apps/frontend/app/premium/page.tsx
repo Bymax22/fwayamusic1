@@ -88,20 +88,20 @@ export default function PremiumPage() {
     <div className="min-h-screen bg-black text-white">
       <div className="relative overflow-hidden">
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
-          <div className="rounded-[2rem] bg-[#111827]/90 p-6 shadow-xl shadow-slate-900/20">
+          <div className="rounded-[2rem] bg-[#000000]/90 p-6 shadow-xl shadow-charcoal/20">
             <div className="mb-10">
-              <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">
-                <Crown className="w-4 h-4 text-purple-400" />
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple/45">
+                <Crown className="w-4 h-4 text-purple/60" />
                 Premium Collection
               </p>
               <h1 className="mt-4 text-4xl font-semibold tracking-tight">Exclusive Premium Tracks</h1>
-              <p className="mt-3 max-w-2xl text-gray-400">
+              <p className="mt-3 max-w-2xl text-white/60">
                 Unlock premium and exclusive content available only to premium members.
               </p>
               <button
                 type="button"
                 onClick={() => setIsSubscriptionOpen(true)}
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-purple-600 px-5 py-3 font-semibold text-white transition hover:bg-purple-500"
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-purple/85 px-5 py-3 font-semibold text-white transition hover:bg-purple/75"
               >
                 <Crown className="h-4 w-4" /> Subscribe to Premium
               </button>
@@ -112,7 +112,7 @@ export default function PremiumPage() {
                 {media.map((track) => (
                   <div
                     key={track.id}
-                    className="group rounded-[2rem] bg-[#111827]/90 overflow-hidden transition hover:ring-purple-500/20 shadow-lg shadow-black/20"
+                    className="group rounded-[2rem] bg-[#000000]/90 overflow-hidden transition hover:ring-purple/20 shadow-lg shadow-black/20"
                   >
                     <div className="relative overflow-hidden">
                       <Image
@@ -126,11 +126,11 @@ export default function PremiumPage() {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                      <div className="absolute top-4 left-4 rounded-full bg-purple-600 px-3 py-1 text-xs font-semibold text-white">
+                      <div className="absolute top-4 left-4 rounded-full bg-purple/85 px-3 py-1 text-xs font-semibold text-white">
                         PREMIUM
                       </div>
                       {track.isExplicit && (
-                        <div className="absolute top-4 right-4 rounded-full bg-gray-600 px-2 py-1 text-xs font-semibold text-white">E</div>
+                        <div className="absolute top-4 right-4 rounded-full bg-charcoal px-2 py-1 text-xs font-semibold text-white">E</div>
                       )}
                     </div>
 
@@ -138,11 +138,11 @@ export default function PremiumPage() {
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <div>
                           <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className="text-lg font-semibold text-white">{track.title}</ScrollingTrackTitle>
-                          <p className="text-sm text-gray-400 truncate">{track.artist}</p>
+                          <p className="text-sm text-white/60 truncate">{track.artist}</p>
                         </div>
                         <button
                           onClick={() => handlePlay(track)}
-                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500 flex-shrink-0"
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple/85 text-white transition hover:bg-purple/75 flex-shrink-0"
                         >
                           {currentTrack?.id === track.id && isPlaying ? (
                             <Waveform playing className="h-5 w-5" />
@@ -152,14 +152,14 @@ export default function PremiumPage() {
                         </button>
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-400 mb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-white/60 mb-3">
                         <span>{track.views.toLocaleString()} plays</span>
                         <span>{track.genre || 'Genre'}</span>
                       </div>
 
-                      <div className="flex items-center justify-between text-sm text-gray-400">
+                      <div className="flex items-center justify-between text-sm text-white/60">
                         <span>{formatDuration(track.duration)}</span>
-                        <button className="text-gray-300 hover:text-white transition">
+                        <button className="text-white/90 hover:text-white transition">
                           <Heart className="w-4 h-4" />
                         </button>
                       </div>
@@ -168,7 +168,7 @@ export default function PremiumPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 text-gray-400">
+              <div className="text-center py-16 text-white/60">
                 <Music className="mx-auto mb-4 h-16 w-16 opacity-50" />
                 <p className="text-lg font-semibold">No premium tracks available</p>
                 <p>Premium content will be added soon.</p>

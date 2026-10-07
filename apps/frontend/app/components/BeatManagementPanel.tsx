@@ -210,13 +210,13 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
   }
 
   if (!beat) {
-    return <div className="p-6 text-center text-red-500">Failed to load beat</div>;
+    return <div className="p-6 text-center text-purple/75">Failed to load beat</div>;
   }
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
       {error && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 rounded text-red-700">
+        <div className="mb-4 p-4 bg-purple/20 border border-purple/60 rounded text-purple/90">
           {error}
         </div>
       )}
@@ -224,7 +224,7 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Cover Art Section */}
         <div className="md:col-span-1">
-          <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden mb-4">
+          <div className="aspect-square bg-white/20 rounded-lg overflow-hidden mb-4">
             <CoverArtImage
               src={coverPreview || beat.artCoverUrl || '/placeholder-beat.png'}
               alt={beat.title}
@@ -232,9 +232,9 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
             />
           </div>
           {isEditing && (
-            <label className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition">
-              <Upload size={20} className="text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Upload Cover</span>
+            <label className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-purple/75 transition">
+              <Upload size={20} className="text-white/60" />
+              <span className="text-sm font-medium text-white/80">Upload Cover</span>
               <input
                 type="file"
                 accept="image/*"
@@ -247,25 +247,25 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
           {/* Analytics Cards */}
           {analytics && (
             <div className="space-y-3 mt-6">
-              <div className="bg-blue-50 p-3 rounded">
-                <p className="text-xs text-gray-600">Play Count</p>
-                <p className="text-2xl font-bold text-blue-600">{analytics.analytics.playCount}</p>
+              <div className="bg-purple/15 p-3 rounded">
+                <p className="text-xs text-white/60">Play Count</p>
+                <p className="text-2xl font-bold text-purple/85">{analytics.analytics.playCount}</p>
               </div>
-              <div className="bg-green-50 p-3 rounded">
-                <p className="text-xs text-gray-600">Downloads</p>
-                <p className="text-2xl font-bold text-green-600">{analytics.analytics.downloadCount}</p>
+              <div className="bg-purple/15 p-3 rounded">
+                <p className="text-xs text-white/60">Downloads</p>
+                <p className="text-2xl font-bold text-purple/85">{analytics.analytics.downloadCount}</p>
               </div>
-              <div className="bg-purple-50 p-3 rounded">
-                <p className="text-xs text-gray-600">Likes</p>
-                <p className="text-2xl font-bold text-purple-600">{analytics.analytics.likeCount}</p>
+              <div className="bg-purple/15 p-3 rounded">
+                <p className="text-xs text-white/60">Likes</p>
+                <p className="text-2xl font-bold text-purple/85">{analytics.analytics.likeCount}</p>
               </div>
-              <div className="bg-orange-50 p-3 rounded">
-                <p className="text-xs text-gray-600">Comments</p>
-                <p className="text-2xl font-bold text-orange-600">{analytics.analytics.commentCount}</p>
+              <div className="bg-purple/15 p-3 rounded">
+                <p className="text-xs text-white/60">Comments</p>
+                <p className="text-2xl font-bold text-purple/85">{analytics.analytics.commentCount}</p>
               </div>
-              <div className="bg-indigo-50 p-3 rounded">
-                <p className="text-xs text-gray-600">Followers</p>
-                <p className="text-2xl font-bold text-indigo-600">{analytics.analytics.followerCount}</p>
+              <div className="bg-purple/15 p-3 rounded">
+                <p className="text-xs text-white/60">Followers</p>
+                <p className="text-2xl font-bold text-purple/85">{analytics.analytics.followerCount}</p>
               </div>
             </div>
           )}
@@ -277,37 +277,37 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
             <div>
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{beat.title}</h2>
-                  <p className="text-gray-600 mt-1">{beat.genre}</p>
+                  <h2 className="text-2xl font-bold text-charcoal">{beat.title}</h2>
+                  <p className="text-white/60 mt-1">{beat.genre}</p>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="p-2 hover:bg-gray-100 rounded transition"
+                    className="p-2 hover:bg-white/10 rounded transition"
                     title="Edit beat"
                   >
-                    <Edit2 size={20} className="text-blue-600" />
+                    <Edit2 size={20} className="text-purple/85" />
                   </button>
                   <button
                     onClick={handleDeleteBeat}
                     disabled={isLoading}
-                    className="p-2 hover:bg-gray-100 rounded transition disabled:opacity-50"
+                    className="p-2 hover:bg-white/10 rounded transition disabled:opacity-50"
                     title="Delete beat"
                   >
-                    <Trash2 size={20} className="text-red-600" />
+                    <Trash2 size={20} className="text-purple/85" />
                   </button>
                 </div>
               </div>
 
-              <p className="text-gray-700 mb-4">{beat.description}</p>
+              <p className="text-white/80 mb-4">{beat.description}</p>
 
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-600">BPM</label>
+                  <label className="text-sm font-medium text-white/60">BPM</label>
                   <p className="text-lg font-semibold">{beat.bpm}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Price</label>
+                  <label className="text-sm font-medium text-white/60">Price</label>
                   <p className="text-lg font-semibold">${beat.price.toFixed(2)}</p>
                 </div>
               </div>
@@ -316,7 +316,7 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
                 <button
                   onClick={handleToggleAccessType}
                   disabled={isLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple/75 to-purple/85 hover:from-purple/85 hover:to-purple/90 text-white rounded-lg transition disabled:opacity-50"
                 >
                   {beat.accessType === 'FREE' ? (
                     <>
@@ -329,34 +329,34 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
                   )}
                 </button>
                 <span className={`px-3 py-2 rounded-lg font-medium text-sm ${
-                  beat.accessType === 'FREE' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'
+                  beat.accessType === 'FREE' ? 'bg-purple/20 text-purple/95' : 'bg-purple/20 text-purple/95'
                 }`}>
                   {beat.accessType}
                 </span>
               </div>
 
               {analytics && (
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
+                <div className="bg-gradient-to-r from-purple/15 to-purple/15 p-4 rounded-lg">
                   <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp size={20} className="text-blue-600" />
-                    <h3 className="font-semibold text-gray-900">Engagement Metrics</h3>
+                    <TrendingUp size={20} className="text-purple/85" />
+                    <h3 className="font-semibold text-charcoal">Engagement Metrics</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-gray-600">Engagement Rate</p>
-                      <p className="text-lg font-bold text-blue-600">{analytics.analytics.engagementRate.toFixed(2)}%</p>
+                      <p className="text-xs text-white/60">Engagement Rate</p>
+                      <p className="text-lg font-bold text-purple/85">{analytics.analytics.engagementRate.toFixed(2)}%</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-600">Avg Rating</p>
-                      <p className="text-lg font-bold text-yellow-600">★ {analytics.analytics.averageRating.toFixed(1)}</p>
+                      <p className="text-xs text-white/60">Avg Rating</p>
+                      <p className="text-lg font-bold text-purple/85">★ {analytics.analytics.averageRating.toFixed(1)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-600">Est. Revenue</p>
-                      <p className="text-lg font-bold text-green-600">${analytics.monetization.estimatedRevenue}</p>
+                      <p className="text-xs text-white/60">Est. Revenue</p>
+                      <p className="text-lg font-bold text-purple/85">${analytics.monetization.estimatedRevenue}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-600">Shares</p>
-                      <p className="text-lg font-bold text-pink-600">{analytics.analytics.shareCount}</p>
+                      <p className="text-xs text-white/60">Shares</p>
+                      <p className="text-lg font-bold text-purple/85">{analytics.analytics.shareCount}</p>
                     </div>
                   </div>
                 </div>
@@ -365,55 +365,55 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
           ) : (
             <form onSubmit={handleUpdateBeat} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <label className="block text-sm font-medium text-white/80 mb-1">Title</label>
                 <input
                   type="text"
                   value={editFormData.title}
                   onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-white/80 mb-1">Description</label>
                 <textarea
                   value={editFormData.description}
                   onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">Genre</label>
                   <input
                     type="text"
                     value={editFormData.genre}
                     onChange={(e) => setEditFormData({ ...editFormData, genre: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">BPM</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">BPM</label>
                   <input
                     type="number"
                     value={editFormData.bpm}
                     onChange={(e) => setEditFormData({ ...editFormData, bpm: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                <label className="block text-sm font-medium text-white/80 mb-1">Price ($)</label>
                 <input
                   type="number"
                   step="0.01"
                   value={editFormData.price}
                   onChange={(e) => setEditFormData({ ...editFormData, price: Number(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 />
               </div>
 
@@ -421,7 +421,7 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-purple/85 hover:bg-purple/90 text-white rounded-lg transition disabled:opacity-50"
                 >
                   {isLoading ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -432,7 +432,7 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
                     setSelectedCover(null);
                     setCoverPreview(null);
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition"
+                  className="flex-1 px-4 py-2 bg-charcoal/50 hover:bg-charcoal/50 text-charcoal rounded-lg transition"
                 >
                   Cancel
                 </button>

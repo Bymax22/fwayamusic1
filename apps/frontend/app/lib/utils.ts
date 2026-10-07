@@ -376,7 +376,7 @@ export function stringToGradient(str: string): string {
   }, 0);
   
   const h = Math.abs(hash % 360);
-  return `bg-gradient-to-br from-[hsl(${h},80%,40%)] to-[hsl(${h + 40},80%,60%)]`;
+  return 'bg-gradient-to-br from-purple to-charcoal';
 }
 
 /**

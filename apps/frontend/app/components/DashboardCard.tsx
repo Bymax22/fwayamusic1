@@ -62,7 +62,7 @@ export function DashboardCard({
       </div>
       {change && (
         <div className="mt-2 text-white/80 text-xs flex items-center gap-1">
-          <span className={change.startsWith('+') ? 'text-green-300' : change.startsWith('-') ? 'text-red-300' : 'text-white/80'}>
+          <span className={change.startsWith('+') ? 'text-purple/45' : change.startsWith('-') ? 'text-purple/45' : 'text-white/80'}>
             {change}
           </span>
         </div>

@@ -42,7 +42,7 @@ export default function Upload() {
       <input type="file" onChange={handleFileChange} className="mb-4" />
       <button
         onClick={handleUpload}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        className="px-4 py-2 bg-purple/85 text-white rounded hover:bg-purple/90"
         disabled={uploading}
       >
         {uploading ? "Uploading..." : "Upload"}
@@ -50,8 +50,8 @@ export default function Upload() {
 
       {uploadedUrl && (
         <div className="mt-4">
-          <p className="text-green-600">Uploaded successfully!</p>
-          <a href={uploadedUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+          <p className="text-purple/85">Uploaded successfully!</p>
+          <a href={uploadedUrl} target="_blank" rel="noopener noreferrer" className="text-purple/75 underline">
             View file
           </a>
         </div>

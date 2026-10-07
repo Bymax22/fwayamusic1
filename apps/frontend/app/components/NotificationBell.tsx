@@ -162,28 +162,28 @@ export default function NotificationBell() {
       <button
         type="button"
         onClick={() => setIsOpen((value) => !value)}
-        className="relative text-gray-400 hover:text-white transition"
+        className="relative text-white/60 hover:text-white transition"
         aria-label="Notifications"
       >
         <Bell size={20} />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 inline-flex min-w-[18px] h-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+          <span className="absolute -top-1 -right-1 inline-flex min-w-[18px] h-5 items-center justify-center rounded-full bg-purple/75 px-1.5 text-[10px] font-semibold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-3 w-[320px] overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-slate-900">
+        <div className="absolute right-0 z-50 mt-3 w-[320px] overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-charcoal">
             <div>
               <p className="text-sm font-semibold text-white">Notifications</p>
-              <p className="text-xs text-slate-400">{unreadCount} unread</p>
+              <p className="text-xs text-white/60">{unreadCount} unread</p>
             </div>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="text-slate-400 hover:text-white"
+              className="text-white/60 hover:text-white"
               aria-label="Close notifications"
             >
               <ChevronDown size={16} className="rotate-180" />
@@ -192,15 +192,15 @@ export default function NotificationBell() {
 
           <div className="max-h-96 overflow-y-auto">
             {loading && (
-              <div className="p-4 text-sm text-slate-300">Loading notifications...</div>
+              <div className="p-4 text-sm text-white/90">Loading notifications...</div>
             )}
 
             {error && (
-              <div className="p-4 text-sm text-red-400">{error}</div>
+              <div className="p-4 text-sm text-purple/60">{error}</div>
             )}
 
             {!loading && !error && notifications.length === 0 && (
-              <div className="p-4 text-sm text-slate-400">No notifications yet.</div>
+              <div className="p-4 text-sm text-white/60">No notifications yet.</div>
             )}
 
             {!loading && !error && notifications.slice(0, 5).map((notification) => (
@@ -208,23 +208,23 @@ export default function NotificationBell() {
                 key={notification.id}
                 type="button"
                 onClick={() => handleNotificationClick(notification)}
-                className={`w-full text-left px-4 py-3 transition ${notification.isRead ? "bg-slate-950 hover:bg-slate-900" : "bg-slate-900 hover:bg-slate-800"}`}
+                className={`w-full text-left px-4 py-3 transition ${notification.isRead ? "bg-black hover:bg-charcoal" : "bg-charcoal hover:bg-charcoal"}`}
               >
                 <div className="flex items-start gap-3">
                   <span
-                    className={`mt-1 h-2.5 w-2.5 rounded-full ${notification.isRead ? "bg-slate-600" : "bg-indigo-400"}`}
+                    className={`mt-1 h-2.5 w-2.5 rounded-full ${notification.isRead ? "bg-charcoal" : "bg-purple/60"}`}
                   />
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-white truncate">{notification.title}</p>
-                    <p className="mt-1 text-xs leading-5 text-slate-400 line-clamp-2">{notification.message}</p>
-                    <p className="mt-2 text-[11px] uppercase tracking-[0.14em] text-slate-500">{new Date(notification.createdAt).toLocaleString()}</p>
+                    <p className="mt-1 text-xs leading-5 text-white/60 line-clamp-2">{notification.message}</p>
+                    <p className="mt-2 text-[11px] uppercase tracking-[0.14em] text-white/60">{new Date(notification.createdAt).toLocaleString()}</p>
                   </div>
                 </div>
               </button>
             ))}
           </div>
 
-          <div className="border-t border-white/10 bg-slate-900 px-4 py-3">
+          <div className="border-t border-white/10 bg-charcoal px-4 py-3">
             <Link href="/notifications" className="inline-flex w-full items-center justify-between rounded-2xl bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
               View all notifications
               <ChevronRight size={16} />

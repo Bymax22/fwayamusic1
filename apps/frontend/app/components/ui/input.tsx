@@ -19,7 +19,7 @@ export const Input = ({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      className="w-full p-3 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-purple/75 transition-all"
     />
   );
 };

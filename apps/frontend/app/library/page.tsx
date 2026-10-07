@@ -578,13 +578,13 @@ export default function LibraryPage() {
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
             <div className="space-y-3">
-              <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">Library</p>
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple/45">Library</p>
               <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">Organize your tracks, playlists, and downloads.</h1>
-              <p className="max-w-2xl text-gray-400">We are glad to have you on board.</p>
+              <p className="max-w-2xl text-white/60">We are glad to have you on board.</p>
             </div>
             <button
               onClick={handleCreatePlaylist}
-              className="inline-flex items-center gap-2 rounded-full bg-purple-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:bg-purple-400"
+              className="inline-flex items-center gap-2 rounded-full bg-purple/75 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple/20 transition hover:bg-purple/60"
             >
               <Plus className="w-4 h-4" />
               New Playlist
@@ -603,8 +603,8 @@ export default function LibraryPage() {
                 onClick={() => setActiveTab(tab.id as 'playlists' | 'liked' | 'recent' | 'downloaded')}
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
                   activeTab === tab.id
-                    ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/15'
-                    : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                    ? 'bg-purple/75 text-white shadow-lg shadow-purple/15'
+                    : 'bg-white/10 text-white/90 hover:bg-white/15'
                 }`}
               >
                 {tab.icon}
@@ -614,8 +614,8 @@ export default function LibraryPage() {
           </div>
 
           <div className="grid gap-6">
-            <div className="flex items-center gap-3 text-sm text-gray-400 mb-4">
-              <span className="inline-flex h-2 w-2 rounded-full bg-purple-400" />
+            <div className="flex items-center gap-3 text-sm text-white/60 mb-4">
+              <span className="inline-flex h-2 w-2 rounded-full bg-purple/60" />
               <span>{getTitle()}</span>
               <span className="text-white/70">({getContent().length})</span>
             </div>
@@ -644,7 +644,7 @@ export default function LibraryPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                       <div className="absolute inset-0 flex items-center justify-between p-4 opacity-0 transition group-hover:opacity-100">
                         <button
-                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/30 hover:bg-purple-500 transition"
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple/85 text-white shadow-lg shadow-purple/30 hover:bg-purple/75 transition"
                           onClick={(e) => { e.stopPropagation(); playTrack({
                             id: playlist.id,
                             title: playlist.name,
@@ -659,14 +659,14 @@ export default function LibraryPage() {
                         </button>
                         <div className="flex gap-2">
                           <button
-                            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-600/80 text-white hover:bg-purple-500 transition"
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple/80 text-white hover:bg-purple/75 transition"
                             onClick={(e) => { e.stopPropagation(); handleRenamePlaylist(playlist); }}
                             title="Edit playlist"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
-                            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-red-600/80 text-white hover:bg-red-500 transition"
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple/80 text-white hover:bg-purple/75 transition"
                             onClick={(e) => { e.stopPropagation(); handleDeletePlaylist(playlist.id); }}
                             title="Delete playlist"
                           >
@@ -676,10 +676,10 @@ export default function LibraryPage() {
                       </div>
                     </div>
                     <div className="space-y-2 p-5">
-                      <div className="text-xs uppercase tracking-[0.24em] text-purple-300">Playlist</div>
+                      <div className="text-xs uppercase tracking-[0.24em] text-purple/45">Playlist</div>
                       <h3 className="text-lg font-semibold text-white truncate">{playlist.name}</h3>
-                      <p className="text-sm text-gray-400 line-clamp-2">{playlist.description}</p>
-                      <div className="flex items-center justify-between text-xs text-gray-500 pt-3">
+                      <p className="text-sm text-white/60 line-clamp-2">{playlist.description}</p>
+                      <div className="flex items-center justify-between text-xs text-white/60 pt-3">
                         <span>{playlist.trackCount} tracks</span>
                         <span>{formatDuration(playlist.duration)}</span>
                       </div>
@@ -691,7 +691,7 @@ export default function LibraryPage() {
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {(getContent() as MediaFile[]).map((file) => (
                   <div key={file.id} className="grid gap-4 rounded-[32px] bg-black p-5 transition hover:bg-white/5">
-                    <div className="relative overflow-hidden rounded-3xl bg-[#0d0c14]">
+                    <div className="relative overflow-hidden rounded-3xl bg-[#000000]">
                       <Image
                         src={file.coverArt}
                         alt={file.title}
@@ -704,7 +704,7 @@ export default function LibraryPage() {
                       />
                       <button
                         onClick={() => handlePlay(file)}
-                        className="absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-500/25 transition hover:bg-purple-500"
+                        className="absolute right-4 bottom-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple/85 text-white shadow-lg shadow-purple/25 transition hover:bg-purple/75"
                       >
                         {String(currentTrack?.id) === String(file.privateRecord?.mediaId || file.id) && isPlaying ? (
                           <Waveform playing className="h-5 w-5" />
@@ -717,22 +717,22 @@ export default function LibraryPage() {
                       <div className="flex items-center justify-between gap-2">
                         <div>
                           <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(file.privateRecord?.mediaId || file.id) && isPlaying} className="text-lg font-semibold text-white">{file.title}</ScrollingTrackTitle>
-                          <p className="text-sm text-gray-400 truncate">{file.artist}</p>
+                          <p className="text-sm text-white/60 truncate">{file.artist}</p>
                         </div>
                         {activeTab === 'downloaded' && (
                           <button
                             onClick={() => void handleDownloadedLike(file)}
                             aria-label={`${file.liked ? 'Unlike' : 'Like'} ${file.title}`}
-                            className={`rounded-full bg-[#15121f] px-3 py-2 text-sm transition hover:bg-purple-600/20 ${file.liked ? 'text-purple-400' : 'text-white/70'}`}
+                            className={`rounded-full bg-[#000000] px-3 py-2 text-sm transition hover:bg-purple/20 ${file.liked ? 'text-purple/60' : 'text-white/70'}`}
                           >
                             <Heart className="w-4 h-4" fill={file.liked ? 'currentColor' : 'none'} />
                           </button>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
                         <span>{formatDuration(file.duration)}</span>
-                        <span className="inline-flex items-center gap-2 rounded-full bg-[#15121f] px-3 py-1 text-xs text-white/80">
-                          <Disc className="w-4 h-4 text-purple-300" />
+                        <span className="inline-flex items-center gap-2 rounded-full bg-[#000000] px-3 py-1 text-xs text-white/80">
+                          <Disc className="w-4 h-4 text-purple/45" />
                           {file.genre || 'Genre'}
                         </span>
                         {activeTab === 'downloaded' && (
@@ -747,14 +747,14 @@ export default function LibraryPage() {
                         <div className="flex gap-2 pt-1">
                           <button
                             onClick={() => handleAddDownloadedToPlaylist(file)}
-                            className="inline-flex items-center gap-2 rounded-full bg-purple-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-purple-500"
+                            className="inline-flex items-center gap-2 rounded-full bg-purple/85 px-3 py-2 text-xs font-semibold text-white transition hover:bg-purple/75"
                           >
                             <ListPlus className="h-4 w-4" />
                             Add to playlist
                           </button>
                           <button
                             onClick={() => setShareItem(file)}
-                            className="inline-flex items-center gap-2 rounded-full bg-[#15121f] px-3 py-2 text-xs font-semibold text-white transition hover:bg-purple-600/30"
+                            className="inline-flex items-center gap-2 rounded-full bg-[#000000] px-3 py-2 text-xs font-semibold text-white transition hover:bg-purple/30"
                           >
                             <Share2 className="h-4 w-4" />
                             Share
@@ -768,12 +768,12 @@ export default function LibraryPage() {
             )}
 
             {getContent().length === 0 && (
-              <div className="rounded-[32px] bg-black p-10 text-center text-gray-400">
-                <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-purple-500 text-white shadow-lg shadow-purple-500/20 mx-auto">
+              <div className="rounded-[32px] bg-black p-10 text-center text-white/60">
+                <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-purple/75 text-white shadow-lg shadow-purple/20 mx-auto">
                   {getIcon()}
                 </div>
                 <h3 className="text-2xl font-semibold text-white mb-2">No {getTitle().toLowerCase()} yet</h3>
-                <p className="max-w-xl mx-auto text-sm text-gray-400">
+                <p className="max-w-xl mx-auto text-sm text-white/60">
                   {activeTab === 'liked' && 'Like some songs to see them here.'}
                   {activeTab === 'recent' && 'Play some music to build your history.'}
                   {activeTab === 'downloaded' && 'Download songs for offline listening.'}
@@ -806,22 +806,22 @@ export default function LibraryPage() {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Playlist Name</label>
+                  <label className="block text-sm font-medium text-white/90 mb-2">Playlist Name</label>
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-4 py-2 bg-[#262626] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 bg-[#36454F] rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
                     placeholder="Enter playlist name"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-white/90 mb-2">Description</label>
                   <textarea
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
-                    className="w-full px-4 py-2 bg-[#262626] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none h-24"
+                    className="w-full px-4 py-2 bg-[#36454F] rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 resize-none h-24"
                     placeholder="Enter playlist description"
                   />
                 </div>
@@ -836,7 +836,7 @@ export default function LibraryPage() {
                 </button>
                 <button
                   onClick={handleSavePlaylistEdit}
-                  className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors font-medium"
+                  className="flex-1 px-4 py-2 bg-purple/85 hover:bg-purple/75 text-white rounded-lg transition-colors font-medium"
                 >
                   Save Changes
                 </button>
@@ -859,7 +859,7 @@ export default function LibraryPage() {
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-[#0a0a0d] rounded-2xl p-6 w-full max-w-md"
+                className="bg-[#000000] rounded-2xl p-6 w-full max-w-md"
                 onClick={(e) => e.stopPropagation()}
               >
                 <h2 className="text-2xl font-semibold text-white mb-4">Create Playlist</h2>
@@ -868,19 +868,19 @@ export default function LibraryPage() {
                     value={createName}
                     onChange={(e) => setCreateName(e.target.value)}
                     placeholder="Playlist name"
-                    className="w-full px-4 py-2 bg-[#15121f] border border-white/10 rounded-lg text-white placeholder-gray-500"
+                    className="w-full px-4 py-2 bg-[#000000] border border-white/10 rounded-lg text-white placeholder-white/60"
                   />
                   <textarea
                     value={createDescription}
                     onChange={(e) => setCreateDescription(e.target.value)}
                     placeholder="Description (optional)"
-                    className="w-full px-4 py-2 bg-[#15121f] border border-white/10 rounded-lg text-white placeholder-gray-500 resize-none h-24"
+                    className="w-full px-4 py-2 bg-[#000000] border border-white/10 rounded-lg text-white placeholder-white/60 resize-none h-24"
                   />
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setCreateCover(e.target.files ? e.target.files[0] : null)}
-                    className="w-full text-sm text-slate-300"
+                    className="w-full text-sm text-white/90"
                   />
                 </div>
 
@@ -894,7 +894,7 @@ export default function LibraryPage() {
                   <button
                     onClick={submitCreatePlaylist}
                     disabled={creating}
-                    className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg"
+                    className="flex-1 px-4 py-2 bg-purple/85 hover:bg-purple/75 text-white rounded-lg"
                   >
                     {creating ? 'Creating...' : 'Create Playlist'}
                   </button>

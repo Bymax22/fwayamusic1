@@ -412,7 +412,7 @@ export default function TrackPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple/75" />
       </div>
     );
   }
@@ -437,7 +437,7 @@ export default function TrackPage() {
             Back
           </button>
 
-          <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+          <div className="flex flex-wrap gap-3 text-xs text-white/60">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
               <FaMusic size={12} />
               {track.genre || 'Unknown Genre'}
@@ -463,7 +463,7 @@ export default function TrackPage() {
               {formatLargeNumber(shareCount)} shares
             </span>
             {track.accessType !== 'FREE' && (
-              <span className="inline-flex items-center gap-2 rounded-full bg-purple-600/20 px-3 py-1 text-purple-200">
+              <span className="inline-flex items-center gap-2 rounded-full bg-purple/20 px-3 py-1 text-purple/30">
                 <FaCrown size={12} />
                 {track.accessType}
               </span>
@@ -490,7 +490,7 @@ export default function TrackPage() {
                   onClick={handlePlayTrack}
                   className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition"
                 >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-600 text-white shadow-sm transition hover:bg-purple-500">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple/85 text-white shadow-sm transition hover:bg-purple/75">
                     {currentTrack?.id === track.id && isPlaying ? (
                       <Waveform playing className="h-7 w-7" />
                     ) : (
@@ -499,7 +499,7 @@ export default function TrackPage() {
                   </div>
                 </button>
                 {track.accessType === 'PREMIUM' && (
-                  <div className="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full bg-purple-600 px-3 py-2 text-xs font-semibold text-white">
+                  <div className="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full bg-purple/85 px-3 py-2 text-xs font-semibold text-white">
                     <FaCrown size={12} />
                     Premium
                   </div>
@@ -509,7 +509,7 @@ export default function TrackPage() {
                     onClick={handleLike}
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition"
                   >
-                    {isLiked ? <FaHeart size={16} className="text-red-500" /> : <FaRegHeart size={16} />}
+                    {isLiked ? <FaHeart size={16} className="text-purple/75" /> : <FaRegHeart size={16} />}
                   </button>
                   <button
                     onClick={handleDownload}
@@ -530,10 +530,10 @@ export default function TrackPage() {
 
               <div className="space-y-5">
                 <div className="rounded-[32px] bg-black p-5 shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.35em] text-purple-300">Now playing</p>
+                  <p className="text-xs uppercase tracking-[0.35em] text-purple/45">Now playing</p>
                   <h1 className="mt-4 text-3xl sm:text-4xl font-semibold text-white leading-tight">{track.title}</h1>
-                  <p className="mt-3 text-lg text-gray-300 flex items-center gap-2">
-                    <FaCheckCircle className="text-purple-400" size={16} />
+                  <p className="mt-3 text-lg text-white/90 flex items-center gap-2">
+                    <FaCheckCircle className="text-purple/60" size={16} />
                     {artistDisplay}
                   </p>
                 </div>
@@ -542,18 +542,18 @@ export default function TrackPage() {
                   <div className="flex items-center justify-between gap-4 mb-5">
                     <div>
                       <h2 className="text-2xl font-semibold text-white">Details</h2>
-                      <p className="text-gray-400 text-sm">Track metadata, release info, and status.</p>
+                      <p className="text-white/60 text-sm">Track metadata, release info, and status.</p>
                     </div>
                     <div className="flex gap-3">
                       <button
                         onClick={() => setShowDetails(true)}
-                        className={`text-sm font-semibold transition ${showDetails ? 'text-purple-300 border-b-2 border-purple-400 pb-1' : 'text-gray-400 hover:text-white'}`}
+                        className={`text-sm font-semibold transition ${showDetails ? 'text-purple/45 border-b-2 border-purple/60 pb-1' : 'text-white/60 hover:text-white'}`}
                       >
                         Details
                       </button>
                       <button
                         onClick={() => setShowDetails(false)}
-                        className={`text-sm font-semibold transition ${!showDetails ? 'text-purple-300 border-b-2 border-purple-400 pb-1' : 'text-gray-400 hover:text-white'}`}
+                        className={`text-sm font-semibold transition ${!showDetails ? 'text-purple/45 border-b-2 border-purple/60 pb-1' : 'text-white/60 hover:text-white'}`}
                       >
                         Lyrics
                       </button>
@@ -562,26 +562,26 @@ export default function TrackPage() {
 
                   {showDetails ? (
                     <div className="flex flex-wrap gap-4 text-sm">
-                      <span className="text-gray-400">Artist:</span>
+                      <span className="text-white/60">Artist:</span>
                       <span className="flex items-center gap-2 text-white font-semibold">
                       <span>{artistDisplay}</span>
                       {track?.user?.isVerified && (
-                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple-600 text-white shadow-sm shadow-purple-600/20" title="Verified artist">
+                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-purple/85 text-white shadow-sm shadow-purple/20" title="Verified artist">
                           <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.5 7.5a1 1 0 0 1-1.414 0l-3.5-3.5a1 1 0 1 1 1.414-1.414L8.793 12.2l6.793-6.793a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
                           </svg>
                         </span>
                       )}
                     </span>
-                      <span className="text-gray-400">Released:</span>
+                      <span className="text-white/60">Released:</span>
                       <span className="text-white font-semibold">{releaseLabel}</span>
-                      <span className="text-gray-400">Genre:</span>
+                      <span className="text-white/60">Genre:</span>
                       <span className="text-white font-semibold">{track.genre || 'Unknown'}</span>
-                      <span className="text-gray-400">Access:</span>
+                      <span className="text-white/60">Access:</span>
                       <span className="text-white font-semibold">{track.isDRMProtected ? 'DRM Protected' : track.accessType}</span>
                     </div>
                   ) : (
-                    <div className="rounded-3xl bg-white/5 p-5 text-gray-300 leading-relaxed">
+                    <div className="rounded-3xl bg-white/5 p-5 text-white/90 leading-relaxed">
                       {track.lyrics?.trim() ? (
                         <pre className="whitespace-pre-wrap font-sans text-sm leading-7">{track.lyrics}</pre>
                       ) : (
@@ -603,9 +603,9 @@ export default function TrackPage() {
                 <div className="flex items-center justify-between gap-3 mb-5">
                   <div>
                     <h3 className="text-2xl font-semibold text-white">Related tracks</h3>
-                    <p className="text-gray-400 text-sm">Swipe horizontally for more music.</p>
+                    <p className="text-white/60 text-sm">Swipe horizontally for more music.</p>
                   </div>
-                  <span className="text-xs uppercase tracking-[0.3em] text-purple-300">Browse</span>
+                  <span className="text-xs uppercase tracking-[0.3em] text-purple/45">Browse</span>
                 </div>
                 <div className="overflow-x-auto pb-2 w-full">
                   <div className="flex gap-2 px-2 snap-x snap-mandatory w-full">
@@ -615,7 +615,7 @@ export default function TrackPage() {
                         onClick={() => router.push(`/track/${createMediaSlug(relatedTrack.title, relatedTrack.id)}`)}
                         className="snap-start min-w-[110px] max-w-[110px] sm:min-w-[120px] sm:max-w-[120px] lg:min-w-[240px] lg:max-w-[240px] rounded-[32px] bg-black p-2 sm:p-3 lg:p-4 text-left transition hover:bg-white/5 shadow-sm"
                       >
-                        <div className="relative mb-2 sm:mb-3 lg:mb-4 h-20 sm:h-28 lg:h-36 overflow-hidden rounded-3xl bg-slate-900">
+                        <div className="relative mb-2 sm:mb-3 lg:mb-4 h-20 sm:h-28 lg:h-36 overflow-hidden rounded-3xl bg-charcoal">
                           <Image
                             src={relatedTrack.coverArt || (relatedTrack as any).artCoverUrl || (relatedTrack as any).thumbnailUrl || (relatedTrack as any).coverUrl || '/default-cover.jpg'}
                             alt={relatedTrack.title}
@@ -627,8 +627,8 @@ export default function TrackPage() {
                           />
                         </div>
                         <p className="font-semibold text-white text-xs sm:text-sm lg:text-base truncate">{relatedTrack.title}</p>
-                        <p className="text-xs sm:text-sm text-gray-400 truncate">{relatedTrack.artist}</p>
-                        <div className="mt-1 sm:mt-2 lg:mt-3 flex items-center gap-1 sm:gap-2 text-xs text-gray-500">
+                        <p className="text-xs sm:text-sm text-white/60 truncate">{relatedTrack.artist}</p>
+                        <div className="mt-1 sm:mt-2 lg:mt-3 flex items-center gap-1 sm:gap-2 text-xs text-white/60">
                           <FaFire size={10} />
                           <span>{formatLargeNumber(relatedTrack.views || 0)} plays</span>
                         </div>
@@ -650,16 +650,16 @@ export default function TrackPage() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
                   <h2 className="text-2xl font-semibold text-white">Comments</h2>
-                  <p className="text-gray-400 text-sm">Add reactions and feedback</p>
+                  <p className="text-white/60 text-sm">Add reactions and feedback</p>
                 </div>
-                <span className="text-sm text-gray-500">{comments.length} total</span>
+                <span className="text-sm text-white/60">{comments.length} total</span>
               </div>
 
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Share your thoughts..."
-                className="w-full min-h-[100px] resize-none rounded-3xl bg-[#15121f] px-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm"
+                className="w-full min-h-[100px] resize-none rounded-3xl bg-[#000000] px-4 py-4 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 shadow-sm"
               />
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -678,14 +678,14 @@ export default function TrackPage() {
               <button
                 onClick={handlePostComment}
                 disabled={!newComment.trim()}
-                className="mt-4 w-full rounded-full bg-purple-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:bg-gray-700"
+                className="mt-4 w-full rounded-full bg-purple/85 px-4 py-3 text-sm font-semibold text-white transition hover:bg-purple/75 disabled:cursor-not-allowed disabled:bg-charcoal"
               >
                 Post comment
               </button>
 
               <div className="mt-6 space-y-4">
                 {comments.length === 0 ? (
-                  <div className="rounded-3xl bg-white/5 p-6 text-center text-gray-400">No comments yet. Be the first!</div>
+                  <div className="rounded-3xl bg-white/5 p-6 text-center text-white/60">No comments yet. Be the first!</div>
                 ) : (
                   comments.map((comment) => (
                     <motion.div
@@ -695,17 +695,17 @@ export default function TrackPage() {
                       className="rounded-3xl bg-white/10 p-4"
                     >
                       <div className="flex gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/20 text-purple-300">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple/20 text-purple/45">
                           <FaUser size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2 mb-1">
                             <p className="font-semibold text-white text-sm truncate">{comment.userName}</p>
                             {comment.isVerified && <VerifiedBadge size="sm" title="Verified user" />}
-                            <span className="text-xs text-gray-500">{new Date(comment.timestamp).toLocaleDateString()}</span>
+                            <span className="text-xs text-white/60">{new Date(comment.timestamp).toLocaleDateString()}</span>
                           </div>
-                          <p className="text-gray-300 text-sm leading-relaxed mb-3">{comment.content}</p>
-                          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                          <p className="text-white/90 text-sm leading-relaxed mb-3">{comment.content}</p>
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-white/60">
                             <button className="inline-flex items-center gap-1 rounded-full bg-white/5 px-3 py-1 hover:bg-white/10 transition">
                               <FaHeart size={12} />
                               {comment.likes}
@@ -730,12 +730,12 @@ export default function TrackPage() {
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
                                 placeholder="Write a reply..."
-                                className="w-full min-h-[90px] resize-none rounded-2xl bg-[#15121f] px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm mb-2 shadow-sm"
+                                className="w-full min-h-[90px] resize-none rounded-2xl bg-[#000000] px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 text-sm mb-2 shadow-sm"
                               />
                               <div className="flex flex-wrap gap-2">
                                 <button
                                   onClick={() => handleReply(comment.id)}
-                                  className="rounded-full bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-500 transition"
+                                  className="rounded-full bg-purple/85 px-4 py-2 text-sm font-semibold text-white hover:bg-purple/75 transition"
                                 >
                                   Reply
                                 </button>
@@ -744,7 +744,7 @@ export default function TrackPage() {
                                     setReplyingTo(null);
                                     setReplyText('');
                                   }}
-                                  className="rounded-full bg-white/10 px-4 py-2 text-sm text-gray-300 hover:bg-white/20 transition"
+                                  className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/90 hover:bg-white/20 transition"
                                 >
                                   Cancel
                                 </button>
@@ -755,8 +755,8 @@ export default function TrackPage() {
                           {comment.replies && comment.replies.length > 0 && (
                             <div className="mt-3 space-y-2 pl-3 border-l-2 border-white/10">
                               {comment.replies.map((reply) => (
-                                <div key={reply.id} className="text-xs text-gray-400">
-                                  <p className="font-semibold text-gray-200">{reply.userName}</p>
+                                <div key={reply.id} className="text-xs text-white/60">
+                                  <p className="font-semibold text-white/90">{reply.userName}</p>
                                   <p>{reply.content}</p>
                                 </div>
                               ))}
@@ -764,7 +764,7 @@ export default function TrackPage() {
                           )}
                         </div>
 
-                        <button className="text-gray-400 hover:text-white transition-colors">
+                        <button className="text-white/60 hover:text-white transition-colors">
                           <FaEllipsisV size={12} />
                         </button>
                       </div>

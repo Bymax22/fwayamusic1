@@ -8,19 +8,19 @@ const quickActions = [
     label: 'WhatsApp',
     href: 'https://wa.me/260966999999',
     description: '0966 999 999',
-    tone: 'bg-green-600/20 text-green-200 border-green-500/30',
+    tone: 'bg-purple/20 text-purple/30 border-purple/30',
   },
   {
     label: 'Email',
     href: 'mailto:support@fwaya.net',
     description: 'support@fwaya.net',
-    tone: 'bg-purple-600/20 text-purple-200 border-purple-500/30',
+    tone: 'bg-purple/20 text-purple/30 border-purple/30',
   },
   {
     label: 'Report Issue',
     href: '/help/contact?subject=Report%20Issue',
     description: 'Tell us what is not working',
-    tone: 'bg-amber-600/20 text-amber-200 border-amber-500/30',
+    tone: 'bg-purple/20 text-purple/30 border-purple/30',
   },
 ];
 
@@ -31,12 +31,12 @@ const sections = [
     content: (
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-white">Need a hand?</h3>
-        <p className="text-sm text-gray-300">
+        <p className="text-sm text-white/90">
           If you need help with your FWAYA account, payment, subscription, content, upload or anything else on the platform, talk to us.
         </p>
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-gray-200">
-          <p>WhatsApp: <a href="https://wa.me/260966999999" className="text-purple-300">0966 999 999</a></p>
-          <p>Email: <a href="mailto:support@fwaya.net" className="text-purple-300">support@fwaya.net</a></p>
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/90">
+          <p>WhatsApp: <a href="https://wa.me/260966999999" className="text-purple/45">0966 999 999</a></p>
+          <p>Email: <a href="mailto:support@fwaya.net" className="text-purple/45">support@fwaya.net</a></p>
         </div>
       </div>
     ),
@@ -47,11 +47,11 @@ const sections = [
     content: (
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-white">Talk to FWAYA</h3>
-        <p className="text-sm text-gray-300">Questions, suggestions or general enquiries? We’d love to hear from you.</p>
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-gray-200">
-          <p>WhatsApp / Call: <a href="tel:+260966999999" className="text-purple-300">0966 999 999</a></p>
-          <p>Email: <a href="mailto:support@fwaya.net" className="text-purple-300">support@fwaya.net</a></p>
-          <p>Website: <a href="https://www.fwaya.net" className="text-purple-300">www.fwaya.net</a></p>
+        <p className="text-sm text-white/90">Questions, suggestions or general enquiries? We’d love to hear from you.</p>
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/90">
+          <p>WhatsApp / Call: <a href="tel:+260966999999" className="text-purple/45">0966 999 999</a></p>
+          <p>Email: <a href="mailto:support@fwaya.net" className="text-purple/45">support@fwaya.net</a></p>
+          <p>Website: <a href="https://www.fwaya.net" className="text-purple/45">www.fwaya.net</a></p>
         </div>
       </div>
     ),
@@ -60,7 +60,7 @@ const sections = [
     id: 'faq',
     label: 'FAQ',
     content: (
-      <div className="space-y-4 text-sm text-gray-200">
+      <div className="space-y-4 text-sm text-white/90">
         <h3 className="text-xl font-semibold text-white">Quick answers</h3>
         <div className="space-y-3">
           <div>
@@ -93,8 +93,8 @@ const sections = [
     content: (
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-white">What’s happening on FWAYA?</h3>
-        <p className="text-sm text-gray-300">Discover platform updates, new features, music stories, promotions, events, opportunities and important announcements.</p>
-        <Link href="/blog" className="inline-flex rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white">Visit Blog & News</Link>
+        <p className="text-sm text-white/90">Discover platform updates, new features, music stories, promotions, events, opportunities and important announcements.</p>
+        <Link href="/blog" className="inline-flex rounded-lg bg-purple/85 px-4 py-2 text-sm font-medium text-white">Visit Blog & News</Link>
       </div>
     ),
   },
@@ -104,10 +104,10 @@ const sections = [
     content: (
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-white">Put your brand where people are listening, watching and discovering.</h3>
-        <p className="text-sm text-gray-300">FWAYA welcomes advertising and promotional opportunities from businesses, brands, organisations, events and creators.</p>
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-gray-200">
-          <p>Advertising Enquiries - WhatsApp: <a href="https://wa.me/260966999999" className="text-purple-300">0966 999 999</a></p>
-          <p>Email: <a href="mailto:advertising@fwaya.net" className="text-purple-300">advertising@fwaya.net</a></p>
+        <p className="text-sm text-white/90">FWAYA welcomes advertising and promotional opportunities from businesses, brands, organisations, events and creators.</p>
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/90">
+          <p>Advertising Enquiries - WhatsApp: <a href="https://wa.me/260966999999" className="text-purple/45">0966 999 999</a></p>
+          <p>Email: <a href="mailto:advertising@fwaya.net" className="text-purple/45">advertising@fwaya.net</a></p>
         </div>
       </div>
     ),
@@ -118,10 +118,10 @@ const sections = [
     content: (
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-white">Let’s build something together.</h3>
-        <p className="text-sm text-gray-300">FWAYA is open to partnerships with businesses, brands, institutions, creators, technology companies and organisations that see opportunities to grow together.</p>
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-gray-200">
-          <p>Partnership Enquiries - WhatsApp: <a href="https://wa.me/260966999999" className="text-purple-300">0966 999 999</a></p>
-          <p>Email: <a href="mailto:partnerships@fwaya.net" className="text-purple-300">partnerships@fwaya.net</a></p>
+        <p className="text-sm text-white/90">FWAYA is open to partnerships with businesses, brands, institutions, creators, technology companies and organisations that see opportunities to grow together.</p>
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/90">
+          <p>Partnership Enquiries - WhatsApp: <a href="https://wa.me/260966999999" className="text-purple/45">0966 999 999</a></p>
+          <p>Email: <a href="mailto:partnerships@fwaya.net" className="text-purple/45">partnerships@fwaya.net</a></p>
         </div>
       </div>
     ),
@@ -132,8 +132,8 @@ const sections = [
     content: (
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-white">This is where discovery becomes connection.</h3>
-        <p className="text-sm text-gray-300">FWAYA brings together listeners, artists, producers, creators, fans and people who simply love great content.</p>
-        <p className="text-sm text-gray-200">Discover. Connect. Support. Enjoy.</p>
+        <p className="text-sm text-white/90">FWAYA brings together listeners, artists, producers, creators, fans and people who simply love great content.</p>
+        <p className="text-sm text-white/90">Discover. Connect. Support. Enjoy.</p>
       </div>
     ),
   },
@@ -141,7 +141,7 @@ const sections = [
     id: 'guidelines',
     label: 'Community Guidelines',
     content: (
-      <div className="space-y-4 text-sm text-gray-200">
+      <div className="space-y-4 text-sm text-white/90">
         <h3 className="text-xl font-semibold text-white">Good communities grow when people respect each other.</h3>
         <ul className="list-disc space-y-2 pl-5">
           <li>Respect other users.</li>
@@ -159,7 +159,7 @@ const sections = [
     id: 'report',
     label: 'Report Issues',
     content: (
-      <div className="space-y-4 text-sm text-gray-200">
+      <div className="space-y-4 text-sm text-white/90">
         <h3 className="text-xl font-semibold text-white">Something not working? Tell us.</h3>
         <ul className="list-disc space-y-2 pl-5">
           <li>Your name.</li>
@@ -169,8 +169,8 @@ const sections = [
           <li>Your transaction reference if the issue involves payment.</li>
         </ul>
         <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <p>WhatsApp: <a href="https://wa.me/260966999999" className="text-purple-300">0966 999 999</a></p>
-          <p>Email: <a href="mailto:support@fwaya.net" className="text-purple-300">support@fwaya.net</a></p>
+          <p>WhatsApp: <a href="https://wa.me/260966999999" className="text-purple/45">0966 999 999</a></p>
+          <p>Email: <a href="mailto:support@fwaya.net" className="text-purple/45">support@fwaya.net</a></p>
         </div>
       </div>
     ),
@@ -181,8 +181,8 @@ const sections = [
     content: (
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-white">Is FWAYA running normally?</h3>
-        <p className="text-sm text-gray-300">All major FWAYA services are currently operational.</p>
-        <p className="text-sm text-gray-300">If something is not working for you, contact FWAYA Support on WhatsApp: <a href="https://wa.me/260966999999" className="text-purple-300">0966 999 999</a>.</p>
+        <p className="text-sm text-white/90">All major FWAYA services are currently operational.</p>
+        <p className="text-sm text-white/90">If something is not working for you, contact FWAYA Support on WhatsApp: <a href="https://wa.me/260966999999" className="text-purple/45">0966 999 999</a>.</p>
       </div>
     ),
   },
@@ -192,9 +192,9 @@ const sections = [
     content: (
       <div className="space-y-4">
         <h3 className="text-xl font-semibold text-white">Build with FWAYA.</h3>
-        <p className="text-sm text-gray-300">Developer tools, APIs and integration resources are coming to FWAYA.</p>
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-gray-200">
-          <p>Email: <a href="mailto:developers@fwaya.net" className="text-purple-300">developers@fwaya.net</a></p>
+        <p className="text-sm text-white/90">Developer tools, APIs and integration resources are coming to FWAYA.</p>
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/90">
+          <p>Email: <a href="mailto:developers@fwaya.net" className="text-purple/45">developers@fwaya.net</a></p>
         </div>
       </div>
     ),
@@ -203,11 +203,11 @@ const sections = [
     id: 'terms',
     label: 'Terms & Conditions',
     content: (
-      <div className="space-y-4 text-sm text-gray-200">
+      <div className="space-y-4 text-sm text-white/90">
         <h3 className="text-xl font-semibold text-white">Fair use. Clear responsibilities.</h3>
         <p>By using FWAYA, you agree to use the platform responsibly and in accordance with FWAYA’s Terms & Conditions.</p>
         <p>Users must not misuse the platform, violate the rights of others, upload content they do not have permission to use, manipulate platform activity, commit fraud or use FWAYA for unlawful purposes.</p>
-        <p>Legal Enquiries: <a href="mailto:legal@fwaya.net" className="text-purple-300">legal@fwaya.net</a></p>
+        <p>Legal Enquiries: <a href="mailto:legal@fwaya.net" className="text-purple/45">legal@fwaya.net</a></p>
       </div>
     ),
   },
@@ -215,11 +215,11 @@ const sections = [
     id: 'privacy',
     label: 'Privacy Policy',
     content: (
-      <div className="space-y-4 text-sm text-gray-200">
+      <div className="space-y-4 text-sm text-white/90">
         <h3 className="text-xl font-semibold text-white">Your information matters.</h3>
         <p>FWAYA may collect information needed to operate the platform, including your name, phone number, email address, account information, platform activity and payment-related information.</p>
         <p>We use this information to provide FWAYA services, process transactions, provide customer support, improve the platform, protect users and meet applicable legal requirements.</p>
-        <p>Privacy Enquiries: <a href="mailto:privacy@fwaya.net" className="text-purple-300">privacy@fwaya.net</a></p>
+        <p>Privacy Enquiries: <a href="mailto:privacy@fwaya.net" className="text-purple/45">privacy@fwaya.net</a></p>
       </div>
     ),
   },
@@ -232,12 +232,12 @@ export default function HelpHomePage() {
   return (
     <div className="min-h-screen bg-black px-4 py-6 text-white md:px-6">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-6 rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-900/30 to-black p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-purple-300">FWAYA Support</p>
+        <div className="mb-6 rounded-2xl border border-purple/30 bg-gradient-to-r from-purple/30 to-black p-5">
+          <p className="text-xs uppercase tracking-[0.2em] text-purple/45">FWAYA Support</p>
           <h1 className="mt-2 text-2xl font-bold md:text-3xl">Need help? You’re in the right place.</h1>
-          <div className="mt-4 flex flex-col gap-2 text-sm text-gray-200 md:flex-row md:items-center md:gap-6">
-            <a href="https://wa.me/260966999999" className="text-purple-300">WhatsApp / Call: 0966 999 999</a>
-            <a href="mailto:support@fwaya.net" className="text-purple-300">Email: support@fwaya.net</a>
+          <div className="mt-4 flex flex-col gap-2 text-sm text-white/90 md:flex-row md:items-center md:gap-6">
+            <a href="https://wa.me/260966999999" className="text-purple/45">WhatsApp / Call: 0966 999 999</a>
+            <a href="mailto:support@fwaya.net" className="text-purple/45">Email: support@fwaya.net</a>
           </div>
         </div>
 
@@ -263,7 +263,7 @@ export default function HelpHomePage() {
                   type="button"
                   onClick={() => setOpen(section.id)}
                   className={`flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-sm transition ${
-                    open === section.id ? 'bg-purple-600 text-white' : 'bg-transparent text-gray-200 hover:bg-white/5'
+                    open === section.id ? 'bg-purple/85 text-white' : 'bg-transparent text-white/90 hover:bg-white/5'
                   }`}
                 >
                   <span>{section.label}</span>

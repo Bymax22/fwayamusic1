@@ -86,10 +86,10 @@ export default function TopChartsPage() {
 
   const getPositionColor = (position: number) => {
     switch (position) {
-      case 1: return 'text-purple-400';
-      case 2: return 'text-gray-400';
-      case 3: return 'text-purple-300';
-      default: return 'text-gray-500';
+      case 1: return 'text-purple/60';
+      case 2: return 'text-white/60';
+      case 3: return 'text-purple/45';
+      default: return 'text-white/60';
     }
   };
 
@@ -97,15 +97,15 @@ export default function TopChartsPage() {
     <div className="min-h-screen bg-black text-white">
       <div className="relative overflow-hidden">
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
-          <div className="rounded-[2rem] bg-[#111827]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-slate-900/20">
+          <div className="rounded-[2rem] bg-[#000000]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-charcoal/20">
             <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr] items-end mb-10">
               <div>
-                <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple-300">
-                  <TrendingUp className="w-4 h-4 text-purple-400" />
+                <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple/45">
+                  <TrendingUp className="w-4 h-4 text-purple/60" />
                   Top Charts
                 </p>
                 <h1 className="mt-4 text-4xl font-semibold tracking-tight">Most-played tracks right now.</h1>
-                <p className="mt-3 max-w-2xl text-gray-400">
+                <p className="mt-3 max-w-2xl text-white/60">
                   Explore the trending hits and discover what fans are playing across the platform.
                 </p>
               </div>
@@ -118,8 +118,8 @@ export default function TopChartsPage() {
                       onClick={() => setTimeRange(range)}
                       className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                         timeRange === range
-                          ? 'bg-purple-500 text-white'
-                          : 'bg-white/10 text-gray-300 hover:bg-white/15'
+                          ? 'bg-purple/75 text-white'
+                          : 'bg-white/10 text-white/90 hover:bg-white/15'
                       }`}
                     >
                       {range.charAt(0).toUpperCase() + range.slice(1)}
@@ -130,22 +130,22 @@ export default function TopChartsPage() {
             </div>
 
             {loading ? (
-              <div className="py-20 text-center text-gray-400">Loading chart data...</div>
+              <div className="py-20 text-center text-white/60">Loading chart data...</div>
             ) : charts.length > 0 ? (
               <div className="space-y-4">
                 {charts.slice(0, 12).map((track, index) => {
                   return (
                     <div
                       key={track.id}
-                      className={`group rounded-[2rem] bg-[#0f1720]/90 overflow-hidden ring-1 ring-white/10 transition hover:ring-purple-400/20 shadow-lg shadow-black/20`}
+                      className={`group rounded-[2rem] bg-[#000000]/90 overflow-hidden ring-1 ring-white/10 transition hover:ring-purple/20 shadow-lg shadow-black/20`}
                     >
                       <div className="grid grid-cols-[auto_1fr_auto_auto] gap-4 items-center p-5">
                         <div className="text-center">
-                          <span className="text-2xl font-bold text-purple-400">#{index + 1}</span>
+                          <span className="text-2xl font-bold text-purple/60">#{index + 1}</span>
                         </div>
 
                         <div className="flex items-center gap-4 min-w-0">
-                          <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-slate-900 flex-shrink-0">
+                          <div className="relative h-16 w-16 overflow-hidden rounded-2xl bg-charcoal flex-shrink-0">
                             <Image
                               src={track.coverArt}
                               alt={track.title}
@@ -158,19 +158,19 @@ export default function TopChartsPage() {
                           </div>
                           <div className="min-w-0">
                             <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className="text-lg font-semibold text-white">{track.title}</ScrollingTrackTitle>
-                            <p className="truncate text-sm text-gray-400">{track.artist}</p>
-                            <p className="text-xs text-gray-500 mt-1">{track.views.toLocaleString()} plays</p>
+                            <p className="truncate text-sm text-white/60">{track.artist}</p>
+                            <p className="text-xs text-white/60 mt-1">{track.views.toLocaleString()} plays</p>
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
                           <span>{track.genre || 'Genre'}</span>
                           <span>{formatDuration(track.duration)}</span>
                         </div>
 
                         <button
                           onClick={() => handlePlay(track)}
-                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white transition hover:bg-purple-500 flex-shrink-0"
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple/85 text-white transition hover:bg-purple/75 flex-shrink-0"
                         >
                           {currentTrack?.id === track.id && isPlaying ? (
                             <Waveform playing className="h-5 w-5" />
@@ -184,7 +184,7 @@ export default function TopChartsPage() {
                 })}
               </div>
             ) : (
-              <div className="text-center py-16 text-gray-400">
+              <div className="text-center py-16 text-white/60">
                 <TrendingUp className="mx-auto mb-4 h-16 w-16 opacity-50" />
                 <p className="text-lg font-semibold">No chart data available</p>
                 <p>Charts will be populated as tracks are played.</p>

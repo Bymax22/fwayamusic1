@@ -24,7 +24,7 @@ export default function GetAppPage() {
               className="mb-10 h-12 w-auto object-contain object-left"
               priority
             />
-            <p className="mb-4 text-sm font-semibold uppercase text-purple-300">Fwaya for mobile</p>
+            <p className="mb-4 text-sm font-semibold uppercase text-purple/45">Fwaya for mobile</p>
             <h1 className="max-w-xl text-4xl font-semibold leading-tight sm:text-5xl">
               Your music life, on the move.
             </h1>
@@ -34,27 +34,27 @@ export default function GetAppPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1">
-            <div className="rounded-2xl bg-[#120d1c] p-6 sm:p-7">
-              <Apple className="h-7 w-7 text-purple-300" aria-hidden="true" />
+            <div className="rounded-2xl bg-[#000000] p-6 sm:p-7">
+              <Apple className="h-7 w-7 text-purple/45" aria-hidden="true" />
               <p className="mt-6 text-lg font-semibold">App Store</p>
               <p className="mt-1 text-sm text-white/50">For iPhone and iPad</p>
               <button
                 type="button"
                 disabled
-                className="mt-6 w-full cursor-not-allowed rounded-xl bg-purple-500/15 px-4 py-3 text-sm font-semibold text-purple-200/75"
+                className="mt-6 w-full cursor-not-allowed rounded-xl bg-purple/15 px-4 py-3 text-sm font-semibold text-purple/75"
               >
                 Coming soon
               </button>
             </div>
 
-            <div className="rounded-2xl bg-[#120d1c] p-6 sm:p-7">
-              <Play className="h-7 w-7 fill-current text-purple-300" aria-hidden="true" />
+            <div className="rounded-2xl bg-[#000000] p-6 sm:p-7">
+              <Play className="h-7 w-7 fill-current text-purple/45" aria-hidden="true" />
               <p className="mt-6 text-lg font-semibold">Google Play</p>
               <p className="mt-1 text-sm text-white/50">For Android devices</p>
               <button
                 type="button"
                 disabled
-                className="mt-6 w-full cursor-not-allowed rounded-xl bg-purple-500/15 px-4 py-3 text-sm font-semibold text-purple-200/75"
+                className="mt-6 w-full cursor-not-allowed rounded-xl bg-purple/15 px-4 py-3 text-sm font-semibold text-purple/75"
               >
                 Coming soon
               </button>

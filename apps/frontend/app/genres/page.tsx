@@ -24,7 +24,7 @@ export default function GenresPage() {
       id: 1,
       name: "Afrobeats",
       description: "Rhythmic sounds from West Africa",
-      color: "from-orange-500 to-red-500",
+      color: "from-purple/75 to-purple/75",
       trackCount: 2450,
       coverArt: "/genres/afrobeats.jpg",
       popularArtists: ["Fwaya", "Burna Boy", "Wizkid", "Davido"]
@@ -33,7 +33,7 @@ export default function GenresPage() {
       id: 2,
       name: "Pop",
       description: "Popular mainstream music",
-      color: "from-blue-500 to-purple-500",
+      color: "from-purple/75 to-purple/75",
       trackCount: 1890,
       coverArt: "/genres/pop.jpg",
       popularArtists: ["The Weeknd", "Dua Lipa", "Taylor Swift", "Ariana Grande"]
@@ -42,7 +42,7 @@ export default function GenresPage() {
       id: 3,
       name: "Hip Hop",
       description: "Urban beats and rhymes",
-      color: "from-gray-700 to-black",
+      color: "from-charcoal/50 to-black",
       trackCount: 1670,
       coverArt: "/genres/hiphop.jpg",
       popularArtists: ["Drake", "Kendrick Lamar", "Travis Scott", "J. Cole"]
@@ -51,7 +51,7 @@ export default function GenresPage() {
       id: 4,
       name: "Electronic",
       description: "Synthetic sounds and beats",
-      color: "from-cyan-500 to-blue-500",
+      color: "from-purple/75 to-purple/75",
       trackCount: 1320,
       coverArt: "/genres/electronic.jpg",
       popularArtists: ["M83", "Daft Punk", "The Chemical Brothers", "Calvin Harris"]
@@ -60,7 +60,7 @@ export default function GenresPage() {
       id: 5,
       name: "R&B",
       description: "Soulful rhythm and blues",
-      color: "from-pink-500 to-rose-500",
+      color: "from-purple/75 to-purple/75",
       trackCount: 980,
       coverArt: "/genres/rnb.jpg",
       popularArtists: ["The Weeknd", "SZA", "Frank Ocean", "Summer Walker"]
@@ -69,7 +69,7 @@ export default function GenresPage() {
       id: 6,
       name: "Rock",
       description: "Guitar-driven anthems",
-      color: "from-yellow-500 to-orange-500",
+      color: "from-purple/75 to-purple/75",
       trackCount: 850,
       coverArt: "/genres/rock.jpg",
       popularArtists: ["Arctic Monkeys", "The Rolling Stones", "Queen", "Led Zeppelin"]
@@ -78,7 +78,7 @@ export default function GenresPage() {
       id: 7,
       name: "Jazz",
       description: "Improvisational classics",
-      color: "from-amber-500 to-brown-500",
+      color: "from-purple/75 to-brown-500",
       trackCount: 620,
       coverArt: "/genres/jazz.jpg",
       popularArtists: ["Miles Davis", "John Coltrane", "Ella Fitzgerald", "Louis Armstrong"]
@@ -87,7 +87,7 @@ export default function GenresPage() {
       id: 8,
       name: "Classical",
       description: "Timeless orchestral masterpieces",
-      color: "from-indigo-500 to-purple-500",
+      color: "from-purple/75 to-purple/75",
       trackCount: 540,
       coverArt: "/genres/classical.jpg",
       popularArtists: ["Beethoven", "Mozart", "Bach", "Chopin"]
@@ -112,11 +112,11 @@ export default function GenresPage() {
      <ThemeProvider>
       <AuthProvider>
         <PaymentProvider>
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0a3747]/95 to-[#0a1f29]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Browse Genres</h1>
-        <p className="text-gray-400">Discover music by genre and mood</p>
+        <p className="text-white/60">Discover music by genre and mood</p>
       </div>
 
       {/* Genres Grid */}
@@ -162,7 +162,7 @@ export default function GenresPage() {
       {/* Genre Detail Modal */}
       {selectedGenre && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0a3747] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#36454F] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className={`bg-gradient-to-br ${selectedGenre.color} p-8 rounded-t-2xl relative`}>
               <button 
                 onClick={() => setSelectedGenre(null)}
@@ -184,28 +184,28 @@ export default function GenresPage() {
             
             <div className="p-6">
               <div className="grid grid-cols-2 gap-6 mb-6">
-                <div className="bg-[#0a3747]/70 rounded-xl p-4">
+                <div className="bg-[#36454F]/70 rounded-xl p-4">
                   <div className="text-2xl font-bold text-white mb-1">{selectedGenre.trackCount}</div>
-                  <div className="text-gray-400 text-sm">Total Tracks</div>
+                  <div className="text-white/60 text-sm">Total Tracks</div>
                 </div>
-                <div className="bg-[#0a3747]/70 rounded-xl p-4">
+                <div className="bg-[#36454F]/70 rounded-xl p-4">
                   <div className="text-2xl font-bold text-white mb-1">
                     {Math.floor(selectedGenre.trackCount / 100)}K+
                   </div>
-                  <div className="text-gray-400 text-sm">Monthly Plays</div>
+                  <div className="text-white/60 text-sm">Monthly Plays</div>
                 </div>
               </div>
               
               <h3 className="text-xl font-bold text-white mb-4">Popular Artists</h3>
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {selectedGenre.popularArtists.map(artist => (
-                  <div key={artist} className="bg-[#0a3747]/70 rounded-lg p-3 text-white">
+                  <div key={artist} className="bg-[#36454F]/70 rounded-lg p-3 text-white">
                     {artist}
                   </div>
                 ))}
               </div>
               
-              <button className="w-full py-3 bg-[#e51f48] hover:bg-[#ff4d6d] text-white rounded-xl transition-colors font-medium">
+              <button className="w-full py-3 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors font-medium">
                 Play {selectedGenre.name} Radio
               </button>
             </div>

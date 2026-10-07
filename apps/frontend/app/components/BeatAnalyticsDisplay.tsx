@@ -42,7 +42,7 @@ interface ProducerStats {
   followerCount: number;
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const COLORS = ['#9B5DE5', '#36454F', '#36454F', '#9B5DE5', '#9B5DE5', '#9B5DE5'];
 
 export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
   const [analytics, setAnalytics] = useState<BeatAnalyticsData | null>(null);
@@ -95,7 +95,7 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
     return (
       <div className="flex items-center justify-center p-12">
         <div className="inline-block animate-spin">
-          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full" />
+          <div className="w-12 h-12 border-4 border-purple/30 border-t-blue-600 rounded-full" />
         </div>
       </div>
     );
@@ -105,93 +105,93 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{analytics.beat.title}</h1>
-          <p className="text-gray-600 mt-2">{analytics.beat.genre} • {new Date(analytics.beat.createdAt).toLocaleDateString()}</p>
+          <h1 className="text-3xl font-bold text-charcoal">{analytics.beat.title}</h1>
+          <p className="text-white/60 mt-2">{analytics.beat.genre} • {new Date(analytics.beat.createdAt).toLocaleDateString()}</p>
         </div>
 
         {/* Key Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-6 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 font-medium">Total Plays</p>
-                <p className="text-3xl font-bold text-blue-600 mt-2">{analytics.analytics.playCount.toLocaleString()}</p>
+                <p className="text-sm text-white/60 font-medium">Total Plays</p>
+                <p className="text-3xl font-bold text-purple/85 mt-2">{analytics.analytics.playCount.toLocaleString()}</p>
               </div>
-              <Play className="text-blue-400" size={32} />
+              <Play className="text-purple/60" size={32} />
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-6 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 font-medium">Downloads</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">{analytics.analytics.downloadCount.toLocaleString()}</p>
+                <p className="text-sm text-white/60 font-medium">Downloads</p>
+                <p className="text-3xl font-bold text-purple/85 mt-2">{analytics.analytics.downloadCount.toLocaleString()}</p>
               </div>
-              <Download className="text-green-400" size={32} />
+              <Download className="text-purple/60" size={32} />
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-6 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 font-medium">Likes</p>
-                <p className="text-3xl font-bold text-red-600 mt-2">{analytics.analytics.likeCount.toLocaleString()}</p>
+                <p className="text-sm text-white/60 font-medium">Likes</p>
+                <p className="text-3xl font-bold text-purple/85 mt-2">{analytics.analytics.likeCount.toLocaleString()}</p>
               </div>
-              <Heart className="text-red-400" size={32} />
+              <Heart className="text-purple/60" size={32} />
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-6 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 font-medium">Comments</p>
-                <p className="text-3xl font-bold text-purple-600 mt-2">{analytics.analytics.commentCount.toLocaleString()}</p>
+                <p className="text-sm text-white/60 font-medium">Comments</p>
+                <p className="text-3xl font-bold text-purple/85 mt-2">{analytics.analytics.commentCount.toLocaleString()}</p>
               </div>
-              <MessageCircle className="text-purple-400" size={32} />
+              <MessageCircle className="text-purple/60" size={32} />
             </div>
           </div>
         </div>
 
         {/* Engagement Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-6 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 font-medium">Engagement Rate</p>
-                <p className="text-3xl font-bold text-indigo-600 mt-2">{analytics.analytics.engagementRate.toFixed(2)}%</p>
+                <p className="text-sm text-white/60 font-medium">Engagement Rate</p>
+                <p className="text-3xl font-bold text-purple/85 mt-2">{analytics.analytics.engagementRate.toFixed(2)}%</p>
               </div>
-              <TrendingUp className="text-indigo-400" size={32} />
+              <TrendingUp className="text-purple/60" size={32} />
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-lg">
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-6 rounded-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 font-medium">Avg Rating</p>
-                <p className="text-3xl font-bold text-yellow-600 mt-2">★ {analytics.analytics.averageRating.toFixed(1)}</p>
+                <p className="text-sm text-white/60 font-medium">Avg Rating</p>
+                <p className="text-3xl font-bold text-purple/85 mt-2">★ {analytics.analytics.averageRating.toFixed(1)}</p>
               </div>
-              <div className="text-yellow-400" style={{ fontSize: '32px' }}>⭐</div>
+              <div className="text-purple/60" style={{ fontSize: '32px' }}>⭐</div>
             </div>
           </div>
         </div>
 
         {/* Revenue Section */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-8 rounded-lg mb-8">
+        <div className="bg-gradient-to-r from-purple/75 to-purple/85 text-white p-8 rounded-lg mb-8">
           <div className="grid grid-cols-2 gap-8">
             <div>
-              <p className="text-green-100 text-sm mb-2">Estimated Revenue</p>
+              <p className="text-purple/20 text-sm mb-2">Estimated Revenue</p>
               <p className="text-4xl font-bold">${analytics.monetization.estimatedRevenue}</p>
             </div>
             <div>
-              <p className="text-green-100 text-sm mb-2">Beat Price</p>
+              <p className="text-purple/20 text-sm mb-2">Beat Price</p>
               <p className="text-4xl font-bold">${analytics.monetization.price.toFixed(2)}</p>
             </div>
           </div>
         </div>
 
         {/* Engagement Breakdown */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Engagement Breakdown</h2>
+        <div className="bg-white/5 p-6 rounded-lg">
+          <h2 className="text-xl font-bold text-charcoal mb-6">Engagement Breakdown</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -207,7 +207,7 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
                 labelLine={false}
                 label={({ name, value }) => `${name}: ${value}`}
                 outerRadius={100}
-                fill="#8884d8"
+                fill="#9B5DE5"
                 dataKey="value"
               >
                 {COLORS.map((color, index) => (
@@ -220,13 +220,13 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
         </div>
 
         {/* Followers Card */}
-        <div className="mt-8 bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-lg">
+        <div className="mt-8 bg-gradient-to-br from-purple/15 to-purple/20 p-6 rounded-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 font-medium">Your Followers</p>
-              <p className="text-3xl font-bold text-cyan-600 mt-2">{analytics.analytics.followerCount.toLocaleString()}</p>
+              <p className="text-sm text-white/60 font-medium">Your Followers</p>
+              <p className="text-3xl font-bold text-purple/85 mt-2">{analytics.analytics.followerCount.toLocaleString()}</p>
             </div>
-            <Users className="text-cyan-400" size={32} />
+            <Users className="text-purple/60" size={32} />
           </div>
         </div>
       </div>
@@ -236,7 +236,7 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
   if (producerStats) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Dashboard</h1>
+        <h1 className="text-3xl font-bold text-charcoal mb-8">Your Dashboard</h1>
 
         {/* Time Range Selector */}
         <div className="flex gap-2 mb-8">
@@ -246,8 +246,8 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
               onClick={() => setTimeRange(range)}
               className={`px-4 py-2 rounded-lg font-medium transition ${
                 timeRange === range
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-purple/85 text-white'
+                  : 'bg-white/20 text-white/80 hover:bg-charcoal/50'
               }`}
             >
               {range.charAt(0).toUpperCase() + range.slice(1)}
@@ -257,61 +257,61 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-            <p className="text-xs text-gray-600 font-medium">Total Beats</p>
-            <p className="text-2xl font-bold text-blue-600 mt-1">{producerStats.totalBeats}</p>
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-4 rounded-lg">
+            <p className="text-xs text-white/60 font-medium">Total Beats</p>
+            <p className="text-2xl font-bold text-purple/85 mt-1">{producerStats.totalBeats}</p>
           </div>
 
-          <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
-            <p className="text-xs text-gray-600 font-medium">Total Plays</p>
-            <p className="text-2xl font-bold text-green-600 mt-1">{producerStats.totalPlays.toLocaleString()}</p>
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-4 rounded-lg">
+            <p className="text-xs text-white/60 font-medium">Total Plays</p>
+            <p className="text-2xl font-bold text-purple/85 mt-1">{producerStats.totalPlays.toLocaleString()}</p>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-            <p className="text-xs text-gray-600 font-medium">Monthly Plays</p>
-            <p className="text-2xl font-bold text-purple-600 mt-1">{producerStats.monthlyPlays.toLocaleString()}</p>
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-4 rounded-lg">
+            <p className="text-xs text-white/60 font-medium">Monthly Plays</p>
+            <p className="text-2xl font-bold text-purple/85 mt-1">{producerStats.monthlyPlays.toLocaleString()}</p>
           </div>
 
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
-            <p className="text-xs text-gray-600 font-medium">Total Downloads</p>
-            <p className="text-2xl font-bold text-orange-600 mt-1">{producerStats.totalDownloads.toLocaleString()}</p>
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-4 rounded-lg">
+            <p className="text-xs text-white/60 font-medium">Total Downloads</p>
+            <p className="text-2xl font-bold text-purple/85 mt-1">{producerStats.totalDownloads.toLocaleString()}</p>
           </div>
 
-          <div className="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg">
-            <p className="text-xs text-gray-600 font-medium">Followers</p>
-            <p className="text-2xl font-bold text-red-600 mt-1">{producerStats.followerCount.toLocaleString()}</p>
+          <div className="bg-gradient-to-br from-purple/15 to-purple/20 p-4 rounded-lg">
+            <p className="text-xs text-white/60 font-medium">Followers</p>
+            <p className="text-2xl font-bold text-purple/85 mt-1">{producerStats.followerCount.toLocaleString()}</p>
           </div>
         </div>
 
         {/* Revenue Section */}
         <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg">
-            <p className="text-green-100 text-sm mb-2">Total Revenue</p>
+          <div className="bg-gradient-to-r from-purple/75 to-purple/85 text-white p-6 rounded-lg">
+            <p className="text-purple/20 text-sm mb-2">Total Revenue</p>
             <p className="text-3xl font-bold">${producerStats.totalRevenue.toFixed(2)}</p>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg">
-            <p className="text-blue-100 text-sm mb-2">Monthly Revenue</p>
+          <div className="bg-gradient-to-r from-purple/75 to-purple/85 text-white p-6 rounded-lg">
+            <p className="text-purple/20 text-sm mb-2">Monthly Revenue</p>
             <p className="text-3xl font-bold">${producerStats.monthlyRevenue.toFixed(2)}</p>
           </div>
         </div>
 
         {/* Sales Stats */}
         <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="bg-gray-50 p-6 rounded-lg">
-            <h3 className="font-bold text-gray-900 mb-4">Total Sales</h3>
-            <p className="text-4xl font-bold text-blue-600">{producerStats.totalSales}</p>
+          <div className="bg-white/5 p-6 rounded-lg">
+            <h3 className="font-bold text-charcoal mb-4">Total Sales</h3>
+            <p className="text-4xl font-bold text-purple/85">{producerStats.totalSales}</p>
           </div>
 
-          <div className="bg-gray-50 p-6 rounded-lg">
-            <h3 className="font-bold text-gray-900 mb-4">Monthly Sales</h3>
-            <p className="text-4xl font-bold text-green-600">{producerStats.monthlySales}</p>
+          <div className="bg-white/5 p-6 rounded-lg">
+            <h3 className="font-bold text-charcoal mb-4">Monthly Sales</h3>
+            <p className="text-4xl font-bold text-purple/85">{producerStats.monthlySales}</p>
           </div>
         </div>
 
         {/* Charts */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Activity Overview</h2>
+        <div className="bg-white/5 p-6 rounded-lg">
+          <h2 className="text-xl font-bold text-charcoal mb-6">Activity Overview</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={[
               { name: 'Plays', value: producerStats.monthlyPlays },
@@ -322,7 +322,7 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="value" fill="#3b82f6" />
+              <Bar dataKey="value" fill="#9B5DE5" />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -266,11 +266,11 @@ export default function ArtistSignUp() {
         className="bg-black rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
       >
         <div className="text-center mb-6">
-          <div className="w-14 h-14 mx-auto rounded-full bg-[#0b0b0b] flex items-center justify-center mb-3">
-            <FaMusic className="text-purple-400 w-6 h-6" />
+          <div className="w-14 h-14 mx-auto rounded-full bg-[#000000] flex items-center justify-center mb-3">
+            <FaMusic className="text-purple/60 w-6 h-6" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-1">Join as Artist</h1>
-          <p className="text-gray-400">Create your artist account and start sharing your music.</p>
+          <p className="text-white/60">Create your artist account and start sharing your music.</p>
         </div>
 
         <AuthErrorBanner error={authError} />
@@ -282,15 +282,15 @@ export default function ArtistSignUp() {
                 <div
                   className={`w-8 h-8 flex items-center justify-center text-sm font-semibold ${
                     step === s
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-purple/85 text-white'
                       : index < arr.indexOf(step)
-                      ? 'bg-[#1f1f1f] text-white'
-                      : 'bg-[#1f1f1f] text-gray-400'
+                      ? 'bg-[#000000] text-white'
+                      : 'bg-[#000000] text-white/60'
                   }`}
                 >
                   {index < arr.indexOf(step) ? <FaCheck className="w-4 h-4" /> : index + 1}
                 </div>
-                <span className="text-xs text-gray-500 mt-1 capitalize">
+                <span className="text-xs text-white/60 mt-1 capitalize">
                   {s === 'basic' && 'Account'}{s === 'artist' && 'Artist Info'}{s === 'consent' && 'Terms'}{s === 'verification' && 'Verify'}
                 </span>
               </div>
@@ -304,7 +304,7 @@ export default function ArtistSignUp() {
               <h2 className="text-xl font-semibold text-white text-center mb-4">Account Information</h2>
 
               {errors.submit && (
-                <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                <div className="p-4 bg-purple/10 border border-purple/30 rounded-lg text-purple/60 text-sm">
                   {errors.submit}
                 </div>
               )}
@@ -334,7 +334,7 @@ export default function ArtistSignUp() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Display name</label>
+                <label className="block text-sm font-medium text-white/90 mb-2">Display name</label>
                 <input
                   type="text"
                   autoComplete="nickname"
@@ -342,42 +342,42 @@ export default function ArtistSignUp() {
                   value={formData.displayName}
                   onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                   placeholder="Your artist name"
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Password *</label>
+                  <label className="block text-sm font-medium text-white/90 mb-2">Password *</label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       placeholder="••••••••"
-                      className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
+                      className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 pr-12"
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white">
                       {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </button>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Confirm password *</label>
+                  <label className="block text-sm font-medium text-white/90 mb-2">Confirm password *</label>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
                   />
                 </div>
               </div>
 
               <div className="flex items-center justify-between pt-4">
-                <Link href="/auth/artist/signin" className="text-sm text-gray-400 hover:text-white">Back to Sign In</Link>
-                <button onClick={handleNext} className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-colors font-semibold">Continue</button>
+                <Link href="/auth/artist/signin" className="text-sm text-white/60 hover:text-white">Back to Sign In</Link>
+                <button onClick={handleNext} className="px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 transition-colors font-semibold">Continue</button>
               </div>
             </motion.div>
           )}
@@ -387,45 +387,45 @@ export default function ArtistSignUp() {
               <h2 className="text-xl font-semibold text-white text-center mb-4">Artist Profile</h2>
 
               {errors.submit && (
-                <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                <div className="p-4 bg-purple/10 border border-purple/30 rounded-lg text-purple/60 text-sm">
                   {errors.submit}
                 </div>
               )}
 
-              <div className="rounded-[24px] border border-white/10 bg-[#0f1112] p-6 space-y-4">
+              <div className="rounded-[24px] border border-white/10 bg-[#000000] p-6 space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="relative w-24 h-24 rounded-full bg-[#0f1112] border border-[#121517] flex items-center justify-center overflow-hidden">
-                    {avatarPreview ? <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" /> : <FaMusic className="text-3xl text-gray-400" />}
+                  <div className="relative w-24 h-24 rounded-full bg-[#000000] border border-[#000000] flex items-center justify-center overflow-hidden">
+                    {avatarPreview ? <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" /> : <FaMusic className="text-3xl text-white/60" />}
                   </div>
                   <div className="flex-1">
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} disabled={uploading} className="hidden" />
-                    <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex items-center gap-2 px-4 py-2 bg-purple/85 hover:bg-purple/75 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                       <FaCamera className="w-4 h-4" />
                       {uploading ? 'Uploading...' : 'Upload Picture'}
                     </button>
-                    <p className="text-xs text-gray-400 mt-2">JPG, PNG or GIF (Max 5MB)</p>
+                    <p className="text-xs text-white/60 mt-2">JPG, PNG or GIF (Max 5MB)</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-white mb-2">Artist name *</label>
-                    <input type="text" value={formData.artistName} onChange={(e) => setFormData({ ...formData, artistName: e.target.value })} className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Your official artist name" />
+                    <input type="text" value={formData.artistName} onChange={(e) => setFormData({ ...formData, artistName: e.target.value })} className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75" placeholder="Your official artist name" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white mb-2">Stage/Artist Name *</label>
-                    <input type="text" value={formData.stageName} onChange={(e) => setFormData({ ...formData, stageName: e.target.value })} className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Your performance name" />
+                    <input type="text" value={formData.stageName} onChange={(e) => setFormData({ ...formData, stageName: e.target.value })} className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75" placeholder="Your performance name" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-white mb-2">Phone Number *</label>
-                    <input type="tel" value={formData.phoneNumber} onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })} className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="+260 96 123 4567" />
+                    <input type="tel" value={formData.phoneNumber} onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })} className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75" placeholder="+260 96 123 4567" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white mb-2">Date of Birth *</label>
-                    <input type="date" value={formData.dateOfBirth} onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })} className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <input type="date" value={formData.dateOfBirth} onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })} className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75" />
                   </div>
                 </div>
 
@@ -438,12 +438,12 @@ export default function ArtistSignUp() {
 
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">Bio</label>
-                  <textarea value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} rows={3} className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Tell us about your music and background..." />
+                  <textarea value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} rows={3} className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75" placeholder="Tell us about your music and background..." />
                 </div>
 
                 <div className="flex justify-between pt-4">
-                  <button onClick={handleBack} className="px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517]">Back</button>
-                  <button onClick={handleNext} className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500">Continue</button>
+                  <button onClick={handleBack} className="px-6 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000]">Back</button>
+                  <button onClick={handleNext} className="px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75">Continue</button>
                 </div>
               </div>
             </motion.div>
@@ -453,49 +453,49 @@ export default function ArtistSignUp() {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
               <h2 className="text-xl font-semibold text-white text-center mb-4">Terms & Agreements</h2>
 
-              <div className="bg-[#121517] rounded-xl p-6 space-y-4">
+              <div className="bg-[#000000] rounded-xl p-6 space-y-4">
                 <div className="flex items-start gap-3">
-                  <input type="checkbox" id="terms-artist" checked={formData.acceptedTerms} onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })} className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2" />
-                  <label htmlFor="terms-artist" className="text-white text-sm">I agree to the <a href="/terms" className="text-purple-400 hover:text-purple-300 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple-400 hover:text-purple-300 hover:underline">Privacy Policy</a> *</label>
+                  <input type="checkbox" id="terms-artist" checked={formData.acceptedTerms} onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })} className="mt-1 w-4 h-4 text-purple/85 bg-transparent border-[#000000] rounded focus:ring-purple/75 focus:ring-2" />
+                  <label htmlFor="terms-artist" className="text-white text-sm">I agree to the <a href="/terms" className="text-purple/60 hover:text-purple/45 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple/60 hover:text-purple/45 hover:underline">Privacy Policy</a> *</label>
                 </div>
-                {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
+                {errors.acceptedTerms && <p className="text-purple/60 text-sm">{errors.acceptedTerms}</p>}
 
                 <div className="flex items-start gap-3">
-                  <input type="checkbox" id="privacy-artist" checked={formData.acceptedPrivacy} onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })} className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2" />
+                  <input type="checkbox" id="privacy-artist" checked={formData.acceptedPrivacy} onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })} className="mt-1 w-4 h-4 text-purple/85 bg-transparent border-[#000000] rounded focus:ring-purple/75 focus:ring-2" />
                   <label htmlFor="privacy-artist" className="text-white text-sm">I acknowledge how my personal data will be processed *</label>
                 </div>
-                {errors.acceptedPrivacy && <p className="text-red-400 text-sm mt-2">{errors.acceptedPrivacy}</p>}
+                {errors.acceptedPrivacy && <p className="text-purple/60 text-sm mt-2">{errors.acceptedPrivacy}</p>}
                 <div className="flex items-start gap-3 mt-3">
-                  <input type="checkbox" id="cookies-artist" checked={formData.acceptedCookies} onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })} className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2" />
+                  <input type="checkbox" id="cookies-artist" checked={formData.acceptedCookies} onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })} className="mt-1 w-4 h-4 text-purple/85 bg-transparent border-[#000000] rounded focus:ring-purple/75 focus:ring-2" />
                   <label htmlFor="cookies-artist" className="text-white text-sm">I agree to the use of cookies for analytics and personalization.</label>
                 </div>
-                {errors.acceptedCookies && <p className="text-red-400 text-sm mt-2">{errors.acceptedCookies}</p>}
-                <button onClick={handleSubmit} disabled={loading || !formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedCookies} className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500">{loading ? 'Creating Account...' : 'Create Account'}</button>
-                {errors.submit && <p className="text-sm text-red-400 text-center">{errors.submit}</p>}
+                {errors.acceptedCookies && <p className="text-purple/60 text-sm mt-2">{errors.acceptedCookies}</p>}
+                <button onClick={handleSubmit} disabled={loading || !formData.acceptedTerms || !formData.acceptedPrivacy || !formData.acceptedCookies} className="w-full px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75">{loading ? 'Creating Account...' : 'Create Account'}</button>
+                {errors.submit && <p className="text-sm text-purple/60 text-center">{errors.submit}</p>}
               </div>
             </motion.div>
           )}
 
           {step === 'verification' && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="text-center space-y-4">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500/20 text-green-300">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple/20 text-purple/45">
                 <FaCheck className="h-6 w-6" />
               </div>
               <h3 className="text-lg font-semibold">Verify your email</h3>
-              <p className="text-sm text-gray-400">We’ve sent a verification link to <strong className="text-white">{formData.email}</strong>.</p>
-              <button type="button" onClick={handleResendVerificationEmail} disabled={resendLoading} className="px-5 py-2 bg-[#121517] rounded-xl text-white hover:bg-[#1f1f1f]">{resendLoading ? 'Resending…' : 'Resend verification email'}</button>
+              <p className="text-sm text-white/60">We’ve sent a verification link to <strong className="text-white">{formData.email}</strong>.</p>
+              <button type="button" onClick={handleResendVerificationEmail} disabled={resendLoading} className="px-5 py-2 bg-[#000000] rounded-xl text-white hover:bg-[#000000]">{resendLoading ? 'Resending…' : 'Resend verification email'}</button>
             </motion.div>
           )}
 
         </div>
 
         <div className="mt-6 pt-6 border-t border-white/10">
-          <div className="text-center text-sm text-gray-400">Already have an artist account? <Link href="/auth/artist/signin" className="font-semibold text-white hover:text-purple-300">Sign In</Link></div>
+          <div className="text-center text-sm text-white/60">Already have an artist account? <Link href="/auth/artist/signin" className="font-semibold text-white hover:text-purple/45">Sign In</Link></div>
 
           <div className="mt-4 flex flex-wrap justify-center gap-2">
-            <Link href="/auth/user/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Listener Sign Up</Link>
-            <Link href="/auth/producer/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Producer Sign Up</Link>
-            <Link href="/auth/reseller/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white text-center hover:bg-[#121517]">Reseller Sign Up</Link>
+            <Link href="/auth/user/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#000000] rounded-none text-sm font-semibold text-white text-center hover:bg-[#000000]">Listener Sign Up</Link>
+            <Link href="/auth/producer/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#000000] rounded-none text-sm font-semibold text-white text-center hover:bg-[#000000]">Producer Sign Up</Link>
+            <Link href="/auth/reseller/signup" className="flex-1 min-w-[90px] px-3 py-2 bg-[#000000] rounded-none text-sm font-semibold text-white text-center hover:bg-[#000000]">Reseller Sign Up</Link>
           </div>
         </div>
       </motion.div>

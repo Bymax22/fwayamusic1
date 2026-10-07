@@ -305,10 +305,10 @@ export default function ProducerSignUp() {
       >
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
-            <Music2 className="w-8 h-8 text-purple-400" />
+            <Music2 className="w-8 h-8 text-purple/60" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Producer</h1>
-          <p className="text-gray-300">Create your producer account and share your beats with the world</p>
+          <p className="text-white/90">Create your producer account and share your beats with the world</p>
         </div>
 
         <AuthErrorBanner error={authError} />
@@ -321,10 +321,10 @@ export default function ProducerSignUp() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                     step === s
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-purple/85 text-white'
                       : index < ['basic', 'producer', 'consent', 'verification'].indexOf(step)
-                      ? 'bg-[#121517] text-white'
-                      : 'bg-[#121517] text-gray-400'
+                      ? 'bg-[#000000] text-white'
+                      : 'bg-[#000000] text-white/60'
                   }`}
                 >
                   {index < ['basic', 'producer', 'consent', 'verification'].indexOf(step) ? (
@@ -333,7 +333,7 @@ export default function ProducerSignUp() {
                     index + 1
                   )}
                 </div>
-                <span className="text-xs text-gray-500 mt-1 capitalize">
+                <span className="text-xs text-white/60 mt-1 capitalize">
                   {s === 'basic' && 'Account'}
                   {s === 'producer' && 'Producer Info'}
                   {s === 'consent' && 'Terms'}
@@ -342,9 +342,9 @@ export default function ProducerSignUp() {
               </div>
             ))}
           </div>
-          <div className="w-full bg-[#121517] rounded-full h-2">
+          <div className="w-full bg-[#000000] rounded-full h-2">
             <div
-              className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+              className="bg-purple/85 h-2 rounded-full transition-all duration-300"
               style={{
                 width: `${(['basic', 'producer', 'consent', 'verification'].indexOf(step) + 1) * 25}%`,
               }}
@@ -401,7 +401,7 @@ export default function ProducerSignUp() {
                 inputMode="text"
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="Your display name"
               />
             </div>
@@ -416,18 +416,18 @@ export default function ProducerSignUp() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+                    className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-12"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
+                {errors.password && <p className="text-purple/60 text-sm mt-1">{errors.password}</p>}
               </div>
 
               <div>
@@ -438,24 +438,24 @@ export default function ProducerSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="••••••••"
                 />
-                {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-purple/60 text-sm mt-1">{errors.confirmPassword}</p>}
               </div>
             </div>
 
             <div className="flex justify-between pt-4">
               <Link
                 href="/auth/producer/signin"
-                className="flex items-center gap-2 px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517] transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Sign In
               </Link>
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-colors font-semibold"
+                className="px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -480,11 +480,11 @@ export default function ProducerSignUp() {
                 Profile Picture
               </label>
               <div className="flex items-center gap-4">
-                <div className="relative w-24 h-24 rounded-full bg-[#0f1112] border border-[#121517] flex items-center justify-center overflow-hidden flex-shrink-0">
+                <div className="relative w-24 h-24 rounded-full bg-[#000000] border border-[#000000] flex items-center justify-center overflow-hidden flex-shrink-0">
                   {avatarPreview ? (
                     <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
                   ) : (
-                    <Music2 className="text-3xl text-gray-400" />
+                    <Music2 className="text-3xl text-white/60" />
                   )}
                 </div>
                 <div className="flex-1">
@@ -500,15 +500,15 @@ export default function ProducerSignUp() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2 bg-purple/85 hover:bg-purple/75 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Camera className="w-4 h-4" />
                     {uploading ? 'Uploading...' : 'Upload Picture'}
                   </button>
-                  <p className="text-xs text-gray-400 mt-2">JPG, PNG or GIF (Max 5MB)</p>
+                  <p className="text-xs text-white/60 mt-2">JPG, PNG or GIF (Max 5MB)</p>
                 </div>
               </div>
-              {errors.avatar && <p className="text-red-400 text-sm mt-2">{errors.avatar}</p>}
+              {errors.avatar && <p className="text-purple/60 text-sm mt-2">{errors.avatar}</p>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -520,10 +520,10 @@ export default function ProducerSignUp() {
                   type="text"
                   value={formData.producerName}
                   onChange={(e) => setFormData({ ...formData, producerName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="Your official producer name"
                 />
-                {errors.producerName && <p className="text-red-400 text-sm mt-1">{errors.producerName}</p>}
+                {errors.producerName && <p className="text-purple/60 text-sm mt-1">{errors.producerName}</p>}
               </div>
 
               <div>
@@ -534,10 +534,10 @@ export default function ProducerSignUp() {
                   type="text"
                   value={formData.stageName}
                   onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="Your production stage name"
                 />
-                {errors.stageName && <p className="text-red-400 text-sm mt-1">{errors.stageName}</p>}
+                {errors.stageName && <p className="text-purple/60 text-sm mt-1">{errors.stageName}</p>}
               </div>
             </div>
 
@@ -550,10 +550,10 @@ export default function ProducerSignUp() {
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="+260 96 123 4567"
                 />
-                {errors.phoneNumber && <p className="text-red-400 text-sm mt-1">{errors.phoneNumber}</p>}
+                {errors.phoneNumber && <p className="text-purple/60 text-sm mt-1">{errors.phoneNumber}</p>}
               </div>
 
               <div>
@@ -564,9 +564,9 @@ export default function ProducerSignUp() {
                   type="date"
                   value={formData.dateOfBirth}
                   onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 />
-                {errors.dateOfBirth && <p className="text-red-400 text-sm mt-1">{errors.dateOfBirth}</p>}
+                {errors.dateOfBirth && <p className="text-purple/60 text-sm mt-1">{errors.dateOfBirth}</p>}
               </div>
             </div>
 
@@ -585,7 +585,7 @@ export default function ProducerSignUp() {
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="Tell us about your production style and background..."
               />
             </div>
@@ -598,7 +598,7 @@ export default function ProducerSignUp() {
                 type="url"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="w-full px-4 py-3 bg-[#0f1112] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="https://yourwebsite.com"
               />
             </div>
@@ -609,30 +609,30 @@ export default function ProducerSignUp() {
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {producerGenres.map(genre => (
-                  <label key={genre} className="flex items-center gap-2 px-3 py-2 bg-[#0f1112] rounded-lg border border-[#121517] hover:bg-[#121517] cursor-pointer transition">
+                  <label key={genre} className="flex items-center gap-2 px-3 py-2 bg-[#000000] rounded-lg border border-[#000000] hover:bg-[#000000] cursor-pointer transition">
                     <input
                       type="checkbox"
                       checked={formData.genres.includes(genre)}
                       onChange={() => handleGenreChange(genre)}
-                      className="w-4 h-4 text-purple-600 bg-transparent rounded focus:ring-purple-500"
+                      className="w-4 h-4 text-purple/85 bg-transparent rounded focus:ring-purple/75"
                     />
                     <span className="text-sm text-white">{genre}</span>
                   </label>
                 ))}
               </div>
-              {errors.genres && <p className="text-red-400 text-sm mt-2">{errors.genres}</p>}
+              {errors.genres && <p className="text-purple/60 text-sm mt-2">{errors.genres}</p>}
             </div>
 
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 bg-[#0f1112] text-white rounded-xl hover:bg-[#121517] transition-colors"
+                className="px-6 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handleNext}
-                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 transition-colors font-semibold"
+                className="px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 transition-colors font-semibold"
               >
                 Continue
               </button>
@@ -651,20 +651,20 @@ export default function ProducerSignUp() {
               Terms & Agreements
             </h2>
 
-            <div className="bg-[#121517] rounded-xl p-6 space-y-4">
+            <div className="bg-[#000000] rounded-xl p-6 space-y-4">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms-producer"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-[#121517] rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-transparent border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="terms-producer" className="text-white text-sm">
-                  I agree to the <a href="/terms" className="text-purple-400 hover:text-purple-300 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple-400 hover:text-purple-300 hover:underline">Privacy Policy</a> *
+                  I agree to the <a href="/terms" className="text-purple/60 hover:text-purple/45 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple/60 hover:text-purple/45 hover:underline">Privacy Policy</a> *
                 </label>
               </div>
-              {errors.acceptedTerms && <p className="text-red-400 text-sm">{errors.acceptedTerms}</p>}
+              {errors.acceptedTerms && <p className="text-purple/60 text-sm">{errors.acceptedTerms}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -672,13 +672,13 @@ export default function ProducerSignUp() {
                   id="privacy-producer"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-white/10 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-transparent border-white/10 rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="privacy-producer" className="text-white text-sm">
                   I acknowledge that I have read and understood how my personal data will be processed *
                 </label>
               </div>
-              {errors.acceptedPrivacy && <p className="text-red-400 text-sm">{errors.acceptedPrivacy}</p>}
+              {errors.acceptedPrivacy && <p className="text-purple/60 text-sm">{errors.acceptedPrivacy}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -686,13 +686,13 @@ export default function ProducerSignUp() {
                   id="cookies-producer"
                   checked={formData.acceptedCookies}
                   onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-white/10 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-transparent border-white/10 rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="cookies-producer" className="text-white text-sm">
                   I agree to the use of cookies for analytics and personalization.
                 </label>
               </div>
-              {errors.acceptedCookies && <p className="text-red-400 text-sm">{errors.acceptedCookies}</p>}
+              {errors.acceptedCookies && <p className="text-purple/60 text-sm">{errors.acceptedCookies}</p>}
 
               <div className="flex items-start gap-3">
                 <input
@@ -700,7 +700,7 @@ export default function ProducerSignUp() {
                   id="marketing-producer"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-white/10 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-transparent border-white/10 rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="marketing-producer" className="text-white text-sm">
                   I agree to receive marketing emails and promotional offers
@@ -713,7 +713,7 @@ export default function ProducerSignUp() {
                   id="dataSharing-producer"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple-600 bg-transparent border-white/10 rounded focus:ring-purple-500 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-transparent border-white/10 rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="dataSharing-producer" className="text-white text-sm">
                   I consent to my data being shared with trusted partners for service improvement
@@ -724,13 +724,13 @@ export default function ProducerSignUp() {
             <button
               onClick={() => handleSubmit()}
               disabled={loading || !formData.acceptedTerms || !formData.acceptedPrivacy}
-              className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-purple/85 text-white rounded-xl hover:bg-purple/75 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
 
             {errors.submit && (
-              <p className="text-red-400 text-sm text-center">{errors.submit}</p>
+              <p className="text-purple/60 text-sm text-center">{errors.submit}</p>
             )}
           </motion.div>
         )}
@@ -742,28 +742,28 @@ export default function ProducerSignUp() {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4 text-center"
           >
-            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 bg-purple/75 rounded-full flex items-center justify-center mx-auto mb-4">
               <Check className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-lg font-semibold text-white">Check Your Email</h3>
             {verificationError && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-3 text-left">
-                <p className="text-red-200 text-sm font-semibold">Verification email failed to send.</p>
-                <p className="text-red-100 text-xs break-words">{verificationError}</p>
+              <div className="bg-purple/10 border border-purple/20 rounded-lg p-3 mb-3 text-left">
+                <p className="text-purple/30 text-sm font-semibold">Verification email failed to send.</p>
+                <p className="text-purple/20 text-xs break-words">{verificationError}</p>
               </div>
             )}
-            <p className="text-sm text-gray-300">We&apos;ve sent a verification link to <strong>{formData.email}</strong></p>
-            <p className="text-sm text-gray-400">Click the link in your email to verify your account and get started.</p>
+            <p className="text-sm text-white/90">We&apos;ve sent a verification link to <strong>{formData.email}</strong></p>
+            <p className="text-sm text-white/60">Click the link in your email to verify your account and get started.</p>
             <button
               type="button"
               onClick={handleResendVerificationEmail}
               disabled={resendLoading}
-              className="mt-4 px-5 py-2 bg-[#121517] rounded-xl text-white hover:bg-[#1f1f1f] transition-colors disabled:opacity-50"
+              className="mt-4 px-5 py-2 bg-[#000000] rounded-xl text-white hover:bg-[#000000] transition-colors disabled:opacity-50"
             >
               {resendLoading ? 'Resending…' : 'Resend verification email'}
             </button>
-            <div className="bg-[#121517] border border-[#121517] rounded-lg p-3 mt-4">
-              <p className="text-gray-400 text-xs">
+            <div className="bg-[#000000] border border-[#000000] rounded-lg p-3 mt-4">
+              <p className="text-white/60 text-xs">
                 <strong>Note:</strong> After email verification, you&apos;ll need to complete KYC document verification to upload beats.
               </p>
             </div>
@@ -772,28 +772,28 @@ export default function ProducerSignUp() {
 
         {/* Navigation Links */}
         <div className="text-center mt-8 pt-6 border-t border-white/10">
-          <p className="text-gray-300">
+          <p className="text-white/90">
             Already have a producer account?{' '}
-            <Link href="/auth/producer/signin" className="text-purple-400 hover:text-purple-300 hover:underline font-semibold">
+            <Link href="/auth/producer/signin" className="text-purple/60 hover:text-purple/45 hover:underline font-semibold">
               Sign In
             </Link>
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             <Link
               href="/auth/user/signup"
-              className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
+              className="flex-1 min-w-[90px] px-3 py-2 bg-[#000000] rounded-none text-sm font-semibold text-white transition hover:bg-[#000000] text-center"
             >
               Listener Sign Up
             </Link>
             <Link
               href="/auth/artist/signup"
-              className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
+              className="flex-1 min-w-[90px] px-3 py-2 bg-[#000000] rounded-none text-sm font-semibold text-white transition hover:bg-[#000000] text-center"
             >
               Artist Sign Up
             </Link>
             <Link
               href="/auth/reseller/signup"
-              className="flex-1 min-w-[90px] px-3 py-2 bg-[#0f1112] rounded-none text-sm font-semibold text-white transition hover:bg-[#121517] text-center"
+              className="flex-1 min-w-[90px] px-3 py-2 bg-[#000000] rounded-none text-sm font-semibold text-white transition hover:bg-[#000000] text-center"
             >
               Reseller Sign Up
             </Link>

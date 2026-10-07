@@ -377,9 +377,9 @@ const PlaylistDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#151515] flex items-center justify-center">
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a855f7] mx-auto mb-3"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9B5DE5] mx-auto mb-3"></div>
           <p className="text-white">Loading playlist...</p>
         </div>
       </div>
@@ -388,13 +388,13 @@ const PlaylistDetailPage = () => {
 
   if (error || !playlist) {
     return (
-      <div className="min-h-screen bg-[#151515] flex items-center justify-center">
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Playlist Not Found</h1>
-          <p className="text-gray-400 mb-6">{error}</p>
+          <p className="text-white/60 mb-6">{error}</p>
           <button
             onClick={() => router.back()}
-            className="bg-[#a855f7] text-white px-6 py-2 rounded-lg hover:bg-[#9333ea] transition-colors"
+            className="bg-[#9B5DE5] text-white px-6 py-2 rounded-lg hover:bg-[#9B5DE5] transition-colors"
           >
             Go Back
           </button>
@@ -407,9 +407,9 @@ const PlaylistDetailPage = () => {
   const totalPlays = playlist.entries.reduce((total, entry) => total + (entry.media.plays || 0), 0);
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-[#151515]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#000000]">
       {/* Header */}
-      <div className="relative overflow-hidden bg-[#151515]">
+      <div className="relative overflow-hidden bg-[#000000]">
         <div className="absolute inset-x-0 top-0 h-[420px] md:hidden">
           <Image
             src={playlist.coverUrl || "/default-playlist.png"}
@@ -419,13 +419,13 @@ const PlaylistDetailPage = () => {
             priority
             className="object-cover object-top"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-[#151515]/35 to-[#151515]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-[#000000]/35 to-[#000000]" />
         </div>
-        <div className="absolute inset-0 hidden bg-gradient-to-b from-transparent to-[#151515]/80 md:block" />
+        <div className="absolute inset-0 hidden bg-gradient-to-b from-transparent to-[#000000]/80 md:block" />
         <div className="relative z-10 p-4 sm:p-6">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-white hover:text-[#a855f7] transition-colors mb-6"
+            className="flex items-center gap-2 text-white hover:text-[#9B5DE5] transition-colors mb-6"
           >
             <FaArrowLeft size={20} />
             Back
@@ -448,11 +448,11 @@ const PlaylistDetailPage = () => {
             {/* Playlist Info */}
             <div className="flex-1 text-white">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm font-medium px-2 py-1 bg-[#a855f7] rounded-full">
+                <span className="text-sm font-medium px-2 py-1 bg-[#9B5DE5] rounded-full">
                   {playlist.type}
                 </span>
                 {!playlist.isPublic && (
-                  <span className="text-sm font-medium px-2 py-1 bg-gray-600 rounded-full">
+                  <span className="text-sm font-medium px-2 py-1 bg-charcoal rounded-full">
                     Private
                   </span>
                 )}
@@ -461,10 +461,10 @@ const PlaylistDetailPage = () => {
               <h1 className="mb-2 break-words text-3xl font-bold md:text-5xl">{playlist.name}</h1>
 
               {playlist.description && (
-                <p className="mb-4 max-w-2xl break-words text-lg text-gray-300">{playlist.description}</p>
+                <p className="mb-4 max-w-2xl break-words text-lg text-white/90">{playlist.description}</p>
               )}
 
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-6">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-white/60 mb-6">
                 <span className="flex items-center gap-1">
                   <FaMusic size={14} />
                   {playlist.entries.length} songs
@@ -483,7 +483,7 @@ const PlaylistDetailPage = () => {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={handlePlayAll}
-                  className="bg-[#a855f7] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#9333ea] transition-colors flex items-center gap-2"
+                  className="bg-[#9B5DE5] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#9B5DE5] transition-colors flex items-center gap-2"
                 >
                   <FaPlay size={16} />
                   Play All
@@ -491,7 +491,7 @@ const PlaylistDetailPage = () => {
 
                 <button
                   onClick={handlePlaylistPrevious}
-                  className="bg-[#222222] text-white px-4 py-3 rounded-full hover:bg-[#2d2d2d] transition-colors"
+                  className="bg-[#000000] text-white px-4 py-3 rounded-full hover:bg-[#36454F] transition-colors"
                   title="Previous track"
                 >
                   <FaArrowLeft size={14} />
@@ -499,7 +499,7 @@ const PlaylistDetailPage = () => {
 
                 <button
                   onClick={handlePlaylistNext}
-                  className="bg-[#222222] text-white px-4 py-3 rounded-full hover:bg-[#2d2d2d] transition-colors"
+                  className="bg-[#000000] text-white px-4 py-3 rounded-full hover:bg-[#36454F] transition-colors"
                   title="Next track"
                 >
                   <FaPlay size={14} />
@@ -508,7 +508,7 @@ const PlaylistDetailPage = () => {
                 <button
                   onClick={handlePlaylistRepeatToggle}
                   className={`px-4 py-3 rounded-full transition-colors ${
-                    repeatMode !== 'off' ? 'bg-[#a855f7] text-white' : 'bg-[#222222] text-white hover:bg-[#2d2d2d]'
+                    repeatMode !== 'off' ? 'bg-[#9B5DE5] text-white' : 'bg-[#000000] text-white hover:bg-[#36454F]'
                   }`}
                   title={repeatMode === 'repeat-all' ? 'Repeat all on' : repeatMode === 'repeat-one' ? 'Repeat one on' : 'Repeat all'}
                 >
@@ -517,14 +517,14 @@ const PlaylistDetailPage = () => {
 
                 <button
                   onClick={handleLike}
-                  className="bg-[#222222] text-white p-3 rounded-full hover:bg-[#2d2d2d] transition-colors"
+                  className="bg-[#000000] text-white p-3 rounded-full hover:bg-[#36454F] transition-colors"
                 >
                   {isLiked ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
                 </button>
 
                 <button
                   onClick={handleShare}
-                  className="bg-[#222222] text-white p-3 rounded-full hover:bg-[#2d2d2d] transition-colors"
+                  className="bg-[#000000] text-white p-3 rounded-full hover:bg-[#36454F] transition-colors"
                 >
                   <FaShare size={16} />
                 </button>
@@ -536,12 +536,12 @@ const PlaylistDetailPage = () => {
 
       {/* Tracks List */}
       <div className="px-2 pb-8 sm:px-6">
-        <div className="bg-[#222222]/80 rounded-lg overflow-hidden">
-          <div className="p-4 border-b border-gray-700">
+        <div className="bg-[#000000]/80 rounded-lg overflow-hidden">
+          <div className="p-4 border-b border-charcoal/50">
             <h2 className="text-xl font-bold text-white">Tracks</h2>
           </div>
 
-          <div className="divide-y divide-gray-700">
+          <div className="divide-y divide-charcoal/50">
             {playlist.entries
               .sort((a, b) => a.position - b.position)
               .map((entry, index) => {
@@ -551,15 +551,15 @@ const PlaylistDetailPage = () => {
                 return (
                   <motion.div
                     key={entry.id}
-                    className="group flex min-w-0 flex-wrap items-center gap-3 p-3 transition-colors hover:bg-[#2d2d2d] sm:gap-4 sm:p-4"
-                    whileHover={{ backgroundColor: 'rgba(45, 45, 45, 0.5)' }}
+                    className="group flex min-w-0 flex-wrap items-center gap-3 p-3 transition-colors hover:bg-[#36454F] sm:gap-4 sm:p-4"
+                    whileHover={{ backgroundColor: 'rgba(54, 69, 79, 0.5)' }}
                   >
                     {/* Track Number / Play Button */}
                     <div className="w-8 flex justify-center">
                       {isCurrent && isPlaying ? (
                         <FaPause
                           size={16}
-                          className="text-[#a855f7] cursor-pointer"
+                          className="text-[#9B5DE5] cursor-pointer"
                           onClick={() => handlePlay({
                             id: track.id.toString(),
                             title: track.title,
@@ -572,10 +572,10 @@ const PlaylistDetailPage = () => {
                         />
                       ) : (
                         <div className="flex items-center justify-center w-6 h-6">
-                          <span className="text-gray-400 group-hover:hidden">{index + 1}</span>
+                          <span className="text-white/60 group-hover:hidden">{index + 1}</span>
                           <FaPlay
                             size={12}
-                            className="text-white hidden group-hover:block cursor-pointer hover:text-[#a855f7]"
+                            className="text-white hidden group-hover:block cursor-pointer hover:text-[#9B5DE5]"
                             onClick={() => handlePlay({
                               id: track.id.toString(),
                               title: track.title,
@@ -605,22 +605,22 @@ const PlaylistDetailPage = () => {
 
                     {/* Track Info */}
                     <div className="min-w-0 flex-1">
-                      <ScrollingTrackTitle isPlaying={isCurrent && isPlaying} className={`font-medium ${isCurrent ? 'text-[#a855f7]' : 'text-white'}`}>
+                      <ScrollingTrackTitle isPlaying={isCurrent && isPlaying} className={`font-medium ${isCurrent ? 'text-[#9B5DE5]' : 'text-white'}`}>
                         <span className="inline-flex items-center gap-2">
                           {isCurrent ? (
                             // show waveform when this is the playing track
-                            <Waveform playing={isCurrent && isPlaying} accentColor="#a855f7" />
+                            <Waveform playing={isCurrent && isPlaying} accentColor="#9B5DE5" />
                           ) : null}
                           <span>{track.title}</span>
                         </span>
                       </ScrollingTrackTitle>
-                      <p className="text-sm text-gray-400 truncate">
+                      <p className="text-sm text-white/60 truncate">
                         {getTrackArtist(track)}
                       </p>
                     </div>
 
                     {/* Track Stats */}
-                    <div className="hidden md:flex items-center gap-4 text-sm text-gray-400">
+                    <div className="hidden md:flex items-center gap-4 text-sm text-white/60">
                       <span className="flex items-center gap-1">
                         <FaHeadphones size={12} />
                         {track.plays?.toLocaleString() || 0}
@@ -675,7 +675,7 @@ const PlaylistDetailPage = () => {
 
                     {/* Access Type */}
                     {track.accessType === 'PREMIUM' && (
-                      <div className="flex items-center gap-1 px-2 py-1 bg-amber-500/20 text-amber-400 rounded-full text-xs">
+                      <div className="flex items-center gap-1 px-2 py-1 bg-purple/20 text-purple/60 rounded-full text-xs">
                         <FaDownload size={10} />
                         Premium
                       </div>
