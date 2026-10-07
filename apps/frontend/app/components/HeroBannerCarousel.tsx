@@ -48,7 +48,7 @@ export default function HeroBannerCarousel({
             : rawOffset;
       return { slide, index, offset };
     })
-    .filter(({ offset }) => Math.abs(offset) <= 1);
+    .filter(({ offset }) => Math.abs(offset) <= 3);
 
   return (
     <section
@@ -78,8 +78,10 @@ export default function HeroBannerCarousel({
       {visibleSlides.map(({ slide, index, offset }) => {
         const distance = Math.abs(offset);
         const isActive = offset === 0;
-        const scale = isActive ? 1 : 0.82;
-        const opacity = isActive ? 1 : 0.82;
+        const sideOffset = distance === 1 ? 24 : distance === 2 ? 40 : 56;
+        const scale = isActive ? 1 : 0.9 - distance * 0.04;
+        const opacity = isActive ? 1 : 0.86 - distance * 0.04;
+        const rotation = 24 + (distance - 1) * 8;
 
         return (
           <motion.button
@@ -94,20 +96,21 @@ export default function HeroBannerCarousel({
               if (isActive) onActivate(slide);
               else onChange(index);
             }}
-            className="absolute top-1/2 h-[82%] w-[60%] overflow-visible rounded-2xl sm:h-[88%] sm:w-[50%] sm:rounded-3xl"
+            className="absolute top-1/2 h-[82%] overflow-visible rounded-2xl sm:h-[88%] sm:rounded-3xl"
             initial={false}
             animate={{
-              left: `${50 + offset * 48}%`,
+              left: `${50 + Math.sign(offset) * sideOffset}%`,
+              width: isActive ? 'min(78%, 760px)' : 'min(58%, 560px)',
               x: '-50%',
               y: '-50%',
               scale,
               opacity,
-              rotateY: offset === 0 ? 0 : offset < 0 ? 38 : -38,
+              rotateY: offset === 0 ? 0 : offset < 0 ? rotation : -rotation,
             }}
             transition={{ type: 'spring', stiffness: 110, damping: 24, mass: 1.1 }}
             style={{
               left: '50%',
-              zIndex: 20 - distance,
+              zIndex: 30 - distance,
               transformStyle: 'preserve-3d',
               transformOrigin: 'center center',
             }}
@@ -117,7 +120,7 @@ export default function HeroBannerCarousel({
                 src={slide.image || '/featured5.jpg'}
                 alt={slide.title}
                 fill
-                sizes="(max-width: 640px) 60vw, 50vw"
+                sizes="(max-width: 640px) 78vw, 760px"
                 className="object-cover"
                 priority={distance === 0}
               />
@@ -142,7 +145,7 @@ export default function HeroBannerCarousel({
               aria-hidden="true"
               className="absolute left-0 right-0 top-[96%] h-[28%] scale-y-[-1] overflow-hidden rounded-2xl opacity-25 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.5),transparent)] sm:rounded-3xl"
             >
-              <Image src={slide.image || '/featured5.jpg'} alt="" fill sizes="(max-width: 640px) 60vw, 50vw" className="object-cover" />
+              <Image src={slide.image || '/featured5.jpg'} alt="" fill sizes="(max-width: 640px) 78vw, 760px" className="object-cover" />
             </span>
           </motion.button>
         );
