@@ -8,20 +8,20 @@ export type Palette = {
   id: PaletteId;
   name: string;
   accent: string;
-  background: string;
   surface: string;
   text: string;
 };
 
 export const palettes: Palette[] = [
-  { id: "fwaya-purple", name: "Fwaya Purple", accent: "#9B5DE5", background: "#000000", surface: "#36454F", text: "#FFFFFF" },
-  { id: "electric-blue", name: "Electric Blue", accent: "#4F8CFF", background: "#05070C", surface: "#26313F", text: "#FFFFFF" },
-  { id: "emerald", name: "Emerald", accent: "#34D399", background: "#050A08", surface: "#26352F", text: "#FFFFFF" },
-  { id: "coral", name: "Coral", accent: "#FF6B6B", background: "#0D090A", surface: "#3A292B", text: "#FFFFFF" },
-  { id: "amber-gold", name: "Amber Gold", accent: "#F5B942", background: "#0C0B08", surface: "#393326", text: "#FFFFFF" },
+  { id: "fwaya-purple", name: "Fwaya Purple", accent: "#9B5DE5", surface: "#36454F", text: "#FFFFFF" },
+  { id: "electric-blue", name: "Electric Blue", accent: "#4F8CFF", surface: "#26313F", text: "#FFFFFF" },
+  { id: "emerald", name: "Emerald", accent: "#34D399", surface: "#26352F", text: "#FFFFFF" },
+  { id: "coral", name: "Coral", accent: "#FF6B6B", surface: "#3A292B", text: "#FFFFFF" },
+  { id: "amber-gold", name: "Amber Gold", accent: "#F5B942", surface: "#393326", text: "#FFFFFF" },
 ];
 
 const STORAGE_KEY = "fwaya-theme-palette";
+const PLATFORM_BACKGROUND = "0, 0, 0";
 const defaultPalette = palettes[0];
 const paletteById = new Map(palettes.map((palette) => [palette.id, palette]));
 const listeners = new Set<() => void>();
@@ -56,10 +56,10 @@ function applyPalette(palette: Palette) {
     root.style.setProperty("--accent-light", rgb(palette.accent));
     root.style.setProperty("--purple-deep", rgb(palette.accent));
     root.style.setProperty("--purple-bright", rgb(palette.accent));
-    root.style.setProperty("--background", rgb(palette.background));
-    root.style.setProperty("--primary-dark", rgb(palette.background));
-    root.style.setProperty("--primary-dark-darker", rgb(palette.background));
-    root.style.setProperty("--dark-bg", rgb(palette.background));
+    root.style.setProperty("--background", PLATFORM_BACKGROUND);
+    root.style.setProperty("--primary-dark", PLATFORM_BACKGROUND);
+    root.style.setProperty("--primary-dark-darker", PLATFORM_BACKGROUND);
+    root.style.setProperty("--dark-bg", PLATFORM_BACKGROUND);
     root.style.setProperty("--card", rgb(palette.surface));
     root.style.setProperty("--border", rgb(palette.surface));
     root.style.setProperty("--input", rgb(palette.surface));

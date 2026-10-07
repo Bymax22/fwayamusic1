@@ -57,6 +57,7 @@ const API_BASE_URL = (
   process.env.EXPO_PUBLIC_API_URL || 'https://fwayamusic1-backend.vercel.app'
 ).replace(/\/+$/, '');
 const SAVED_TRACKS_KEY = 'fwaya-mobile-saved-tracks';
+const RECENT_TRACKS_KEY = 'fwaya-mobile-recent-tracks';
 const CATALOG_CACHE_KEY = 'fwaya-mobile-catalog-v1';
 const COLOR_PALETTE_KEY = 'fwaya-mobile-color-palette';
 const REVENUECAT_API_KEY =
@@ -141,7 +142,7 @@ function Text({ style, ...props }: TextProps) {
   return <NativeText {...props} style={[{ fontFamily: getFontFamily(style) }, style]} />;
 }
 
-type Screen = 'home' | 'search' | 'saved';
+type Screen = 'home' | 'search' | 'saved' | 'recent';
 type LibraryTab = 'saved' | 'downloads';
 type HomeTab =
   | 'for-you'
@@ -171,6 +172,11 @@ type HomeItem = ApiMedia & {
   isProducer?: boolean;
   mediaCount?: number | null;
 };
+
+interface NativeEntityDetail {
+  tab: HomeTab;
+  item: HomeItem;
+}
 
 interface Track {
   id: string;
@@ -326,8 +332,17 @@ export default function App() {
   const [localPermissionDenied, setLocalPermissionDenied] = useState(false);
   const [homeSections, setHomeSections] = useState<Record<string, HomeItem[]>>({});
   const [homeError, setHomeError] = useState<string | null>(null);
+  const [selectedEntity, setSelectedEntity] = useState<NativeEntityDetail | null>(null);
+  const [entityTracks, setEntityTracks] = useState<Track[]>([]);
+  const [entityDescription, setEntityDescription] = useState('');
+  const [entityLoading, setEntityLoading] = useState(false);
+  const [entityError, setEntityError] = useState<string | null>(null);
+  const [entityRetry, setEntityRetry] = useState(0);
   const [bannerIndex, setBannerIndex] = useState(0);
   const [savedTrackIds, setSavedTrackIds] = useState<string[]>([]);
+  const [serverLikedTrackIds, setServerLikedTrackIds] = useState<string[]>([]);
+  const [recentTrackIds, setRecentTrackIds] = useState<string[]>([]);
+  const [recentTracksReady, setRecentTracksReady] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [queueTracks, setQueueTracks] = useState<Track[]>([]);
   const [playerPanel, setPlayerPanel] = useState<'queue' | 'lyrics'>('queue');
@@ -383,6 +398,91 @@ export default function App() {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!account) {
+      setServerLikedTrackIds([]);
+      return () => {
+        mounted = false;
+      };
+    }
+
+    void (async () => {
+      try {
+        const firebaseUser = getMobileAuth().currentUser;
+        if (!firebaseUser) throw new Error('Your sign-in session is unavailable.');
+        const token = await firebaseUser.getIdToken();
+        const response = await fetch(`${API_BASE_URL}/api/v1/users/me/liked`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        });
+        if (!response.ok) {
+          throw new Error(`Liked tracks could not be loaded (${response.status}).`);
+        }
+        const payload: unknown = await response.json();
+        if (!Array.isArray(payload)) throw new Error('Liked tracks returned an unexpected response.');
+        const ids = payload
+          .filter((entry): entry is { media?: { id?: number | string } } =>
+            entry !== null && typeof entry === 'object'
+          )
+          .map((entry) => entry.media?.id)
+          .filter((id): id is number | string => typeof id === 'number' || typeof id === 'string')
+          .map(String);
+        if (mounted) setServerLikedTrackIds(ids);
+      } catch (error) {
+        console.error('Unable to load account liked tracks:', error);
+        if (mounted) {
+          Alert.alert(
+            'Liked tracks unavailable',
+            error instanceof Error ? error.message : 'Your liked tracks could not be loaded.'
+          );
+        }
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [account]);
+
+  useEffect(() => {
+    let mounted = true;
+    void AsyncStorage.getItem(RECENT_TRACKS_KEY)
+      .then((stored) => {
+        if (!stored) return;
+        const parsed: unknown = JSON.parse(stored);
+        if (!Array.isArray(parsed) || !parsed.every((id) => typeof id === 'string')) {
+          throw new Error('Recently played track data has an invalid format.');
+        }
+        if (mounted) setRecentTrackIds(parsed);
+      })
+      .catch((error) => {
+        console.error('Unable to restore recently played tracks:', error);
+        if (mounted) {
+          Alert.alert(
+            'Listening history unavailable',
+            'Your recently played tracks could not be read from this device.'
+          );
+        }
+      })
+      .finally(() => {
+        if (mounted) setRecentTracksReady(true);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!recentTracksReady || !currentTrack || currentTrack.localDownload) return;
+    if (recentTrackIds[0] === currentTrack.id) return;
+    const next = [currentTrack.id, ...recentTrackIds.filter((id) => id !== currentTrack.id)].slice(0, 50);
+    setRecentTrackIds(next);
+    void AsyncStorage.setItem(RECENT_TRACKS_KEY, JSON.stringify(next)).catch((error) => {
+      console.error('Unable to save recently played tracks:', error);
+      Alert.alert('Listening history not saved', 'Recently played could not be saved on this device.');
+    });
+  }, [currentTrack, recentTrackIds, recentTracksReady]);
 
   useEffect(() => {
     if (!paletteReady) return;
@@ -725,6 +825,96 @@ export default function App() {
   }, [loadHomeSections]);
 
   useEffect(() => {
+    if (!selectedEntity) {
+      setEntityTracks([]);
+      setEntityDescription('');
+      setEntityError(null);
+      return;
+    }
+
+    let active = true;
+    const loadEntity = async () => {
+      setEntityLoading(true);
+      setEntityError(null);
+      const rawId = selectedEntity.item.id;
+      if (rawId === undefined || rawId === null || String(rawId).trim() === '') {
+        setEntityError('This item is missing its Fwaya ID.');
+        setEntityLoading(false);
+        return;
+      }
+
+      const id = encodeURIComponent(String(rawId));
+      const endpoint = selectedEntity.tab === 'playlists'
+        ? `/api/v1/playlist/${id}`
+        : selectedEntity.tab === 'albums' || selectedEntity.tab === 'eps'
+          ? `/api/v1/albums/${id}`
+          : selectedEntity.tab === 'artists'
+            ? `/api/v1/artists/${id}`
+            : selectedEntity.tab === 'producers'
+              ? `/api/v1/users/${id}`
+              : `/api/v1/media/${id}`;
+      try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          headers: { Accept: 'application/json' },
+        });
+        if (!response.ok) {
+          throw new Error(`This Fwaya page could not be loaded (${response.status}).`);
+        }
+        const payload: unknown = await response.json();
+        if (!payload || typeof payload !== 'object') {
+          throw new Error('This Fwaya page returned an unexpected response.');
+        }
+        const wrapper = payload as Record<string, unknown>;
+        const entity = (
+          wrapper.data ||
+          wrapper.playlist ||
+          wrapper.album ||
+          wrapper.artist ||
+          wrapper.user ||
+          payload
+        ) as Record<string, unknown>;
+        const rawTracks = [
+          entity.media,
+          entity.tracks,
+          entity.entries,
+          entity.items,
+        ].find(Array.isArray);
+        const mediaItems = Array.isArray(rawTracks)
+          ? rawTracks
+              .map((entry) =>
+                entry && typeof entry === 'object' && 'media' in entry
+                  ? (entry as { media?: unknown }).media
+                  : entry
+              )
+              .filter((entry): entry is ApiMedia =>
+                entry !== null && typeof entry === 'object'
+              )
+          : [];
+        if (!active) return;
+        setEntityTracks(
+          mediaItems
+            .map(normalizeTrack)
+            .filter((track): track is Track => track !== null)
+        );
+        const description = entity.description || entity.bio;
+        setEntityDescription(typeof description === 'string' ? description : '');
+      } catch (error) {
+        console.error('Unable to load native entity detail:', error);
+        if (active) {
+          setEntityError(error instanceof Error ? error.message : 'This page could not be loaded.');
+        }
+      } finally {
+        if (active) setEntityLoading(false);
+      }
+    };
+
+    void loadEntity();
+    return () => {
+      active = false;
+    };
+  }, [entityRetry, selectedEntity]);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setBannerIndex((index) => (index + 1) % BANNER_IMAGES.length);
     }, 5000);
@@ -1008,7 +1198,15 @@ export default function App() {
       if (libraryTab === 'downloads') {
         return downloadedTracks.map(asDownloadedTrack);
       }
-      return tracks.filter((track) => savedTrackIds.includes(track.id));
+      return tracks.filter((track) =>
+        savedTrackIds.includes(track.id) || serverLikedTrackIds.includes(track.id)
+      );
+    }
+
+    if (screen === 'recent') {
+      return recentTrackIds
+        .map((id) => tracks.find((track) => track.id === id))
+        .filter((track): track is Track => track !== undefined);
     }
 
     if (screen === 'search') {
@@ -1023,11 +1221,71 @@ export default function App() {
     }
 
     return tracks;
-  }, [downloadedTracks, libraryTab, query, savedTrackIds, screen, tracks]);
+  }, [downloadedTracks, libraryTab, query, recentTrackIds, savedTrackIds, screen, serverLikedTrackIds, tracks]);
 
   const toggleSavedTrack = useCallback(
     async (track: Track) => {
       if (!savedTracksReady) return;
+
+      if (account) {
+        if (
+          savedTrackIds.includes(track.id) &&
+          !serverLikedTrackIds.includes(track.id)
+        ) {
+          const nextIds = savedTrackIds.filter((id) => id !== track.id);
+          setSavedTrackIds(nextIds);
+          try {
+            await AsyncStorage.setItem(SAVED_TRACKS_KEY, JSON.stringify(nextIds));
+          } catch (error) {
+            console.error('Unable to remove locally saved track:', error);
+            setSavedTrackIds(savedTrackIds);
+            Alert.alert('Could not remove track', 'Please try again.');
+          }
+          return;
+        }
+
+        try {
+          const firebaseUser = getMobileAuth().currentUser;
+          if (!firebaseUser) throw new Error('Your sign-in session is unavailable.');
+          const token = await firebaseUser.getIdToken();
+          const response = await fetch(
+            `${API_BASE_URL}/api/v1/media/${encodeURIComponent(track.id)}/interact/like`,
+            {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+            }
+          );
+          const payload: unknown = await response.json().catch(() => null);
+          if (!response.ok) {
+            throw new Error(`This track could not be updated (${response.status}).`);
+          }
+          if (!payload || typeof payload !== 'object' || !('liked' in payload) ||
+            typeof payload.liked !== 'boolean') {
+            throw new Error('The like service returned an unexpected response.');
+          }
+          setServerLikedTrackIds((existing) =>
+            payload.liked
+              ? [...new Set([...existing, track.id])]
+              : existing.filter((id) => id !== track.id)
+          );
+          if (savedTrackIds.includes(track.id)) {
+            const nextLocalIds = savedTrackIds.filter((id) => id !== track.id);
+            setSavedTrackIds(nextLocalIds);
+            void AsyncStorage.setItem(SAVED_TRACKS_KEY, JSON.stringify(nextLocalIds)).catch((error) => {
+              console.error('Unable to clear transferred saved track:', error);
+              Alert.alert('Saved tracks not updated', 'The server change succeeded, but the local copy could not be updated.');
+            });
+          }
+          return;
+        } catch (error) {
+          console.error('Could not update liked track:', error);
+          Alert.alert(
+            'Could not update liked tracks',
+            error instanceof Error ? error.message : 'Please try again.'
+          );
+          return;
+        }
+      }
 
       const nextIds = savedTrackIds.includes(track.id)
         ? savedTrackIds.filter((id) => id !== track.id)
@@ -1042,7 +1300,7 @@ export default function App() {
         Alert.alert('Could not save track', 'Please try saving this track again.');
       }
     },
-    [savedTrackIds, savedTracksReady]
+    [account, savedTrackIds, savedTracksReady, serverLikedTrackIds]
   );
 
   const downloadTrack = useCallback(async (track: Track) => {
@@ -1307,7 +1565,7 @@ export default function App() {
 
   const renderTrack = ({ item }: { item: Track }) => {
     const isCurrentTrack = currentTrack?.id === item.id;
-    const isSaved = savedTrackIds.includes(item.id);
+    const isSaved = savedTrackIds.includes(item.id) || serverLikedTrackIds.includes(item.id);
     const isDownloaded = downloadedTracks.some((download) => download.mediaId === item.id);
     const isLocked =
       !item.localDownload &&
@@ -1459,27 +1717,6 @@ export default function App() {
     return homeSections[sectionKey[tab as Exclude<HomeTab, 'for-you' | 'local'>]] || [];
   };
 
-  const sectionPaths: Record<HomeTab, string> = {
-    'for-you': '/browse',
-    local: '/browse',
-    videos: '/videos',
-    'new-releases': '/new-releases',
-    playlists: '/playlist',
-    trending: '/trending',
-    artists: '/artists',
-    producers: '/artists?role=producer',
-    albums: '/albums',
-    eps: '/albums?type=EP',
-    'top-charts': '/top-charts',
-  };
-
-  const entityPath = (tab: HomeTab, id: string | number) => {
-    const encodedId = encodeURIComponent(String(id));
-    if (tab === 'producers') return `/artists/${encodedId}?role=producer`;
-    if (tab === 'eps') return `/albums/${encodedId}?type=EP`;
-    return `${sectionPaths[tab].split('?')[0]}/${encodedId}`;
-  };
-
   const renderMediaRow = (title: string, tab: HomeTab, items: HomeItem[]) => {
     const mediaTracks = tracksFromItems(items);
     if (mediaTracks.length === 0) return null;
@@ -1532,7 +1769,7 @@ export default function App() {
           data={items}
           horizontal
           keyExtractor={(item, index) => String(item.id ?? `${tab}-${index}`)}
-          renderItem={({ item, index }) => {
+          renderItem={({ item }) => {
             const name =
               item.title || item.name || item.displayName || item.producerName ||
               item.username || `Fwaya ${title.toLowerCase().replace(/s$/, '')}`;
@@ -1541,7 +1778,7 @@ export default function App() {
             return (
               <Pressable
                 accessibilityRole="button"
-                onPress={() => openWebSection(entityPath(tab, item.id || index))}
+                onPress={() => setSelectedEntity({ tab, item })}
                 style={({ pressed }) => [styles.entityCard, pressed && styles.pressed]}
               >
                 <Image
@@ -1660,6 +1897,15 @@ export default function App() {
   };
 
   const contentScrollRef = useRef<FlatList<Track>>(null);
+  const openHomeSection = (tab: HomeTab) => {
+    setMoreOpen(false);
+    setScreen('home');
+    setHomeTab(tab);
+    if (tab === 'local' && localTracks.length === 0 && !localTracksLoading) {
+      void loadLocalTracks();
+    }
+    contentScrollRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
   const listHeader = (
     <View>
       <View style={styles.topBar}>
@@ -1758,9 +2004,17 @@ export default function App() {
         </>
       ) : (
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionEyebrow}>{screen === 'search' ? 'DISCOVER' : 'YOUR COLLECTION'}</Text>
+          <Text style={styles.sectionEyebrow}>
+            {screen === 'search' ? 'DISCOVER' : screen === 'recent' ? 'YOUR LISTENING' : 'YOUR COLLECTION'}
+          </Text>
           <Text style={styles.sectionTitle}>
-            {screen === 'search' ? 'Search music' : libraryTab === 'downloads' ? 'Fwaya Downloads' : 'Saved tracks'}
+            {screen === 'search'
+              ? 'Search music'
+              : screen === 'recent'
+                ? 'Recently played'
+                : libraryTab === 'downloads'
+                  ? 'Fwaya Downloads'
+                  : 'Saved tracks'}
           </Text>
           {screen === 'saved' && (
             <View style={styles.libraryTabs}>
@@ -1826,7 +2080,9 @@ export default function App() {
                 : 'Your collection starts here'
               : screen === 'search'
                 ? 'No matches yet'
-                : 'No tracks to show yet'}
+                : screen === 'recent'
+                  ? 'Nothing played yet'
+                  : 'No tracks to show yet'}
           </Text>
           <Text style={styles.emptyCopy}>
             {screen === 'saved'
@@ -1835,7 +2091,9 @@ export default function App() {
                 : 'Tap the heart beside a track to save it for later.'
               : screen === 'search'
                 ? 'Try another track, artist, or genre.'
-                : 'Pull down to refresh the catalog.'}
+                : screen === 'recent'
+                  ? 'Tracks you play will appear here on this device.'
+                  : 'Pull down to refresh the catalog.'}
           </Text>
         </>
       )}
@@ -2115,7 +2373,68 @@ export default function App() {
               <Text style={styles.nowPlayingLabel}>MORE</Text>
               <View style={styles.closePlayerButton} />
             </View>
-            <View style={styles.moreOptions}>
+            <ScrollView contentContainerStyle={styles.moreOptions} showsVerticalScrollIndicator={false}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  setMoreOpen(false);
+                  setScreen('search');
+                }}
+                style={({ pressed }) => [styles.moreOption, pressed && styles.pressed]}
+              >
+                <Text style={styles.moreOptionTitle}>Browse and search</Text>
+                <Text style={styles.moreOptionDescription}>Find tracks across the Fwaya catalog</Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  setMoreOpen(false);
+                  setScreen('recent');
+                }}
+                style={({ pressed }) => [styles.moreOption, pressed && styles.pressed]}
+              >
+                <Text style={styles.moreOptionTitle}>Recently played</Text>
+                <Text style={styles.moreOptionDescription}>Continue listening to tracks you played</Text>
+              </Pressable>
+              {HOME_TABS.filter(({ key }) => key !== 'for-you').map(({ key, label }) => (
+                <Pressable
+                  accessibilityRole="button"
+                  key={key}
+                  onPress={() => openHomeSection(key)}
+                  style={({ pressed }) => [styles.moreOption, pressed && styles.pressed]}
+                >
+                  <Text style={styles.moreOptionTitle}>{label}</Text>
+                  <Text style={styles.moreOptionDescription}>
+                    {key === 'local'
+                      ? 'Play audio stored on this device'
+                      : `Explore ${label.toLocaleLowerCase()} on Fwaya`}
+                  </Text>
+                </Pressable>
+              ))}
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  setMoreOpen(false);
+                  setLibraryTab('saved');
+                  setScreen('saved');
+                }}
+                style={({ pressed }) => [styles.moreOption, pressed && styles.pressed]}
+              >
+                <Text style={styles.moreOptionTitle}>Saved tracks</Text>
+                <Text style={styles.moreOptionDescription}>Open your personal collection</Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  setMoreOpen(false);
+                  setLibraryTab('downloads');
+                  setScreen('saved');
+                }}
+                style={({ pressed }) => [styles.moreOption, pressed && styles.pressed]}
+              >
+                <Text style={styles.moreOptionTitle}>Downloads</Text>
+                <Text style={styles.moreOptionDescription}>Play music saved for offline listening</Text>
+              </Pressable>
               <Pressable
                 accessibilityRole="button"
                 onPress={() => {
@@ -2165,7 +2484,95 @@ export default function App() {
                 <Text style={styles.moreOptionTitle}>Help & support</Text>
                 <Text style={styles.moreOptionDescription}>Find answers or contact Fwaya</Text>
               </Pressable>
+            </ScrollView>
+          </SafeAreaView>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          onRequestClose={() => setSelectedEntity(null)}
+          presentationStyle="pageSheet"
+          visible={selectedEntity !== null}
+        >
+          <SafeAreaView style={styles.accountScreen}>
+            <View style={styles.accountHeader}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Close details"
+                onPress={() => setSelectedEntity(null)}
+                style={styles.closePlayerButton}
+              >
+                <Text style={styles.closePlayerText}>×</Text>
+              </Pressable>
+              <Text style={styles.nowPlayingLabel}>
+                {selectedEntity?.tab === 'eps' ? 'EP' : selectedEntity?.tab?.toUpperCase()}
+              </Text>
+              <View style={styles.closePlayerButton} />
             </View>
+            {selectedEntity && (
+              <ScrollView contentContainerStyle={styles.detailContent} showsVerticalScrollIndicator={false}>
+                <Image
+                  source={{
+                    uri:
+                      selectedEntity.item.avatarUrl ||
+                      selectedEntity.item.artCoverUrl ||
+                      selectedEntity.item.coverArt ||
+                      selectedEntity.item.coverUrl ||
+                      selectedEntity.item.thumbnailUrl ||
+                      DEFAULT_COVER,
+                  }}
+                  style={[
+                    styles.detailCover,
+                    (selectedEntity.tab === 'artists' || selectedEntity.tab === 'producers') &&
+                      styles.artistImage,
+                  ]}
+                />
+                <Text style={styles.detailTitle}>
+                  {selectedEntity.item.title ||
+                    selectedEntity.item.name ||
+                    selectedEntity.item.displayName ||
+                    selectedEntity.item.producerName ||
+                    selectedEntity.item.username ||
+                    'Fwaya'}
+                </Text>
+                {entityDescription ? (
+                  <Text style={styles.detailDescription}>{entityDescription}</Text>
+                ) : null}
+                {entityTracks.length > 0 && (
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => void playTrack(entityTracks[0], entityTracks)}
+                    style={({ pressed }) => [styles.heroButton, pressed && styles.pressed]}
+                  >
+                    <Text style={styles.heroButtonText}>PLAY ALL</Text>
+                  </Pressable>
+                )}
+                {entityLoading ? (
+                  <ActivityIndicator color={palette.accent} size="large" style={styles.localLoader} />
+                ) : entityError ? (
+                  <View style={styles.homeEmpty}>
+                    <Text accessibilityRole="alert" style={styles.emptyCopy}>{entityError}</Text>
+                    <Pressable
+                      accessibilityRole="button"
+                      onPress={() => setEntityRetry((attempt) => attempt + 1)}
+                      style={styles.heroButton}
+                    >
+                      <Text style={styles.heroButtonText}>TRY AGAIN</Text>
+                    </Pressable>
+                  </View>
+                ) : entityTracks.length > 0 ? (
+                  <View style={styles.detailTrackList}>
+                    {entityTracks.map((track) => (
+                      <View key={track.id}>{renderTrack({ item: track })}</View>
+                    ))}
+                  </View>
+                ) : (
+                  <View style={styles.homeEmpty}>
+                    <Text style={styles.emptyCopy}>No public tracks are available here yet.</Text>
+                  </View>
+                )}
+              </ScrollView>
+            )}
           </SafeAreaView>
         </Modal>
 
@@ -2661,6 +3068,19 @@ function createStyles(palette: AppPalette) {
   moreOption: { backgroundColor: palette.surface, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14 },
   moreOptionTitle: { color: palette.text, fontSize: 14, fontWeight: '700' },
   moreOptionDescription: { color: palette.muted, fontSize: 11, marginTop: 4 },
+  detailContent: { paddingBottom: 32, paddingTop: 12 },
+  detailCover: {
+    alignSelf: 'center',
+    aspectRatio: 1,
+    backgroundColor: palette.surfaceRaised,
+    borderRadius: 18,
+    height: 220,
+    marginBottom: 18,
+    width: 220,
+  },
+  detailTitle: { color: palette.text, fontSize: 24, fontWeight: '800', textAlign: 'center' },
+  detailDescription: { color: palette.muted, fontSize: 13, lineHeight: 20, marginTop: 10 },
+  detailTrackList: { marginTop: 18 },
   accountContent: { flexGrow: 1, justifyContent: 'center', paddingBottom: 35 },
   accountEmail: { color: palette.text, fontSize: 20, fontWeight: '800', marginTop: 10 },
   accountMembership: { color: palette.muted, fontSize: 14, marginTop: 8 },
