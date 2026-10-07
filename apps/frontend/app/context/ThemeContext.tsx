@@ -60,7 +60,7 @@ function applyPalette(palette: Palette) {
     root.style.setProperty("--primary-dark", PLATFORM_BACKGROUND);
     root.style.setProperty("--primary-dark-darker", PLATFORM_BACKGROUND);
     root.style.setProperty("--dark-bg", PLATFORM_BACKGROUND);
-    root.style.setProperty("--card", rgb(palette.surface));
+    root.style.setProperty("--card", PLATFORM_BACKGROUND);
     root.style.setProperty("--border", rgb(palette.surface));
     root.style.setProperty("--input", rgb(palette.surface));
     root.style.setProperty("--muted", rgb(palette.surface));

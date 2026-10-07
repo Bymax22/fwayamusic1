@@ -10,6 +10,7 @@ export async function GET() {
     const start = Date.now();
     const res = await fetch(`${baseUrl}/api/v1/media/homepage-sections`, {
       headers: { Accept: 'application/json' },
+      cache: 'no-store',
     });
 
     const upstreamMs = Date.now() - start;
@@ -21,7 +22,12 @@ export async function GET() {
     }
 
     const data = await res.json();
-    return NextResponse.json(data, { headers: { 'x-upstream-ms': String(upstreamMs) } });
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'no-store',
+        'x-upstream-ms': String(upstreamMs),
+      },
+    });
   } catch (error) {
     console.error('Failed to fetch homepage-sections:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });

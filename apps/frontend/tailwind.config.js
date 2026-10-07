@@ -17,60 +17,60 @@ module.exports = {
     extend: {
       colors: {
         // Semantic colors mapped to CSS variables
-        purple: "rgb(var(--primary-accent) / <alpha-value>)",
-        charcoal: "rgb(var(--card) / <alpha-value>)",
-        border: "rgb(var(--border) / <alpha-value>)",
-        input: "rgb(var(--input) / <alpha-value>)",
-        ring: "rgb(var(--ring) / <alpha-value>)",
-        background: "rgb(var(--background) / <alpha-value>)",
-        foreground: "rgb(var(--foreground) / <alpha-value>)",
+        purple: "rgba(var(--primary-accent), <alpha-value>)",
+        charcoal: "rgba(var(--card), <alpha-value>)",
+        border: "rgba(var(--border), <alpha-value>)",
+        input: "rgba(var(--input), <alpha-value>)",
+        ring: "rgba(var(--ring), <alpha-value>)",
+        background: "rgba(var(--background), <alpha-value>)",
+        foreground: "rgba(var(--foreground), <alpha-value>)",
         
         // Primary colors with opacity variants
         primary: {
-          DEFAULT: "rgb(var(--primary-accent) / <alpha-value>)",
+          DEFAULT: "rgba(var(--primary-accent), <alpha-value>)",
           dark: {
-            DEFAULT: "rgb(var(--primary-dark) / <alpha-value>)",
-            50: "rgb(var(--primary-dark) / 0.5)",
-            95: "rgb(var(--primary-dark) / 0.95)",
+            DEFAULT: "rgba(var(--primary-dark), <alpha-value>)",
+            50: "rgba(var(--primary-dark), 0.5)",
+            95: "rgba(var(--primary-dark), 0.95)",
           },
-          light: "rgb(var(--primary-light) / <alpha-value>)",
-          foreground: "rgb(var(--foreground))",
+          light: "rgba(var(--primary-light), <alpha-value>)",
+          foreground: "rgba(var(--foreground), 1)",
         },
         
         // Accent colors
         accent: {
-          DEFAULT: "rgb(var(--primary-accent) / <alpha-value>)",
-          light: "rgb(var(--accent-light) / <alpha-value>)",
-          foreground: "rgb(var(--foreground))",
+          DEFAULT: "rgba(var(--primary-accent), <alpha-value>)",
+          light: "rgba(var(--accent-light), <alpha-value>)",
+          foreground: "rgba(var(--foreground), 1)",
         },
         
         // Card colors
         card: {
-          DEFAULT: "rgb(var(--card) / <alpha-value>)",
-          foreground: "rgb(var(--card-foreground))",
+          DEFAULT: "rgba(var(--card), <alpha-value>)",
+          foreground: "rgba(var(--card-foreground), 1)",
         },
         
         // Destructive colors
         destructive: {
-          DEFAULT: "rgb(var(--primary-accent) / <alpha-value>)",
-          foreground: "rgb(var(--foreground))",
+          DEFAULT: "rgba(var(--primary-accent), <alpha-value>)",
+          foreground: "rgba(var(--foreground), 1)",
         },
         
         // Muted colors
         muted: {
-          DEFAULT: "rgb(var(--muted) / <alpha-value>)",
-          foreground: "rgb(var(--muted-foreground))",
+          DEFAULT: "rgba(var(--muted), <alpha-value>)",
+          foreground: "rgba(var(--muted-foreground), 1)",
         },
         
         // Popover colors
         popover: {
-          DEFAULT: "rgb(var(--card) / <alpha-value>)",
-          foreground: "rgb(var(--foreground))",
+          DEFAULT: "rgba(var(--card), <alpha-value>)",
+          foreground: "rgba(var(--foreground), 1)",
         },
         
         // Custom colors
-        'dark-bg': "rgb(var(--dark-bg) / <alpha-value>)",
-        'light-bg': "rgb(var(--light-bg) / <alpha-value>)",
+        'dark-bg': "rgba(var(--dark-bg), <alpha-value>)",
+        'light-bg': "rgba(var(--light-bg), <alpha-value>)",
       },
       borderRadius: {
         sm: "var(--radius-sm)",

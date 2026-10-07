@@ -60,6 +60,8 @@ export default function GuestWelcome() {
   const [otherVideos, setOtherVideos] = useState<any[]>([]);
   const [playlists, setPlaylists] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [homepageLoadError, setHomepageLoadError] = useState<string | null>(null);
+  const [homepageRetryCount, setHomepageRetryCount] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const router = useRouter();
@@ -135,10 +137,9 @@ export default function GuestWelcome() {
 
   const loadCachedHomepageData = () => {
     if (typeof window === 'undefined') return false;
-    const cached = sessionStorage.getItem(cacheKey);
-    if (!cached) return false;
-
     try {
+      const cached = localStorage.getItem(cacheKey);
+      if (!cached) return false;
       const data = JSON.parse(cached);
       if (data && typeof data === 'object') {
         setQuickPicks(data.quickPicks || []);
@@ -164,7 +165,7 @@ export default function GuestWelcome() {
   const saveCachedHomepageData = (data: any) => {
     if (typeof window === 'undefined') return;
     try {
-      sessionStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheKey, JSON.stringify(data));
     } catch (error) {
       console.warn('Failed to save guest welcome cache:', error);
     }
@@ -587,15 +588,49 @@ export default function GuestWelcome() {
         if (showLoader) setIsLoading(true);
         const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-        // Fetch homepage sections (featured songs, trending, beats, top charts) via frontend proxy
-        // Use timeout to avoid hanging the preloader
-        let homepageResponse = await fetchJsonWithTimeout(`/api/media/homepage-sections`, 6000);
-        if (!homepageResponse.ok) {
-          console.warn('Homepage proxy failed, retrying direct backend call');
-          homepageResponse = await fetchJsonWithTimeout(`${API_BASE}/api/v1/media/homepage-sections`, 8000);
+        let homepageResponse: Response | null = null;
+        let homepageRequestError: unknown;
+        for (let attempt = 0; attempt < 2 && !homepageResponse; attempt += 1) {
+          try {
+            const response = await fetchJsonWithTimeout(
+              '/api/media/homepage-sections',
+              10000,
+              { cache: 'no-store' }
+            );
+            if (!response.ok) {
+              throw new Error(`Homepage request failed (${response.status}).`);
+            }
+            homepageResponse = response;
+          } catch (error) {
+            homepageRequestError = error;
+            if (attempt === 0) {
+              console.warn('Homepage request failed on first attempt; retrying:', error);
+              await new Promise((resolve) => setTimeout(resolve, 350));
+            }
+          }
         }
-        if (!homepageResponse.ok) throw new Error('Failed to fetch homepage data');
+        if (!homepageResponse && process.env.NEXT_PUBLIC_API_URL) {
+          try {
+            const response = await fetchJsonWithTimeout(
+              `${API_BASE}/api/v1/media/homepage-sections`,
+              8000,
+              { cache: 'no-store' }
+            );
+            if (!response.ok) {
+              throw new Error(`Direct homepage request failed (${response.status}).`);
+            }
+            homepageResponse = response;
+          } catch (error) {
+            homepageRequestError = error;
+          }
+        }
+        if (!homepageResponse) {
+          throw homepageRequestError instanceof Error
+            ? homepageRequestError
+            : new Error('Homepage data could not be loaded.');
+        }
         const homepageData = await homepageResponse.json();
+        setHomepageLoadError(null);
 
         const processedQuickPicks = homepageData.featuredSongs && Array.isArray(homepageData.featuredSongs)
           ? homepageData.featuredSongs.map((song: any) => ({
@@ -705,14 +740,39 @@ export default function GuestWelcome() {
             }))
           : [];
 
+        setQuickPicks(processedQuickPicks);
+        setTrendingNow(processedTrendingNow);
+        setTopCharts(processedTopCharts);
+        setFeaturedAlbums(processedFeaturedAlbums);
+        setFeaturedEPs(processedDedicatedEPs.length > 0 ? processedDedicatedEPs : processedFeaturedEPs);
+        setBeats(processedBeats);
+        setMusicVideos(processedMusicVideos);
+        setOtherVideos(processedOtherVideos);
+        setIsLoading(false);
+
+        const fetchOptionalData = async (url: string, section: string) => {
+          try {
+            const response = await fetchJsonWithTimeout(url, 5000, { cache: 'no-store' });
+            if (!response.ok) {
+              throw new Error(`${section} request failed (${response.status}).`);
+            }
+            return await response.json();
+          } catch (error) {
+            console.warn(`Homepage ${section} could not be loaded:`, error);
+            return null;
+          }
+        };
+        const [artistsData, playlistsData, producersData] = await Promise.all([
+          fetchOptionalData('/api/artists', 'artists'),
+          fetchOptionalData('/api/playlist', 'playlists'),
+          fetchOptionalData('/api/users', 'producers'),
+        ]);
+
         const processedArtists: any[] = [];
         const processedPlaylists: any[] = [];
         const processedFeaturedProducers: any[] = [];
 
-        const artistsUrl = `/api/artists`;
-        const artistsResponse = await fetchJsonWithTimeout(artistsUrl, 3000);
-        if (artistsResponse.ok) {
-          const artistsData = await artistsResponse.json();
+        if (artistsData) {
           const artistsArray = Array.isArray(artistsData) ? artistsData : artistsData.artists || [];
           artistsArray.forEach((artist: any) => {
             processedArtists.push({
@@ -723,10 +783,7 @@ export default function GuestWelcome() {
           });
         }
 
-        const playlistsUrl = `/api/playlist`;
-        const playlistsResponse = await fetchJsonWithTimeout(playlistsUrl, 3000);
-        if (playlistsResponse.ok) {
-          const playlistsData = await playlistsResponse.json();
+        if (playlistsData) {
           const playlistsArray = Array.isArray(playlistsData) ? playlistsData : playlistsData.playlists || [];
           playlistsArray.forEach((playlist: any) => {
             processedPlaylists.push({
@@ -736,14 +793,7 @@ export default function GuestWelcome() {
           });
         }
 
-        const producersUrl = `/api/users`;
-        let producersResponse = await fetchJsonWithTimeout(producersUrl, 3000);
-        if (!producersResponse.ok) {
-          console.warn('Producers proxy failed, retrying direct backend call');
-          producersResponse = await fetchJsonWithTimeout(`${API_BASE}/api/v1/users`, 5000);
-        }
-        if (producersResponse.ok) {
-          const producersData = await producersResponse.json();
+        if (producersData) {
           const producersArray = Array.isArray(producersData)
             ? producersData
             : Array.isArray(producersData.data)
@@ -771,33 +821,30 @@ export default function GuestWelcome() {
           }
         }
 
-        setQuickPicks(processedQuickPicks);
-        setTrendingNow(processedTrendingNow);
-        setTopCharts(processedTopCharts);
-        setFeaturedAlbums(processedFeaturedAlbums);
-        setFeaturedEPs(processedDedicatedEPs.length > 0 ? processedDedicatedEPs : processedFeaturedEPs);
-        setBeats(processedBeats);
-        setMusicVideos(processedMusicVideos);
-        setOtherVideos(processedOtherVideos);
-        setFeaturedArtists(processedArtists);
-        setPlaylists(processedPlaylists);
-        setFeaturedProducers(processedFeaturedProducers);
+        if (artistsData) setFeaturedArtists(processedArtists);
+        if (playlistsData) setPlaylists(processedPlaylists);
+        if (producersData) setFeaturedProducers(processedFeaturedProducers);
 
-        saveCachedHomepageData({
-          quickPicks: processedQuickPicks,
-          featuredAlbums: processedFeaturedAlbums,
-          featuredEPs: processedDedicatedEPs.length > 0 ? processedDedicatedEPs : processedFeaturedEPs,
-          featuredArtists: processedArtists,
-          featuredProducers: processedFeaturedProducers,
-          beats: processedBeats,
-          trendingNow: processedTrendingNow,
-          topCharts: processedTopCharts,
-          musicVideos: processedMusicVideos,
-          otherVideos: processedOtherVideos,
-          playlists: processedPlaylists,
-        });
+        if (artistsData && playlistsData && producersData) {
+          saveCachedHomepageData({
+            quickPicks: processedQuickPicks,
+            featuredAlbums: processedFeaturedAlbums,
+            featuredEPs: processedDedicatedEPs.length > 0 ? processedDedicatedEPs : processedFeaturedEPs,
+            featuredArtists: processedArtists,
+            featuredProducers: processedFeaturedProducers,
+            beats: processedBeats,
+            trendingNow: processedTrendingNow,
+            topCharts: processedTopCharts,
+            musicVideos: processedMusicVideos,
+            otherVideos: processedOtherVideos,
+            playlists: processedPlaylists,
+          });
+        }
       } catch (error) {
         console.error('Error fetching homepage data:', error);
+        setHomepageLoadError(
+          error instanceof Error ? error.message : 'Music could not be loaded. Please try again.'
+        );
         setIsLoading(false);
       } finally {
         setIsLoading(false);
@@ -818,7 +865,7 @@ export default function GuestWelcome() {
       try {
         unsub = await subscribe('media:uploaded', (payload: any) => {
           try {
-            if (typeof window !== 'undefined') sessionStorage.removeItem(cacheKey);
+            if (typeof window !== 'undefined') localStorage.removeItem(cacheKey);
             void fetchHomepageData(false);
           } catch (err) {
             console.error('Homepage realtime handler error:', err);
@@ -834,7 +881,7 @@ export default function GuestWelcome() {
     return () => {
       if (unsub) unsub();
     };
-  }, []);
+  }, [homepageRetryCount]);
 
   const defaultHeroSlides = [
     {
@@ -1124,20 +1171,37 @@ export default function GuestWelcome() {
 
       <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-background relative">
       {isLoading && (
-        <div className="absolute inset-0 bg-background/85 backdrop-blur-xl flex items-center justify-center z-50">
+        <div className="homepage-loading-backdrop absolute inset-0 flex items-center justify-center z-50">
           <motion.div
-            className="relative"
+            className="relative flex items-center justify-center"
             animate={{ opacity: [0.7, 1, 0.7], scale: [0.95, 1.05, 0.95] }}
             transition={{ duration: 2.2, ease: "easeInOut", repeat: Infinity }}
           >
+            <div aria-hidden="true" className="homepage-loading-glow absolute inset-[-48px] rounded-full" />
             <Image
               src="/fwaya-lp-01.png"
               alt="Fwaya loading logo"
               width={96}
               height={96}
-              className="block"
+              className="relative block drop-shadow-[0_0_24px_rgba(var(--primary-accent),0.25)]"
             />
           </motion.div>
+        </div>
+      )}
+
+      {homepageLoadError && (
+        <div
+          role="alert"
+          className="absolute left-4 right-4 top-20 z-[60] mx-auto flex max-w-3xl items-center justify-between gap-3 rounded-xl border border-white/10 bg-black px-4 py-3 text-sm text-white/80 shadow-xl"
+        >
+          <span>Music could not be loaded just now. Please try again.</span>
+          <button
+            type="button"
+            onClick={() => setHomepageRetryCount((count) => count + 1)}
+            className="shrink-0 rounded-full bg-purple/85 px-4 py-2 font-semibold text-white transition hover:bg-purple/75"
+          >
+            Retry
+          </button>
         </div>
       )}
 

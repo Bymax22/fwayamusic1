@@ -49,7 +49,7 @@
   --accent-light: 155, 93, 229;
   --dark-bg: 0, 0, 0;
   --light-bg: 255, 255, 255;
-  --card: 54, 69, 79;
+  --card: 0, 0, 0;
   --card-foreground: 255, 255, 255;
   --border: 54, 69, 79;
   --input: 54, 69, 79;
@@ -117,6 +117,18 @@ body {
 
 html {
   background: rgb(var(--background));
+}
+
+.homepage-loading-backdrop {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(var(--primary-accent), 0.16), transparent 52%),
+    linear-gradient(145deg, #08070b 0%, #000000 58%, #090610 100%);
+  backdrop-filter: blur(10px);
+}
+
+.homepage-loading-glow {
+  background: radial-gradient(circle, rgba(var(--primary-accent), 0.22), transparent 68%);
+  filter: blur(10px);
 }
 
 /* ===============================
