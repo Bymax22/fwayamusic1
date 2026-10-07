@@ -49,7 +49,7 @@ export default function VideoCard({
   return (
     <Link
       href={route}
-      className="block w-full rounded-2xl bg-black hover:bg-charcoal transition-colors"
+      className="block w-full rounded-2xl bg-background hover:bg-charcoal transition-colors"
       aria-label={`Open video ${title}`}
     >
       <div className="relative overflow-hidden rounded-2xl bg-charcoal">

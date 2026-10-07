@@ -336,7 +336,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-32">
+    <div className="min-h-screen bg-background text-white pb-32">
       {/* Hidden file inputs */}
       <input
         ref={avatarInputRef}
@@ -364,12 +364,12 @@ export default function ProfilePage() {
             setProfile((prev) => ({ ...prev, coverImage: '/covers/banner1.jpg' }));
           }}
         />
-        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-background/20" />
         {isEditing && (
           <button
             onClick={() => coverInputRef.current?.click()}
             disabled={uploadingCover}
-            className="absolute top-4 right-4 px-4 py-2 bg-black/50 hover:bg-black/70 text-white rounded-lg transition-colors flex items-center gap-2"
+            className="absolute top-4 right-4 px-4 py-2 bg-background/50 hover:bg-background/70 text-white rounded-lg transition-colors flex items-center gap-2"
           >
             {uploadingCover ? <Loader className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
             {uploadingCover ? 'Uploading...' : 'Change Cover'}
@@ -380,7 +380,7 @@ export default function ProfilePage() {
       {/* Profile Content */}
       <div className="px-6 -mt-16 relative z-10">
         {/* Profile Header */}
-        <div className="rounded-[2rem] bg-[#000000]/90 p-8 shadow-xl shadow-charcoal/20 mb-8">
+        <div className="rounded-[2rem] bg-background/90 p-8 shadow-xl shadow-charcoal/20 mb-8">
         <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-end">
         {/* Avatar */}
           <div className="relative">
@@ -395,7 +395,7 @@ export default function ProfilePage() {
               <button
                 onClick={() => avatarInputRef.current?.click()}
                 disabled={uploadingAvatar}
-                className="absolute bottom-2 right-2 w-8 h-8 bg-[#36454F] hover:bg-[#9B5DE5] rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-colors"
+                className="absolute bottom-2 right-2 w-8 h-8 bg-card hover:bg-primary rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-colors"
               >
                 {uploadingAvatar ? <Loader className="w-4 h-4 animate-spin" /> : <Edit3 className="w-4 h-4" />}
               </button>
@@ -424,22 +424,22 @@ export default function ProfilePage() {
                   <>
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#36454F]/80 text-white rounded-xl transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-card hover:bg-card/80 text-white rounded-xl transition-colors"
                     >
                       <Edit3 className="w-4 h-4" />
                       Edit Profile
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#36454F]/80 text-white rounded-xl transition-colors">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-card hover:bg-card/80 text-white rounded-xl transition-colors">
                       <Settings className="w-4 h-4" />
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={handleSaveProfile} disabled={saving} className="px-4 py-2 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
+                    <button onClick={handleSaveProfile} disabled={saving} className="px-4 py-2 bg-card hover:bg-primary text-white rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
                       {saving ? <Loader className="w-4 h-4 animate-spin" /> : null}
                       {saving ? 'Saving...' : 'Save'}
                     </button>
-                    <button onClick={() => { setIsEditing(false); setEditForm({ displayName: profile.displayName, bio: profile.bio, location: profile.location, website: profile.website }); }} className="px-4 py-2 bg-[#36454F] hover:bg-[#36454F]/80 text-white rounded-xl transition-colors">
+                    <button onClick={() => { setIsEditing(false); setEditForm({ displayName: profile.displayName, bio: profile.bio, location: profile.location, website: profile.website }); }} className="px-4 py-2 bg-card hover:bg-card/80 text-white rounded-xl transition-colors">
                       Cancel
                     </button>
                   </>
@@ -518,11 +518,11 @@ export default function ProfilePage() {
           <div className="lg:col-span-2">
             <h2 className="text-2xl font-bold text-white mb-6">Recent Activity</h2>
 
-            <div className="rounded-[2rem] bg-[#000000]/90 p-6 shadow-xl shadow-charcoal/20">
+            <div className="rounded-[2rem] bg-background/90 p-6 shadow-xl shadow-charcoal/20">
               {profile.recentActivity.length > 0 ? (
                 <div className="space-y-4">
                   {profile.recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-center gap-4 p-3 bg-[#000000] rounded-3xl">
+                    <div key={activity.id} className="flex items-center gap-4 p-3 bg-background rounded-3xl">
                       <div className={`p-2 rounded-lg ${getActivityColor(activity.type)} bg-opacity-20`}>
                         {getActivityIcon(activity.type)}
                       </div>
@@ -550,7 +550,7 @@ export default function ProfilePage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Stats */}
-            <div className="rounded-[2rem] bg-[#000000]/90 p-6 shadow-xl shadow-charcoal/20">
+            <div className="rounded-[2rem] bg-background/90 p-6 shadow-xl shadow-charcoal/20">
               <h3 className="text-lg font-bold text-white mb-4">Listening Stats</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
@@ -569,7 +569,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Account Details */}
-            <div className="rounded-[2rem] bg-[#000000]/90 p-6 shadow-xl shadow-charcoal/20">
+            <div className="rounded-[2rem] bg-background/90 p-6 shadow-xl shadow-charcoal/20">
               <h3 className="text-lg font-bold text-white mb-4">Account Details</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">

@@ -200,7 +200,7 @@ export default function AdvertisingAdminPage() {
     return <main className="p-8 text-white">Access denied.</main>;
 
   return (
-    <main className="min-h-screen bg-[#FFFFFF] p-6 text-black md:p-10">
+    <main className="min-h-screen bg-card p-6 text-foreground md:p-10">
       <div className="mx-auto max-w-6xl space-y-8">
         <div>
           <h1 className="text-3xl font-bold">Advertising</h1>
@@ -213,7 +213,7 @@ export default function AdvertisingAdminPage() {
             {message}
           </p>
         )}
-        <section className="rounded-2xl bg-white p-5 shadow-sm">
+        <section className="rounded-2xl bg-card p-5 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold">Create campaign</h2>
           <form onSubmit={createCampaign} className="grid gap-3 md:grid-cols-5">
             <input
@@ -221,20 +221,20 @@ export default function AdvertisingAdminPage() {
               placeholder="Campaign name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="rounded-xl bg-white/10 px-3 py-2 text-black"
+              className="rounded-xl bg-white/10 px-3 py-2 text-foreground"
             />
             <input
               required
               type="datetime-local"
               value={form.startAt}
               onChange={(e) => setForm({ ...form, startAt: e.target.value })}
-              className="rounded-xl bg-white/10 px-3 py-2 text-black"
+              className="rounded-xl bg-white/10 px-3 py-2 text-foreground"
             />
             <input
               type="datetime-local"
               value={form.endAt}
               onChange={(e) => setForm({ ...form, endAt: e.target.value })}
-              className="rounded-xl bg-white/10 px-3 py-2 text-black"
+              className="rounded-xl bg-white/10 px-3 py-2 text-foreground"
             />
             <input
               min="1"
@@ -244,7 +244,7 @@ export default function AdvertisingAdminPage() {
               onChange={(e) =>
                 setForm({ ...form, frequencyCap: Number(e.target.value) })
               }
-              className="rounded-xl bg-white/10 px-3 py-2 text-black"
+              className="rounded-xl bg-white/10 px-3 py-2 text-foreground"
             />
             <button
               disabled={busy}
@@ -257,7 +257,7 @@ export default function AdvertisingAdminPage() {
             Frequency cap is per browser. Cooldown is 300 seconds by default.
           </p>
         </section>
-        <section className="rounded-2xl bg-white p-5 shadow-sm">
+        <section className="rounded-2xl bg-card p-5 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold">Upload creative</h2>
           <form onSubmit={addCreative} className="grid gap-3 md:grid-cols-6">
             <select
@@ -266,7 +266,7 @@ export default function AdvertisingAdminPage() {
               onChange={(e) =>
                 setCreative({ ...creative, campaignId: e.target.value })
               }
-              className="rounded-xl bg-white/10 px-3 py-2 text-black"
+              className="rounded-xl bg-white/10 px-3 py-2 text-foreground"
             >
               <option value="">Choose campaign</option>
               {campaigns.map((c) => (
@@ -282,7 +282,7 @@ export default function AdvertisingAdminPage() {
               onChange={(e) =>
                 setCreative({ ...creative, title: e.target.value })
               }
-              className="rounded-xl bg-white/10 px-3 py-2 text-black"
+              className="rounded-xl bg-white/10 px-3 py-2 text-foreground"
             />
             <input
               placeholder="Click-through URL"
@@ -290,14 +290,14 @@ export default function AdvertisingAdminPage() {
               onChange={(e) =>
                 setCreative({ ...creative, clickUrl: e.target.value })
               }
-              className="rounded-xl bg-white/10 px-3 py-2 text-black"
+              className="rounded-xl bg-white/10 px-3 py-2 text-foreground"
             />
             <select
               value={creative.mediaType}
               onChange={(e) =>
                 setCreative({ ...creative, mediaType: e.target.value })
               }
-              className="rounded-xl bg-white/10 px-3 py-2 text-black"
+              className="rounded-xl bg-white/10 px-3 py-2 text-foreground"
             >
               <option value="IMAGE">Image</option>
               <option value="VIDEO">Video</option>
@@ -305,7 +305,7 @@ export default function AdvertisingAdminPage() {
             <select
               name="placement"
               defaultValue="HOME_BANNER"
-              className="rounded-xl bg-white/10 px-3 py-2 text-black"
+              className="rounded-xl bg-white/10 px-3 py-2 text-foreground"
             >
               <option value="HOME_BANNER">Home banner</option>
               <option value="DISCOVER_BANNER">Discover banner</option>
@@ -338,7 +338,7 @@ export default function AdvertisingAdminPage() {
           {campaigns.map((campaign) => (
             <section
               key={campaign.id}
-              className="rounded-2xl bg-white p-5 shadow-sm"
+              className="rounded-2xl bg-card p-5 shadow-sm"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -365,7 +365,7 @@ export default function AdvertisingAdminPage() {
                   </div>
                   <button
                     onClick={() => toggleCampaign(campaign)}
-                    className="inline-flex items-center gap-1 rounded-xl bg-black px-3 py-2 text-sm text-white"
+                    className="inline-flex items-center gap-1 rounded-xl bg-background px-3 py-2 text-sm text-white"
                   >
                     {campaign.isActive ? (
                       <Pause size={15} />

@@ -171,7 +171,7 @@ export default function BeatPackManagement({ packId }: { packId?: number }) {
   // Grid view when no pack is selected
   if (!packId && packs.length > 0) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-card rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold mb-6">Beat Packs</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {packs.map((pack) => (
@@ -189,7 +189,7 @@ export default function BeatPackManagement({ packId }: { packId?: number }) {
                 )}
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-charcoal">{pack.title}</h3>
+                <h3 className="font-bold text-card-foreground">{pack.title}</h3>
                 <p className="text-sm text-white/60 mb-2">{pack.genre} • {pack.beatCount} beats</p>
                 <div className="flex justify-between items-center">
                   <span className={`px-2 py-1 rounded text-xs font-bold ${
@@ -215,7 +215,7 @@ export default function BeatPackManagement({ packId }: { packId?: number }) {
   // Detailed view
   if (analytics && selectedPack) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-card rounded-lg shadow-lg p-6">
         {error && (
           <div className="mb-4 p-4 bg-purple/20 border border-purple/60 rounded text-purple/90">
             {error}
@@ -345,7 +345,7 @@ export default function BeatPackManagement({ packId }: { packId?: number }) {
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="flex-1 px-4 py-2 bg-charcoal/50 hover:bg-charcoal/50 text-charcoal rounded-lg transition"
+                className="flex-1 px-4 py-2 bg-charcoal/50 hover:bg-charcoal/50 text-card-foreground rounded-lg transition"
               >
                 Cancel
               </button>

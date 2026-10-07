@@ -118,11 +118,11 @@ export default function RecentlyPlayedPage() {
 
   if (loading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen">
+      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-card/95 to-background/95 min-h-screen">
         <div className="animate-pulse">
-          <div className="h-8 bg-[#36454F] rounded w-1/4 mb-8"></div>
+          <div className="h-8 bg-card rounded w-1/4 mb-8"></div>
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-20 bg-[#36454F] rounded-lg mb-4"></div>
+            <div key={i} className="h-20 bg-card rounded-lg mb-4"></div>
           ))}
         </div>
       </div>
@@ -131,7 +131,7 @@ export default function RecentlyPlayedPage() {
 
   return (
     <Protected>
-      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen pb-32">
+      <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-card/95 to-background/95 min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Recently Played</h1>
@@ -139,9 +139,9 @@ export default function RecentlyPlayedPage() {
       </div>
 
       {/* Tracks List */}
-      <div className="bg-[#36454F]/70 rounded-xl overflow-hidden">
+      <div className="bg-card/70 rounded-xl overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-12 gap-4 items-center p-4 border-b border-[#36454F] text-white/60 text-sm font-medium">
+        <div className="grid grid-cols-12 gap-4 items-center p-4 border-b border-card text-white/60 text-sm font-medium">
           <div className="col-span-1">#</div>
           <div className="col-span-5">TITLE</div>
           <div className="col-span-2">PLAYS</div>
@@ -152,14 +152,14 @@ export default function RecentlyPlayedPage() {
         </div>
 
         {recentTracks.length > 0 ? (
-          <div className="divide-y divide-[#36454F]">
+          <div className="divide-y divide-card">
             {recentTracks.map((track, index) => (
               <div 
                 key={track.id} 
                 className={`grid grid-cols-12 gap-4 items-center p-4 transition-colors ${
                   currentTrack?.id === track.id 
-                    ? 'bg-[#36454F]'
-                    : 'hover:bg-[#36454F]/50'
+                    ? 'bg-card'
+                    : 'hover:bg-card/50'
                 }`}
               >
                 <div className="col-span-1 text-white/60">
@@ -169,7 +169,7 @@ export default function RecentlyPlayedPage() {
                     </button>
                   ) : (
                     <span 
-                      className="cursor-pointer hover:text-[#36454F] transition-colors"
+                      className="cursor-pointer hover:text-card-foreground transition-colors"
                       onClick={() => handlePlay(track)}
                     >
                       {index + 1}
@@ -188,7 +188,7 @@ export default function RecentlyPlayedPage() {
                   />
                   <div>
                     <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(track.id) && isPlaying} className={`font-medium ${
-                      currentTrack?.id === track.id ? 'text-[#36454F]' : 'text-white'
+                      currentTrack?.id === track.id ? 'text-card-foreground' : 'text-white'
                     }`}>
                       {track.title}
                     </ScrollingTrackTitle>
@@ -205,7 +205,7 @@ export default function RecentlyPlayedPage() {
                 </div>
                 
                 <div className="col-span-2 flex justify-end gap-3 items-center">
-                  <button className="text-white/60 hover:text-[#36454F] transition-colors">
+                  <button className="text-white/60 hover:text-card-foreground transition-colors">
                     <Heart className="w-5 h-5" />
                   </button>
                   <span className="text-white/60 text-sm w-12 text-right">

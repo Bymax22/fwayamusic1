@@ -228,9 +228,9 @@ const NewsDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#000000] to-[#36454F] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-background to-card flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#36454F] mx-auto mb-3"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-card mx-auto mb-3"></div>
           <p className="text-white">Loading news article...</p>
         </div>
       </div>
@@ -239,13 +239,13 @@ const NewsDetailPage = () => {
 
   if (error || !news) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#000000] to-[#36454F] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-background to-card flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">News Article Not Found</h1>
           <p className="text-white/60 mb-6">{error}</p>
           <button
             onClick={() => router.back()}
-            className="bg-[#36454F] text-white px-6 py-2 rounded-lg hover:bg-[#36454F] transition-colors"
+            className="bg-card text-white px-6 py-2 rounded-lg hover:bg-card transition-colors"
           >
             Go Back
           </button>
@@ -255,14 +255,14 @@ const NewsDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#000000] to-[#36454F]">
+    <div className="min-h-screen bg-gradient-to-b from-background to-card">
       {/* Header */}
       <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#000000]/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80" />
         <div className="relative z-10 p-6">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-white hover:text-[#36454F] transition-colors mb-6"
+            className="flex items-center gap-2 text-white hover:text-card-foreground transition-colors mb-6"
           >
             <FaArrowLeft size={20} />
             Back to News
@@ -280,7 +280,7 @@ const NewsDetailPage = () => {
               }}
             />
             <div className="absolute top-4 left-4">
-              <span className="bg-[#36454F] text-white px-3 py-1 rounded-full text-sm font-medium">
+              <span className="bg-card text-white px-3 py-1 rounded-full text-sm font-medium">
                 {news.category}
               </span>
             </div>
@@ -322,8 +322,8 @@ const NewsDetailPage = () => {
                 onClick={handleLike}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                   isLiked
-                    ? 'bg-[#36454F] text-white'
-                    : 'bg-[#36454F] text-white hover:bg-[#36454F]'
+                    ? 'bg-card text-white'
+                    : 'bg-card text-white hover:bg-card'
                 }`}
               >
                 {isLiked ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
@@ -332,7 +332,7 @@ const NewsDetailPage = () => {
 
               <button
                 onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-2 bg-[#36454F] text-white px-4 py-2 rounded-lg hover:bg-[#36454F] transition-colors"
+                className="flex items-center gap-2 bg-card text-white px-4 py-2 rounded-lg hover:bg-card transition-colors"
               >
                 <FaComment size={16} />
                 {news.comments.length} Comments
@@ -340,7 +340,7 @@ const NewsDetailPage = () => {
 
               <button
                 onClick={handleShare}
-                className="flex items-center gap-2 bg-[#36454F] text-white px-4 py-2 rounded-lg hover:bg-[#36454F] transition-colors"
+                className="flex items-center gap-2 bg-card text-white px-4 py-2 rounded-lg hover:bg-card transition-colors"
               >
                 <FaShare size={16} />
                 Share
@@ -353,7 +353,7 @@ const NewsDetailPage = () => {
       {/* Article Content */}
       <div className="px-6 pb-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-[#36454F]/50 rounded-lg p-6 md:p-8">
+          <div className="bg-card/50 rounded-lg p-6 md:p-8">
             <div
               className="prose prose-lg prose-invert max-w-none"
               dangerouslySetInnerHTML={{ __html: news.content }}
@@ -361,7 +361,7 @@ const NewsDetailPage = () => {
           </div>
 
           {/* Reactions Section */}
-          <div className="bg-[#36454F]/50 rounded-lg p-6 mt-6">
+          <div className="bg-card/50 rounded-lg p-6 mt-6">
             <h3 className="text-xl font-bold text-white mb-4">React to this article</h3>
             <div className="flex flex-wrap gap-2">
               {[
@@ -380,7 +380,7 @@ const NewsDetailPage = () => {
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                     userReactions[news.id] === type
                       ? `${getReactionColor(type)} bg-opacity-20`
-                      : 'text-white/60 hover:text-white hover:bg-[#36454F]'
+                      : 'text-white/60 hover:text-white hover:bg-card'
                   }`}
                 >
                   <Icon size={16} />
@@ -397,7 +397,7 @@ const NewsDetailPage = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="bg-[#36454F]/50 rounded-lg p-6 mt-6"
+                className="bg-card/50 rounded-lg p-6 mt-6"
               >
                 <h3 className="text-xl font-bold text-white mb-6">Comments ({news.comments.length})</h3>
 
@@ -417,14 +417,14 @@ const NewsDetailPage = () => {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         placeholder="Write a comment..."
-                        className="w-full bg-[#36454F] text-white rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-[#36454F]"
+                        className="w-full bg-card text-white rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                         rows={3}
                       />
                       <div className="flex justify-end mt-2">
                         <button
                           onClick={handleComment}
                           disabled={!newComment.trim()}
-                          className="bg-[#36454F] text-white px-4 py-2 rounded-lg hover:bg-[#36454F] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          className="bg-card text-white px-4 py-2 rounded-lg hover:bg-card disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           Comment
                         </button>
@@ -447,7 +447,7 @@ const NewsDetailPage = () => {
                           />
                         </div>
                         <div className="flex-1">
-                          <div className="bg-[#36454F] rounded-lg p-3">
+                          <div className="bg-card rounded-lg p-3">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="font-medium text-white">{comment.user.displayName}</span>
                               <span className="text-xs text-white/60">
@@ -500,7 +500,7 @@ const NewsDetailPage = () => {
                                       value={newReply}
                                       onChange={(e) => setNewReply(e.target.value)}
                                       placeholder="Write a reply..."
-                                      className="w-full bg-[#36454F] text-white rounded-lg p-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#36454F]"
+                                      className="w-full bg-card text-white rounded-lg p-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                                       rows={2}
                                     />
                                     <div className="flex justify-end gap-2 mt-2">
@@ -513,7 +513,7 @@ const NewsDetailPage = () => {
                                       <button
                                         onClick={() => handleReply(comment.id)}
                                         disabled={!newReply.trim()}
-                                        className="bg-[#36454F] text-white px-3 py-1 rounded text-sm hover:bg-[#36454F] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        className="bg-card text-white px-3 py-1 rounded text-sm hover:bg-card disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                       >
                                         Reply
                                       </button>
@@ -538,7 +538,7 @@ const NewsDetailPage = () => {
                                     />
                                   </div>
                                   <div className="flex-1">
-                                    <div className="bg-[#36454F] rounded-lg p-2">
+                                    <div className="bg-card rounded-lg p-2">
                                       <div className="flex items-center gap-2 mb-1">
                                         <span className="font-medium text-white text-sm">{reply.user.displayName}</span>
                                         <span className="text-xs text-white/60">

@@ -78,7 +78,7 @@ export default function SignInPopup({ isOpen, onClose, onSuccess, defaultRole = 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-background/60 backdrop-blur-sm z-50"
             onClick={onClose}
           />
           
@@ -89,9 +89,9 @@ export default function SignInPopup({ isOpen, onClose, onSuccess, defaultRole = 
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md p-6"
           >
-            <div className="bg-white rounded-2xl p-6 shadow-xl border border-white/20">
+            <div className="bg-card rounded-2xl p-6 shadow-xl border border-white/20">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-charcoal">Sign In</h2>
+                <h2 className="text-2xl font-bold text-card-foreground">Sign In</h2>
                 <button
                   onClick={onClose}
                   className="p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -108,8 +108,8 @@ export default function SignInPopup({ isOpen, onClose, onSuccess, defaultRole = 
                     onClick={() => setFormData({ ...formData, role })}
                     className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                       formData.role === role
-                        ? 'bg-white text-charcoal shadow-sm'
-                        : 'text-white/60 hover:text-charcoal'
+                        ? 'bg-card text-card-foreground shadow-sm'
+                        : 'text-white/60 hover:text-card-foreground'
                     }`}
                   >
                     {role === 'USER' && 'Listener'}
@@ -129,7 +129,7 @@ export default function SignInPopup({ isOpen, onClose, onSuccess, defaultRole = 
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg text-charcoal placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg text-card-foreground placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                     placeholder="your@email.com"
                   />
                   {errors.email && <p className="text-purple/75 text-sm mt-1">{errors.email}</p>}
@@ -144,7 +144,7 @@ export default function SignInPopup({ isOpen, onClose, onSuccess, defaultRole = 
                       type={showPassword ? 'text' : 'password'}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg text-charcoal placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-10"
+                      className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg text-card-foreground placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-10"
                       placeholder="••••••••"
                     />
                     <button
@@ -194,7 +194,7 @@ export default function SignInPopup({ isOpen, onClose, onSuccess, defaultRole = 
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleSocialSignIn('google')}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white text-charcoal rounded-lg hover:bg-white/5 transition-colors font-medium border border-white/20 text-sm"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-card text-card-foreground rounded-lg hover:bg-white/5 transition-colors font-medium border border-white/20 text-sm"
                   >
                     <FaGoogle className="w-4 h-4" />
                     Google

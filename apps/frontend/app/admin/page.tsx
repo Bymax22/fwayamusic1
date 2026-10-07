@@ -129,7 +129,7 @@ function AdminDashboard() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#FFFFFF] px-5 py-8 text-black sm:px-8 lg:px-10">
+    <main className="min-h-screen bg-card px-5 py-8 text-foreground sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl space-y-8">
         <header className="flex flex-col gap-4 pb-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -137,7 +137,7 @@ function AdminDashboard() {
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Admin overview</h1>
             <p className="mt-2 text-sm text-white/60">Monitor the platform, moderate content, and keep operations moving.</p>
           </div>
-          <button onClick={() => void loadStats()} className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm text-white shadow-lg shadow-black/10 hover:bg-purple/90" disabled={loading}>
+          <button onClick={() => void loadStats()} className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-4 py-3 text-sm text-white shadow-lg shadow-black/10 hover:bg-purple/90" disabled={loading}>
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh data
           </button>
         </header>
@@ -146,32 +146,32 @@ function AdminDashboard() {
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {statCards.map(({ label, value, detail, icon: Icon, color }) => (
-            <article key={label} className="rounded-2xl bg-white p-5 shadow-sm">
+            <article key={label} className="rounded-2xl bg-card p-5 shadow-sm">
               <div className="flex items-start justify-between"><span className="text-sm text-white/60">{label}</span><Icon size={19} className="text-purple/90" /></div>
-              <p className="mt-5 text-2xl font-semibold text-black">{loading ? '...' : value}</p>
+              <p className="mt-5 text-2xl font-semibold text-foreground">{loading ? '...' : value}</p>
               <p className="mt-1 text-xs text-white/60">{detail}</p>
             </article>
           ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-2xl bg-white p-5 shadow-sm">
+          <div className="rounded-2xl bg-card p-5 shadow-sm">
             <div className="flex items-center justify-between"><div><h2 className="text-lg font-semibold">Platform mix</h2><p className="mt-1 text-sm text-white/60">Current audience and content distribution.</p></div><BarChart3 className="text-purple/90" size={21} /></div>
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[['Artists', stats.totalArtists], ['Producers', stats.totalProducers], ['Premium users', stats.premiumUsers], ['Videos', stats.videoCount]].map(([label, value]) => <div key={label} className="rounded-xl bg-white/10 p-4"><p className="text-xs text-white/60">{label}</p><p className="mt-2 text-xl font-semibold text-black">{Number(value).toLocaleString()}</p></div>)}
+              {[['Artists', stats.totalArtists], ['Producers', stats.totalProducers], ['Premium users', stats.premiumUsers], ['Videos', stats.videoCount]].map(([label, value]) => <div key={label} className="rounded-xl bg-white/10 p-4"><p className="text-xs text-white/60">{label}</p><p className="mt-2 text-xl font-semibold text-foreground">{Number(value).toLocaleString()}</p></div>)}
             </div>
           </div>
-          <div className="rounded-2xl bg-black p-5 text-white shadow-sm"><div className="flex items-center justify-between"><div><h2 className="text-lg font-semibold">Live status</h2><p className="mt-1 text-sm text-white/55">Realtime events plus periodic reconciliation.</p></div><span className="h-3 w-3 rounded-full bg-purple/60" /></div><div className="mt-8 grid grid-cols-2 gap-3"><div><p className="text-xs text-white/45">Active now</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers}</p></div><div><p className="text-xs text-white/45">Active 24h</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers24h}</p></div></div><p className="mt-4 text-xs text-white/45">{lastUpdated ? `Last synced ${lastUpdated.toLocaleTimeString()}` : 'Connecting to data service...'}</p></div>
+          <div className="rounded-2xl bg-background p-5 text-white shadow-sm"><div className="flex items-center justify-between"><div><h2 className="text-lg font-semibold">Live status</h2><p className="mt-1 text-sm text-white/55">Realtime events plus periodic reconciliation.</p></div><span className="h-3 w-3 rounded-full bg-purple/60" /></div><div className="mt-8 grid grid-cols-2 gap-3"><div><p className="text-xs text-white/45">Active now</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers}</p></div><div><p className="text-xs text-white/45">Active 24h</p><p className="mt-1 text-2xl font-semibold">{analytics.activeUsers24h}</p></div></div><p className="mt-4 text-xs text-white/45">{lastUpdated ? `Last synced ${lastUpdated.toLocaleTimeString()}` : 'Connecting to data service...'}</p></div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-2xl bg-white p-5 shadow-sm"><h2 className="text-lg font-semibold">Active users by location</h2><p className="mt-1 text-sm text-white/60">Users active in the last 24 hours.</p><div className="mt-5 space-y-3">{analytics.usersByCountry.length === 0 ? <p className="text-sm text-white/60">No location activity yet.</p> : analytics.usersByCountry.slice(0, 8).map((entry) => <div key={entry.country} className="flex items-center justify-between text-sm"><span>{entry.country}</span><span className="font-medium text-purple/90">{entry.count}</span></div>)}</div></div>
+          <div className="rounded-2xl bg-card p-5 shadow-sm"><h2 className="text-lg font-semibold">Active users by location</h2><p className="mt-1 text-sm text-white/60">Users active in the last 24 hours.</p><div className="mt-5 space-y-3">{analytics.usersByCountry.length === 0 ? <p className="text-sm text-white/60">No location activity yet.</p> : analytics.usersByCountry.slice(0, 8).map((entry) => <div key={entry.country} className="flex items-center justify-between text-sm"><span>{entry.country}</span><span className="font-medium text-purple/90">{entry.count}</span></div>)}</div></div>
           <div className="rounded-2xl bg-purple/90 p-5 text-white shadow-sm"><h2 className="text-lg font-semibold">Approval queue</h2><p className="mt-1 text-sm text-purple/70">Role-based signups waiting for review.</p><p className="mt-5 text-4xl font-semibold">{analytics.pendingApplications}</p><Link href="/admin/applications" className="mt-4 inline-flex text-sm text-white hover:underline">Open approval workspace <ArrowUpRight size={14} className="ml-1" /></Link></div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Audience trends</h2><p className="mt-1 text-sm text-white/50">Daily active users and new signups captured by the control center.</p><div className="mt-5 h-64"><ResponsiveContainer width="100%" height="100%"><LineChart data={analytics.series}><CartesianGrid stroke="rgba(255, 255, 255, .08)" /><XAxis dataKey="day" tick={{ fill: '#9B5DE5', fontSize: 11 }} /><YAxis tick={{ fill: '#9B5DE5', fontSize: 11 }} /><Tooltip contentStyle={{ background: '#000000', border: '1px solid rgba(255, 255, 255, .1)' }} /><Legend /><Line type="monotone" dataKey="activeUsers" stroke="#9B5DE5" name="Active now" /><Line type="monotone" dataKey="activeUsers24h" stroke="#36454F" name="Active 24h" /><Line type="monotone" dataKey="signups" stroke="#9B5DE5" name="Signups" /></LineChart></ResponsiveContainer></div></div>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Approvals and engagement</h2><p className="mt-1 text-sm text-white/50">Operational outcomes and platform activity over time.</p><div className="mt-5 h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={analytics.series}><CartesianGrid stroke="rgba(255, 255, 255, .08)" /><XAxis dataKey="day" tick={{ fill: '#9B5DE5', fontSize: 11 }} /><YAxis tick={{ fill: '#9B5DE5', fontSize: 11 }} /><Tooltip contentStyle={{ background: '#000000', border: '1px solid rgba(255, 255, 255, .1)' }} /><Legend /><Bar dataKey="approvals" fill="#36454F" name="Approvals" /><Bar dataKey="downloads" fill="#9B5DE5" name="Downloads" /><Bar dataKey="shares" fill="#9B5DE5" name="Shares" /></BarChart></ResponsiveContainer></div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Audience trends</h2><p className="mt-1 text-sm text-white/50">Daily active users and new signups captured by the control center.</p><div className="mt-5 h-64"><ResponsiveContainer width="100%" height="100%"><LineChart data={analytics.series}><CartesianGrid stroke="rgba(255, 255, 255, .08)" /><XAxis dataKey="day" tick={{ fill: 'rgb(var(--primary-accent))', fontSize: 11 }} /><YAxis tick={{ fill: 'rgb(var(--primary-accent))', fontSize: 11 }} /><Tooltip contentStyle={{ background: 'rgb(var(--background))', border: '1px solid rgba(255, 255, 255, .1)' }} /><Legend /><Line type="monotone" dataKey="activeUsers" stroke="rgb(var(--primary-accent))" name="Active now" /><Line type="monotone" dataKey="activeUsers24h" stroke="rgb(var(--card))" name="Active 24h" /><Line type="monotone" dataKey="signups" stroke="rgb(var(--primary-accent))" name="Signups" /></LineChart></ResponsiveContainer></div></div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"><h2 className="text-lg font-semibold">Approvals and engagement</h2><p className="mt-1 text-sm text-white/50">Operational outcomes and platform activity over time.</p><div className="mt-5 h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={analytics.series}><CartesianGrid stroke="rgba(255, 255, 255, .08)" /><XAxis dataKey="day" tick={{ fill: 'rgb(var(--primary-accent))', fontSize: 11 }} /><YAxis tick={{ fill: 'rgb(var(--primary-accent))', fontSize: 11 }} /><Tooltip contentStyle={{ background: 'rgb(var(--background))', border: '1px solid rgba(255, 255, 255, .1)' }} /><Legend /><Bar dataKey="approvals" fill="rgb(var(--card))" name="Approvals" /><Bar dataKey="downloads" fill="rgb(var(--primary-accent))" name="Downloads" /><Bar dataKey="shares" fill="rgb(var(--primary-accent))" name="Shares" /></BarChart></ResponsiveContainer></div></div>
         </section>
 
         <section><div className="mb-4 flex items-end justify-between"><div><h2 className="text-lg font-semibold">Operations</h2><p className="mt-1 text-sm text-white/50">Jump directly into connected admin workflows.</p></div><ArrowUpRight className="text-white/35" size={20} /></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{links.map(({ href, label, detail, icon: Icon }) => <Link key={href} href={href} className="group rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition hover:border-purple/40 hover:bg-purple/75/[0.08]"><Icon size={20} className="text-purple/45" /><h3 className="mt-5 font-semibold">{label}</h3><p className="mt-1 text-sm text-white/50">{detail}</p><span className="mt-5 inline-flex text-xs text-purple/30 opacity-0 transition group-hover:opacity-100">Open workspace <ArrowUpRight size={14} className="ml-1" /></span></Link>)}</div></section>

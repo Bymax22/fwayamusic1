@@ -520,7 +520,7 @@ export default function GuestWelcome() {
         />
       </div>
       {homepageSearchOpen && homepageSearchQuery.trim() && (
-        <div className="absolute left-0 right-0 top-full mt-2 max-h-[min(70vh,36rem)] overflow-y-auto rounded-2xl bg-black p-3 shadow-2xl">
+        <div className="absolute left-0 right-0 top-full mt-2 max-h-[min(70vh,36rem)] overflow-y-auto rounded-2xl bg-background p-3 shadow-2xl">
           <div className="mb-2 flex items-center justify-between px-1">
             <div>
               <p className="text-sm font-semibold text-white">Search results</p>
@@ -546,7 +546,7 @@ export default function GuestWelcome() {
                     setHomepageSearchOpen(false);
                     router.push(result.href);
                   }}
-                  className="flex w-full items-center gap-3 rounded-xl bg-black p-2 text-left transition hover:bg-white/10"
+                  className="flex w-full items-center gap-3 rounded-xl bg-background p-2 text-left transition hover:bg-white/10"
                 >
                   <Image
                     src={result.image}
@@ -1063,8 +1063,8 @@ export default function GuestWelcome() {
   return (
     <>
       {showRoleModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm px-4">
-          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#000000] shadow-xl shadow-black/40 sm:p-5">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/75 backdrop-blur-sm px-4">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl bg-background shadow-xl shadow-black/40 sm:p-5">
             <div className="px-4 py-3 sm:px-5 sm:py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -1124,9 +1124,9 @@ export default function GuestWelcome() {
         </div>
       )}
 
-      <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-black relative">
+      <div className="h-screen w-full overflow-x-hidden px-0 py-3 bg-background relative">
       {isLoading && (
-        <div className="absolute inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-background/85 backdrop-blur-xl flex items-center justify-center z-50">
           <motion.div
             className="relative"
             animate={{ opacity: [0.7, 1, 0.7], scale: [0.95, 1.05, 0.95] }}
@@ -1218,7 +1218,7 @@ export default function GuestWelcome() {
 
                     {showUserMenu && (
                       <>
-                        <div className="absolute right-0 top-full z-50 mt-2 w-52 rounded-3xl bg-black/95 backdrop-blur-xl shadow-xl shadow-black/50 overflow-hidden">
+                        <div className="absolute right-0 top-full z-50 mt-2 w-52 rounded-3xl bg-background/95 backdrop-blur-xl shadow-xl shadow-black/50 overflow-hidden">
                           <div className="px-4 py-3">
                             <div className="flex items-center gap-3">
                               <div className="relative h-10 w-10 rounded-full overflow-hidden bg-purple/75">
@@ -1377,7 +1377,7 @@ export default function GuestWelcome() {
                           <div className="w-full h-full bg-gradient-to-br from-purple/75 to-purple/75" />
                         )}
                         {isVideo ? (
-                          <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                          <span className="absolute inset-0 flex items-center justify-center bg-background/25">
                             <FaPlay className="text-sm text-white" />
                           </span>
                         ) : (
@@ -1385,7 +1385,7 @@ export default function GuestWelcome() {
                             type="button"
                             aria-label={`Add ${item.title} to a playlist`}
                             onClick={(event) => handleAddToPlaylist(event, item)}
-                            className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple/85"
+                            className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/75 text-white hover:bg-purple/85"
                           >
                             <FaPlus className="text-xs" />
                           </button>
@@ -1419,7 +1419,7 @@ export default function GuestWelcome() {
                     <div className="relative aspect-video">
                       {item.coverPreview ? (
                         <div
-                          className="absolute inset-0 bg-black"
+                          className="absolute inset-0 bg-background"
                           style={{
                             backgroundImage: `url(${item.coverPreview})`,
                             backgroundSize: 'cover',
@@ -1439,7 +1439,7 @@ export default function GuestWelcome() {
                       ) : (
                         <div className="absolute inset-0 bg-gradient-to-br from-purple/75 to-purple/75" />
                       )}
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-background/30 flex items-center justify-center">
                         <FaPlay className="text-white text-xl" />
                       </div>
                     </div>
@@ -1556,7 +1556,7 @@ export default function GuestWelcome() {
                       duration: beat.duration
                     })}
                   >
-                    <div className="relative aspect-[4/5] overflow-hidden bg-black/10">
+                    <div className="relative aspect-[4/5] overflow-hidden bg-background/10">
                       <div
                         className={`absolute inset-0 ${beat.artCoverUrl ? '' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
                         style={{
@@ -1612,7 +1612,7 @@ export default function GuestWelcome() {
                     })}
                   >
                     <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow mb-2">
-                      <div className="aspect-square relative overflow-hidden bg-black/10">
+                      <div className="aspect-square relative overflow-hidden bg-background/10">
                         {item.artCoverUrl ? (
                           <Image
                             src={item.artCoverUrl}
@@ -1627,7 +1627,7 @@ export default function GuestWelcome() {
                           type="button"
                           aria-label={`Add ${item.title} to a playlist`}
                           onClick={(event) => handleAddToPlaylist(event, item)}
-                          className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white hover:bg-purple/85"
+                          className="absolute bottom-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/75 text-white hover:bg-purple/85"
                         >
                           <FaPlus className="text-xs" />
                         </button>
@@ -1714,7 +1714,7 @@ export default function GuestWelcome() {
                   <div key={track.id || i} className="bg-white/5 p-3 rounded-lg hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-white/60 w-5 text-sm">{i + 1}</span>
-                      <div className="w-10 h-10 rounded-md overflow-hidden bg-black flex-shrink-0 relative">
+                      <div className="w-10 h-10 rounded-md overflow-hidden bg-background flex-shrink-0 relative">
                         {track.artCoverUrl ? (
                           <Image
                             src={track.artCoverUrl}
@@ -1810,7 +1810,7 @@ export default function GuestWelcome() {
                   >
                     <div className="rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow mb-2">
                       <div 
-                        className="aspect-square bg-black"
+                        className="aspect-square bg-background"
                         style={{
                           backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -1890,11 +1890,11 @@ export default function GuestWelcome() {
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
                 {topCharts.map((track: any, i: number) => (
-                  <div key={track.id || i} className="bg-[#000000] p-3 rounded-lg hover:bg-[#000000] transition-colors">
+                  <div key={track.id || i} className="bg-background p-3 rounded-lg hover:bg-background transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-white/60 w-5 text-sm">{i + 1}</span>
                       <div 
-                        className="w-10 h-10 rounded-md bg-black flex-shrink-0"
+                        className="w-10 h-10 rounded-md bg-background flex-shrink-0"
                         style={{
                           backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -1941,9 +1941,9 @@ export default function GuestWelcome() {
               </div>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {playlists.map((item: any, i: number) => (
-                  <div key={i} className="min-w-[120px] rounded-xl p-3 cursor-pointer hover:bg-[#000000] transition-colors flex-shrink-0 bg-transparent">
+                  <div key={i} className="min-w-[120px] rounded-xl p-3 cursor-pointer hover:bg-background transition-colors flex-shrink-0 bg-transparent">
                     <div 
-                      className="w-full aspect-square bg-black rounded-lg mb-2"
+                      className="w-full aspect-square bg-background rounded-lg mb-2"
                       style={{
                         backgroundImage: item.coverUrl ? `url(${item.coverUrl})` : undefined,
                         backgroundSize: 'cover',
@@ -1982,7 +1982,7 @@ export default function GuestWelcome() {
                   >
                     <div className="rounded-2xl overflow-hidden relative shadow-lg hover:shadow-xl transition-shadow mb-2">
                       <div 
-                        className="aspect-square bg-black"
+                        className="aspect-square bg-background"
                         style={{
                           backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -2046,7 +2046,7 @@ export default function GuestWelcome() {
                   <div key={i} onClick={() => goToAlbum(item.id, item.title)} role="button" tabIndex={0} className="min-w-[calc(50%-0.375rem)] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex-shrink-0 bg-transparent cursor-pointer">
                     <div className="relative">
                       <div 
-                        className="aspect-square bg-black"
+                        className="aspect-square bg-background"
                         style={{
                           backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -2071,11 +2071,11 @@ export default function GuestWelcome() {
               <h3 className="font-semibold mb-3">Top Charts</h3>
               <div className="space-y-3">
                 {topCharts.map((track: any, i: number) => (
-                  <div key={track.id || i} className="bg-[#000000] p-3 rounded-lg hover:bg-[#000000] transition-colors">
+                  <div key={track.id || i} className="bg-background p-3 rounded-lg hover:bg-background transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-white/60 w-5 text-sm">{i + 1}</span>
                       <div 
-                        className="w-10 h-10 rounded-md bg-black flex-shrink-0"
+                        className="w-10 h-10 rounded-md bg-background flex-shrink-0"
                         style={{
                           backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -2124,7 +2124,7 @@ export default function GuestWelcome() {
                   <Link key={i} href={`/artists/${artist.id}`} className="rounded-3xl bg-transparent p-4 block">
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-12 h-12 rounded-full bg-black flex-shrink-0"
+                        className="w-12 h-12 rounded-full bg-background flex-shrink-0"
                         style={{
                           backgroundImage: artist.avatarUrl ? `url(${artist.avatarUrl})` : undefined,
                           backgroundSize: 'cover',
@@ -2164,14 +2164,14 @@ export default function GuestWelcome() {
                   >
                     <div className="relative aspect-video">
                       <div
-                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
+                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-background' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
                         style={{
                           backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
                           backgroundPosition: 'center'
                         }}
                       />
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-background/30 flex items-center justify-center">
                         <FaPlay className="text-white text-xl" />
                       </div>
                     </div>
@@ -2208,14 +2208,14 @@ export default function GuestWelcome() {
                   >
                     <div className="relative aspect-video">
                       <div
-                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
+                        className={`absolute inset-0 ${item.artCoverUrl ? 'bg-background' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
                         style={{
                           backgroundImage: item.artCoverUrl ? `url(${item.artCoverUrl})` : undefined,
                           backgroundSize: 'cover',
                           backgroundPosition: 'center'
                         }}
                       />
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-background/30 flex items-center justify-center">
                         <FaPlay className="text-white text-xl" />
                       </div>
                     </div>
@@ -2279,7 +2279,7 @@ export default function GuestWelcome() {
       <div className="hidden lg:flex h-full gap-3 items-stretch">
 
         {/* SIDEBAR */}
-        <div className="w-60 h-full min-h-0 overflow-y-auto scrollbar-modern bg-[#000000]/60 backdrop-blur p-6 flex flex-col rounded-2xl">
+        <div className="w-60 h-full min-h-0 overflow-y-auto scrollbar-modern bg-background/60 backdrop-blur p-6 flex flex-col rounded-2xl">
          
 
           {[
@@ -2307,7 +2307,7 @@ export default function GuestWelcome() {
         </div>
 
         {/* MAIN */}
-        <div className="flex-1 h-full min-h-0 px-4 py-6 overflow-y-auto scrollbar-modern rounded-2xl bg-[#000000]/60">
+        <div className="flex-1 h-full min-h-0 px-4 py-6 overflow-y-auto scrollbar-modern rounded-2xl bg-background/60">
 
 
           {renderHomepageSearch('mb-6')}
@@ -2368,12 +2368,12 @@ export default function GuestWelcome() {
                         <Image src={image} alt={item.title || ''} fill className="object-cover" />
                       )}
                       {isVideo && (
-                        <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                        <span className="absolute inset-0 flex items-center justify-center bg-background/25">
                           <FaPlay className="text-white" />
                         </span>
                       )}
                     </div>
-                    <div className="bg-[#000000] p-3">
+                    <div className="bg-background p-3">
                       <p className="truncate text-xs font-medium text-white">{item.title}</p>
                       <p className="truncate text-xs text-white/60">
                         {item.user?.displayName || item.user?.username || (isVideo ? 'Fwaya video' : 'Unknown Artist')}
@@ -2429,7 +2429,7 @@ export default function GuestWelcome() {
                 >
                   {/* ALBUM COVER */}
                   <div
-                    className="aspect-[4/5] bg-black rounded-lg group-hover:scale-105 transition-transform"
+                    className="aspect-[4/5] bg-background rounded-lg group-hover:scale-105 transition-transform"
                     style={{
                       backgroundImage: album.artCoverUrl ? `url(${album.artCoverUrl})` : undefined,
                       backgroundSize: 'cover',
@@ -2437,7 +2437,7 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  <div className="p-3 bg-[#000000]">
+                  <div className="p-3 bg-background">
                     <p className="text-xs font-semibold truncate text-white mb-0.5">
                       {album.title}
                     </p>
@@ -2460,8 +2460,8 @@ export default function GuestWelcome() {
               <div className="grid grid-cols-6 gap-3">
                 {featuredEPs.slice(0, 6).map((ep: any, i: number) => (
                   <div key={i} onClick={() => goToAlbum(ep.id, ep.title)} role="button" tabIndex={0} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group">
-                    <div className="aspect-[4/5] bg-black group-hover:scale-105 transition-transform" style={{ backgroundImage: ep.artCoverUrl ? `url(${ep.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                    <div className="p-3 bg-[#000000]">
+                    <div className="aspect-[4/5] bg-background group-hover:scale-105 transition-transform" style={{ backgroundImage: ep.artCoverUrl ? `url(${ep.artCoverUrl})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                    <div className="p-3 bg-background">
                       <p className="text-xs font-semibold truncate text-white mb-0.5">{ep.title}</p>
                       <p className="text-xs text-white/60 truncate">{ep.user?.displayName || ep.user?.username || 'Unknown Artist'}</p>
                       <p className="text-xs text-white/60">{getTrackCount(ep) || 0} tracks</p>
@@ -2483,7 +2483,7 @@ export default function GuestWelcome() {
 
               <div className="grid grid-cols-6 gap-3">
               {featuredProducers.length === 0 ? (
-                <div className="col-span-6 rounded-xl border border-dashed border-white/10 bg-[#000000] p-6 text-center text-sm text-white/60">
+                <div className="col-span-6 rounded-xl border border-dashed border-white/10 bg-background p-6 text-center text-sm text-white/60">
                   No producers found right now.
                 </div>
               ) : (
@@ -2540,7 +2540,7 @@ export default function GuestWelcome() {
                   <div className="relative aspect-video">
                     {video.coverPreview ? (
                       <div
-                        className="absolute inset-0 bg-black"
+                        className="absolute inset-0 bg-background"
                         style={{
                           backgroundImage: `url(${video.coverPreview})`,
                           backgroundSize: 'cover',
@@ -2560,12 +2560,12 @@ export default function GuestWelcome() {
                     ) : (
                       <div className="absolute inset-0 bg-gradient-to-br from-purple/75 to-purple/75" />
                     )}
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/50 transition-colors">
+                    <div className="absolute inset-0 bg-background/30 flex items-center justify-center group-hover:bg-background/50 transition-colors">
                       <FaPlay className="text-white text-xl" />
                     </div>
                   </div>
 
-                  <div className="p-3 bg-[#000000]">
+                  <div className="p-3 bg-background">
                     <p className="text-xs font-medium truncate text-white">
                       {video.title}
                     </p>
@@ -2635,7 +2635,7 @@ export default function GuestWelcome() {
                 >
                   {/* IMAGE */}
                   <div
-                    className={`aspect-[4/5] ${track.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'} group-hover:scale-105 transition-transform`}
+                    className={`aspect-[4/5] ${track.artCoverUrl ? 'bg-background' : 'bg-gradient-to-br from-purple/75 to-purple/75'} group-hover:scale-105 transition-transform`}
                     style={{
                       backgroundImage: track.artCoverUrl ? `url(${track.artCoverUrl})` : undefined,
                       backgroundSize: 'cover',
@@ -2643,7 +2643,7 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  <div className="p-3 bg-[#000000]">
+                  <div className="p-3 bg-background">
                     <p className="text-xs font-medium truncate text-white">
                       {track.title}
                     </p>
@@ -2686,7 +2686,7 @@ export default function GuestWelcome() {
                 >
                   {/* PLAYLIST COVER */}
                   <div
-                    className={`aspect-[4/5] ${playlist.coverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'} rounded-lg group-hover:scale-105 transition-transform`}
+                    className={`aspect-[4/5] ${playlist.coverUrl ? 'bg-background' : 'bg-gradient-to-br from-purple/75 to-purple/75'} rounded-lg group-hover:scale-105 transition-transform`}
                     style={{
                       backgroundImage: playlist.coverUrl ? `url(${playlist.coverUrl})` : undefined,
                       backgroundSize: 'cover',
@@ -2694,7 +2694,7 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  <div className="p-3 bg-[#000000]">
+                  <div className="p-3 bg-background">
                     <p className="text-xs font-semibold truncate text-white mb-0.5">
                       {playlist.name || playlist.title}
                     </p>
@@ -2726,19 +2726,19 @@ export default function GuestWelcome() {
                 >
                   <div className="relative aspect-video">
                     <div
-                      className={`absolute inset-0 ${video.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
+                      className={`absolute inset-0 ${video.artCoverUrl ? 'bg-background' : 'bg-gradient-to-br from-purple/75 to-purple/75'}`}
                       style={{
                         backgroundImage: video.artCoverUrl ? `url(${video.artCoverUrl})` : undefined,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                       }}
                     />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/50 transition-colors">
+                    <div className="absolute inset-0 bg-background/30 flex items-center justify-center group-hover:bg-background/50 transition-colors">
                       <FaPlay className="text-white text-xl" />
                     </div>
                   </div>
 
-                  <div className="p-3 bg-[#000000]">
+                  <div className="p-3 bg-background">
                     <p className="text-xs font-medium truncate text-white">
                       {video.title}
                     </p>
@@ -2840,7 +2840,7 @@ export default function GuestWelcome() {
                   className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
                 >
                   <div
-                    className={`aspect-[4/5] ${beat.artCoverUrl ? 'bg-black' : 'bg-gradient-to-br from-purple/75 to-purple/75'} group-hover:scale-105 transition-transform`}
+                    className={`aspect-[4/5] ${beat.artCoverUrl ? 'bg-background' : 'bg-gradient-to-br from-purple/75 to-purple/75'} group-hover:scale-105 transition-transform`}
                     style={{
                       backgroundImage: beat.artCoverUrl ? `url(${beat.artCoverUrl})` : undefined,
                       backgroundSize: 'cover',
@@ -2848,7 +2848,7 @@ export default function GuestWelcome() {
                     }}
                   />
 
-                  <div className="p-3 bg-[#000000]">
+                  <div className="p-3 bg-background">
                     <p className="text-xs font-medium truncate text-white">
                       {beat.title}
                     </p>
@@ -2864,7 +2864,7 @@ export default function GuestWelcome() {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-64 h-full min-h-0 overflow-y-auto scrollbar-modern bg-[#000000]/60 backdrop-blur p-6 rounded-2xl">
+        <div className="w-64 h-full min-h-0 overflow-y-auto scrollbar-modern bg-background/60 backdrop-blur p-6 rounded-2xl">
           <h3 className="mb-6 font-semibold text-lg">Now Playing</h3>
 
           {/* Current Track */}

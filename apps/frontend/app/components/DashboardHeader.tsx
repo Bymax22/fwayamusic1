@@ -82,7 +82,7 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
   ];
 
   return (
-    <header className="bg-black/95 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50 lg:hidden">
+    <header className="bg-background/95 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50 lg:hidden">
       <div className="px-5 py-4">
         <div className="flex items-center justify-between">
           {/* Logo/Brand */}
@@ -128,7 +128,7 @@ export default function DashboardHeader({ showLogo = true, logoText = "Fwaya" }:
 
               {/* User Menu Dropdown */}
               {showUserMenu && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-black/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-xl z-50">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-background/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-xl z-50">
                   {/* User Info */}
                   <div className="px-4 py-3 border-b border-white/10">
                     <div className="flex items-center gap-3">

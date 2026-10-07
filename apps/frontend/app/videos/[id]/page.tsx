@@ -75,22 +75,22 @@ function VideoPageSkeleton({ onBack }: { onBack: () => void }) {
         >
           Back
         </button>
-        <div className="h-[420px] rounded-3xl bg-[#000000] animate-pulse" />
-        <div className="space-y-4 rounded-3xl bg-[#000000] p-6 shadow-lg shadow-black/20">
-          <div className="h-6 w-2/5 rounded-full bg-[#000000] animate-pulse" />
-          <div className="h-4 w-3/5 rounded-full bg-[#000000] animate-pulse" />
+        <div className="h-[420px] rounded-3xl bg-background animate-pulse" />
+        <div className="space-y-4 rounded-3xl bg-background p-6 shadow-lg shadow-black/20">
+          <div className="h-6 w-2/5 rounded-full bg-background animate-pulse" />
+          <div className="h-4 w-3/5 rounded-full bg-background animate-pulse" />
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="h-28 rounded-3xl bg-[#000000] animate-pulse" />
-            <div className="h-28 rounded-3xl bg-[#000000] animate-pulse" />
+            <div className="h-28 rounded-3xl bg-background animate-pulse" />
+            <div className="h-28 rounded-3xl bg-background animate-pulse" />
           </div>
         </div>
         <div className="grid gap-4 lg:grid-cols-[1.5fr_0.9fr]">
           <div className="space-y-4">
-            <div className="h-20 rounded-3xl bg-[#000000] animate-pulse" />
-            <div className="h-80 rounded-3xl bg-[#000000] animate-pulse" />
+            <div className="h-20 rounded-3xl bg-background animate-pulse" />
+            <div className="h-80 rounded-3xl bg-background animate-pulse" />
           </div>
           <div className="space-y-4">
-            <div className="h-96 rounded-3xl bg-[#000000] animate-pulse" />
+            <div className="h-96 rounded-3xl bg-background animate-pulse" />
           </div>
         </div>
       </div>
@@ -449,13 +449,13 @@ export default function VideoWatchPage() {
 
 
         {error ? (
-          <div className="rounded-3xl bg-[#000000] border border-white/10 p-6 text-sm text-purple/45">{error}</div>
+          <div className="rounded-3xl bg-background border border-white/10 p-6 text-sm text-purple/45">{error}</div>
         ) : loading || !video ? (
           <VideoPageSkeleton onBack={() => router.back()} />
         ) : (
           <div className="grid gap-8 lg:grid-cols-[1.5fr_0.9fr]">
             <div className="space-y-6">
-              <div className="rounded-3xl bg-[#000000] p-4 shadow-lg shadow-black/20">
+              <div className="rounded-3xl bg-background p-4 shadow-lg shadow-black/20">
                 <VideoWatchPlayer
                   trackId={video.id}
                   videoUrl={video.videoUrl}
@@ -513,7 +513,7 @@ export default function VideoWatchPage() {
                     onClick={() => {
                       setShowShareModal(true);
                     }}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-black text-white transition hover:bg-charcoal"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-background text-white transition hover:bg-charcoal"
                     aria-label="Share"
                     title="Share"
                   >
@@ -525,7 +525,7 @@ export default function VideoWatchPage() {
                       setIsLiked((prev) => !prev);
                       if (isDisliked) setIsDisliked(false);
                     }}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isLiked ? 'bg-black text-white' : 'bg-black text-white/90 hover:bg-charcoal'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isLiked ? 'bg-background text-white' : 'bg-background text-white/90 hover:bg-charcoal'}`}
                     aria-label="Like"
                     title="Like"
                   >
@@ -537,7 +537,7 @@ export default function VideoWatchPage() {
                       setIsDisliked((prev) => !prev);
                       if (isLiked) setIsLiked(false);
                     }}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isDisliked ? 'bg-black text-white' : 'bg-black text-white/90 hover:bg-charcoal'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isDisliked ? 'bg-background text-white' : 'bg-background text-white/90 hover:bg-charcoal'}`}
                     aria-label="Dislike"
                     title="Dislike"
                   >
@@ -546,7 +546,7 @@ export default function VideoWatchPage() {
                   <button
                     type="button"
                     onClick={() => setShowPlaylistModal(true)}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isInPlaylist ? 'bg-black text-white' : 'bg-black text-white/90 hover:bg-charcoal'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isInPlaylist ? 'bg-background text-white' : 'bg-background text-white/90 hover:bg-charcoal'}`}
                     aria-label="Add to playlist"
                     title="Add to playlist"
                   >
@@ -575,7 +575,7 @@ export default function VideoWatchPage() {
                         alert('Unable to save this video yet.');
                       }
                     }}
-                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isSaved ? 'bg-black text-white' : 'bg-black text-white/90 hover:bg-charcoal'}`}
+                    className={`inline-flex h-10 w-10 items-center justify-center rounded-full transition ${isSaved ? 'bg-background text-white' : 'bg-background text-white/90 hover:bg-charcoal'}`}
                     aria-label="Save"
                     title="Save"
                   >
@@ -595,9 +595,9 @@ export default function VideoWatchPage() {
                 shareText={video ? `Watch ${video.title} by ${video.artist} on Fwaya.\n${window.location.origin}/videos/${createMediaSlug(video.title, video.id)}` : undefined}
               />
 
-              <div className="rounded-3xl bg-[#000000] p-6 shadow-lg shadow-black/20">
+              <div className="rounded-3xl bg-background p-6 shadow-lg shadow-black/20">
                 <div className="flex items-center gap-3">
-                  <div className="h-14 w-14 rounded-full bg-[#000000]" />
+                  <div className="h-14 w-14 rounded-full bg-background" />
                   <div>
                     <p className="text-sm font-semibold text-white">{video.channelName}</p>
                     <p className="text-xs text-white/60">Channel</p>
@@ -606,7 +606,7 @@ export default function VideoWatchPage() {
                 <div className="mt-6 text-sm leading-7 text-white/90">{video.description}</div>
               </div>
 
-              <div className="rounded-3xl bg-[#000000] p-6 shadow-lg shadow-black/20">
+              <div className="rounded-3xl bg-background p-6 shadow-lg shadow-black/20">
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -621,7 +621,7 @@ export default function VideoWatchPage() {
                       onChange={(e) => setNewComment(e.target.value)}
                       rows={4}
                       placeholder="Write a comment..."
-                      className="w-full rounded-3xl border border-white/10 bg-[#000000] px-4 py-3 text-sm text-white placeholder:text-white/60 focus:border-purple/75 focus:outline-none"
+                      className="w-full rounded-3xl border border-white/10 bg-background px-4 py-3 text-sm text-white placeholder:text-white/60 focus:border-purple/75 focus:outline-none"
                     />
                     <button
                       onClick={handlePostComment}
@@ -634,12 +634,12 @@ export default function VideoWatchPage() {
 
                   <div className="space-y-4 pt-4">
                     {comments.length === 0 ? (
-                      <div className="rounded-3xl bg-[#000000] p-4 text-sm text-white/60">
+                      <div className="rounded-3xl bg-background p-4 text-sm text-white/60">
                         No comments yet. Be the first to share your thoughts.
                       </div>
                     ) : (
                       comments.map((comment) => (
-                        <div key={comment.id} className="rounded-3xl bg-[#000000] p-4">
+                        <div key={comment.id} className="rounded-3xl bg-background p-4">
                           <div className="flex items-start gap-3">
                             <img
                               src={comment.userAvatar}
@@ -682,9 +682,9 @@ export default function VideoWatchPage() {
                               </div>
 
                               {comment.replies && comment.replies.length > 0 && (
-                                <div className="mt-4 space-y-4 rounded-3xl bg-[#000000] p-4">
+                                <div className="mt-4 space-y-4 rounded-3xl bg-background p-4">
                                   {comment.replies.map((reply) => (
-                                    <div key={reply.id} className="rounded-3xl bg-[#000000] p-4">
+                                    <div key={reply.id} className="rounded-3xl bg-background p-4">
                                       <div className="flex items-start gap-3">
                                         <img
                                           src={reply.userAvatar}
@@ -755,7 +755,7 @@ export default function VideoWatchPage() {
             </div>
 
             <aside className="space-y-4">
-              <div className="rounded-3xl bg-[#000000] p-6 shadow-lg shadow-black/20">
+              <div className="rounded-3xl bg-background p-6 shadow-lg shadow-black/20">
                 <div className="mb-4 flex items-center justify-between">
                   <p className="text-sm uppercase tracking-[0.2em] text-white/60">Related videos</p>
                   <button className="text-sm text-purple/60 hover:text-purple/45">See all</button>

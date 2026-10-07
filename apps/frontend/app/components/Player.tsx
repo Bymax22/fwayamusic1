@@ -229,7 +229,7 @@ export default function Player({
             />
             
             {/* Light overlay */}
-            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute inset-0 bg-background/20" />
             
             {/* Waveform */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -244,7 +244,7 @@ export default function Player({
         <motion.div
           className={`fixed left-0 right-0 z-50 ${
             isExpanded ? "h-[60vh]" : "h-32 sm:h-28"
-          } bg-gradient-to-br from-[#000000]/95 to-[#36454F]/95 border-t border-white/10 shadow-2xl backdrop-blur-lg bottom-0 md:bottom-0 ${
+          } bg-gradient-to-br from-background/95 to-card/95 border-t border-white/10 shadow-2xl backdrop-blur-lg bottom-0 md:bottom-0 ${
             className || ""
           }`}
           initial={{ y: "100%" }}
@@ -344,15 +344,15 @@ export default function Player({
                   alt={track.title || "Track cover"}
                   width={56}
                   height={56}
-                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#36454F]/50 w-14 h-14 sm:w-12 sm:h-12"
+                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-charcoal/50 w-14 h-14 sm:w-12 sm:h-12"
                 />
                 {isLoading ? (
-                  <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                  <div className="absolute inset-0 bg-background/30 rounded-lg flex items-center justify-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple/60"></div>
                   </div>
                 ) : isPlaying ? (
                   <motion.div
-                    className="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center"
+                    className="absolute inset-0 bg-background/20 rounded-lg flex items-center justify-center"
                     animate={{ opacity: [0.3, 0.5, 0.3] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   >
@@ -390,7 +390,7 @@ export default function Player({
               <div className="flex items-center gap-1 sm:gap-1.5">
                 <button 
                   onClick={toggleLoop} 
-                  className={`p-2 sm:p-1.5 rounded-full ${isLooping ? "text-[#36454F] bg-white/10" : "text-white/60 hover:text-white hover:bg-white/10"} transition-colors active:bg-white/20`}
+                  className={`p-2 sm:p-1.5 rounded-full ${isLooping ? "text-card-foreground bg-white/10" : "text-white/60 hover:text-white hover:bg-white/10"} transition-colors active:bg-white/20`}
                   aria-label={isLooping ? "Disable loop" : "Enable loop"}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-4 sm:h-4">
@@ -435,7 +435,7 @@ export default function Player({
                     {isMuted || volume === 0 ? <SpeakerXMarkIcon className="w-5 h-5 sm:w-4 sm:h-4" /> : <SpeakerWaveIcon className="w-5 h-5 sm:w-4 sm:h-4" />}
                   </button>
 
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#36454F] p-2 rounded-lg shadow-lg z-10">
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-card p-2 rounded-lg shadow-lg z-10">
                     <input 
                       type="range" 
                       min="0" 
@@ -443,7 +443,7 @@ export default function Player({
                       step="0.01" 
                       value={isMuted ? 0 : volume} 
                       onChange={handleVolumeChange} 
-                      className="w-20 h-1 bg-charcoal rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                      className="w-20 h-1 bg-charcoal rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-card"
                       aria-label="Volume control" 
                     />
                   </div>
@@ -474,15 +474,15 @@ export default function Player({
                   alt={track.title || "Track cover"}
                   width={120}
                   height={120}
-                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-[#36454F]/50 w-30 h-30"
+                  className="rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-charcoal/50 w-30 h-30"
                 />
                 {isLoading ? (
-                  <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                  <div className="absolute inset-0 bg-background/30 rounded-lg flex items-center justify-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple/60"></div>
                   </div>
                 ) : isPlaying ? (
                   <motion.div
-                    className="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center"
+                    className="absolute inset-0 bg-background/20 rounded-lg flex items-center justify-center"
                     animate={{ opacity: [0.3, 0.5, 0.3] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   >

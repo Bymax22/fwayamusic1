@@ -11,13 +11,14 @@ import {
 
   User
 } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function SettingsPage() {
   const { audioQuality, setAudioQuality } = useAudioPlayer();
+  const { palette, palettes, selectPalette } = useTheme();
   const [activeSection, setActiveSection] = useState<'general' | 'audio' | 'privacy' | 'account'>('general');
   const [settings, setSettings] = useState({
     // General
-    theme: 'dark',
     language: 'en',
     autoPlay: true,
     // Audio
@@ -55,7 +56,7 @@ export default function SettingsPage() {
 
   return (
     <Protected>
-      <div className="min-h-screen bg-black text-white pb-32 px-6"/>
+      <div className="min-h-screen bg-background text-white pb-32 px-6">
         {/* Header */}
         <div className="mb-8 max-w-6xl mx-auto pt-6">
           <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
@@ -67,7 +68,7 @@ export default function SettingsPage() {
 
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
           {/* Sidebar Navigation */}
-          <div className="lg:w-64 rounded-[2rem] bg-[#000000]/90 p-4 ring-1 ring-white/10 shadow-xl shadow-charcoal/20 h-fit">
+          <div className="lg:w-64 rounded-[2rem] bg-background/90 p-4 ring-1 ring-white/10 shadow-xl shadow-charcoal/20 h-fit">
             <div className="space-y-2">
               {sections.map(section => (
                 <button
@@ -87,7 +88,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Settings Content */}
-          <div className="flex-1 rounded-[2rem] bg-[#000000]/90 p-8 ring-1 ring-white/10 shadow-xl shadow-charcoal/20">
+          <div className="flex-1 rounded-[2rem] bg-background/90 p-8 ring-1 ring-white/10 shadow-xl shadow-charcoal/20">
             {activeSection === 'general' && (
             <div>
               <h2 className="text-2xl font-bold text-white mb-6">General Settings</h2>
@@ -100,13 +101,13 @@ export default function SettingsPage() {
                     <p className="text-white/60 text-sm">Choose your interface theme</p>
                   </div>
                   <select 
-                    value={settings.theme}
-                    onChange={(e) => handleSettingChange('theme', e.target.value)}
+                    value={palette.id}
+                    onChange={(e) => selectPalette(e.target.value as typeof palette.id)}
                     className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   >
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                    <option value="system">System</option>
+                    {palettes.map((option) => (
+                      <option key={option.id} value={option.id}>{option.name}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -140,7 +141,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('autoPlay', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-card"></div>
                   </label>
                 </div>
               </div>
@@ -182,7 +183,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('crossfade', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-card"></div>
                   </label>
                 </div>
 
@@ -217,7 +218,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('volumeNormalization', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-card"></div>
                   </label>
                 </div>
               </div>
@@ -242,7 +243,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('explicitContent', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-card"></div>
                   </label>
                 </div>
 
@@ -259,7 +260,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('listeningHistory', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-card"></div>
                   </label>
                 </div>
 
@@ -276,7 +277,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('personalizedRecommendations', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-card"></div>
                   </label>
                 </div>
               </div>
@@ -301,7 +302,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('emailNotifications', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-card"></div>
                   </label>
                 </div>
 
@@ -318,7 +319,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('pushNotifications', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-card"></div>
                   </label>
                 </div>
 
@@ -335,18 +336,18 @@ export default function SettingsPage() {
                       onChange={(e) => handleSettingChange('twoFactorAuth', e.target.checked)}
                       className="sr-only peer" 
                     />
-                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#36454F]"></div>
+                    <div className="w-11 h-6 bg-charcoal peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-card"></div>
                   </label>
                 </div>
 
                 {/* Account Actions */}
-                <div className="pt-6 border-t border-[#36454F]">
+                <div className="pt-6 border-t border-card">
                   <h3 className="text-lg font-bold text-white mb-4">Account Actions</h3>
                   <div className="space-y-3">
-                    <button className="w-full text-left p-3 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg text-white transition-colors">
+                    <button className="w-full text-left p-3 bg-card hover:bg-card/80 rounded-lg text-white transition-colors">
                       Change Password
                     </button>
-                    <button className="w-full text-left p-3 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg text-white transition-colors">
+                    <button className="w-full text-left p-3 bg-card hover:bg-card/80 rounded-lg text-white transition-colors">
                       Download Your Data
                     </button>
                     <button className="w-full text-left p-3 bg-purple/20 hover:bg-purple/30 rounded-lg text-purple/60 transition-colors">
@@ -358,11 +359,9 @@ export default function SettingsPage() {
             </div>
           )}
         </div>
+        </div>
       </div>
     </Protected>
   );
 }
-
-
-
 

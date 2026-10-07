@@ -191,21 +191,21 @@ export default function UserSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4 pt-4 pb-24 sm:pb-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 pt-4 pb-24 sm:pb-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-black rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
+        className="bg-background rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
       >
         <button
           type="button"
           onClick={() => router.push('/')}
-          className="absolute right-4 top-4 rounded-full bg-[#000000] text-white hover:bg-[#000000] p-2 transition-colors"
+          className="absolute right-4 top-4 rounded-full bg-background text-white hover:bg-background p-2 transition-colors"
         >
           <FaTimes className="w-4 h-4" />
         </button>
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#000000] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center mx-auto mb-4">
             <FaUser className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Listener</h1>
@@ -225,9 +225,9 @@ export default function UserSignUp() {
             Continue with Google
           </button>
           <div className="flex items-center gap-3 mt-4 text-xs text-white/60">
-            <span className="h-px flex-1 bg-[#000000]" />
+            <span className="h-px flex-1 bg-background" />
             <span>or continue with your email</span>
-            <span className="h-px flex-1 bg-[#000000]" />
+            <span className="h-px flex-1 bg-background" />
           </div>
         </div>
 
@@ -268,7 +268,7 @@ export default function UserSignUp() {
               type="text"
               value={formData.displayName}
               onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-              className="w-full px-3 py-2 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+              className="w-full px-3 py-2 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               placeholder="Your display name"
             />
           </div>
@@ -283,7 +283,7 @@ export default function UserSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3 py-2 rounded-3xl bg-[#000000] ring-1 ring-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-10"
+                  className="w-full px-3 py-2 rounded-3xl bg-background ring-1 ring-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-10"
                   placeholder="••••••••"
                 />
                 <button
@@ -305,7 +305,7 @@ export default function UserSignUp() {
                 type={showPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="w-full px-3 py-2 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                className="w-full px-3 py-2 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="••••••••"
               />
               {errors.confirmPassword && <p className="text-purple/60 text-sm mt-1">{errors.confirmPassword}</p>}
@@ -330,7 +330,7 @@ export default function UserSignUp() {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-3 rounded-3xl bg-[#000000] ring-1 ring-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-3xl bg-background ring-1 ring-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               />
             </div>
           </div>
@@ -341,7 +341,7 @@ export default function UserSignUp() {
               Profile Picture
             </label>
             <div className="flex items-center gap-4">
-              <div className="relative w-24 h-24 rounded-full bg-[#000000] flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div className="relative w-24 h-24 rounded-full bg-background flex items-center justify-center overflow-hidden flex-shrink-0">
                 {avatarPreview ? (
                   <Image src={avatarPreview} alt="Avatar preview" fill className="object-cover" />
                 ) : (
@@ -361,7 +361,7 @@ export default function UserSignUp() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-card hover:bg-primary text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FaCamera className="text-sm" />
                   {uploading ? 'Uploading...' : 'Upload Picture'}
@@ -388,14 +388,14 @@ export default function UserSignUp() {
                 type="text"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="w-full px-4 py-3 rounded-3xl bg-[#000000] ring-1 ring-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-3xl bg-background ring-1 ring-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="Street address"
               />
             </div>
           </div>
 
           {/* Consent Section */}
-          <div className="bg-[#000000] rounded-3xl p-4 space-y-3">
+          <div className="bg-background rounded-3xl p-4 space-y-3">
             <div className="flex items-start gap-3">
               <input
                 type="checkbox"

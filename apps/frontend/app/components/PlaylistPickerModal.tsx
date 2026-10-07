@@ -36,7 +36,7 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
     onSuccess?.();
     onClose();
     toast.custom((toastItem) => (
-      <div role="status" className="flex items-center gap-4 rounded-xl bg-black px-4 py-3 text-sm text-white shadow-xl ring-1 ring-white/10">
+      <div role="status" className="flex items-center gap-4 rounded-xl bg-background px-4 py-3 text-sm text-white shadow-xl ring-1 ring-white/10">
         <span>{message}</span>
         <button
           type="button"
@@ -250,8 +250,8 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4">
-      <div className="w-full max-w-md rounded-3xl bg-black p-6 shadow-2xl shadow-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/65 p-4">
+      <div className="w-full max-w-md rounded-3xl bg-background p-6 shadow-2xl shadow-black/40">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div>
             <h2 className="text-lg font-semibold text-white">Add to Playlist</h2>
@@ -267,9 +267,9 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
         </div>
 
         {loading ? (
-          <div className="rounded-3xl bg-[#000000] p-8 text-center text-sm text-white/60">Loading playlists...</div>
+          <div className="rounded-3xl bg-background p-8 text-center text-sm text-white/60">Loading playlists...</div>
         ) : error ? (
-          <div className="rounded-3xl bg-[#000000] p-4 text-sm text-purple/45">{error}</div>
+          <div className="rounded-3xl bg-background p-4 text-sm text-purple/45">{error}</div>
         ) : (
           <div className="space-y-3 max-h-72 overflow-y-auto">
             {/* Always offer create UI */}
@@ -292,7 +292,7 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder="Playlist name"
-                    className="w-full rounded-lg bg-[#000000] px-3 py-2 text-white"
+                    className="w-full rounded-lg bg-background px-3 py-2 text-white"
                   />
                   <input
                     type="file"
@@ -322,7 +322,7 @@ export default function PlaylistPickerModal({ open, mediaId, onClose, onSuccess 
             </div>
 
             {playlists.length === 0 && (
-              <div className="rounded-3xl bg-[#000000] p-6 text-center text-sm text-white/60">
+              <div className="rounded-3xl bg-background p-6 text-center text-sm text-white/60">
                 You don't have any playlists yet. Use the form above to create one.
               </div>
             )}

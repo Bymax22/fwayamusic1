@@ -149,12 +149,12 @@ export default function LikedSongsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 max-w-7xl mx-auto bg-black min-h-screen">
+      <div className="p-6 max-w-7xl mx-auto bg-background min-h-screen">
         <div className="animate-pulse space-y-6">
-          <div className="h-48 bg-[#000000] rounded-[2rem] mb-8"></div>
+          <div className="h-48 bg-background rounded-[2rem] mb-8"></div>
           <div className="space-y-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-16 bg-[#000000] rounded-2xl"></div>
+              <div key={i} className="h-16 bg-background rounded-2xl"></div>
             ))}
           </div>
         </div>
@@ -164,12 +164,12 @@ export default function LikedSongsPage() {
 
   return (
     <Protected>
-      <div className="min-h-screen bg-black text-white pb-32">
+      <div className="min-h-screen bg-background text-white pb-32">
         <div className="px-6 max-w-7xl mx-auto">
           {/* Header */}
-          <div className="rounded-[2rem] bg-[#000000] p-8 mb-8 mt-6">
+          <div className="rounded-[2rem] bg-background p-8 mb-8 mt-6">
             <div className="flex flex-col lg:flex-row items-start lg:items-end gap-6">
-              <div className="w-48 h-48 bg-[#000000] rounded-[2rem] flex items-center justify-center">
+              <div className="w-48 h-48 bg-background rounded-[2rem] flex items-center justify-center">
                 <Heart className="w-16 h-16 text-purple/60" fill="currentColor" />
               </div>
               <div className="flex-1">
@@ -206,7 +206,7 @@ export default function LikedSongsPage() {
 
           {/* Songs List */}
           {likedSongs.length > 0 ? (
-            <div className="rounded-[2rem] bg-[#000000] overflow-hidden">
+            <div className="rounded-[2rem] bg-background overflow-hidden">
               {/* Table Header */}
               <div className="grid grid-cols-12 gap-4 items-center p-6 border-b border-white/5 text-white/60 text-sm font-medium">
                 <div className="col-span-1">#</div>

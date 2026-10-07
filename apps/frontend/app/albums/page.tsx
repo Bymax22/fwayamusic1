@@ -93,7 +93,7 @@ export default function AlbumsPage() {
         </div>
 
         {error ? (
-          <div className="rounded-3xl bg-black p-6 text-sm text-purple/45">{error}</div>
+          <div className="rounded-3xl bg-background p-6 text-sm text-purple/45">{error}</div>
         ) : loading ? (
           <div className="space-y-4">
             <div className="h-24 rounded-3xl bg-charcoal animate-pulse" />
@@ -117,9 +117,9 @@ export default function AlbumsPage() {
                   <Link
                     key={album.id}
                     href={`/albums/${createMediaSlug(album.title, album.id)}`}
-                    className="rounded-3xl overflow-hidden bg-[#000000] shadow-lg shadow-black/20 transition hover:-translate-y-1"
+                    className="rounded-3xl overflow-hidden bg-background shadow-lg shadow-black/20 transition hover:-translate-y-1"
                   >
-                    <div className="relative h-64 bg-black">
+                    <div className="relative h-64 bg-background">
                       <Image
                         src={album.coverArt}
                         alt={album.title}
@@ -162,9 +162,9 @@ export default function AlbumsPage() {
                   <Link
                     key={album.id}
                     href={`/albums/${createMediaSlug(album.title, album.id)}`}
-                    className="rounded-3xl overflow-hidden bg-[#000000] shadow-lg shadow-black/20 transition hover:-translate-y-1"
+                    className="rounded-3xl overflow-hidden bg-background shadow-lg shadow-black/20 transition hover:-translate-y-1"
                   >
-                    <div className="relative h-56 bg-black">
+                    <div className="relative h-56 bg-background">
                       <Image
                         src={album.coverArt}
                         alt={album.title}

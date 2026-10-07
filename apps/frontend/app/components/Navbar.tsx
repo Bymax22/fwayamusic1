@@ -10,7 +10,7 @@ export default function Navbar({ currentTrack }: { currentTrack: any }) {
   const { user } = useAuth();
 
   return (
-    <nav className="hidden lg:flex fixed top-0 left-0 right-0 w-full h-14 items-center bg-[#000000]/60 backdrop-blur-xl border-b border-white/10 z-50">
+    <nav className="hidden lg:flex fixed top-0 left-0 right-0 w-full h-14 items-center bg-background/60 backdrop-blur-xl border-b border-white/10 z-50">
       <div className="flex items-center w-full h-full max-w-7xl mx-auto">
         <div className="w-[260px] flex items-center h-full px-6 border-r border-white/10">
           <div className="flex items-center gap-3">

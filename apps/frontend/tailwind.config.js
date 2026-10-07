@@ -17,60 +17,60 @@ module.exports = {
     extend: {
       colors: {
         // Semantic colors mapped to CSS variables
-        purple: "#9B5DE5",
-        charcoal: "#36454F",
-        border: "rgb(var(--border))",
-        input: "rgb(var(--input))",
-        ring: "rgb(var(--ring))",
-        background: "rgb(var(--background))",
-        foreground: "rgb(var(--foreground))",
+        purple: "rgb(var(--primary-accent) / <alpha-value>)",
+        charcoal: "rgb(var(--card) / <alpha-value>)",
+        border: "rgb(var(--border) / <alpha-value>)",
+        input: "rgb(var(--input) / <alpha-value>)",
+        ring: "rgb(var(--ring) / <alpha-value>)",
+        background: "rgb(var(--background) / <alpha-value>)",
+        foreground: "rgb(var(--foreground) / <alpha-value>)",
         
         // Primary colors with opacity variants
         primary: {
-          DEFAULT: "rgb(var(--primary-accent))",
+          DEFAULT: "rgb(var(--primary-accent) / <alpha-value>)",
           dark: {
-            DEFAULT: "rgb(var(--primary-dark))",
+            DEFAULT: "rgb(var(--primary-dark) / <alpha-value>)",
             50: "rgb(var(--primary-dark) / 0.5)",
             95: "rgb(var(--primary-dark) / 0.95)",
           },
-          light: "rgb(var(--primary-light))",
+          light: "rgb(var(--primary-light) / <alpha-value>)",
           foreground: "rgb(var(--foreground))",
         },
         
         // Accent colors
         accent: {
-          DEFAULT: "rgb(var(--primary-accent))",
-          light: "rgb(var(--accent-light))",
+          DEFAULT: "rgb(var(--primary-accent) / <alpha-value>)",
+          light: "rgb(var(--accent-light) / <alpha-value>)",
           foreground: "rgb(var(--foreground))",
         },
         
         // Card colors
         card: {
-          DEFAULT: "rgb(var(--card))",
+          DEFAULT: "rgb(var(--card) / <alpha-value>)",
           foreground: "rgb(var(--card-foreground))",
         },
         
         // Destructive colors
         destructive: {
-          DEFAULT: "rgb(var(--primary-accent))",
+          DEFAULT: "rgb(var(--primary-accent) / <alpha-value>)",
           foreground: "rgb(var(--foreground))",
         },
         
         // Muted colors
         muted: {
-          DEFAULT: "rgb(var(--muted))",
+          DEFAULT: "rgb(var(--muted) / <alpha-value>)",
           foreground: "rgb(var(--muted-foreground))",
         },
         
         // Popover colors
         popover: {
-          DEFAULT: "rgb(var(--card))",
+          DEFAULT: "rgb(var(--card) / <alpha-value>)",
           foreground: "rgb(var(--foreground))",
         },
         
         // Custom colors
-        'dark-bg': "rgb(var(--dark-bg))",
-        'light-bg': "rgb(var(--light-bg))",
+        'dark-bg': "rgb(var(--dark-bg) / <alpha-value>)",
+        'light-bg': "rgb(var(--light-bg) / <alpha-value>)",
       },
       borderRadius: {
         sm: "var(--radius-sm)",

@@ -128,12 +128,12 @@ const InviteButton = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center p-2 bg-[#36454F] rounded-full text-white hover:bg-[#9B5DE5] transition-all relative"
+        className="flex items-center justify-center p-2 bg-card rounded-full text-white hover:bg-primary transition-all relative"
         aria-label="Invite friends"
       >
         <HiUserAdd size={20} />
         {referralData && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-[#36454F] text-[10px] font-bold rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-card text-card-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
             {referralData.invites}
           </span>
         )}
@@ -146,7 +146,7 @@ const InviteButton = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="absolute right-0 mt-2 w-72 bg-[#36454F] rounded-lg shadow-xl border border-[#36454F] z-50 overflow-hidden"
+            className="absolute right-0 mt-2 w-72 bg-card rounded-lg shadow-xl border border-card z-50 overflow-hidden"
           >
             <div className="p-4">
               <h3 className="font-bold text-white flex items-center gap-2">
@@ -159,15 +159,15 @@ const InviteButton = () => {
 
               {isLoading ? (
                 <div className="mt-4 space-y-2">
-                  <div className="h-4 bg-[#36454F] rounded animate-pulse"></div>
-                  <div className="h-8 bg-[#36454F] rounded animate-pulse"></div>
+                  <div className="h-4 bg-card rounded animate-pulse"></div>
+                  <div className="h-8 bg-card rounded animate-pulse"></div>
                 </div>
               ) : (
                 <>
-                  <div className="mt-4 bg-[#36454F] bg-opacity-30 p-3 rounded-lg">
+                  <div className="mt-4 bg-card bg-opacity-30 p-3 rounded-lg">
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-white/90">Your Code:</span>
-                      <span className="font-mono font-bold text-[#36454F]">
+                      <span className="font-mono font-bold text-card-foreground">
                         {referralData?.code}
                       </span>
                     </div>
@@ -176,11 +176,11 @@ const InviteButton = () => {
                         type="text"
                         value={referralLink}
                         readOnly
-                        className="flex-1 bg-[#36454F] text-xs p-2 rounded-l text-white/90 truncate"
+                        className="flex-1 bg-card text-xs p-2 rounded-l text-white/90 truncate"
                       />
                       <button
                         onClick={handleCopy}
-                        className="bg-[#36454F] hover:bg-[#9B5DE5] px-3 rounded-r flex items-center"
+                        className="bg-card hover:bg-primary px-3 rounded-r flex items-center"
                       >
                         {copied ? (
                           <HiCheck size={16} className="text-white" />
@@ -192,15 +192,15 @@ const InviteButton = () => {
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 gap-2">
-                    <div className="bg-[#36454F] bg-opacity-30 p-2 rounded text-center">
+                    <div className="bg-card bg-opacity-30 p-2 rounded text-center">
                       <p className="text-xs text-white/60">Earned</p>
-                      <p className="font-bold text-[#36454F]">
+                      <p className="font-bold text-card-foreground">
                         ZMW {referralData?.earned.toFixed(2)}
                       </p>
                     </div>
-                    <div className="bg-[#36454F] bg-opacity-30 p-2 rounded text-center">
+                    <div className="bg-card bg-opacity-30 p-2 rounded text-center">
                       <p className="text-xs text-white/60">Pending</p>
-                      <p className="font-bold text-[#36454F]">
+                      <p className="font-bold text-card-foreground">
                         ZMW {referralData?.pending.toFixed(2)}
                       </p>
                     </div>
@@ -209,7 +209,7 @@ const InviteButton = () => {
               )}
             </div>
 
-            <div className="border-t border-[#36454F] p-3 bg-[#36454F]">
+            <div className="border-t border-card p-3 bg-card">
               <h4 className="text-xs font-medium text-white/60 mb-2 flex items-center gap-1">
                 <HiOutlineShare size={14} />
                 Share via
@@ -219,7 +219,7 @@ const InviteButton = () => {
                   <button
                     key={method.name}
                     onClick={method.action}
-                    className="p-2 hover:bg-[#36454F] rounded-full transition-colors"
+                    className="p-2 hover:bg-card rounded-full transition-colors"
                     aria-label={`Share via ${method.name}`}
                   >
                     {method.icon}

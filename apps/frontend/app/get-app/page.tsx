@@ -4,7 +4,7 @@ import { Apple, ArrowLeft, Play } from 'lucide-react';
 
 export default function GetAppPage() {
   return (
-    <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-8 sm:py-12">
+    <main className="min-h-screen bg-background px-5 py-8 text-white sm:px-8 sm:py-12">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl flex-col">
         <Link
           href="/"
@@ -34,7 +34,7 @@ export default function GetAppPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1">
-            <div className="rounded-2xl bg-[#000000] p-6 sm:p-7">
+            <div className="rounded-2xl bg-background p-6 sm:p-7">
               <Apple className="h-7 w-7 text-purple/45" aria-hidden="true" />
               <p className="mt-6 text-lg font-semibold">App Store</p>
               <p className="mt-1 text-sm text-white/50">For iPhone and iPad</p>
@@ -47,7 +47,7 @@ export default function GetAppPage() {
               </button>
             </div>
 
-            <div className="rounded-2xl bg-[#000000] p-6 sm:p-7">
+            <div className="rounded-2xl bg-background p-6 sm:p-7">
               <Play className="h-7 w-7 fill-current text-purple/45" aria-hidden="true" />
               <p className="mt-6 text-lg font-semibold">Google Play</p>
               <p className="mt-1 text-sm text-white/50">For Android devices</p>

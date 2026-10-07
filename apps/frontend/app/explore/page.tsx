@@ -120,7 +120,7 @@ export default function ExplorePage() {
   const popularGenres = Array.from(new Set(mediaFiles.map(file => file.genre))).slice(0, 6);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#000000]/95 to-[#36454F]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-background/95 to-card/95 min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Explore</h1>
@@ -165,7 +165,7 @@ export default function ExplorePage() {
           {trendingTracks.map(file => (
             <div 
               key={file.id} 
-              className="bg-[#36454F]/70 rounded-xl overflow-hidden hover:bg-[#36454F] transition-colors group"
+              className="bg-card/70 rounded-xl overflow-hidden hover:bg-card transition-colors group"
             >
               <div className="relative">
                 <Image 
@@ -176,7 +176,7 @@ export default function ExplorePage() {
                     (e.target as HTMLImageElement).src = '/default-cover.jpg';
                   }}
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all">
+                <div className="absolute inset-0 flex items-center justify-center bg-background bg-opacity-0 group-hover:bg-opacity-30 transition-all">
                   <button 
                     onClick={() => handlePlay(file)}
                     className={`transform transition-all ${currentTrack?.id === file.id && isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 group-hover:opacity-100 group-hover:translate-y-0'}`}
@@ -190,7 +190,7 @@ export default function ExplorePage() {
                     </div>
                   </button>
                 </div>
-                <div className="absolute top-3 right-3 bg-[#000000]/70 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
+                <div className="absolute top-3 right-3 bg-background/70 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
                   {file.views} plays
                 </div>
               </div>
@@ -224,7 +224,7 @@ export default function ExplorePage() {
           {newReleases.map(file => (
             <div 
               key={file.id} 
-              className="bg-[#000000]/70 rounded-xl overflow-hidden hover:bg-[#000000] transition-colors group"
+              className="bg-background/70 rounded-xl overflow-hidden hover:bg-background transition-colors group"
             >
               <div className="relative">
                 <Image 
@@ -235,7 +235,7 @@ export default function ExplorePage() {
                     (e.target as HTMLImageElement).src = '/default-cover.jpg';
                   }}
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all">
+                <div className="absolute inset-0 flex items-center justify-center bg-background bg-opacity-0 group-hover:bg-opacity-30 transition-all">
                   <button 
                     onClick={() => handlePlay(file)}
                     className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all"
@@ -270,7 +270,7 @@ export default function ExplorePage() {
 {popularGenres.map((genre, index) => (
   <div 
     key={genre ?? `unknown-${index}`}
-    className="bg-[#000000]/70 rounded-xl p-4 text-center hover:bg-[#000000] transition-colors cursor-pointer group"
+    className="bg-background/70 rounded-xl p-4 text-center hover:bg-background transition-colors cursor-pointer group"
   >
     <div className="w-12 h-12 bg-gradient-to-br from-purple/75 to-purple/75 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
       <Music className="w-6 h-6 text-white" />

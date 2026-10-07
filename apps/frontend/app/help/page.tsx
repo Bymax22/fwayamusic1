@@ -230,7 +230,7 @@ export default function HelpHomePage() {
   const activeSection = sections.find((section) => section.id === open) ?? sections[0];
 
   return (
-    <div className="min-h-screen bg-black px-4 py-6 text-white md:px-6">
+    <div className="min-h-screen bg-background px-4 py-6 text-white md:px-6">
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 rounded-2xl border border-purple/30 bg-gradient-to-r from-purple/30 to-black p-5">
           <p className="text-xs uppercase tracking-[0.2em] text-purple/45">FWAYA Support</p>

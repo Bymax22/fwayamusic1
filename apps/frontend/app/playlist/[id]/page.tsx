@@ -377,9 +377,9 @@ const PlaylistDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9B5DE5] mx-auto mb-3"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-3"></div>
           <p className="text-white">Loading playlist...</p>
         </div>
       </div>
@@ -388,13 +388,13 @@ const PlaylistDetailPage = () => {
 
   if (error || !playlist) {
     return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Playlist Not Found</h1>
           <p className="text-white/60 mb-6">{error}</p>
           <button
             onClick={() => router.back()}
-            className="bg-[#9B5DE5] text-white px-6 py-2 rounded-lg hover:bg-[#9B5DE5] transition-colors"
+            className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary transition-colors"
           >
             Go Back
           </button>
@@ -407,9 +407,9 @@ const PlaylistDetailPage = () => {
   const totalPlays = playlist.entries.reduce((total, entry) => total + (entry.media.plays || 0), 0);
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-[#000000]">
+    <div className="min-h-screen w-full overflow-x-hidden bg-background">
       {/* Header */}
-      <div className="relative overflow-hidden bg-[#000000]">
+      <div className="relative overflow-hidden bg-background">
         <div className="absolute inset-x-0 top-0 h-[420px] md:hidden">
           <Image
             src={playlist.coverUrl || "/default-playlist.png"}
@@ -419,13 +419,13 @@ const PlaylistDetailPage = () => {
             priority
             className="object-cover object-top"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-[#000000]/35 to-[#000000]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-background/35 to-background" />
         </div>
-        <div className="absolute inset-0 hidden bg-gradient-to-b from-transparent to-[#000000]/80 md:block" />
+        <div className="absolute inset-0 hidden bg-gradient-to-b from-transparent to-background/80 md:block" />
         <div className="relative z-10 p-4 sm:p-6">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-white hover:text-[#9B5DE5] transition-colors mb-6"
+            className="flex items-center gap-2 text-white hover:text-primary transition-colors mb-6"
           >
             <FaArrowLeft size={20} />
             Back
@@ -448,7 +448,7 @@ const PlaylistDetailPage = () => {
             {/* Playlist Info */}
             <div className="flex-1 text-white">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm font-medium px-2 py-1 bg-[#9B5DE5] rounded-full">
+                <span className="text-sm font-medium px-2 py-1 bg-primary rounded-full">
                   {playlist.type}
                 </span>
                 {!playlist.isPublic && (
@@ -483,7 +483,7 @@ const PlaylistDetailPage = () => {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={handlePlayAll}
-                  className="bg-[#9B5DE5] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#9B5DE5] transition-colors flex items-center gap-2"
+                  className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary transition-colors flex items-center gap-2"
                 >
                   <FaPlay size={16} />
                   Play All
@@ -491,7 +491,7 @@ const PlaylistDetailPage = () => {
 
                 <button
                   onClick={handlePlaylistPrevious}
-                  className="bg-[#000000] text-white px-4 py-3 rounded-full hover:bg-[#36454F] transition-colors"
+                  className="bg-background text-white px-4 py-3 rounded-full hover:bg-card transition-colors"
                   title="Previous track"
                 >
                   <FaArrowLeft size={14} />
@@ -499,7 +499,7 @@ const PlaylistDetailPage = () => {
 
                 <button
                   onClick={handlePlaylistNext}
-                  className="bg-[#000000] text-white px-4 py-3 rounded-full hover:bg-[#36454F] transition-colors"
+                  className="bg-background text-white px-4 py-3 rounded-full hover:bg-card transition-colors"
                   title="Next track"
                 >
                   <FaPlay size={14} />
@@ -508,7 +508,7 @@ const PlaylistDetailPage = () => {
                 <button
                   onClick={handlePlaylistRepeatToggle}
                   className={`px-4 py-3 rounded-full transition-colors ${
-                    repeatMode !== 'off' ? 'bg-[#9B5DE5] text-white' : 'bg-[#000000] text-white hover:bg-[#36454F]'
+                    repeatMode !== 'off' ? 'bg-primary text-white' : 'bg-background text-white hover:bg-card'
                   }`}
                   title={repeatMode === 'repeat-all' ? 'Repeat all on' : repeatMode === 'repeat-one' ? 'Repeat one on' : 'Repeat all'}
                 >
@@ -517,14 +517,14 @@ const PlaylistDetailPage = () => {
 
                 <button
                   onClick={handleLike}
-                  className="bg-[#000000] text-white p-3 rounded-full hover:bg-[#36454F] transition-colors"
+                  className="bg-background text-white p-3 rounded-full hover:bg-card transition-colors"
                 >
                   {isLiked ? <FaHeart size={16} /> : <FaRegHeart size={16} />}
                 </button>
 
                 <button
                   onClick={handleShare}
-                  className="bg-[#000000] text-white p-3 rounded-full hover:bg-[#36454F] transition-colors"
+                  className="bg-background text-white p-3 rounded-full hover:bg-card transition-colors"
                 >
                   <FaShare size={16} />
                 </button>
@@ -536,7 +536,7 @@ const PlaylistDetailPage = () => {
 
       {/* Tracks List */}
       <div className="px-2 pb-8 sm:px-6">
-        <div className="bg-[#000000]/80 rounded-lg overflow-hidden">
+        <div className="bg-background/80 rounded-lg overflow-hidden">
           <div className="p-4 border-b border-charcoal/50">
             <h2 className="text-xl font-bold text-white">Tracks</h2>
           </div>
@@ -551,15 +551,15 @@ const PlaylistDetailPage = () => {
                 return (
                   <motion.div
                     key={entry.id}
-                    className="group flex min-w-0 flex-wrap items-center gap-3 p-3 transition-colors hover:bg-[#36454F] sm:gap-4 sm:p-4"
-                    whileHover={{ backgroundColor: 'rgba(54, 69, 79, 0.5)' }}
+                    className="group flex min-w-0 flex-wrap items-center gap-3 p-3 transition-colors hover:bg-card sm:gap-4 sm:p-4"
+                    whileHover={{ backgroundColor: 'rgba(var(--card), 0.5)' }}
                   >
                     {/* Track Number / Play Button */}
                     <div className="w-8 flex justify-center">
                       {isCurrent && isPlaying ? (
                         <FaPause
                           size={16}
-                          className="text-[#9B5DE5] cursor-pointer"
+                          className="text-primary cursor-pointer"
                           onClick={() => handlePlay({
                             id: track.id.toString(),
                             title: track.title,
@@ -575,7 +575,7 @@ const PlaylistDetailPage = () => {
                           <span className="text-white/60 group-hover:hidden">{index + 1}</span>
                           <FaPlay
                             size={12}
-                            className="text-white hidden group-hover:block cursor-pointer hover:text-[#9B5DE5]"
+                            className="text-white hidden group-hover:block cursor-pointer hover:text-primary"
                             onClick={() => handlePlay({
                               id: track.id.toString(),
                               title: track.title,
@@ -605,11 +605,11 @@ const PlaylistDetailPage = () => {
 
                     {/* Track Info */}
                     <div className="min-w-0 flex-1">
-                      <ScrollingTrackTitle isPlaying={isCurrent && isPlaying} className={`font-medium ${isCurrent ? 'text-[#9B5DE5]' : 'text-white'}`}>
+                      <ScrollingTrackTitle isPlaying={isCurrent && isPlaying} className={`font-medium ${isCurrent ? 'text-primary' : 'text-white'}`}>
                         <span className="inline-flex items-center gap-2">
                           {isCurrent ? (
                             // show waveform when this is the playing track
-                            <Waveform playing={isCurrent && isPlaying} accentColor="#9B5DE5" />
+                            <Waveform playing={isCurrent && isPlaying} accentColor="rgb(var(--primary-accent))" />
                           ) : null}
                           <span>{track.title}</span>
                         </span>

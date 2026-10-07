@@ -93,7 +93,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-8 flex items-center gap-3">
           <div className="rounded-3xl bg-purple/10 p-3 text-purple/45">
@@ -110,7 +110,7 @@ export default function NotificationsPage() {
           {error && <p className="text-purple/60">{error}</p>}
 
           {!loading && !error && notifications.length === 0 && (
-            <div className="rounded-3xl border border-dashed border-white/10 bg-black p-8 text-center text-white/60">
+            <div className="rounded-3xl border border-dashed border-white/10 bg-background p-8 text-center text-white/60">
               No notifications yet.
             </div>
           )}
@@ -120,7 +120,7 @@ export default function NotificationsPage() {
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`rounded-3xl border px-4 py-4 transition ${notification.isRead ? "border-white/10 bg-black" : "border-purple/30 bg-charcoal"}`}
+                  className={`rounded-3xl border px-4 py-4 transition ${notification.isRead ? "border-white/10 bg-background" : "border-purple/30 bg-charcoal"}`}
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>

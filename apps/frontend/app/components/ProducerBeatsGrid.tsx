@@ -100,7 +100,7 @@ export default function ProducerBeatsGrid() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-charcoal">My Beats</h1>
+          <h1 className="text-3xl font-bold text-card-foreground">My Beats</h1>
           <Link
             href="/dashboard/beats/upload"
             className="px-6 py-3 bg-gradient-to-r from-purple/75 to-purple/85 hover:from-purple/85 hover:to-purple/90 text-white rounded-lg font-medium transition"
@@ -133,7 +133,7 @@ export default function ProducerBeatsGrid() {
               {beats.map((beat) => (
                 <div
                   key={beat.id}
-                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
+                  className="bg-card rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
                 >
                   {/* Cover Image */}
                   <div className="relative aspect-square bg-white/20 overflow-hidden">
@@ -142,7 +142,7 @@ export default function ProducerBeatsGrid() {
                       alt={beat.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
+                    <div className="absolute inset-0 bg-background/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
                       <Link
                         href={`/beats/${beat.id}`}
                         className="p-2 bg-purple/85 hover:bg-purple/90 text-white rounded-full transition"
@@ -173,7 +173,7 @@ export default function ProducerBeatsGrid() {
 
                   {/* Beat Info */}
                   <div className="p-4">
-                    <h3 className="font-bold text-charcoal truncate">{beat.title}</h3>
+                    <h3 className="font-bold text-card-foreground truncate">{beat.title}</h3>
                     <p className="text-sm text-white/60 mb-3">{beat.genre}</p>
 
                     {/* Stats */}

@@ -214,7 +214,7 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
+    <div className="bg-card rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
       {error && (
         <div className="mb-4 p-4 bg-purple/20 border border-purple/60 rounded text-purple/90">
           {error}
@@ -277,7 +277,7 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
             <div>
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-charcoal">{beat.title}</h2>
+                  <h2 className="text-2xl font-bold text-card-foreground">{beat.title}</h2>
                   <p className="text-white/60 mt-1">{beat.genre}</p>
                 </div>
                 <div className="flex gap-2">
@@ -339,7 +339,7 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
                 <div className="bg-gradient-to-r from-purple/15 to-purple/15 p-4 rounded-lg">
                   <div className="flex items-center gap-2 mb-3">
                     <TrendingUp size={20} className="text-purple/85" />
-                    <h3 className="font-semibold text-charcoal">Engagement Metrics</h3>
+                    <h3 className="font-semibold text-card-foreground">Engagement Metrics</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -432,7 +432,7 @@ export default function BeatManagementPanel({ beatId, onUpdate }: { beatId: numb
                     setSelectedCover(null);
                     setCoverPreview(null);
                   }}
-                  className="flex-1 px-4 py-2 bg-charcoal/50 hover:bg-charcoal/50 text-charcoal rounded-lg transition"
+                  className="flex-1 px-4 py-2 bg-charcoal/50 hover:bg-charcoal/50 text-card-foreground rounded-lg transition"
                 >
                   Cancel
                 </button>

@@ -37,17 +37,17 @@ export default function CoversAdminPage() {
     if (res.ok) setCovers(covers.filter(c => c.id !== id));
   };
 
-  if (loading) return <main className="min-h-screen bg-[#FFFFFF] p-8 text-white/60">Loading moderation queue...</main>;
+  if (loading) return <main className="min-h-screen bg-card p-8 text-white/60">Loading moderation queue...</main>;
 
   return (
-    <main className="min-h-screen bg-[#FFFFFF] px-5 py-8 text-black sm:px-8 lg:px-10"><div className="mx-auto max-w-7xl">
+    <main className="min-h-screen bg-card px-5 py-8 text-foreground sm:px-8 lg:px-10"><div className="mx-auto max-w-7xl">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-purple/90">Control center</p>
       <h1 className="mt-2 text-3xl font-semibold">Cover moderation</h1>
       <p className="mt-2 text-sm text-white/60">Review artwork before it appears across the platform.</p>
-      {covers.length === 0 && <div className="mt-7 rounded-2xl bg-white p-6 text-white/60 shadow-sm">No pending covers.</div>}
+      {covers.length === 0 && <div className="mt-7 rounded-2xl bg-card p-6 text-white/60 shadow-sm">No pending covers.</div>}
       <div className="mt-7 grid grid-cols-1 gap-5 md:grid-cols-3">
         {covers.map(cover => (
-          <div key={cover.id} className="overflow-hidden rounded-2xl bg-white p-4 shadow-sm">
+          <div key={cover.id} className="overflow-hidden rounded-2xl bg-card p-4 shadow-sm">
             <img src={cover.url} alt={`cover-${cover.id}`} className="mb-3 h-56 w-full rounded-xl object-cover" />
             <p className="text-sm text-white/60">Uploaded: {new Date(cover.createdAt).toLocaleString()}</p>
             <div className="flex gap-2 mt-2">

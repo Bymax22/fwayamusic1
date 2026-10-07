@@ -39,9 +39,9 @@ function VerifyEmailContent() {
 
   const getStatusIcon = () => {
     if (status === 'loading') {
-      return <FaSpinner className="w-16 h-16 text-[#9B5DE5] animate-spin mx-auto mb-4" />;
+      return <FaSpinner className="w-16 h-16 text-primary animate-spin mx-auto mb-4" />;
     }
-    return <FaTimes className="w-16 h-16 text-[#9B5DE5] mx-auto mb-4" />;
+    return <FaTimes className="w-16 h-16 text-primary mx-auto mb-4" />;
   };
 
   const getStatusColor = () => {
@@ -49,8 +49,8 @@ function VerifyEmailContent() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="bg-[#000000] rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="bg-background rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
         {getStatusIcon()}
 
         <h1 className={`text-2xl font-bold mb-4 ${getStatusColor()}`}>
@@ -76,7 +76,7 @@ function VerifyEmailContent() {
             </p>
             <button
               onClick={() => router.push('/auth/signin')}
-              className="w-full px-6 py-3 bg-[#36454F] text-white rounded-xl hover:bg-[#9B5DE5] transition-colors font-semibold"
+              className="w-full px-6 py-3 bg-card text-white rounded-xl hover:bg-primary transition-colors font-semibold"
             >
               Go to Sign In
             </button>
@@ -90,8 +90,8 @@ function VerifyEmailContent() {
 export default function VerifyEmail() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="bg-[#000000] rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-background rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
           <FaSpinner className="w-16 h-16 text-purple/75 animate-spin mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-4 text-purple/60">
             Loading...

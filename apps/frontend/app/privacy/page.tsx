@@ -7,8 +7,8 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-black text-white px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-[#000000]/90 p-8 shadow-2xl shadow-purple/10">
+    <div className="min-h-screen bg-background text-white px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-background/90 p-8 shadow-2xl shadow-purple/10">
         <div className="mb-6">
           <p className="text-sm uppercase tracking-[0.24em] text-purple/45">Privacy Policy</p>
           <h1 className="mt-3 text-3xl font-bold text-white">Fwaya Privacy Policy</h1>

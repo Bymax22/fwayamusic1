@@ -4,7 +4,7 @@ import React from "react";
 // Card component
 export const Card = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-card rounded-lg shadow-md overflow-hidden">
       {children}
     </div>
   );

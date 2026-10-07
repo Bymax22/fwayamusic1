@@ -1022,9 +1022,9 @@ export default function ForArtistsPage() {
     if (!editingMedia) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-background/50 z-50 flex items-center justify-center p-4">
         <motion.div 
-          className="bg-black rounded-2xl p-6 max-w-lg w-full max-h-96 overflow-y-auto ring-1 ring-white/10"
+          className="bg-background rounded-2xl p-6 max-w-lg w-full max-h-96 overflow-y-auto ring-1 ring-white/10"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
@@ -1153,9 +1153,9 @@ export default function ForArtistsPage() {
     };
 
     return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-background/50 z-50 flex items-center justify-center p-4">
         <motion.div 
-          className="bg-black rounded-2xl p-6 max-w-lg w-full ring-1 ring-white/10"
+          className="bg-background rounded-2xl p-6 max-w-lg w-full ring-1 ring-white/10"
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
@@ -1264,7 +1264,7 @@ export default function ForArtistsPage() {
               color="bg-gradient-to-br from-purple/20 to-purple/20"
             />
             
-            <div className="md:col-span-2 lg:col-span-3 bg-black p-6 rounded-3xl">
+            <div className="md:col-span-2 lg:col-span-3 bg-background p-6 rounded-3xl">
               <h3 className="text-white/60 mb-4">Plays Over Time</h3>
               <div className="h-64 bg-charcoal rounded-3xl p-4">
                 <div className="flex items-end h-full gap-1">
@@ -1509,7 +1509,7 @@ export default function ForArtistsPage() {
       case 'analytics':
         return (
           <div className="space-y-8">
-            <div className="bg-black p-6 rounded-3xl">
+            <div className="bg-background p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Top Tracks</h3>
               <div className="bg-charcoal rounded-3xl p-4">
                 <table className="w-full">
@@ -1542,7 +1542,7 @@ export default function ForArtistsPage() {
               </div>
             </div>
             
-            <div className="bg-black p-6 rounded-3xl">
+            <div className="bg-background p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Top Countries</h3>
               <div className="bg-charcoal rounded-3xl p-4">
                 <table className="w-full">
@@ -1589,7 +1589,7 @@ export default function ForArtistsPage() {
               </div>
             </div>
             
-            <div className="bg-black rounded-3xl overflow-hidden">
+            <div className="bg-background rounded-3xl overflow-hidden">
               <table className="w-full">
                 <thead>
                   <tr className="text-white/60 text-left">
@@ -1637,7 +1637,7 @@ export default function ForArtistsPage() {
       case 'monetization':
         return (
           <div className="space-y-6">
-            <div className="bg-black p-6 rounded-3xl">
+            <div className="bg-background p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Earnings Overview</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -1660,7 +1660,7 @@ export default function ForArtistsPage() {
               </div>
             </div>
             
-            <div className="bg-black p-6 rounded-3xl">
+            <div className="bg-background p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Commission History</h3>
               <div className="bg-charcoal rounded-3xl p-4">
                 <table className="w-full">
@@ -1703,7 +1703,7 @@ export default function ForArtistsPage() {
       case 'reseller':
         return (
           <div className="space-y-6">
-            <div className="bg-black p-6 rounded-3xl">
+            <div className="bg-background p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Reseller Program</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-charcoal p-6 rounded-3xl">
@@ -1754,7 +1754,7 @@ export default function ForArtistsPage() {
               </div>
             </div>
 
-            <div className="bg-black p-6 rounded-3xl">
+            <div className="bg-background p-6 rounded-3xl">
               <h3 className="text-xl font-bold text-white mb-4">Reseller Settings</h3>
               <div className="space-y-4">
                 {(media || []).map(item => (
@@ -1804,7 +1804,7 @@ export default function ForArtistsPage() {
     <RoleGuard allowedRoles={['ARTIST']} 
       requireKYC={false}
       requireEmailVerification={true}>
-          <div className="bg-black min-h-screen">
+          <div className="bg-background min-h-screen">
         {/* Your artist dashboard content */}
         {user?.kycStatus !== 'APPROVED' && (
           <div className="bg-purple/20 border border-purple/30 rounded-lg p-4 mb-6">
@@ -1816,12 +1816,12 @@ export default function ForArtistsPage() {
       {/* Upload Modal */}
       <AnimatePresence>
         {showUploadModal && (
-          <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-[120] p-2 sm:p-4">
+          <div className="fixed inset-0 bg-background/95 flex items-center justify-center z-[120] p-2 sm:p-4">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#000000] border border-white/10 rounded-[28px] p-4 sm:p-5 w-full max-w-[26rem] shadow-2xl max-h-[calc(100vh-5rem)] overflow-y-auto"
+              className="bg-background border border-white/10 rounded-[28px] p-4 sm:p-5 w-full max-w-[26rem] shadow-2xl max-h-[calc(100vh-5rem)] overflow-y-auto"
             >
               <div className="flex items-center justify-between gap-4 mb-4">
                 <h2 className="text-xl font-bold text-white">Upload New Media</h2>
@@ -1842,7 +1842,7 @@ export default function ForArtistsPage() {
                       <span className="text-white/60 text-sm">Uploading...</span>
                       <span className="text-white font-medium">{uploadProgress}%</span>
                     </div>
-                    <div className="w-full bg-[#000000] rounded-full h-3 overflow-hidden">
+                    <div className="w-full bg-background rounded-full h-3 overflow-hidden">
                       <motion.div 
                         className="h-full bg-purple/75"
                         initial={{ width: 0 }}
@@ -1861,7 +1861,7 @@ export default function ForArtistsPage() {
                     <label className="block text-white/60 mb-2">Title *</label>
                     <input
                       type="text"
-                      className="w-full bg-[#000000] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
+                      className="w-full bg-background rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                       placeholder="Enter media title"
                       value={newMedia.title}
                       onChange={(e) => setNewMedia({...newMedia, title: e.target.value})}
@@ -1872,7 +1872,7 @@ export default function ForArtistsPage() {
                   <div>
                     <label className="block text-white/60 mb-2">Type *</label>
                     <select
-                      className="w-full bg-[#000000] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
+                      className="w-full bg-background rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                       value={newMedia.type}
                       onChange={(e) => setNewMedia({
                         ...newMedia, 
@@ -1895,7 +1895,7 @@ export default function ForArtistsPage() {
                       id="media-release-date"
                       type="date"
                       required
-                      className="w-full bg-[#000000] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
+                      className="w-full bg-background rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                       value={newMedia.releaseDate}
                       onChange={(e) => setNewMedia({ ...newMedia, releaseDate: e.target.value })}
                       disabled={isUploading}
@@ -1906,7 +1906,7 @@ export default function ForArtistsPage() {
                     <label className="block text-white/60 mb-2" htmlFor="media-genre-select">Genre *</label>
                     <select
                       id="media-genre-select"
-                      className="w-full bg-[#000000] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
+                      className="w-full bg-background rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                       value={newMedia.genre}
                       onChange={(e) => setNewMedia({ ...newMedia, genre: e.target.value })}
                       disabled={isUploading}
@@ -1936,7 +1936,7 @@ export default function ForArtistsPage() {
                               type="button"
                               onClick={() => toggleVideoTag(tag)}
                               disabled={isUploading}
-                              className={`rounded-full px-3 py-2 text-sm transition ${isSelected ? 'bg-purple/85 text-white' : 'bg-[#000000] text-white/90 hover:bg-white/10'}`}
+                              className={`rounded-full px-3 py-2 text-sm transition ${isSelected ? 'bg-purple/85 text-white' : 'bg-background text-white/90 hover:bg-white/10'}`}
                             >
                               {tag}
                             </button>
@@ -1961,7 +1961,7 @@ export default function ForArtistsPage() {
                       </div>
 
                       {newMedia.tracks.map((track, index) => (
-                        <div key={track.id} className="rounded-3xl border border-white/10 bg-[#000000] p-3 space-y-3">
+                        <div key={track.id} className="rounded-3xl border border-white/10 bg-background p-3 space-y-3">
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-sm text-white/90">Track {index + 1}</span>
                             {newMedia.tracks.length > 1 && (
@@ -1977,7 +1977,7 @@ export default function ForArtistsPage() {
 
                           <input
                             type="text"
-                            className="w-full bg-[#000000] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
+                            className="w-full bg-background rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                             placeholder="Track title"
                             value={track.title}
                             onChange={(e) => setNewMedia(prev => ({
@@ -1987,7 +1987,7 @@ export default function ForArtistsPage() {
                             disabled={isUploading}
                           />
 
-                          <div className="bg-[#000000] rounded-3xl p-3 text-center">
+                          <div className="bg-background rounded-3xl p-3 text-center">
                             <input
                               type="file"
                               className="hidden"
@@ -2013,7 +2013,7 @@ export default function ForArtistsPage() {
 
                   <div>
                     <label className="block text-white/60 mb-2">Cover Art (Optional)</label>
-                    <div className="bg-[#000000] rounded-3xl p-3 text-center">
+                    <div className="bg-background rounded-3xl p-3 text-center">
                       <input
                         type="file"
                         className="hidden"
@@ -2033,7 +2033,7 @@ export default function ForArtistsPage() {
 
                   <div>
                     <label className="block text-white/60 mb-2">File * (Max {newMedia.type === 'VIDEO' ? '200MB' : '50MB'})</label>
-                    <div className="bg-[#000000] rounded-3xl p-4 text-center">
+                    <div className="bg-background rounded-3xl p-4 text-center">
                       <div className="flex flex-col items-center justify-center gap-1 text-white/60">
                         <Upload className="w-8 h-8 text-purple/60" />
                         <input
@@ -2064,7 +2064,7 @@ export default function ForArtistsPage() {
                     <label className="block text-white/60 mb-2">Pricing</label>
                     <div className="grid grid-cols-1 gap-3">
                       <select
-                        className="w-full bg-[#000000] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
+                        className="w-full bg-background rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                         value={newMedia.accessType}
                         onChange={(e) => setNewMedia({ ...newMedia, accessType: e.target.value as 'FREE' | 'PREMIUM' | 'PAY_PER_VIEW' })}
                         disabled={isUploading}
@@ -2082,7 +2082,7 @@ export default function ForArtistsPage() {
                           ) : (
                             <>
                               <select
-                                className="w-full bg-[#000000] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
+                                className="w-full bg-background rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                                 value={selectedPriceTierId ?? ''}
                                 onChange={(e) => setSelectedPriceTierId(e.target.value ? Number(e.target.value) : null)}
                                 disabled={isUploading}
@@ -2127,7 +2127,7 @@ export default function ForArtistsPage() {
                     <label className="block text-white/60 mb-2">Optional Lyrics</label>
                     <textarea
                       rows={4}
-                      className="w-full bg-[#000000] rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
+                      className="w-full bg-background rounded-3xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple/75"
                       placeholder="Add lyrics or production notes"
                       value={newMedia.lyrics}
                       onChange={(e) => setNewMedia({ ...newMedia, lyrics: e.target.value })}
@@ -2141,7 +2141,7 @@ export default function ForArtistsPage() {
                         setShowUploadModal(false);
                         setNewMedia({ title: '', releaseDate: '', type: 'AUDIO', file: null, artCoverFile: null, artCoverPreview: null, accessType: 'FREE', price: '', genre: '', lyrics: '', tags: '', tracks: [createEmptyTrack()] });
                       }}
-                      className="px-4 py-2 bg-[#000000] text-white rounded-3xl hover:bg-[#000000] transition-colors"
+                      className="px-4 py-2 bg-background text-white rounded-3xl hover:bg-background transition-colors"
                       disabled={isUploading}
                     >
                       Cancel

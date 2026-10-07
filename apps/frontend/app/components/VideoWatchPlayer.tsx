@@ -419,19 +419,19 @@ export default function VideoWatchPlayer({
   const formattedDuration = useMemo(() => formatTime(duration), [duration]);
 
   return (
-    <div className="group rounded-3xl bg-black shadow-2xl shadow-black/40 overflow-hidden">
+    <div className="group rounded-3xl bg-background shadow-2xl shadow-black/40 overflow-hidden">
       <div
-        className="relative bg-black"
+        className="relative bg-background"
         onMouseEnter={() => setShowProgress(true)}
         onMouseLeave={() => setShowProgress(false)}
         onTouchStart={showTouchProgress}
       >
-        <div className="aspect-video w-full bg-black">
+        <div className="aspect-video w-full bg-background">
           {showQualityBadge && (
             <button
               type="button"
               onClick={() => setShowQualityMenu((prev) => !prev)}
-              className="absolute left-3 top-3 z-10 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90 backdrop-blur transition hover:bg-black/85"
+              className="absolute left-3 top-3 z-10 rounded-full bg-background/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90 backdrop-blur transition hover:bg-background/85"
             >
               {selectedQuality === "auto" ? "Auto" : selectedQuality}
             </button>
@@ -439,7 +439,7 @@ export default function VideoWatchPlayer({
           <video
             ref={videoRef}
             poster={poster}
-            className="h-full w-full object-contain bg-black"
+            className="h-full w-full object-contain bg-background"
             onClick={togglePlayPause}
             playsInline
             muted={isMuted}
@@ -447,14 +447,14 @@ export default function VideoWatchPlayer({
             disablePictureInPicture
           />
           {playbackError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-6 text-center text-sm text-purple/30">
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 px-6 text-center text-sm text-purple/30">
               {playbackError}
             </div>
           )}
         </div>
 
         <div className={`absolute inset-x-0 bottom-0 px-4 pb-3 transition-all duration-200 ${showProgress ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
-          <div className="rounded-full bg-black/70 px-3 py-2 backdrop-blur-sm shadow-lg shadow-black/40">
+          <div className="rounded-full bg-background/70 px-3 py-2 backdrop-blur-sm shadow-lg shadow-black/40">
             <input
               type="range"
               min={0}
@@ -471,7 +471,7 @@ export default function VideoWatchPlayer({
         </div>
       </div>
 
-      <div className="px-4 py-4 bg-black">
+      <div className="px-4 py-4 bg-background">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -512,7 +512,7 @@ export default function VideoWatchPlayer({
                   <Settings2 size={16} />
                 </button>
                 {showQualityMenu && (
-                  <div className="absolute bottom-12 right-0 min-w-[120px] rounded-2xl border border-white/10 bg-black/90 p-2 text-sm shadow-xl">
+                  <div className="absolute bottom-12 right-0 min-w-[120px] rounded-2xl border border-white/10 bg-background/90 p-2 text-sm shadow-xl">
                     {getVideoQualityOptions(videoUrl).map((option) => (
                       <button
                         key={option.value}
@@ -585,7 +585,7 @@ export default function VideoWatchPlayer({
               <div className="text-sm text-white/70">{likesCount ?? '-'}</div>
             </div>
           <div className="hidden grid-cols-[1.4fr_0.9fr] gap-3 sm:grid">
-            <div className="flex items-center gap-2 rounded-3xl bg-[#000000] px-3 py-3 text-sm text-white/90">
+            <div className="flex items-center gap-2 rounded-3xl bg-background px-3 py-3 text-sm text-white/90">
               <span className="uppercase tracking-[0.2em] text-white/60">Volume</span>
               <input
                 type="range"
@@ -598,15 +598,15 @@ export default function VideoWatchPlayer({
               />
               <span className="min-w-[40px] text-right text-xs text-white/60">{Math.round(volume * 100)}%</span>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-3xl bg-[#000000] px-3 py-3 text-sm text-white/90">
+            <div className="flex items-center justify-between gap-3 rounded-3xl bg-background px-3 py-3 text-sm text-white/90">
               <span className="uppercase tracking-[0.2em] text-white/60">Speed</span>
               <select
                 value={playbackRate}
                 onChange={handlePlaybackRateChange}
-                className="rounded-2xl bg-[#000000] px-3 py-2 text-sm text-white outline-none"
+                className="rounded-2xl bg-background px-3 py-2 text-sm text-white outline-none"
               >
                 {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
-                  <option key={rate} value={rate} className="bg-[#000000] text-white">
+                  <option key={rate} value={rate} className="bg-background text-white">
                     {rate}x
                   </option>
                 ))}
@@ -617,7 +617,7 @@ export default function VideoWatchPlayer({
       </div>
 
       {!isReady && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-sm text-white/90">Loading video…</div>
+        <div className="absolute inset-0 flex items-center justify-center bg-background/70 text-sm text-white/90">Loading video…</div>
       )}
     </div>
   );

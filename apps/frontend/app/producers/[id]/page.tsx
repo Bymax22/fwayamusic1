@@ -50,9 +50,9 @@ export default function ProducerPage() {
     if (params.id) fetchProducer();
   }, [params.id]);
 
-  if (loading) return <div className="min-h-screen bg-black text-white flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple/75"></div></div>;
+  if (loading) return <div className="min-h-screen bg-background text-white flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple/75"></div></div>;
   if (error || !producer) return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="min-h-screen bg-background text-white flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-white mb-4">Producer Not Found</h1>
         <button onClick={() => router.back()} className="bg-purple/75 text-white px-6 py-2 rounded-lg">Go Back</button>
@@ -61,7 +61,7 @@ export default function ProducerPage() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="p-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-6 mb-6">
           <div className="relative w-28 h-28 rounded-xl overflow-hidden">
@@ -91,7 +91,7 @@ export default function ProducerPage() {
           <div className="grid grid-cols-3 gap-4">
             {producer.media.map((m: any, idx: number) => (
               <div key={m.id || idx} className="bg-white/5 rounded-lg p-3">
-                <div className="aspect-[4/3] bg-black rounded-md" style={{backgroundImage: m.coverArt ? `url(${m.coverArt})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center'}} />
+                <div className="aspect-[4/3] bg-background rounded-md" style={{backgroundImage: m.coverArt ? `url(${m.coverArt})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center'}} />
                 <ScrollingTrackTitle isPlaying={String(currentTrack?.id) === String(m.id) && isPlaying} className="mt-2 text-sm font-medium">{m.title}</ScrollingTrackTitle>
               </div>
             ))}

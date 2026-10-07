@@ -47,7 +47,7 @@ export default function TrendingPage() {
   if (loading) return <div className="p-4 text-center">Loading trending tracks...</div>;
 
   return (
-    <div className="min-h-screen bg-black/95 p-4 md:p-8">
+    <div className="min-h-screen bg-background/95 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <TrendingUp className="w-8 h-8 text-purple/60" />
@@ -61,7 +61,7 @@ export default function TrendingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="group bg-[#000000]/80 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/10 hover:border-purple/30 transition-all"
+              className="group bg-background/80 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/10 hover:border-purple/30 transition-all"
             >
               <div className="relative">
                 <Image
@@ -76,7 +76,7 @@ export default function TrendingPage() {
                 />
                 <button
                   onClick={() => playTrack(track)}
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute inset-0 flex items-center justify-center bg-background/50 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <Play className="w-12 h-12 text-purple/45 fill-purple/45" />
                 </button>

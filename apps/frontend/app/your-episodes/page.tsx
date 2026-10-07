@@ -63,7 +63,7 @@ export default function YourEpisodesPage() {
   if (loading) return <div className="p-4 text-center">Loading episodes...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#36454F] to-[#36454F] p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-card to-card p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <History className="w-8 h-8 text-primary" />
@@ -78,7 +78,7 @@ export default function YourEpisodesPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="group bg-[#36454F]/50 backdrop-blur-lg rounded-lg overflow-hidden border border-primary/20 hover:border-primary/50 transition-all p-4 flex items-center gap-4"
+                className="group bg-card/50 backdrop-blur-lg rounded-lg overflow-hidden border border-primary/20 hover:border-primary/50 transition-all p-4 flex items-center gap-4"
               >
                 <div className="relative flex-shrink-0">
                   <Image
@@ -93,7 +93,7 @@ export default function YourEpisodesPage() {
                   />
                   <button
                     onClick={() => playTrack(episode)}
-                    className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded"
+                    className="absolute inset-0 flex items-center justify-center bg-background/50 opacity-0 group-hover:opacity-100 transition-opacity rounded"
                   >
                     <Play className="w-6 h-6 text-primary fill-primary" />
                   </button>

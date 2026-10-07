@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function AdvertisingPage() {
   return (
-    <div className="min-h-screen pb-40 px-5 pt-6 bg-black text-white">
+    <div className="min-h-screen pb-40 px-5 pt-6 bg-background text-white">
       <main className="max-w-3xl mx-auto">
         <h1 className="text-2xl font-semibold">Advertising</h1>
         <p className="mt-2 text-white/60">Reach millions of listeners on Fwaya. Tell us about your campaign and we'll get back to you.</p>

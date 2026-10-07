@@ -42,18 +42,18 @@ export default function TicketDetail() {
   if (!user || !['ADMIN','MODERATOR','CONTENT_MANAGER'].includes(user.role)) return <div className="p-6">Access denied.</div>;
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] p-6 text-black sm:p-8">
+    <div className="min-h-screen bg-card p-6 text-foreground sm:p-8">
       <div className="mx-auto max-w-3xl">
         <button onClick={() => router.push('/admin/support')} className="mb-4 text-sm text-purple/90">← Back to support center</button>
         {loading ? <p>Loading…</p> : (
           ticket ? (
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="rounded-2xl bg-card p-6 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-purple/90">Support conversation</p><h2 className="mt-2 text-lg font-semibold">{ticket.ticketId}</h2>
               <p className="text-sm text-white/60">From: {ticket.name || ticket.email}</p>
               <p className="mt-3 text-sm text-white/80">{ticket.message}</p>
               <div className="mt-4">
                 <label className="text-sm text-white/60">Status</label>
-                <select value={status} onChange={(e) => setStatus(e.target.value)} className="ml-2 rounded-xl bg-white/10 p-2 text-black">
+                <select value={status} onChange={(e) => setStatus(e.target.value)} className="ml-2 rounded-xl bg-white/10 p-2 text-foreground">
                   <option>OPEN</option>
                   <option>IN_PROGRESS</option>
                   <option>RESOLVED</option>

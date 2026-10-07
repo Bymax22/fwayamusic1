@@ -112,11 +112,11 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
 
-  background: #000000;
+  background: rgb(var(--background));
 }
 
 html {
-  background: #000000;
+  background: rgb(var(--background));
 }
 
 /* ===============================
@@ -243,8 +243,8 @@ html {
     justify-content: space-between;
     background: linear-gradient(
       90deg,
-      rgba(54, 69, 79, 0.6),
-      rgba(155, 93, 229, 0.2)
+      rgba(var(--card), 0.6),
+      rgba(var(--primary-accent), 0.2)
     );
     backdrop-filter: blur(20px);
     border-radius: var(--radius-lg);
@@ -473,7 +473,7 @@ html {
 
 /* Show on hover */
 .scrollbar-modern:hover::-webkit-scrollbar-thumb {
-  background: rgba(155, 93, 229, 0.6); /* purple */
+  background: rgba(var(--primary-accent), 0.6);
 }
 
 /* Firefox */
@@ -483,5 +483,5 @@ html {
 }
 
 .scrollbar-modern:hover {
-  scrollbar-color: rgba(155, 93, 229, 0.6) transparent;
+  scrollbar-color: rgba(var(--primary-accent), 0.6) transparent;
 }

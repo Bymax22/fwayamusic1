@@ -119,11 +119,11 @@ export default function ProducerSignIn() {
 
   return (
     <>
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-black rounded-3xl p-8 w-full max-w-md shadow-2xl"
+          className="bg-background rounded-3xl p-8 w-full max-w-md shadow-2xl"
         >
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-purple/90 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -145,7 +145,7 @@ export default function ProducerSignIn() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
+                className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
                 placeholder="your@email.com"
               />
               {errors.email && <p className="text-purple/60 text-sm mt-1">{errors.email}</p>}
@@ -160,7 +160,7 @@ export default function ProducerSignIn() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 pr-12"
+                  className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 pr-12"
                   placeholder="••••••••"
                 />
                 <button
@@ -211,14 +211,14 @@ export default function ProducerSignIn() {
               <div className="flex gap-4">
                 <button
                   onClick={() => handleSocialSignIn('google')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors font-medium"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-background text-white rounded-xl hover:bg-background transition-colors font-medium"
                 >
                   <FaGoogle className="w-5 h-5" />
                   Google
                 </button>
                 <button
                   onClick={() => handleSocialSignIn('facebook')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors font-medium"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-background text-white rounded-xl hover:bg-background transition-colors font-medium"
                 >
                   <FaFacebook className="w-5 h-5" />
                   Facebook

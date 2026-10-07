@@ -134,8 +134,8 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
         </button>
 
         <div className="grid min-w-0 gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <div className="w-full min-w-0 overflow-hidden rounded-3xl bg-[#000000] shadow-2xl shadow-black/30">
-            <div className="relative mx-auto aspect-square w-full max-w-lg overflow-hidden bg-black sm:aspect-[4/5] lg:h-96 lg:max-w-none">
+          <div className="w-full min-w-0 overflow-hidden rounded-3xl bg-background shadow-2xl shadow-black/30">
+            <div className="relative mx-auto aspect-square w-full max-w-lg overflow-hidden bg-background sm:aspect-[4/5] lg:h-96 lg:max-w-none">
               <Image
                 src={album.coverUrl || album.artCoverUrl || album.thumbnailUrl || '/default-cover.jpg'}
                 alt={album.title || 'Album cover'}
@@ -203,12 +203,12 @@ export default function AlbumDetailClient({ album }: AlbumDetailClientProps) {
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-3xl bg-[#000000] p-6 shadow-2xl shadow-black/30">
+            <div className="rounded-3xl bg-background p-6 shadow-2xl shadow-black/30">
               <h3 className="text-sm text-white/60">About</h3>
               <p className="mt-2 text-sm leading-7 text-white/90">{album.description || 'No description provided yet.'}</p>
             </div>
 
-            <div className="rounded-3xl bg-[#000000] p-4 shadow-2xl shadow-black/30">
+            <div className="rounded-3xl bg-background p-4 shadow-2xl shadow-black/30">
               <div className="mb-3 flex items-center justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.3em] text-purple/45">Tracklist</p>

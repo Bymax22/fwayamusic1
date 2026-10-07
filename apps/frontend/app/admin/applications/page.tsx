@@ -72,7 +72,7 @@ function ApplicationsWorkspace() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FFFFFF] px-5 py-8 text-black sm:px-8 lg:px-10">
+    <main className="min-h-screen bg-card px-5 py-8 text-foreground sm:px-8 lg:px-10">
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -80,18 +80,18 @@ function ApplicationsWorkspace() {
             <h1 className="mt-2 text-3xl font-semibold">Signup approvals</h1>
             <p className="mt-2 text-sm text-white/60">Review artist, producer, and reseller applications before activation.</p>
           </div>
-          <button onClick={() => void loadApplications()} className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm text-white shadow-lg shadow-black/10 hover:bg-purple/90" disabled={loading}>
+          <button onClick={() => void loadApplications()} className="inline-flex items-center justify-center gap-2 rounded-xl bg-background px-4 py-3 text-sm text-white shadow-lg shadow-black/10 hover:bg-purple/90" disabled={loading}>
             <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Refresh
           </button>
         </header>
         {error && <div className="rounded-xl bg-purple/20 px-4 py-3 text-sm text-purple/90">{error}</div>}
-        {loading ? <div className="rounded-2xl bg-white p-6 text-white/60 shadow-sm">Loading applications...</div> : applications.length === 0 ? <div className="rounded-2xl bg-white p-6 text-white/60 shadow-sm">No pending applications.</div> : (
+        {loading ? <div className="rounded-2xl bg-card p-6 text-white/60 shadow-sm">Loading applications...</div> : applications.length === 0 ? <div className="rounded-2xl bg-card p-6 text-white/60 shadow-sm">No pending applications.</div> : (
           <div className="space-y-3">
             {applications.map((application) => (
-              <article key={application.id} className="rounded-2xl bg-white p-5 shadow-sm">
+              <article key={application.id} className="rounded-2xl bg-card p-5 shadow-sm">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   <div>
-                    <div className="flex flex-wrap items-center gap-2"><h2 className="font-semibold text-black">{application.displayName || application.username}</h2><span className="rounded-full bg-purple/20 px-2 py-1 text-xs uppercase text-purple/90">{application.role}</span></div>
+                    <div className="flex flex-wrap items-center gap-2"><h2 className="font-semibold text-foreground">{application.displayName || application.username}</h2><span className="rounded-full bg-purple/20 px-2 py-1 text-xs uppercase text-purple/90">{application.role}</span></div>
                     <p className="mt-1 text-sm text-white/60">{application.email} {application.country ? `· ${application.country}` : ''}</p>
                     <p className="mt-2 text-xs text-white/60">Submitted {new Date(application.createdAt).toLocaleString()}</p>
                     <p className="mt-1 text-sm text-white/80">{application.artistName || application.producerName || application.businessName || 'No profile name supplied'}</p>

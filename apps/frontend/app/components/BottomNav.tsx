@@ -84,7 +84,7 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
                 <Icon
                   size={22}
                   className={isActive ? "text-purple/60" : "text-current"}
-                  fill={isActive ? "rgba(155, 93, 229, 0.2)" : "none"}
+                  fill={isActive ? "rgba(var(--primary-accent), 0.2)" : "none"}
                 />
               ) : null}
               <span className="text-[10px] font-medium">{item.label}</span>
@@ -101,10 +101,10 @@ export default function BottomNav({ onMoreClick }: BottomNavProps) {
           className={`fixed inset-0 z-[9999] flex items-end justify-center transition-opacity duration-200 ${needHelpClosing ? 'opacity-0' : 'opacity-100'}`}
           onClick={closeNeedHelp}
         >
-          <div className={`absolute inset-0 bg-black/60 transition-opacity duration-200 ${needHelpClosing ? 'opacity-0' : 'opacity-100'}`} />
+          <div className={`absolute inset-0 bg-background/60 transition-opacity duration-200 ${needHelpClosing ? 'opacity-0' : 'opacity-100'}`} />
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`relative w-full max-w-md bg-black rounded-t-3xl p-4 z-10 transition-all duration-200 ${needHelpClosing ? 'translate-y-6 opacity-0' : 'translate-y-0 opacity-100'}`}
+            className={`relative w-full max-w-md bg-background rounded-t-3xl p-4 z-10 transition-all duration-200 ${needHelpClosing ? 'translate-y-6 opacity-0' : 'translate-y-0 opacity-100'}`}
             style={{ marginBottom: '72px' }}
           >
             <div className="flex items-center justify-between">

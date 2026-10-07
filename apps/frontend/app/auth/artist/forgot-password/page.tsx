@@ -39,14 +39,14 @@ export default function ArtistForgotPassword() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#000000] rounded-3xl p-8 w-full max-w-md shadow-2xl"
+          className="bg-background rounded-3xl p-8 w-full max-w-md shadow-2xl"
         >
           <div className="text-center">
-            <div className="w-16 h-16 bg-[#000000] rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center mx-auto mb-4">
               <FaCheck className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-4">Check Your Email</h1>
@@ -65,7 +65,7 @@ export default function ArtistForgotPassword() {
               </Link>
               <button
                 onClick={() => setIsSubmitted(false)}
-                className="w-full px-4 py-2 border border-purple/40 text-white rounded-lg hover:bg-[#36454F] transition-colors"
+                className="w-full px-4 py-2 border border-purple/40 text-white rounded-lg hover:bg-card transition-colors"
               >
                 Try Another Email
               </button>
@@ -77,14 +77,14 @@ export default function ArtistForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#000000] rounded-3xl p-8 w-full max-w-md shadow-2xl"
+        className="bg-background rounded-3xl p-8 w-full max-w-md shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#000000] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center mx-auto mb-4">
             <FaMusic className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Reset Your Password</h1>
@@ -100,7 +100,7 @@ export default function ArtistForgotPassword() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+              className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               placeholder="your@email.com"
             />
             {errors.email && <p className="text-purple/60 text-sm mt-1">{errors.email}</p>}

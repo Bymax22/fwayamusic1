@@ -187,14 +187,14 @@ export default function ResellerSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#000000] rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
+        className="bg-background rounded-3xl p-8 w-full max-w-2xl shadow-2xl"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#000000] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center mx-auto mb-4">
             <FaStore className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join as Reseller</h1>
@@ -260,7 +260,7 @@ export default function ResellerSignUp() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="your@email.com"
                 />
                 {errors.email && <p className="text-purple/60 text-sm mt-1">{errors.email}</p>}
@@ -274,7 +274,7 @@ export default function ResellerSignUp() {
                   type="text"
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="username"
                 />
                 {errors.username && <p className="text-purple/60 text-sm mt-1">{errors.username}</p>}
@@ -289,7 +289,7 @@ export default function ResellerSignUp() {
                 type="text"
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="Your display name"
               />
             </div>
@@ -302,7 +302,7 @@ export default function ResellerSignUp() {
                 type="file"
                 accept="image/*"
                 onChange={(e) => setFormData({ ...formData, avatarFile: e.target.files?.[0] || null })}
-                className="w-full px-4 py-3 bg-[#36454F] border border-[#000000] rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#36454F] file:text-purple/45 hover:file:bg-[#36454F]"
+                className="w-full px-4 py-3 bg-card border border-background rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-card file:text-purple/45 hover:file:bg-card"
               />
             </div>
 
@@ -316,7 +316,7 @@ export default function ResellerSignUp() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-12"
+                    className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-12"
                     placeholder="••••••••"
                   />
                   <button
@@ -338,7 +338,7 @@ export default function ResellerSignUp() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="••••••••"
                 />
                 {errors.confirmPassword && <p className="text-purple/60 text-sm mt-1">{errors.confirmPassword}</p>}
@@ -348,7 +348,7 @@ export default function ResellerSignUp() {
             <div className="flex justify-between pt-4">
               <Link
                 href="/auth/reseller/signin"
-                className="flex items-center gap-2 px-6 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-background text-white rounded-xl hover:bg-background transition-colors"
               >
                 <FaArrowLeft className="w-4 h-4" />
                 Back to Sign In
@@ -383,7 +383,7 @@ export default function ResellerSignUp() {
                   type="text"
                   value={formData.businessName}
                   onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="Your business name"
                 />
                 {errors.businessName && <p className="text-purple/60 text-sm mt-1">{errors.businessName}</p>}
@@ -396,7 +396,7 @@ export default function ResellerSignUp() {
                 <select
                   value={formData.businessType}
                   onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 >
                   <option value="">Select business type</option>
                   {businessTypes.map((type) => (
@@ -418,7 +418,7 @@ export default function ResellerSignUp() {
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   placeholder="+260 96 123 4567"
                 />
                 {errors.phoneNumber && <p className="text-purple/60 text-sm mt-1">{errors.phoneNumber}</p>}
@@ -432,7 +432,7 @@ export default function ResellerSignUp() {
                   type="date"
                   value={formData.dateOfBirth}
                   onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 />
                 {errors.dateOfBirth && <p className="text-purple/60 text-sm mt-1">{errors.dateOfBirth}</p>}
               </div>
@@ -446,7 +446,7 @@ export default function ResellerSignUp() {
                 type="text"
                 value={formData.taxNumber}
                 onChange={(e) => setFormData({ ...formData, taxNumber: e.target.value })}
-                className="w-full px-4 py-3 bg-[#000000] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                className="w-full px-4 py-3 bg-background rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 placeholder="Tax ID or VAT number"
               />
               <p className="text-white/60 text-sm mt-1">
@@ -457,7 +457,7 @@ export default function ResellerSignUp() {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors"
+                className="px-6 py-3 bg-background text-white rounded-xl hover:bg-background transition-colors"
               >
                 Back
               </button>
@@ -482,14 +482,14 @@ export default function ResellerSignUp() {
               Reseller Agreements
             </h2>
 
-            <div className="bg-[#36454F] rounded-xl p-6 space-y-4">
+            <div className="bg-card rounded-xl p-6 space-y-4">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms-reseller"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-background border-background rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="terms-reseller" className="text-white text-sm">
                   I agree to the <a href="/terms" className="text-purple/60 hover:text-purple/45 hover:underline">Reseller Terms of Service</a> and <a href="/privacy" className="text-purple/60 hover:text-purple/45 hover:underline">Privacy Policy</a> *
@@ -503,7 +503,7 @@ export default function ResellerSignUp() {
                   id="privacy-reseller"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-background border-background rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="privacy-reseller" className="text-white text-sm">
                   I acknowledge that I have read and understood how my personal and business data will be processed *
@@ -517,7 +517,7 @@ export default function ResellerSignUp() {
                   id="cookies-reseller"
                   checked={formData.acceptedCookies}
                   onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-background border-background rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="cookies-reseller" className="text-white text-sm">
                   I agree to the use of cookies for analytics and personalization.
@@ -531,7 +531,7 @@ export default function ResellerSignUp() {
                   id="marketing-reseller"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-background border-background rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="marketing-reseller" className="text-white text-sm">
                   I agree to receive marketing emails and promotional offers
@@ -544,7 +544,7 @@ export default function ResellerSignUp() {
                   id="dataSharing-reseller"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/75 bg-[#000000] border-[#000000] rounded focus:ring-purple/75 focus:ring-2"
+                  className="mt-1 w-4 h-4 text-purple/75 bg-background border-background rounded focus:ring-purple/75 focus:ring-2"
                 />
                 <label htmlFor="dataSharing-reseller" className="text-white text-sm">
                   I consent to my data being shared with trusted partners for service improvement
@@ -554,7 +554,7 @@ export default function ResellerSignUp() {
 
             {/* Avatar Upload */}
             <div className="flex flex-col items-center gap-4 mb-6">
-              <div className="w-32 h-32 rounded-full bg-[#000000] border border-[#000000] flex items-center justify-center overflow-hidden">
+              <div className="w-32 h-32 rounded-full bg-background border border-background flex items-center justify-center overflow-hidden">
                 {avatarPreview ? (
                   <Image
                     src={avatarPreview}
@@ -571,7 +571,7 @@ export default function ResellerSignUp() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="px-4 py-2 bg-[#000000] border border-[#000000] text-white rounded-lg hover:bg-[#000000] transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-background border border-background text-white rounded-lg hover:bg-background transition-colors disabled:opacity-50"
               >
                 {uploading ? 'Uploading...' : 'Upload Avatar'}
               </button>
@@ -588,7 +588,7 @@ export default function ResellerSignUp() {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="px-6 py-3 bg-[#000000] text-white rounded-xl hover:bg-[#000000] transition-colors"
+                className="px-6 py-3 bg-background text-white rounded-xl hover:bg-background transition-colors"
               >
                 Back
               </button>
@@ -638,13 +638,13 @@ export default function ResellerSignUp() {
                 type="button"
                 onClick={handleResendVerificationEmail}
                 disabled={resendLoading}
-                className="mt-4 px-5 py-2 bg-[#000000] rounded-xl text-white hover:bg-[#000000] transition-colors disabled:opacity-50"
+                className="mt-4 px-5 py-2 bg-background rounded-xl text-white hover:bg-background transition-colors disabled:opacity-50"
               >
                 {resendLoading ? 'Resending…' : 'Resend verification email'}
               </button>
             </div>
 
-            <div className="bg-[#000000] border border-[#000000] rounded-xl p-4">
+            <div className="bg-background border border-background rounded-xl p-4">
               <p className="text-purple/30 text-sm">
                 <strong>Important:</strong> After email verification, you&lsquo;ll need to complete KYC and business verification to start reselling and receiving commissions.
               </p>
@@ -659,7 +659,7 @@ export default function ResellerSignUp() {
               </button>
               <button
                 onClick={() => setStep('basic')}
-                className="w-full px-6 py-3 border border-[#000000] text-white rounded-xl hover:bg-[#36454F] transition-colors"
+                className="w-full px-6 py-3 border border-background text-white rounded-xl hover:bg-card transition-colors"
               >
                 Create Another Account
               </button>

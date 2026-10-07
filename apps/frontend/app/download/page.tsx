@@ -360,7 +360,7 @@ const handleDownload = async (item: DownloadItem) => {
 
   return (
       <>
-      <div className="min-h-screen bg-black p-4 text-white sm:p-6">
+      <div className="min-h-screen bg-background p-4 text-white sm:p-6">
       
       {/* Network Status Notification */}
       {showNetworkNotification && (
@@ -398,7 +398,7 @@ const handleDownload = async (item: DownloadItem) => {
                   if (window.history.length > 1) router.back();
                   else router.push('/browse');
                 }}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#000000] text-white/75 transition hover:bg-purple/85 hover:text-white"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-background text-white/75 transition hover:bg-purple/85 hover:text-white"
                 aria-label="Go back"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -419,7 +419,7 @@ const handleDownload = async (item: DownloadItem) => {
                 {formatFileSize(storageUsage.used)} / {formatFileSize(storageUsage.total)}
               </span>
             </div>
-            <div className="w-full sm:w-32 h-2 bg-[#000000] rounded-full overflow-hidden">
+            <div className="w-full sm:w-32 h-2 bg-background rounded-full overflow-hidden">
               <div 
                 className="h-full bg-gradient-to-r from-purple/75 to-purple/75 rounded-full"
                 style={{ width: `${calculateStoragePercentage()}%` }}
@@ -430,7 +430,7 @@ const handleDownload = async (item: DownloadItem) => {
               className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center transition-colors ${
                 isOfflineMode 
                   ? 'bg-purple/75 text-white'
-                  : 'bg-[#000000] text-white/90'
+                  : 'bg-background text-white/90'
               }`}
               title={!isOnline || connectionQuality === 'offline' ? 'You are offline' : 'Toggle offline mode'}
             >
@@ -458,7 +458,7 @@ const handleDownload = async (item: DownloadItem) => {
           </div>
         )}
 
-        <div className="mb-6 rounded-lg bg-[#000000] p-3 text-xs text-white/90">
+        <div className="mb-6 rounded-lg bg-background p-3 text-xs text-white/90">
           <Shield className="mr-2 inline h-4 w-4 text-purple/45" />
           Downloads stay in this browser’s private Fwaya storage. Protected files are encrypted for this browser; they are not exported to the phone’s public Music or Downloads folder.
           {downloadedFiles.length > 0 && (
@@ -500,7 +500,7 @@ const handleDownload = async (item: DownloadItem) => {
               return (
                 <div 
                   key={item.id} 
-                  className="flex items-center gap-3 rounded-xl bg-[#000000] p-2 transition-colors hover:bg-[#000000]"
+                  className="flex items-center gap-3 rounded-xl bg-background p-2 transition-colors hover:bg-background"
                 >
                   <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md sm:h-16 sm:w-16">
                     <Image
@@ -591,7 +591,7 @@ const handleDownload = async (item: DownloadItem) => {
                             </button>
                           </>
                         ) : item.downloadStatus === 'downloading' ? (
-                          <div className="w-16 sm:w-20 bg-[#000000] rounded-full h-1.5">
+                          <div className="w-16 sm:w-20 bg-background rounded-full h-1.5">
                             <div 
                               className="bg-gradient-to-r from-purple/75 to-purple/75 h-1.5 rounded-full"
                               style={{ width: `${item.progress || 0}%` }}
@@ -659,7 +659,7 @@ const handleDownload = async (item: DownloadItem) => {
             
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
               {suggestions.slice(0, 5).map(item => (
-                <div key={item.id} className="bg-[#000000] rounded-lg p-2 sm:p-3 hover:bg-[#000000] transition-colors">
+                <div key={item.id} className="bg-background rounded-lg p-2 sm:p-3 hover:bg-background transition-colors">
                   <div className="relative mb-2 sm:mb-3">
                     <Image
                       src={item.coverArt} 
@@ -689,14 +689,14 @@ const handleDownload = async (item: DownloadItem) => {
 
         {/* Download Queue */}
         {downloads.filter(d => d.downloadStatus === 'downloading').length > 0 && (
-          <div className="mt-8 sm:mt-12 bg-[#000000] rounded-xl p-4 sm:p-6">
+          <div className="mt-8 sm:mt-12 bg-background rounded-xl p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
               <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 text-purple/45" />
               Download Queue
             </h2>
             <div className="space-y-2 sm:space-y-3">
               {downloads.filter(d => d.downloadStatus === 'downloading').map(item => (
-                <div key={item.id} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 bg-[#000000] rounded-lg">
+                <div key={item.id} className="flex items-center gap-3 sm:gap-4 p-2 sm:p-3 bg-background rounded-lg">
                   <Image
                     src={item.coverArt} 
                     alt={item.title} 
@@ -707,7 +707,7 @@ const handleDownload = async (item: DownloadItem) => {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-white truncate text-sm sm:text-base">{item.title}</h3>
                     <p className="text-xs sm:text-sm text-white/60 truncate">{item.artist}</p>
-                    <div className="w-full bg-black rounded-full h-1 sm:h-1.5 mt-1 sm:mt-2">
+                    <div className="w-full bg-background rounded-full h-1 sm:h-1.5 mt-1 sm:mt-2">
                       <div 
                         className="bg-gradient-to-r from-purple/75 to-purple/75 h-full rounded-full"
                         style={{ width: `${item.progress || 0}%` }}
@@ -723,7 +723,7 @@ const handleDownload = async (item: DownloadItem) => {
 
         {/* DRM Information */}
         {downloads.some(d => d.isDRMProtected) && (
-          <div className="mt-8 sm:mt-12 bg-[#000000] rounded-xl p-4 sm:p-6">
+          <div className="mt-8 sm:mt-12 bg-background rounded-xl p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
               <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-purple/60" />
               DRM Protection Information

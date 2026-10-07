@@ -83,7 +83,7 @@ export default function ConnectDevicePage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-4xl mx-auto bg-gradient-to-br from-card/95 to-background/95 min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Connect Device</h1>
@@ -92,7 +92,7 @@ export default function ConnectDevicePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Available Devices */}
-        <div className="bg-[#36454F]/70 rounded-xl p-6">
+        <div className="bg-card/70 rounded-xl p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-white">Available Devices</h2>
             <button 
@@ -107,7 +107,7 @@ export default function ConnectDevicePage() {
             {devices.map(device => (
               <div 
                 key={device.id} 
-                className="flex items-center justify-between p-4 bg-[#36454F] rounded-lg hover:bg-[#36454F]/80 transition-colors"
+                className="flex items-center justify-between p-4 bg-card rounded-lg hover:bg-card/80 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-12 h-12 ${getDeviceTypeColor(device.type)} rounded-xl flex items-center justify-center text-white`}>
@@ -128,8 +128,8 @@ export default function ConnectDevicePage() {
                   onClick={() => toggleDeviceConnection(device.id)}
                   className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                     device.isConnected
-                      ? 'bg-[#36454F] hover:bg-[#9B5DE5] text-white'
-                      : 'bg-[#000000] hover:bg-[#36454F] text-white/90'
+                      ? 'bg-card hover:bg-primary text-white'
+                      : 'bg-background hover:bg-card text-white/90'
                   }`}
                 >
                   {device.isConnected ? 'Connected' : 'Connect'}
@@ -151,19 +151,19 @@ export default function ConnectDevicePage() {
         {/* Connection Methods */}
         <div className="space-y-6">
           {/* QR Code Connection */}
-          <div className="bg-[#36454F]/70 rounded-xl p-6">
+          <div className="bg-card/70 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Quick Connect</h2>
             <div className="text-center">
               <div 
-                className="w-48 h-48 bg-white rounded-xl mx-auto mb-4 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors"
+                className="w-48 h-48 bg-card rounded-xl mx-auto mb-4 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors"
                 onClick={() => setShowQR(true)}
               >
                 {showQR ? (
                   <div className="text-center p-4">
-                    <div className="w-32 h-32 bg-black mx-auto mb-2 flex items-center justify-center text-white text-xs">
+                    <div className="w-32 h-32 bg-background mx-auto mb-2 flex items-center justify-center text-white text-xs">
                       QR Code
                     </div>
-                    <p className="text-black text-sm">Scan to connect</p>
+                    <p className="text-foreground text-sm">Scan to connect</p>
                   </div>
                 ) : (
                   <QrCode className="w-16 h-16 text-white/60" />
@@ -171,7 +171,7 @@ export default function ConnectDevicePage() {
               </div>
               <button
                 onClick={() => setShowQR(!showQR)}
-                className="text-[#36454F] hover:text-[#9B5DE5] transition-colors"
+                className="text-card-foreground hover:text-primary transition-colors"
               >
                 {showQR ? 'Hide QR Code' : 'Show QR Code'}
               </button>
@@ -179,11 +179,11 @@ export default function ConnectDevicePage() {
           </div>
 
           {/* Connection Info */}
-          <div className="bg-[#36454F]/70 rounded-xl p-6">
+          <div className="bg-card/70 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Connection Guide</h2>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <Wifi className="w-5 h-5 text-[#36454F]" />
+                <Wifi className="w-5 h-5 text-card-foreground" />
                 <div>
                   <p className="text-white font-medium">Wi-Fi Network</p>
                   <p className="text-white/60 text-sm">Ensure devices are on the same network</p>
@@ -191,7 +191,7 @@ export default function ConnectDevicePage() {
               </div>
               
               <div className="flex items-center gap-3">
-                <Bluetooth className="w-5 h-5 text-[#36454F]" />
+                <Bluetooth className="w-5 h-5 text-card-foreground" />
                 <div>
                   <p className="text-white font-medium">Bluetooth</p>
                   <p className="text-white/60 text-sm">Pair devices via Bluetooth for direct connection</p>
@@ -199,7 +199,7 @@ export default function ConnectDevicePage() {
               </div>
               
               <div className="flex items-center gap-3">
-                <QrCode className="w-5 h-5 text-[#36454F]" />
+                <QrCode className="w-5 h-5 text-card-foreground" />
                 <div>
                   <p className="text-white font-medium">QR Code</p>
                   <p className="text-white/60 text-sm">Scan QR code with your mobile device</p>
@@ -209,7 +209,7 @@ export default function ConnectDevicePage() {
           </div>
 
           {/* Current Connection Status */}
-          <div className="bg-[#36454F]/70 rounded-xl p-6">
+          <div className="bg-card/70 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Current Connection</h2>
             {devices.find(d => d.isConnected) ? (
               <div className="space-y-3">

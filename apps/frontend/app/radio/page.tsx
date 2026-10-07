@@ -47,7 +47,7 @@ export default function RadioPage() {
   if (loading) return <div className="p-4 text-center">Loading radio stations...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#000000] to-[#000000] p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Radio className="w-8 h-8 text-purple/75 animate-pulse" />
@@ -61,7 +61,7 @@ export default function RadioPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="group bg-[#36454F]/50 backdrop-blur-lg rounded-lg overflow-hidden border border-purple/20 hover:border-purple/50 transition-all"
+              className="group bg-card/50 backdrop-blur-lg rounded-lg overflow-hidden border border-purple/20 hover:border-purple/50 transition-all"
             >
               <div className="relative">
                 <Image
@@ -76,7 +76,7 @@ export default function RadioPage() {
                 />
                 <button
                   onClick={() => playTrack(track)}
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute inset-0 flex items-center justify-center bg-background/50 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <Play className="w-12 h-12 text-purple/75 fill-purple/75" />
                 </button>
@@ -88,14 +88,14 @@ export default function RadioPage() {
                 
                 <div className="flex items-center justify-between text-xs text-white/60 mb-3">
                   <span>{(track.views || 0).toLocaleString()} listens</span>
-                  <span className="px-2 py-1 bg-[#36454F] rounded text-purple/60 font-semibold">{track.type || 'Podcast'}</span>
+                  <span className="px-2 py-1 bg-card rounded text-purple/60 font-semibold">{track.type || 'Podcast'}</span>
                 </div>
 
                 <div className="flex gap-2">
                   <button className="flex-1 p-2 bg-purple/20 text-purple/60 rounded hover:bg-purple/30 transition-colors text-xs font-semibold">
                     <Heart className="w-4 h-4 inline mr-1" /> Like
                   </button>
-                  <button className="flex-1 p-2 bg-[#36454F] text-white/90 rounded hover:bg-[#36454F] transition-colors text-xs font-semibold">
+                  <button className="flex-1 p-2 bg-card text-white/90 rounded hover:bg-card transition-colors text-xs font-semibold">
                     <Download className="w-4 h-4 inline mr-1" /> Subscribe
                   </button>
                 </div>

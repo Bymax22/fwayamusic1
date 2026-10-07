@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, Bell, Moon, Sun, ChevronRight, Crown } from "lucide-react";
+import { X, Home, Search, Library, User, Music, Heart, Plus, Download, Settings, LogIn, UserPlus, Compass, Bell, Sun, Check, ChevronRight, Crown } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import SubscriptionModal from "./modal/SubscriptionModal";
 
 interface MobileMenuProps {
@@ -23,9 +24,10 @@ const Icon = ({ children }: { children: React.ReactNode }) => (
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { palette, palettes, selectPalette } = useTheme();
   const [activeMenuTab, setActiveMenuTab] = useState("menu");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [showPaletteChooser, setShowPaletteChooser] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"signin" | "signup" | null>(null);
   const [subscriptionOpen, setSubscriptionOpen] = useState(false);
   const hasActivePremium = Boolean(user?.isPremium && user.premiumUntil && new Date(user.premiumUntil) > new Date());
@@ -183,7 +185,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-50"
+            className="fixed inset-0 bg-background/60 z-50"
             onClick={onClose}
           />
           
@@ -197,10 +199,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               damping: 30, 
               stiffness: 300 
             }}
-            className={`fixed bottom-0 left-0 right-0 h-[90vh] rounded-t-[32px] z-50 overflow-hidden bg-black flex flex-col`}
+            className={`fixed bottom-0 left-0 right-0 h-[90vh] rounded-t-[32px] z-50 overflow-hidden bg-background flex flex-col relative`}
           >
             {/* Header with search */}
-            <div className={`flex-shrink-0 p-6 bg-black`}>
+            <div className={`flex-shrink-0 p-6 bg-background`}>
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
                   <motion.div 
@@ -215,10 +217,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setIsDarkMode(!isDarkMode)}
+                    type="button"
+                    aria-label="Choose color palette"
+                    aria-expanded={showPaletteChooser}
+                    onClick={() => setShowPaletteChooser((open) => !open)}
                     className="p-2 rounded-full bg-white/10 text-white hover:bg-white/15 transition-colors"
                   >
-                    {isDarkMode ? <Sun className="w-5 h-5 text-purple/45" /> : <Moon className="w-5 h-5 text-purple/45" />}
+                    <Sun className="w-5 h-5 text-purple/45" />
                   </button>
                   <button
                     onClick={onClose}
@@ -229,6 +234,28 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   </button>
                 </div>
               </div>
+
+              {showPaletteChooser && (
+                <div className="absolute right-16 top-4 z-20 w-56 rounded-2xl border border-white/10 bg-card p-2 shadow-2xl">
+                  <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/60">Color palette</p>
+                  {palettes.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => {
+                        selectPalette(option.id);
+                        setShowPaletteChooser(false);
+                      }}
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-white transition hover:bg-white/10"
+                      aria-pressed={palette.id === option.id}
+                    >
+                      <span className="h-4 w-4 rounded-full" style={{ backgroundColor: option.accent }} />
+                      <span className="flex-1">{option.name}</span>
+                      {palette.id === option.id && <Check className="h-4 w-4 text-purple" />}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Search Bar */}
               <div className="relative">
@@ -260,7 +287,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/70"
+                  className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-background/70"
                   onClick={() => setAuthModalMode(null)}
                 >
                   <motion.div
@@ -268,7 +295,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 30, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 240, damping: 22 }}
-                    className="w-full max-w-md overflow-hidden rounded-2xl bg-[#000000] shadow-2xl shadow-black/40"
+                    className="w-full max-w-md overflow-hidden rounded-2xl bg-background shadow-2xl shadow-black/40"
                     onClick={(event) => event.stopPropagation()}
                   >
                     <div className="flex items-center justify-between gap-4 bg-white/[0.02] px-4 py-3 sm:px-5">
@@ -321,7 +348,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
             {/* User Info */}
             {user ? (
-              <div className="flex-shrink-0 px-6 py-4 bg-black">
+              <div className="flex-shrink-0 px-6 py-4 bg-background">
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3 bg-white/5 rounded-3xl p-3">
                     <div className="w-10 h-10 rounded-full bg-purple/75 flex items-center justify-center text-white text-sm font-bold">
@@ -354,7 +381,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </div>
               </div>
             ) : (
-              <div className="flex-shrink-0 px-6 py-4 bg-black">
+              <div className="flex-shrink-0 px-6 py-4 bg-background">
                 <div className="space-y-4">
                   {/* Guest Plan Info */}
                   <div className="flex items-center justify-between bg-white/5 rounded-2xl p-3">
@@ -466,7 +493,6 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   </>
   );
 }
-
 
 
 

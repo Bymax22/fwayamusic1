@@ -39,8 +39,8 @@ export default function MobileFooter() {
       {/* More modal */}
       {openMore && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setOpenMore(false)} />
-          <div className="w-full max-w-md bg-[#000000] rounded-t-3xl p-4 border-t border-white/6">
+          <div className="absolute inset-0 bg-background/60" onClick={() => setOpenMore(false)} />
+          <div className="w-full max-w-md bg-background rounded-t-3xl p-4 border-t border-white/6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white">More</h3>
               <button onClick={() => setOpenMore(false)} className="text-white/60">Close</button>
@@ -68,8 +68,8 @@ export default function MobileFooter() {
       {/* Support modal inline form */}
       {openSupport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setOpenSupport(false)} />
-          <div className="relative w-full max-w-md bg-[#000000] rounded-2xl p-4 border border-white/6">
+          <div className="absolute inset-0 bg-background/60" onClick={() => setOpenSupport(false)} />
+          <div className="relative w-full max-w-md bg-background rounded-2xl p-4 border border-white/6">
             <h3 className="text-lg font-semibold text-white">Contact Support</h3>
             <p className="text-sm text-white/60 mt-1">We aim to respond within 24 hours.</p>
 

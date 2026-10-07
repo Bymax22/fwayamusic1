@@ -135,11 +135,11 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="relative overflow-hidden">
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
           <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr] items-end mb-10">
-            <div className="rounded-[2rem] bg-black p-6">
+            <div className="rounded-[2rem] bg-background p-6">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
                   <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple/45">Search</p>
@@ -176,7 +176,7 @@ export default function SearchPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[2rem] bg-black p-6">
+              <div className="rounded-[2rem] bg-background p-6">
                 <h2 className="text-lg font-semibold text-white">Popular Genres</h2>
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   {['Hip Hop', 'Pop', 'R&B', 'Rock', 'Electronic', 'Jazz', 'Classical', 'Reggae'].map((genre) => (
@@ -191,7 +191,7 @@ export default function SearchPage() {
                   ))}
                 </div>
               </div>
-              <div className="rounded-[2rem] bg-black p-6">
+              <div className="rounded-[2rem] bg-background p-6">
                 <h2 className="text-lg font-semibold text-white">Popular Artists</h2>
                 <div className="mt-4 space-y-3">
                   {artists.slice(0, 4).map((artist) => (
@@ -233,12 +233,12 @@ export default function SearchPage() {
                     {searchResults.map((file) => (
                       <div
                         key={file.id}
-                        className={`group rounded-[2rem] bg-black p-5 transition hover:bg-white/5 ${
+                        className={`group rounded-[2rem] bg-background p-5 transition hover:bg-white/5 ${
                           currentTrack?.id === file.id ? 'ring-1 ring-purple/30' : ''
                         }`}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="relative h-20 w-20 overflow-hidden rounded-3xl bg-[#000000]">
+                          <div className="relative h-20 w-20 overflow-hidden rounded-3xl bg-background">
                             <Image
                               src={file.coverArt}
                               alt={file.title}
@@ -289,8 +289,8 @@ export default function SearchPage() {
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {artistResults.map((artist) => (
-                      <div key={artist.id} className="rounded-[2rem] bg-black p-5 text-center transition hover:bg-white/5">
-                        <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-[#000000]">
+                      <div key={artist.id} className="rounded-[2rem] bg-background p-5 text-center transition hover:bg-white/5">
+                        <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-background">
                           <Image
                             src={artist.avatar}
                             alt={artist.name}
@@ -310,7 +310,7 @@ export default function SearchPage() {
               )}
 
               {searchQuery.trim() && getFilteredResults().length === 0 && artistResults.length === 0 && (
-                <div className="rounded-[2rem] bg-[#000000]/90 p-12 text-center text-white/60">
+                <div className="rounded-[2rem] bg-background/90 p-12 text-center text-white/60">
                   <Search className="mx-auto mb-4 h-16 w-16 text-white/60" />
                   <h3 className="text-2xl font-semibold text-white mb-2">No results found</h3>
                   <p className="text-sm text-white/60">Try different keywords or refine your search.</p>

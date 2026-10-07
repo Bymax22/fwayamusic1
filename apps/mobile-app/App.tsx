@@ -57,12 +57,40 @@ const API_BASE_URL = (
 ).replace(/\/+$/, '');
 const SAVED_TRACKS_KEY = 'fwaya-mobile-saved-tracks';
 const CATALOG_CACHE_KEY = 'fwaya-mobile-catalog-v1';
+const COLOR_PALETTE_KEY = 'fwaya-mobile-color-palette';
 const REVENUECAT_API_KEY =
   Platform.OS === 'ios'
     ? process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY
     : process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY;
 const DEFAULT_COVER =
   'https://res.cloudinary.com/dayn5vifn/image/upload/v1777062569/fwaya-01-01_xx0lgo.jpg';
+
+const COLOR_PALETTES = {
+  fwaya: { name: 'Fwaya Purple', accent: '#9B5DE5', background: '#000000', surface: '#36454F' },
+  blue: { name: 'Electric Blue', accent: '#4F8CFF', background: '#05070C', surface: '#26313F' },
+  emerald: { name: 'Emerald', accent: '#34D399', background: '#050A08', surface: '#26352F' },
+  coral: { name: 'Coral', accent: '#FF6B6B', background: '#0D090A', surface: '#3A292B' },
+  amber: { name: 'Amber Gold', accent: '#F5B942', background: '#0C0B08', surface: '#393326' },
+} as const;
+
+type ColorPaletteId = keyof typeof COLOR_PALETTES;
+type AppPalette = {
+  name: string;
+  accent: string;
+  background: string;
+  surface: string;
+  surfaceRaised: string;
+  surfaceOverlay: string;
+  accentSubtle: string;
+  accentOverlay: string;
+  text: string;
+  muted: string;
+  border: string;
+};
+
+function isColorPaletteId(value: string): value is ColorPaletteId {
+  return Object.prototype.hasOwnProperty.call(COLOR_PALETTES, value);
+}
 
 const HOME_TABS: { key: HomeTab; label: string }[] = [
   { key: 'for-you', label: 'For You' },
@@ -265,6 +293,26 @@ export default function App() {
   const { width: windowWidth } = useWindowDimensions();
   const player = useAudioPlayer(null);
   const playerStatus = useAudioPlayerStatus(player);
+  const [selectedPaletteId, setSelectedPaletteId] = useState<ColorPaletteId>('fwaya');
+  const [paletteReady, setPaletteReady] = useState(false);
+  const [palettePickerOpen, setPalettePickerOpen] = useState(false);
+  const palette = useMemo(() => {
+    const selected = COLOR_PALETTES[selectedPaletteId];
+    const channels = selected.surface.match(/[A-Fa-f0-9]{2}/g)?.map((channel) => parseInt(channel, 16));
+    const [red, green, blue] = channels ?? [54, 69, 79];
+    return {
+      ...selected,
+      surface: `rgba(${red},${green},${blue},0.18)`,
+      surfaceRaised: `rgba(${red},${green},${blue},0.32)`,
+      surfaceOverlay: `rgba(${red},${green},${blue},0.65)`,
+      accentSubtle: `${selected.accent}38`,
+      accentOverlay: `${selected.accent}EB`,
+      text: '#FFFFFF',
+      muted: 'rgba(255,255,255,0.65)',
+      border: 'transparent',
+    };
+  }, [selectedPaletteId]);
+  const styles = useMemo(() => createStyles(palette), [palette]);
   const [screen, setScreen] = useState<Screen>('home');
   const [libraryTab, setLibraryTab] = useState<LibraryTab>('saved');
   const [homeTab, setHomeTab] = useState<HomeTab>('for-you');
@@ -307,6 +355,40 @@ export default function App() {
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [savedTracksReady, setSavedTracksReady] = useState(false);
   const bannerRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    void AsyncStorage.getItem(COLOR_PALETTE_KEY)
+      .then((storedPalette) => {
+        if (
+          mounted &&
+          storedPalette &&
+          isColorPaletteId(storedPalette)
+        ) {
+          setSelectedPaletteId(storedPalette);
+        }
+      })
+      .catch((error) => {
+        console.error('Unable to restore color palette:', error);
+        if (mounted) {
+          Alert.alert('Theme unavailable', 'Your saved color theme could not be loaded.');
+        }
+      })
+      .finally(() => {
+        if (mounted) setPaletteReady(true);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!paletteReady) return;
+    void AsyncStorage.setItem(COLOR_PALETTE_KEY, selectedPaletteId).catch((error) => {
+      console.error('Unable to save color palette:', error);
+      Alert.alert('Theme not saved', 'Your color theme could not be saved on this device.');
+    });
+  }, [paletteReady, selectedPaletteId]);
 
   const loadAccount = useCallback(async (firebaseUser: FirebaseUser) => {
     setAccountLoading(true);
@@ -1576,20 +1658,30 @@ export default function App() {
           <Image source={require('./assets/fwaya-01-01.jpg')} style={styles.brandMark} />
           <Text style={styles.brand}>Fwaya</Text>
         </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={account ? `Account: ${account.email}` : 'Sign in to your account'}
-          onPress={() => {
-            setSignInError(null);
-            setAccountOpen(true);
-          }}
-          style={({ pressed }) => [styles.accountBadge, pressed && styles.pressed]}
-        >
-          <View style={styles.liveDot} />
-          <Text numberOfLines={1} style={styles.liveText}>
-            {account?.isPremium ? 'PREMIUM' : account ? 'ACCOUNT' : 'SIGN IN'}
-          </Text>
-        </Pressable>
+        <View style={styles.topBarActions}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Choose color theme"
+            onPress={() => setPalettePickerOpen(true)}
+            style={({ pressed }) => [styles.themeButton, pressed && styles.pressed]}
+          >
+            <Text style={styles.themeButtonText}>◐</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={account ? `Account: ${account.email}` : 'Sign in to your account'}
+            onPress={() => {
+              setSignInError(null);
+              setAccountOpen(true);
+            }}
+            style={({ pressed }) => [styles.accountBadge, pressed && styles.pressed]}
+          >
+            <View style={styles.liveDot} />
+            <Text numberOfLines={1} style={styles.liveText}>
+              {account?.isPremium ? 'PREMIUM' : account ? 'ACCOUNT' : 'SIGN IN'}
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       {screen === 'home' ? (
@@ -1992,6 +2084,54 @@ export default function App() {
 
         <Modal
           animationType="slide"
+          onRequestClose={() => setPalettePickerOpen(false)}
+          presentationStyle="pageSheet"
+          visible={palettePickerOpen}
+        >
+          <SafeAreaView style={styles.accountScreen}>
+            <View style={styles.accountHeader}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Close color themes"
+                onPress={() => setPalettePickerOpen(false)}
+                style={styles.closePlayerButton}
+              >
+                <Text style={styles.closePlayerText}>×</Text>
+              </Pressable>
+              <Text style={styles.nowPlayingLabel}>COLOR THEME</Text>
+              <View style={styles.closePlayerButton} />
+            </View>
+            <View style={styles.paletteOptions}>
+              {(Object.entries(COLOR_PALETTES) as [ColorPaletteId, (typeof COLOR_PALETTES)[ColorPaletteId]][]).map(
+                ([paletteId, option]) => (
+                  <Pressable
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: selectedPaletteId === paletteId }}
+                    key={paletteId}
+                    onPress={() => setSelectedPaletteId(paletteId)}
+                    style={[
+                      styles.paletteOption,
+                      selectedPaletteId === paletteId && styles.paletteOptionSelected,
+                    ]}
+                  >
+                    <View style={styles.paletteSwatches}>
+                      <View style={[styles.paletteSwatch, { backgroundColor: option.accent }]} />
+                      <View style={[styles.paletteSwatch, { backgroundColor: option.background }]} />
+                      <View style={[styles.paletteSwatch, { backgroundColor: option.surface }]} />
+                    </View>
+                    <Text style={styles.paletteOptionText}>{option.name}</Text>
+                    <Text style={styles.paletteOptionCheck}>
+                      {selectedPaletteId === paletteId ? '✓' : ''}
+                    </Text>
+                  </Pressable>
+                )
+              )}
+            </View>
+          </SafeAreaView>
+        </Modal>
+
+        <Modal
+          animationType="slide"
           onRequestClose={() => setAccountOpen(false)}
           presentationStyle="pageSheet"
           visible={accountOpen}
@@ -2329,17 +2469,8 @@ export default function App() {
   );
 }
 
-const palette = {
-  background: '#000000',
-  surface: 'rgba(54,69,79,0.18)',
-  surfaceRaised: 'rgba(54,69,79,0.32)',
-  text: '#FFFFFF',
-  muted: 'rgba(255,255,255,0.65)',
-  accent: '#9B5DE5',
-  border: 'transparent',
-};
-
-const styles = StyleSheet.create({
+function createStyles(palette: AppPalette) {
+  return StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: palette.background },
   listContent: { flexGrow: 1, paddingBottom: 8, paddingHorizontal: 16 },
   topBar: {
@@ -2350,6 +2481,16 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     paddingBottom: 8,
   },
+  topBarActions: { alignItems: 'center', flexDirection: 'row', gap: 9 },
+  themeButton: {
+    alignItems: 'center',
+    backgroundColor: palette.surfaceRaised,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  themeButtonText: { color: palette.accent, fontSize: 20, fontWeight: '800' },
   brandLockup: { alignItems: 'center', flexDirection: 'row', gap: 5 },
   brandMark: { height: 60, width: 60 },
   brand: { color: palette.text, fontSize: 28, fontWeight: '700', letterSpacing: 0.1 },
@@ -2407,7 +2548,7 @@ const styles = StyleSheet.create({
   sectionTitle: { color: palette.text, fontSize: 24, fontWeight: '800', marginTop: 5 },
   libraryTabs: { flexDirection: 'row', gap: 10, marginTop: 14 },
   libraryTab: { backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 18, paddingHorizontal: 15, paddingVertical: 8 },
-  libraryTabActive: { backgroundColor: 'rgba(155,93,229,0.22)' },
+  libraryTabActive: { backgroundColor: palette.accentSubtle },
   libraryTabText: { color: palette.muted, fontSize: 12, fontWeight: '600' },
   homeTrackRow: { gap: 12 },
   homeTrackCard: { marginBottom: 5, minWidth: 0 },
@@ -2415,7 +2556,7 @@ const styles = StyleSheet.create({
   homeCover: { backgroundColor: palette.surfaceRaised, height: '100%', width: '100%' },
   homeCoverAction: {
     alignItems: 'center',
-    backgroundColor: 'rgba(155,93,229,0.92)',
+    backgroundColor: palette.accentOverlay,
     borderRadius: 18,
     bottom: 9,
     height: 36,
@@ -2462,6 +2603,22 @@ const styles = StyleSheet.create({
   retryText: { color: palette.text, fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   accountScreen: { backgroundColor: palette.background, flex: 1, paddingHorizontal: 20 },
   accountHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10 },
+  paletteOptions: { gap: 10, paddingTop: 20 },
+  paletteOption: {
+    alignItems: 'center',
+    backgroundColor: palette.surface,
+    borderColor: palette.border,
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
+    minHeight: 60,
+    paddingHorizontal: 14,
+  },
+  paletteOptionSelected: { borderColor: palette.accent },
+  paletteSwatches: { flexDirection: 'row', gap: 5, marginRight: 12 },
+  paletteSwatch: { borderColor: palette.text, borderRadius: 10, borderWidth: 1, height: 20, width: 20 },
+  paletteOptionText: { color: palette.text, flex: 1, fontSize: 13, fontWeight: '700' },
+  paletteOptionCheck: { color: palette.accent, fontSize: 18, fontWeight: '900', width: 24 },
   accountContent: { flexGrow: 1, justifyContent: 'center', paddingBottom: 35 },
   accountEmail: { color: palette.text, fontSize: 20, fontWeight: '800', marginTop: 10 },
   accountMembership: { color: palette.muted, fontSize: 14, marginTop: 8 },
@@ -2521,7 +2678,7 @@ const styles = StyleSheet.create({
   accountSecondaryText: { color: palette.text, fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   resetButton: { alignSelf: 'center', marginTop: 22, padding: 10 },
   accountError: {
-    backgroundColor: 'rgba(54,69,79,0.65)',
+    backgroundColor: palette.surfaceOverlay,
     borderRadius: 9,
     color: palette.text,
     fontSize: 12,
@@ -2531,8 +2688,8 @@ const styles = StyleSheet.create({
   },
   accountSpinner: { marginTop: 18 },
   disabledButton: { opacity: 0.55 },
-  catalogNotice: { backgroundColor: 'rgba(155,93,229,0.22)', color: palette.text, paddingHorizontal: 20, paddingVertical: 9, fontSize: 12 },
-  playbackError: { backgroundColor: 'rgba(54,69,79,0.65)', color: palette.text, paddingHorizontal: 20, paddingVertical: 9, fontSize: 12 },
+  catalogNotice: { backgroundColor: palette.accentSubtle, color: palette.text, paddingHorizontal: 20, paddingVertical: 9, fontSize: 12 },
+  playbackError: { backgroundColor: palette.surfaceOverlay, color: palette.text, paddingHorizontal: 20, paddingVertical: 9, fontSize: 12 },
   playerBar: {
     alignItems: 'center',
     backgroundColor: palette.surface,
@@ -2598,4 +2755,5 @@ const styles = StyleSheet.create({
   bottomNavigationText: { color: palette.muted, fontSize: 9, fontWeight: '500', marginTop: 1 },
   bottomNavigationTextActive: { color: palette.accent },
   activeTabText: { color: palette.accent },
-});
+  });
+}

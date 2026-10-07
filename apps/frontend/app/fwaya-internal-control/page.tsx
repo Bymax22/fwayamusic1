@@ -30,8 +30,8 @@ export default function SecretAdminLoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#FFFFFF] px-5 py-10">
-      <section className="w-full max-w-md rounded-3xl bg-black p-8 text-white shadow-2xl shadow-black/20 sm:p-10">
+    <main className="flex min-h-screen items-center justify-center bg-card px-5 py-10">
+      <section className="w-full max-w-md rounded-3xl bg-background p-8 text-white shadow-2xl shadow-black/20 sm:p-10">
         <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-purple/90"><LockKeyhole size={22} /></div>
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-purple/45">Private access</p>
         <h1 className="mt-3 text-3xl font-semibold">Control center</h1>

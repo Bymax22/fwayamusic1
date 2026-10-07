@@ -71,9 +71,9 @@ export default function HeroBannerCarousel({
           touchSwiped.current = false;
         }, 300);
       }}
-      className={`relative isolate h-[190px] touch-pan-y overflow-hidden bg-black [perspective:1400px] sm:h-[320px] lg:h-[390px] ${className}`}
+      className={`relative isolate h-[190px] touch-pan-y overflow-hidden bg-background [perspective:1400px] sm:h-[320px] lg:h-[390px] ${className}`}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(54, 69, 79, 0.32),transparent_68%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(var(--card), 0.32),transparent_68%)]" />
 
       {visibleSlides.map(({ slide, index, offset }) => {
         const distance = Math.abs(offset);
@@ -115,7 +115,7 @@ export default function HeroBannerCarousel({
               transformOrigin: 'center center',
             }}
           >
-            <span className="absolute inset-x-0 top-0 z-10 h-full overflow-hidden rounded-2xl bg-[#000000] shadow-[0_18px_50px_rgba(0, 0, 0, 0.65)] sm:rounded-3xl">
+            <span className="absolute inset-x-0 top-0 z-10 h-full overflow-hidden rounded-2xl bg-background shadow-[0_18px_50px_rgba(0, 0, 0, 0.65)] sm:rounded-3xl">
               <Image
                 src={slide.image || '/featured5.jpg'}
                 alt={slide.title}
@@ -135,7 +135,7 @@ export default function HeroBannerCarousel({
                       {slide.subtitle}
                     </span>
                   </span>
-                  <span className="absolute left-1/2 top-1/2 z-10 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-black/25 text-white backdrop-blur-sm sm:h-14 sm:w-14">
+                  <span className="absolute left-1/2 top-1/2 z-10 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-background/25 text-white backdrop-blur-sm sm:h-14 sm:w-14">
                     <FaPlay className="ml-0.5 text-sm sm:text-base" />
                   </span>
                 </>

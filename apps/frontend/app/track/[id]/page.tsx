@@ -411,7 +411,7 @@ export default function TrackPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple/75" />
       </div>
     );
@@ -419,14 +419,14 @@ export default function TrackPage() {
 
   if (!track) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4 text-white">
         {error || 'Track not found.'}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+    <div className="min-h-screen bg-background text-white overflow-x-hidden">
       <div className="relative max-w-7xl mx-auto px-4 py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <button
@@ -474,7 +474,7 @@ export default function TrackPage() {
         <div className="grid gap-5 lg:grid-cols-[1.3fr_0.95fr] min-w-0">
           <div className="space-y-5 min-w-0">
             <div className="grid gap-4 md:grid-cols-[minmax(0,280px)_1fr] items-start">
-              <div className="relative overflow-hidden rounded-[32px] bg-black shadow-sm w-full max-w-full h-[260px] sm:h-[320px] md:h-[420px]">
+              <div className="relative overflow-hidden rounded-[32px] bg-background shadow-sm w-full max-w-full h-[260px] sm:h-[320px] md:h-[420px]">
                 <Image
                   src={coverArtUrl}
                   alt={track.title}
@@ -488,7 +488,7 @@ export default function TrackPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <button
                   onClick={handlePlayTrack}
-                  className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition"
+                  className="absolute inset-0 flex items-center justify-center bg-background/20 hover:bg-background/30 transition"
                 >
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple/85 text-white shadow-sm transition hover:bg-purple/75">
                     {currentTrack?.id === track.id && isPlaying ? (
@@ -507,7 +507,7 @@ export default function TrackPage() {
                 <div className="absolute bottom-4 right-4 flex gap-2 z-10">
                   <button
                     onClick={handleLike}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-background/50 text-white hover:bg-background/70 transition"
                   >
                     {isLiked ? <FaHeart size={16} className="text-purple/75" /> : <FaRegHeart size={16} />}
                   </button>
@@ -515,13 +515,13 @@ export default function TrackPage() {
                     onClick={handleDownload}
                     disabled={downloadBusy}
                     aria-label={downloadBusy ? 'Saving download' : 'Download privately to Fwaya'}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition disabled:opacity-50"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-background/50 text-white hover:bg-background/70 transition disabled:opacity-50"
                   >
                     {downloadBusy ? <span className="text-xs">…</span> : <FaDownload size={16} />}
                   </button>
                   <button
                     onClick={handleShare}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-background/50 text-white hover:bg-background/70 transition"
                   >
                     <FaShare size={16} />
                   </button>
@@ -529,7 +529,7 @@ export default function TrackPage() {
               </div>
 
               <div className="space-y-5">
-                <div className="rounded-[32px] bg-black p-5 shadow-sm">
+                <div className="rounded-[32px] bg-background p-5 shadow-sm">
                   <p className="text-xs uppercase tracking-[0.35em] text-purple/45">Now playing</p>
                   <h1 className="mt-4 text-3xl sm:text-4xl font-semibold text-white leading-tight">{track.title}</h1>
                   <p className="mt-3 text-lg text-white/90 flex items-center gap-2">
@@ -538,7 +538,7 @@ export default function TrackPage() {
                   </p>
                 </div>
 
-                <div className="rounded-[32px] bg-black p-5 shadow-sm">
+                <div className="rounded-[32px] bg-background p-5 shadow-sm">
                   <div className="flex items-center justify-between gap-4 mb-5">
                     <div>
                       <h2 className="text-2xl font-semibold text-white">Details</h2>
@@ -598,7 +598,7 @@ export default function TrackPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="rounded-[32px] bg-black p-5 shadow-sm"
+                className="rounded-[32px] bg-background p-5 shadow-sm"
               >
                 <div className="flex items-center justify-between gap-3 mb-5">
                   <div>
@@ -613,7 +613,7 @@ export default function TrackPage() {
                       <button
                         key={relatedTrack.id}
                         onClick={() => router.push(`/track/${createMediaSlug(relatedTrack.title, relatedTrack.id)}`)}
-                        className="snap-start min-w-[110px] max-w-[110px] sm:min-w-[120px] sm:max-w-[120px] lg:min-w-[240px] lg:max-w-[240px] rounded-[32px] bg-black p-2 sm:p-3 lg:p-4 text-left transition hover:bg-white/5 shadow-sm"
+                        className="snap-start min-w-[110px] max-w-[110px] sm:min-w-[120px] sm:max-w-[120px] lg:min-w-[240px] lg:max-w-[240px] rounded-[32px] bg-background p-2 sm:p-3 lg:p-4 text-left transition hover:bg-white/5 shadow-sm"
                       >
                         <div className="relative mb-2 sm:mb-3 lg:mb-4 h-20 sm:h-28 lg:h-36 overflow-hidden rounded-3xl bg-charcoal">
                           <Image
@@ -645,7 +645,7 @@ export default function TrackPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-[32px] bg-black p-5 shadow-sm"
+              className="rounded-[32px] bg-background p-5 shadow-sm"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
@@ -659,7 +659,7 @@ export default function TrackPage() {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Share your thoughts..."
-                className="w-full min-h-[100px] resize-none rounded-3xl bg-[#000000] px-4 py-4 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 shadow-sm"
+                className="w-full min-h-[100px] resize-none rounded-3xl bg-background px-4 py-4 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 shadow-sm"
               />
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -730,7 +730,7 @@ export default function TrackPage() {
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
                                 placeholder="Write a reply..."
-                                className="w-full min-h-[90px] resize-none rounded-2xl bg-[#000000] px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 text-sm mb-2 shadow-sm"
+                                className="w-full min-h-[90px] resize-none rounded-2xl bg-background px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 text-sm mb-2 shadow-sm"
                               />
                               <div className="flex flex-wrap gap-2">
                                 <button

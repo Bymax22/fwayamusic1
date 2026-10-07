@@ -20,8 +20,8 @@ export default function SubscriptionPromptModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[65] flex items-start justify-center bg-black/45 px-4 pt-20 backdrop-blur-[2px] sm:pt-24">
-      <div className="relative w-full max-w-sm rounded-2xl bg-black p-5 text-white shadow-2xl shadow-black/40">
+    <div className="fixed inset-0 z-[65] flex items-start justify-center bg-background/45 px-4 pt-20 backdrop-blur-[2px] sm:pt-24">
+      <div className="relative w-full max-w-sm rounded-2xl bg-background p-5 text-white shadow-2xl shadow-black/40">
         <button
           type="button"
           onClick={onClose}

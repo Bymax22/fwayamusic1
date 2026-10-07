@@ -112,7 +112,7 @@ export default function GenresPage() {
      <ThemeProvider>
       <AuthProvider>
         <PaymentProvider>
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-card/95 to-background/95 min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Browse Genres</h1>
@@ -128,7 +128,7 @@ export default function GenresPage() {
             onClick={() => setSelectedGenre(genre)}
           >
             {/* Background Image with Overlay */}
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors"></div>
+            <div className="absolute inset-0 bg-background/30 group-hover:bg-background/20 transition-colors"></div>
             
             {/* Content */}
             <div className="relative z-10">
@@ -161,12 +161,12 @@ export default function GenresPage() {
 
       {/* Genre Detail Modal */}
       {selectedGenre && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#36454F] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-background/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className={`bg-gradient-to-br ${selectedGenre.color} p-8 rounded-t-2xl relative`}>
               <button 
                 onClick={() => setSelectedGenre(null)}
-                className="absolute top-4 right-4 w-8 h-8 bg-black/20 hover:bg-black/30 rounded-full flex items-center justify-center text-white transition-colors"
+                className="absolute top-4 right-4 w-8 h-8 bg-background/20 hover:bg-background/30 rounded-full flex items-center justify-center text-white transition-colors"
               >
                 ×
               </button>
@@ -184,11 +184,11 @@ export default function GenresPage() {
             
             <div className="p-6">
               <div className="grid grid-cols-2 gap-6 mb-6">
-                <div className="bg-[#36454F]/70 rounded-xl p-4">
+                <div className="bg-card/70 rounded-xl p-4">
                   <div className="text-2xl font-bold text-white mb-1">{selectedGenre.trackCount}</div>
                   <div className="text-white/60 text-sm">Total Tracks</div>
                 </div>
-                <div className="bg-[#36454F]/70 rounded-xl p-4">
+                <div className="bg-card/70 rounded-xl p-4">
                   <div className="text-2xl font-bold text-white mb-1">
                     {Math.floor(selectedGenre.trackCount / 100)}K+
                   </div>
@@ -199,13 +199,13 @@ export default function GenresPage() {
               <h3 className="text-xl font-bold text-white mb-4">Popular Artists</h3>
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {selectedGenre.popularArtists.map(artist => (
-                  <div key={artist} className="bg-[#36454F]/70 rounded-lg p-3 text-white">
+                  <div key={artist} className="bg-card/70 rounded-lg p-3 text-white">
                     {artist}
                   </div>
                 ))}
               </div>
               
-              <button className="w-full py-3 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors font-medium">
+              <button className="w-full py-3 bg-card hover:bg-primary text-white rounded-xl transition-colors font-medium">
                 Play {selectedGenre.name} Radio
               </button>
             </div>

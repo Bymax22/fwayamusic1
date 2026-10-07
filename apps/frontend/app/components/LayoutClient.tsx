@@ -99,7 +99,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
             📌 SIDEBAR (LEFT) - DESKTOP
         ======================== */}
         {user && (
-          <div className="hidden lg:flex fixed left-0 top-14 h-[calc(100%-56px)] w-[260px] bg-[#000000]/60 backdrop-blur-xl border-r border-white/10 z-20">
+          <div className="hidden lg:flex fixed left-0 top-14 h-[calc(100%-56px)] w-[260px] bg-background/60 backdrop-blur-xl border-r border-white/10 z-20">
             <Sidebar sidebarExpanded={sidebarExpanded} />
           </div>
         )}
@@ -124,7 +124,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
             🎶 NOW PLAYING (RIGHT) - DESKTOP
         ======================== */}
         {currentTrack && (
-          <div className="hidden lg:block fixed right-0 top-14 h-[calc(100%-56px)] w-[340px] bg-[#000000]/60 backdrop-blur-xl border-l border-white/10 z-20">
+          <div className="hidden lg:block fixed right-0 top-14 h-[calc(100%-56px)] w-[340px] bg-background/60 backdrop-blur-xl border-l border-white/10 z-20">
             <NowPlayingPanel
               track={currentTrack}
               isPlaying={isPlaying}
@@ -218,7 +218,7 @@ export default function LayoutClient({ children }: { children: React.ReactNode }
           )}
           
           {/* Desktop Player - shows on large screens */}
-          <div className="hidden lg:block bg-black/80 backdrop-blur-xl border-t border-white/10">
+          <div className="hidden lg:block bg-background/80 backdrop-blur-xl border-t border-white/10">
             <Player
               track={currentTrack}
               isPlaying={isPlaying}

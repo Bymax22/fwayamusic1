@@ -11,13 +11,13 @@ export const metadata: Metadata = {
 export default function UploadSuccess() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-purple/15 to-white p-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg ring-1 ring-white/10">
+      <div className="w-full max-w-md rounded-xl bg-card p-8 shadow-lg ring-1 ring-white/10">
         {/* Animated checkmark */}
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-purple/20">
           <CheckCircle className="h-10 w-10 text-purple/85 animate-in fade-in zoom-in-75" />
         </div>
 
-        <h1 className="mb-2 text-center text-2xl font-bold text-charcoal">
+        <h1 className="mb-2 text-center text-2xl font-bold text-card-foreground">
           Upload Successful!
         </h1>
         <p className="mb-6 text-center text-white/60">

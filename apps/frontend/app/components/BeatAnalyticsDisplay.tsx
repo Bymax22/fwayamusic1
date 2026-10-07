@@ -42,7 +42,14 @@ interface ProducerStats {
   followerCount: number;
 }
 
-const COLORS = ['#9B5DE5', '#36454F', '#36454F', '#9B5DE5', '#9B5DE5', '#9B5DE5'];
+const COLORS = [
+  'rgb(var(--primary-accent))',
+  'rgb(var(--card))',
+  'rgb(var(--card))',
+  'rgb(var(--primary-accent))',
+  'rgb(var(--primary-accent))',
+  'rgb(var(--primary-accent))',
+];
 
 export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
   const [analytics, setAnalytics] = useState<BeatAnalyticsData | null>(null);
@@ -103,9 +110,9 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
 
   if (analytics) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-6xl mx-auto">
+      <div className="bg-card rounded-lg shadow-lg p-6 max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-charcoal">{analytics.beat.title}</h1>
+          <h1 className="text-3xl font-bold text-card-foreground">{analytics.beat.title}</h1>
           <p className="text-white/60 mt-2">{analytics.beat.genre} • {new Date(analytics.beat.createdAt).toLocaleDateString()}</p>
         </div>
 
@@ -191,7 +198,7 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
 
         {/* Engagement Breakdown */}
         <div className="bg-white/5 p-6 rounded-lg">
-          <h2 className="text-xl font-bold text-charcoal mb-6">Engagement Breakdown</h2>
+          <h2 className="text-xl font-bold text-card-foreground mb-6">Engagement Breakdown</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -207,7 +214,7 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
                 labelLine={false}
                 label={({ name, value }) => `${name}: ${value}`}
                 outerRadius={100}
-                fill="#9B5DE5"
+                fill="rgb(var(--primary-accent))"
                 dataKey="value"
               >
                 {COLORS.map((color, index) => (
@@ -235,8 +242,8 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
 
   if (producerStats) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-charcoal mb-8">Your Dashboard</h1>
+      <div className="bg-card rounded-lg shadow-lg p-6 max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold text-card-foreground mb-8">Your Dashboard</h1>
 
         {/* Time Range Selector */}
         <div className="flex gap-2 mb-8">
@@ -299,19 +306,19 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
         {/* Sales Stats */}
         <div className="grid grid-cols-2 gap-6 mb-8">
           <div className="bg-white/5 p-6 rounded-lg">
-            <h3 className="font-bold text-charcoal mb-4">Total Sales</h3>
+            <h3 className="font-bold text-card-foreground mb-4">Total Sales</h3>
             <p className="text-4xl font-bold text-purple/85">{producerStats.totalSales}</p>
           </div>
 
           <div className="bg-white/5 p-6 rounded-lg">
-            <h3 className="font-bold text-charcoal mb-4">Monthly Sales</h3>
+            <h3 className="font-bold text-card-foreground mb-4">Monthly Sales</h3>
             <p className="text-4xl font-bold text-purple/85">{producerStats.monthlySales}</p>
           </div>
         </div>
 
         {/* Charts */}
         <div className="bg-white/5 p-6 rounded-lg">
-          <h2 className="text-xl font-bold text-charcoal mb-6">Activity Overview</h2>
+          <h2 className="text-xl font-bold text-card-foreground mb-6">Activity Overview</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={[
               { name: 'Plays', value: producerStats.monthlyPlays },
@@ -322,7 +329,7 @@ export default function BeatAnalyticsDisplay({ beatId }: { beatId?: number }) {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="value" fill="#9B5DE5" />
+              <Bar dataKey="value" fill="rgb(var(--primary-accent))" />
             </BarChart>
           </ResponsiveContainer>
         </div>

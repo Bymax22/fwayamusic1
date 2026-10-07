@@ -573,7 +573,7 @@ export default function LibraryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="relative overflow-hidden">
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10">
@@ -628,7 +628,7 @@ export default function LibraryPage() {
                     role="button"
                     tabIndex={0}
                     onClick={() => router.push(`/playlist/${playlist.id}`)}
-                    className="group overflow-hidden rounded-[32px] bg-black transition hover:bg-white/5 flex flex-col cursor-pointer"
+                    className="group overflow-hidden rounded-[32px] bg-background transition hover:bg-white/5 flex flex-col cursor-pointer"
                   >
                     <div className="relative overflow-hidden flex-1">
                       <Image
@@ -690,8 +690,8 @@ export default function LibraryPage() {
             ) : (
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {(getContent() as MediaFile[]).map((file) => (
-                  <div key={file.id} className="grid gap-4 rounded-[32px] bg-black p-5 transition hover:bg-white/5">
-                    <div className="relative overflow-hidden rounded-3xl bg-[#000000]">
+                  <div key={file.id} className="grid gap-4 rounded-[32px] bg-background p-5 transition hover:bg-white/5">
+                    <div className="relative overflow-hidden rounded-3xl bg-background">
                       <Image
                         src={file.coverArt}
                         alt={file.title}
@@ -723,7 +723,7 @@ export default function LibraryPage() {
                           <button
                             onClick={() => void handleDownloadedLike(file)}
                             aria-label={`${file.liked ? 'Unlike' : 'Like'} ${file.title}`}
-                            className={`rounded-full bg-[#000000] px-3 py-2 text-sm transition hover:bg-purple/20 ${file.liked ? 'text-purple/60' : 'text-white/70'}`}
+                            className={`rounded-full bg-background px-3 py-2 text-sm transition hover:bg-purple/20 ${file.liked ? 'text-purple/60' : 'text-white/70'}`}
                           >
                             <Heart className="w-4 h-4" fill={file.liked ? 'currentColor' : 'none'} />
                           </button>
@@ -731,7 +731,7 @@ export default function LibraryPage() {
                       </div>
                       <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
                         <span>{formatDuration(file.duration)}</span>
-                        <span className="inline-flex items-center gap-2 rounded-full bg-[#000000] px-3 py-1 text-xs text-white/80">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-background px-3 py-1 text-xs text-white/80">
                           <Disc className="w-4 h-4 text-purple/45" />
                           {file.genre || 'Genre'}
                         </span>
@@ -754,7 +754,7 @@ export default function LibraryPage() {
                           </button>
                           <button
                             onClick={() => setShareItem(file)}
-                            className="inline-flex items-center gap-2 rounded-full bg-[#000000] px-3 py-2 text-xs font-semibold text-white transition hover:bg-purple/30"
+                            className="inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-xs font-semibold text-white transition hover:bg-purple/30"
                           >
                             <Share2 className="h-4 w-4" />
                             Share
@@ -768,7 +768,7 @@ export default function LibraryPage() {
             )}
 
             {getContent().length === 0 && (
-              <div className="rounded-[32px] bg-black p-10 text-center text-white/60">
+              <div className="rounded-[32px] bg-background p-10 text-center text-white/60">
                 <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-purple/75 text-white shadow-lg shadow-purple/20 mx-auto">
                   {getIcon()}
                 </div>
@@ -792,14 +792,14 @@ export default function LibraryPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-background/50 flex items-center justify-center z-50 p-4"
             onClick={() => setShowEditModal(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-black rounded-2xl p-6 w-full max-w-md"
+              className="bg-background rounded-2xl p-6 w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-semibold text-white mb-6">Edit Playlist</h2>
@@ -811,7 +811,7 @@ export default function LibraryPage() {
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-4 py-2 bg-[#36454F] rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
+                    className="w-full px-4 py-2 bg-card rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75"
                     placeholder="Enter playlist name"
                   />
                 </div>
@@ -821,7 +821,7 @@ export default function LibraryPage() {
                   <textarea
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
-                    className="w-full px-4 py-2 bg-[#36454F] rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 resize-none h-24"
+                    className="w-full px-4 py-2 bg-card rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 resize-none h-24"
                     placeholder="Enter playlist description"
                   />
                 </div>
@@ -852,14 +852,14 @@ export default function LibraryPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-background/50 flex items-center justify-center z-50 p-4"
               onClick={() => setShowCreateModal(false)}
             >
               <motion.div
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-[#000000] rounded-2xl p-6 w-full max-w-md"
+                className="bg-background rounded-2xl p-6 w-full max-w-md"
                 onClick={(e) => e.stopPropagation()}
               >
                 <h2 className="text-2xl font-semibold text-white mb-4">Create Playlist</h2>
@@ -868,13 +868,13 @@ export default function LibraryPage() {
                     value={createName}
                     onChange={(e) => setCreateName(e.target.value)}
                     placeholder="Playlist name"
-                    className="w-full px-4 py-2 bg-[#000000] border border-white/10 rounded-lg text-white placeholder-white/60"
+                    className="w-full px-4 py-2 bg-background border border-white/10 rounded-lg text-white placeholder-white/60"
                   />
                   <textarea
                     value={createDescription}
                     onChange={(e) => setCreateDescription(e.target.value)}
                     placeholder="Description (optional)"
-                    className="w-full px-4 py-2 bg-[#000000] border border-white/10 rounded-lg text-white placeholder-white/60 resize-none h-24"
+                    className="w-full px-4 py-2 bg-background border border-white/10 rounded-lg text-white placeholder-white/60 resize-none h-24"
                   />
                   <input
                     type="file"

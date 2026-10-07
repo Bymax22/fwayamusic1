@@ -186,7 +186,7 @@ export default function ResourceManagement({ resourceId }: { resourceId?: number
   // Grid view when no resource is selected
   if (!resourceId && resources.length > 0) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-card rounded-lg shadow-lg p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Resources</h2>
           <select
@@ -226,7 +226,7 @@ export default function ResourceManagement({ resourceId }: { resourceId?: number
                     {resource.resourceType}
                   </span>
                 </div>
-                <h3 className="font-bold text-charcoal mb-1">{resource.title}</h3>
+                <h3 className="font-bold text-card-foreground mb-1">{resource.title}</h3>
                 <p className="text-sm text-white/60 mb-3">{resource.genre}</p>
                 <div className="flex justify-between items-center text-xs">
                   <span className={`px-2 py-1 rounded font-bold ${
@@ -250,7 +250,7 @@ export default function ResourceManagement({ resourceId }: { resourceId?: number
   // Detailed view
   if (analytics && selectedResource) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-card rounded-lg shadow-lg p-6">
         {error && (
           <div className="mb-4 p-4 bg-purple/20 border border-purple/60 rounded text-purple/90">
             {error}
@@ -405,7 +405,7 @@ export default function ResourceManagement({ resourceId }: { resourceId?: number
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="flex-1 px-4 py-2 bg-charcoal/50 hover:bg-charcoal/50 text-charcoal rounded-lg transition"
+                className="flex-1 px-4 py-2 bg-charcoal/50 hover:bg-charcoal/50 text-card-foreground rounded-lg transition"
               >
                 Cancel
               </button>

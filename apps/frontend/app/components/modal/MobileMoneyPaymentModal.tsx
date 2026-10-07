@@ -165,18 +165,18 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="bg-gradient-to-br from-[#000000] to-[#36454F] rounded-2xl p-6 w-full max-w-md border border-[#36454F] shadow-xl"
+            className="bg-gradient-to-br from-background to-card rounded-2xl p-6 w-full max-w-md border border-card shadow-xl"
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Phone className="w-5 h-5 text-[#36454F]" />
+                  <Phone className="w-5 h-5 text-card-foreground" />
                   Mobile Money Payment
                 </h2>
                 <p className="text-sm text-white/60 mt-1">
@@ -185,7 +185,7 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
               </div>
               <button
                 onClick={handleClose}
-                className="text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-[#36454F]"
+                className="text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-card"
                 disabled={isProcessing && step === 'processing'}
               >
                 <X className="w-5 h-5" />
@@ -193,11 +193,11 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
             </div>
 
             {/* Media Info */}
-            <div className="mb-6 p-4 bg-[#36454F]/50 rounded-xl border border-[#36454F]">
+            <div className="mb-6 p-4 bg-card/50 rounded-xl border border-card">
               <h3 className="font-semibold text-white truncate">{media.title}</h3>
               <p className="text-white/60 text-sm truncate">{media.artist}</p>
               <div className="mt-2 flex justify-between items-center">
-                <span className="text-2xl font-bold text-[#36454F]">
+                <span className="text-2xl font-bold text-card-foreground">
                   {media.currency} {media.price.toFixed(2)}
                 </span>
                 <div className="flex items-center gap-1 text-xs text-purple/60 bg-purple/10 px-2 py-1 rounded-full">
@@ -220,11 +220,11 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                       placeholder="0961234567"
-                      className="w-full px-4 py-3 bg-[#36454F] border border-[#36454F] rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#36454F] focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-card border border-card rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                       disabled={isProcessing}
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <div className="flex items-center gap-1 px-2 py-1 bg-[#36454F] text-white rounded text-xs">
+                      <div className="flex items-center gap-1 px-2 py-1 bg-card text-white rounded text-xs">
                         <Phone className="w-3 h-3" />
                         ZM
                       </div>
@@ -245,7 +245,7 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="flex-1 px-4 py-3 border border-charcoal/50 text-white/90 rounded-xl hover:bg-[#36454F] transition-colors"
+                    className="flex-1 px-4 py-3 border border-charcoal/50 text-white/90 rounded-xl hover:bg-card transition-colors"
                     disabled={isProcessing}
                   >
                     Cancel
@@ -253,7 +253,7 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
                   <button
                     type="submit"
                     disabled={isProcessing || !phoneNumber.trim()}
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-[#36454F] to-[#9B5DE5] text-white rounded-xl hover:from-[#9B5DE5] hover:to-[#36454F] disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold"
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-card to-primary text-white rounded-xl hover:from-primary hover:to-card disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold"
                   >
                     {isProcessing ? 'Processing...' : 'Pay Now'}
                   </button>
@@ -264,7 +264,7 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
             {/* Processing Step */}
             {step === 'processing' && (
               <div className="text-center py-8 space-y-4">
-                <div className="w-20 h-20 border-4 border-[#36454F] border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <div className="w-20 h-20 border-4 border-card border-t-transparent rounded-full animate-spin mx-auto"></div>
                 <div>
                   <h3 className="text-white font-semibold text-lg mb-2">
                     Processing Payment
@@ -307,7 +307,7 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
                 </div>
                 <button
                   onClick={handleClose}
-                  className="w-full px-4 py-3 bg-[#36454F] text-white rounded-xl hover:bg-[#9B5DE5] transition-colors font-semibold"
+                  className="w-full px-4 py-3 bg-card text-white rounded-xl hover:bg-primary transition-colors font-semibold"
                 >
                   Start Listening
                 </button>
@@ -329,13 +329,13 @@ export const MobileMoneyPaymentModal: React.FC<MobileMoneyPaymentModalProps> = (
                 <div className="flex gap-3">
                   <button
                     onClick={handleClose}
-                    className="flex-1 px-4 py-3 border border-charcoal/50 text-white/90 rounded-xl hover:bg-[#36454F] transition-colors"
+                    className="flex-1 px-4 py-3 border border-charcoal/50 text-white/90 rounded-xl hover:bg-card transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => setStep('form')}
-                    className="flex-1 px-4 py-3 bg-[#36454F] text-white rounded-xl hover:bg-[#9B5DE5] transition-colors font-semibold"
+                    className="flex-1 px-4 py-3 bg-card text-white rounded-xl hover:bg-primary transition-colors font-semibold"
                   >
                     Try Again
                   </button>

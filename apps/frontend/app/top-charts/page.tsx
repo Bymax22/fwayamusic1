@@ -94,10 +94,10 @@ export default function TopChartsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="relative overflow-hidden">
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
-          <div className="rounded-[2rem] bg-[#000000]/90 p-6 ring-1 ring-white/10 shadow-xl shadow-charcoal/20">
+          <div className="rounded-[2rem] bg-background/90 p-6 ring-1 ring-white/10 shadow-xl shadow-charcoal/20">
             <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr] items-end mb-10">
               <div>
                 <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple/45">
@@ -109,7 +109,7 @@ export default function TopChartsPage() {
                   Explore the trending hits and discover what fans are playing across the platform.
                 </p>
               </div>
-              <div className="rounded-[2rem] bg-black/60 p-6 ring-1 ring-white/10">
+              <div className="rounded-[2rem] bg-background/60 p-6 ring-1 ring-white/10">
                 <h2 className="text-lg font-semibold text-white">Time Range</h2>
                 <div className="mt-4 flex flex-wrap gap-3">
                   {(['day', 'week', 'month'] as const).map((range) => (
@@ -137,7 +137,7 @@ export default function TopChartsPage() {
                   return (
                     <div
                       key={track.id}
-                      className={`group rounded-[2rem] bg-[#000000]/90 overflow-hidden ring-1 ring-white/10 transition hover:ring-purple/20 shadow-lg shadow-black/20`}
+                      className={`group rounded-[2rem] bg-background/90 overflow-hidden ring-1 ring-white/10 transition hover:ring-purple/20 shadow-lg shadow-black/20`}
                     >
                       <div className="grid grid-cols-[auto_1fr_auto_auto] gap-4 items-center p-5">
                         <div className="text-center">

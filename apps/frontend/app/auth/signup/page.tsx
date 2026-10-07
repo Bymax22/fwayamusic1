@@ -269,11 +269,11 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 pb-40">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 pb-40">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-[#000000] w-full max-w-3xl rounded-[32px] p-8 pb-10 shadow-[0_25px_70px_rgba(0, 0, 0, 0.55)] border border-white/10"
+        className="relative bg-background w-full max-w-3xl rounded-[32px] p-8 pb-10 shadow-[0_25px_70px_rgba(0, 0, 0, 0.55)] border border-white/10"
       >
         <div className="flex items-center justify-between mb-6">
           <button
@@ -288,7 +288,7 @@ export default function SignUp() {
           <button
             type="button"
             onClick={() => router.push('/')}
-            className="rounded-full bg-[#000000] text-white/90 ring-1 ring-white/10 hover:bg-[#36454F] p-2 transition-colors shadow-sm"
+            className="rounded-full bg-background text-white/90 ring-1 ring-white/10 hover:bg-card p-2 transition-colors shadow-sm"
           >
             <FaTimes className="w-5 h-5" />
           </button>
@@ -313,8 +313,8 @@ export default function SignUp() {
                       step === s
                         ? 'bg-purple/85 text-white'
                         : index < currentIndex
-                        ? 'bg-[#000000] text-white'
-                        : 'bg-[#000000] text-white/60'
+                        ? 'bg-background text-white'
+                        : 'bg-background text-white/60'
                     }`}
                   >
                     {index < currentIndex ? (
@@ -328,7 +328,7 @@ export default function SignUp() {
               );
             })}
           </div>
-          <div className="w-full bg-[#000000] h-1 rounded-full">
+          <div className="w-full bg-background h-1 rounded-full">
             <div
               className="bg-purple/85 h-1 rounded-full transition-all duration-300"
               style={{
@@ -358,7 +358,7 @@ export default function SignUp() {
                     className={`p-6 rounded-3xl transition-all ${
                       formData.role === role.id
                         ? 'bg-purple/85 text-white shadow-lg shadow-purple/20 border border-purple/30'
-                        : 'bg-[#000000] text-white/90 hover:bg-[#36454F] border border-white/10'
+                        : 'bg-background text-white/90 hover:bg-card border border-white/10'
                     }`}
                   >
                     <Icon className="w-8 h-8 mb-3" />
@@ -433,7 +433,7 @@ export default function SignUp() {
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                 placeholder="Your display name"
-                className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               />
             </div>
 
@@ -446,7 +446,7 @@ export default function SignUp() {
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-10"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent pr-10"
                   />
                   <button
                     type="button"
@@ -466,7 +466,7 @@ export default function SignUp() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                  className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                 />
                 {errors.confirmPassword && <p className="text-purple/75 text-xs mt-1">{errors.confirmPassword}</p>}
               </div>
@@ -475,7 +475,7 @@ export default function SignUp() {
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#000000] text-white/90 hover:bg-[#000000] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-background text-white/90 hover:bg-background transition-colors"
               >
                 Back
               </button>
@@ -500,7 +500,7 @@ export default function SignUp() {
               Additional Information
             </h2>
 
-            <div className="bg-[#000000] border border-white/10 rounded-3xl p-5 space-y-5">
+            <div className="bg-background border border-white/10 rounded-3xl p-5 space-y-5">
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-purple/45">Contact</p>
@@ -534,7 +534,7 @@ export default function SignUp() {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
               />
               {errors.dateOfBirth && <p className="text-purple/75 text-xs mt-1">{errors.dateOfBirth}</p>}
             </div>
@@ -549,7 +549,7 @@ export default function SignUp() {
                       value={formData.artistName}
                       onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
                       placeholder="Your official artist name"
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                     />
                     {errors.artistName && <p className="text-purple/75 text-xs mt-1">{errors.artistName}</p>}
                   </div>
@@ -561,7 +561,7 @@ export default function SignUp() {
                       value={formData.stageName}
                       onChange={(e) => setFormData({ ...formData, stageName: e.target.value })}
                       placeholder="Your performance name"
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                     />
                     {errors.stageName && <p className="text-purple/75 text-xs mt-1">{errors.stageName}</p>}
                   </div>
@@ -575,7 +575,7 @@ export default function SignUp() {
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       placeholder="Tell us about yourself and your music..."
                       rows={3}
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                     />
                   </div>
 
@@ -586,7 +586,7 @@ export default function SignUp() {
                       value={formData.website}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                       placeholder="https://yourwebsite.com"
-                      className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                      className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -602,7 +602,7 @@ export default function SignUp() {
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                     placeholder="Your business name"
-                    className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   />
                   {errors.businessName && <p className="text-purple/75 text-xs mt-1">{errors.businessName}</p>}
                 </div>
@@ -612,7 +612,7 @@ export default function SignUp() {
                   <select
                     value={formData.businessType}
                     onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-3xl bg-[#000000] text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
+                    className="w-full px-4 py-2.5 rounded-3xl bg-background text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent"
                   >
                     <option value="">Select business type</option>
                     <option value="INDIVIDUAL">Individual</option>
@@ -628,7 +628,7 @@ export default function SignUp() {
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#000000] text-white/90 hover:bg-[#000000] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-background text-white/90 hover:bg-background transition-colors"
               >
                 Back
               </button>
@@ -653,14 +653,14 @@ export default function SignUp() {
               Terms & Consent
             </h2>
 
-            <div className="bg-[#000000] p-6 space-y-4 rounded-3xl">
+            <div className="bg-background p-6 space-y-4 rounded-3xl">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms"
                   checked={formData.acceptedTerms}
                   onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-background border-transparent rounded focus:ring-purple/85"
                 />
                 <label htmlFor="terms" className="text-white/90 text-sm">
                   I agree to the <a href="/terms" className="text-purple/75 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-purple/75 hover:underline">Privacy Policy</a>
@@ -674,7 +674,7 @@ export default function SignUp() {
                   id="privacy"
                   checked={formData.acceptedPrivacy}
                   onChange={(e) => setFormData({ ...formData, acceptedPrivacy: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-background border-transparent rounded focus:ring-purple/85"
                 />
                 <label htmlFor="privacy" className="text-white/90 text-sm">
                   I acknowledge that I have read and understood how my personal data will be processed
@@ -688,7 +688,7 @@ export default function SignUp() {
                   id="cookies"
                   checked={formData.acceptedCookies}
                   onChange={(e) => setFormData({ ...formData, acceptedCookies: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-background border-transparent rounded focus:ring-purple/85"
                 />
                 <label htmlFor="cookies" className="text-white/90 text-sm">
                   I agree to the use of cookies for analytics and personalization.
@@ -702,7 +702,7 @@ export default function SignUp() {
                   id="marketing"
                   checked={formData.marketingEmails}
                   onChange={(e) => setFormData({ ...formData, marketingEmails: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-background border-transparent rounded focus:ring-purple/85"
                 />
                 <label htmlFor="marketing" className="text-white/90 text-sm">
                   I agree to receive marketing emails and promotional offers
@@ -715,7 +715,7 @@ export default function SignUp() {
                   id="dataSharing"
                   checked={formData.dataSharing}
                   onChange={(e) => setFormData({ ...formData, dataSharing: e.target.checked })}
-                  className="mt-1 w-4 h-4 text-purple/85 bg-[#000000] border-transparent rounded focus:ring-purple/85"
+                  className="mt-1 w-4 h-4 text-purple/85 bg-background border-transparent rounded focus:ring-purple/85"
                 />
                 <label htmlFor="dataSharing" className="text-white/90 text-sm">
                   I consent to my data being shared with trusted partners for service improvement
@@ -735,7 +735,7 @@ export default function SignUp() {
             <div className="flex justify-between pt-6">
               <button
                 onClick={handleBack}
-                className="px-8 py-3 rounded-3xl bg-[#000000] text-white/90 hover:bg-[#36454F] transition-colors"
+                className="px-8 py-3 rounded-3xl bg-background text-white/90 hover:bg-card transition-colors"
               >
                 Back
               </button>
@@ -781,7 +781,7 @@ export default function SignUp() {
                 type="button"
                 onClick={handleResendVerificationEmail}
                 disabled={resendLoading}
-                className="mt-4 px-5 py-2 bg-[#000000] text-white hover:bg-[#36454F] transition-colors disabled:opacity-50"
+                className="mt-4 px-5 py-2 bg-background text-white hover:bg-card transition-colors disabled:opacity-50"
               >
                 {resendLoading ? 'Resending…' : 'Resend verification email'}
               </button>

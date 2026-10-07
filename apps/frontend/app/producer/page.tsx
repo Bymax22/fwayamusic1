@@ -567,7 +567,7 @@ export default function ProducerPage() {
 
   return (
     <RoleGuard allowedRoles={["PRODUCER"]}>
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-background text-white">
         <div className="relative overflow-hidden">
           <DashboardHeader />
           <div className="relative p-6 max-w-7xl mx-auto pb-40 lg:pb-16">
@@ -678,7 +678,7 @@ export default function ProducerPage() {
                 )}
 
                 {/* Recent Beats */}
-                <div className="rounded-2xl bg-black border border-white/10 p-6">
+                <div className="rounded-2xl bg-background border border-white/10 p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Recent Beats</h3>
                   <div className="grid gap-4">
                     {beats.slice(0, 5).map(beat => (
@@ -707,7 +707,7 @@ export default function ProducerPage() {
             {activeTab === 'beats' && (
               <div className="grid gap-6">
                 {beats.length === 0 ? (
-                  <div className="rounded-2xl bg-black border border-white/10 p-12 text-center">
+                  <div className="rounded-2xl bg-background border border-white/10 p-12 text-center">
                     <Music2 className="w-16 h-16 text-purple/30 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-white mb-2">No beats yet</h3>
                     <p className="text-white/60 mb-6">Start by uploading your first beat to get started</p>
@@ -722,7 +722,7 @@ export default function ProducerPage() {
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {beats.map(beat => (
-                      <div key={beat.id} className="group rounded-2xl bg-black border border-white/10 overflow-hidden hover:border-purple/50 transition">
+                      <div key={beat.id} className="group rounded-2xl bg-background border border-white/10 overflow-hidden hover:border-purple/50 transition">
                         {(
                           <div className="relative h-44 overflow-hidden bg-gradient-to-b from-purple/20 to-black">
                             <CoverArtImage src={beat.artCoverUrl} alt={beat.title} fill className="object-cover group-hover:scale-105 transition duration-300" />
@@ -798,7 +798,7 @@ export default function ProducerPage() {
                 </div>
 
                 {beatPacks.length === 0 ? (
-                  <div className="rounded-2xl bg-black border border-white/10 p-12 text-center">
+                  <div className="rounded-2xl bg-background border border-white/10 p-12 text-center">
                     <Package className="w-16 h-16 text-purple/30 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-white mb-2">No beat packs yet</h3>
                     <p className="text-white/60">Bundle your beats into packs for better pricing</p>
@@ -806,7 +806,7 @@ export default function ProducerPage() {
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {beatPacks.map(pack => (
-                      <div key={pack.id} className="rounded-2xl bg-black border border-white/10 p-6 hover:border-purple/50 transition">
+                      <div key={pack.id} className="rounded-2xl bg-background border border-white/10 p-6 hover:border-purple/50 transition">
                         <h4 className="text-white font-semibold mb-2">{pack.title}</h4>
                         <p className="text-sm text-white/60 mb-4">{pack.description}</p>
                         <div className="flex items-center justify-between text-sm text-white/60">
@@ -823,7 +823,7 @@ export default function ProducerPage() {
             {/* Analytics Tab */}
             {activeTab === 'analytics' && (
               <div className="grid gap-6">
-                <div className="rounded-2xl bg-black border border-white/10 p-6">
+                <div className="rounded-2xl bg-background border border-white/10 p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Performance Analytics</h3>
                   <p className="text-white/60">Detailed analytics coming soon</p>
                 </div>
@@ -845,7 +845,7 @@ export default function ProducerPage() {
                 </div>
 
                 {soundResources.length === 0 ? (
-                  <div className="rounded-2xl bg-black border border-white/10 p-12 text-center">
+                  <div className="rounded-2xl bg-background border border-white/10 p-12 text-center">
                     <Zap className="w-16 h-16 text-purple/30 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-white mb-2">No resources yet</h3>
                     <p className="text-white/60">Share sample packs, presets, and sound kits</p>
@@ -853,7 +853,7 @@ export default function ProducerPage() {
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {soundResources.map(resource => (
-                      <div key={resource.id} className="rounded-2xl bg-black border border-white/10 p-6">
+                      <div key={resource.id} className="rounded-2xl bg-background border border-white/10 p-6">
                         <h4 className="text-white font-semibold mb-2">{resource.title}</h4>
                         <p className="text-xs text-purple/60 mb-2 capitalize">{resource.type}</p>
                         <p className="text-sm text-white/60 mb-4">{resource.description}</p>
@@ -877,13 +877,13 @@ export default function ProducerPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+              className="fixed inset-0 bg-background/50 z-50 flex items-center justify-center p-4"
             >
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-black border border-white/10 rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                className="bg-background border border-white/10 rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
               >
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold text-white">Upload New Beat</h2>

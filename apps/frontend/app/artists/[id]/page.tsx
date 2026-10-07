@@ -342,7 +342,7 @@ export default function ArtistPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple/75"></div>
       </div>
     );
@@ -350,7 +350,7 @@ export default function ArtistPage() {
 
   if (error || !artist) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Artist Not Found</h1>
           <button
@@ -365,7 +365,7 @@ export default function ArtistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="relative overflow-hidden">
         <div className="relative mx-auto max-w-7xl px-4 py-5 pb-32 sm:p-6">
           <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -388,7 +388,7 @@ export default function ArtistPage() {
                 className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold shadow-lg transition ${
                   artist.isFollowing
                     ? 'bg-purple/75 text-white shadow-purple/20 hover:bg-purple/60'
-                    : 'bg-white text-black hover:bg-white/20'
+                    : 'bg-card text-foreground hover:bg-white/20'
                 }`}
               >
                 {artist.isFollowing ? 'Following' : 'Follow'}
@@ -493,7 +493,7 @@ export default function ArtistPage() {
                     />
                     <button
                       onClick={() => handlePlaySong(song)}
-                      className={`absolute inset-0 flex items-center justify-center bg-black/60 transition-opacity rounded-xl ${currentTrack?.id === song.id.toString() && isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                      className={`absolute inset-0 flex items-center justify-center bg-background/60 transition-opacity rounded-xl ${currentTrack?.id === song.id.toString() && isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                     >
                       {currentTrack?.id === song.id.toString() && isPlaying ? (
                         <Waveform playing className="h-5 w-5" />

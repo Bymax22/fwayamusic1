@@ -216,7 +216,7 @@ const UserDashboard: React.FC = () => {
   }, [user]);
 
   if (authLoading || !user) return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#000000] to-[#36454F]">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-card">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
     </div>
   );
@@ -413,7 +413,7 @@ const UserDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-3 border-white/20 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
           <p className="text-white/60 mobile-text-sm">Loading dashboard...</p>
@@ -424,7 +424,7 @@ const UserDashboard: React.FC = () => {
 
   return (
     <RoleGuard allowedRoles={['USER']}>
-      <div className="min-h-screen bg-black text-white pb-20">
+      <div className="min-h-screen bg-background text-white pb-20">
         {/* Mobile Header */}
         <DashboardHeader />
 
@@ -442,7 +442,7 @@ const UserDashboard: React.FC = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-1 px-3 py-2 rounded-md transition-all flex-shrink-0 mobile-text-xs ${
                 activeTab === tab.id
-                  ? 'bg-[#36454F] text-white shadow-lg'
+                  ? 'bg-card text-white shadow-lg'
                   : 'text-white/60 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -501,13 +501,13 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center gap-1">
                 <button 
                   onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-lg ${viewMode === 'grid' ? 'bg-[#36454F] text-white' : 'bg-white/5 text-white/60'}`}
+                  className={`p-1.5 rounded-lg ${viewMode === 'grid' ? 'bg-card text-white' : 'bg-white/5 text-white/60'}`}
                 >
                   <FaThLarge className="w-3 h-3" />
                 </button>
                 <button 
                   onClick={() => setViewMode('list')}
-                  className={`p-1.5 rounded-lg ${viewMode === 'list' ? 'bg-[#36454F] text-white' : 'bg-white/5 text-white/60'}`}
+                  className={`p-1.5 rounded-lg ${viewMode === 'list' ? 'bg-card text-white' : 'bg-white/5 text-white/60'}`}
                 >
                   <FaList className="w-3 h-3" />
                 </button>
@@ -536,7 +536,7 @@ const UserDashboard: React.FC = () => {
                           (e.target as HTMLImageElement).src = '/default-cover.jpg';
                         }}
                       />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center rounded-lg transition-all">
+                      <div className="absolute inset-0 bg-background/0 group-hover:bg-background/40 flex items-center justify-center rounded-lg transition-all">
                         {currentTrack?.id === track.id && isPlaying ? (
                           <Waveform playing className="h-3 w-3" />
                         ) : (
@@ -563,9 +563,9 @@ const UserDashboard: React.FC = () => {
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={(e) => { e.stopPropagation(); handleLike(track.id); }}
-                        className="text-white/60 hover:text-[#36454F] transition-colors touch-target"
+                        className="text-white/60 hover:text-card-foreground transition-colors touch-target"
                       >
-                        <FaHeart className={track.likes > 0 ? 'text-[#36454F] fill-current w-4 h-4' : 'w-4 h-4'} />
+                        <FaHeart className={track.likes > 0 ? 'text-card-foreground fill-current w-4 h-4' : 'w-4 h-4'} />
                       </button>
                     </div>
                   </motion.div>
@@ -593,13 +593,13 @@ const UserDashboard: React.FC = () => {
                           (e.target as HTMLImageElement).src = '/default-cover.jpg';
                         }}
                       />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all">
+                      <div className="absolute inset-0 bg-background/0 group-hover:bg-background/40 flex items-center justify-center transition-all">
                         {currentTrack?.id === track.id && isPlaying ? (
-                          <button className="w-8 h-8 rounded-full bg-[#36454F] flex items-center justify-center shadow-lg">
+                          <button className="w-8 h-8 rounded-full bg-card flex items-center justify-center shadow-lg">
                             <Waveform playing className="h-3 w-3" />
                           </button>
                         ) : (
-                          <button className="w-8 h-8 rounded-full bg-[#36454F] flex items-center justify-center shadow-lg">
+                          <button className="w-8 h-8 rounded-full bg-card flex items-center justify-center shadow-lg">
                             <FaPlay className="text-white w-3 h-3 ml-0.5" />
                           </button>
                         )}
@@ -617,9 +617,9 @@ const UserDashboard: React.FC = () => {
                           <span>{formatDuration(track.duration)}</span>
                           <button 
                             onClick={(e) => { e.stopPropagation(); handleLike(track.id); }}
-                            className="text-white/60 hover:text-[#36454F] transition-colors"
+                            className="text-white/60 hover:text-card-foreground transition-colors"
                           >
-                            <FaHeart className={track.likes > 0 ? 'text-[#36454F] fill-current w-3 h-3' : 'w-3 h-3'} />
+                            <FaHeart className={track.likes > 0 ? 'text-card-foreground fill-current w-3 h-3' : 'w-3 h-3'} />
                           </button>
                         </div>
                       </div>
@@ -636,10 +636,10 @@ const UserDashboard: React.FC = () => {
               <section className="bg-white/5 rounded-xl p-4 border border-white/10">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="font-bold flex items-center gap-2 mobile-text-base">
-                    <FaCompactDisc className="text-[#36454F]" />
+                    <FaCompactDisc className="text-card-foreground" />
                     Featured EPs
                   </h2>
-                  <a href="/browse" className="text-[#36454F] hover:underline text-xs mobile-text-xs">More</a>
+                  <a href="/browse" className="text-card-foreground hover:underline text-xs mobile-text-xs">More</a>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {featuredEPs.slice(0, 4).map((ep: any, index: number) => (
@@ -679,7 +679,7 @@ const UserDashboard: React.FC = () => {
                   <FaStar className="text-purple/60" />
                   For You
                 </h2>
-                <button className="text-[#36454F] hover:underline text-xs mobile-text-xs">
+                <button className="text-card-foreground hover:underline text-xs mobile-text-xs">
                   More
                 </button>
               </div>
@@ -705,7 +705,7 @@ const UserDashboard: React.FC = () => {
                           (e.target as HTMLImageElement).src = '/default-cover.jpg';
                         }}
                       />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center rounded transition-all">
+                      <div className="absolute inset-0 bg-background/0 group-hover:bg-background/40 flex items-center justify-center rounded transition-all">
                         <FaPlay className="text-white opacity-0 group-hover:opacity-100 transition-opacity w-2 h-2" />
                       </div>
                     </div>
@@ -789,7 +789,7 @@ const UserDashboard: React.FC = () => {
                   <FaMicrophone />
                   Your Uploads
                 </h2>
-                <a href="/upload" className="text-[#36454F] hover:underline text-xs flex items-center gap-1 mobile-text-xs">
+                <a href="/upload" className="text-card-foreground hover:underline text-xs flex items-center gap-1 mobile-text-xs">
                   <FaPlus className="w-2 h-2" />
                   New
                 </a>
@@ -835,7 +835,7 @@ const UserDashboard: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         {media['acceptedPricingSnapshotId'] ? (
-                          <button onClick={() => viewPricingSnapshot(media.id)} className="text-sm text-[#36454F]">View snapshot</button>
+                          <button onClick={() => viewPricingSnapshot(media.id)} className="text-sm text-card-foreground">View snapshot</button>
                         ) : (
                           <button onClick={() => router.push(`/media/${media.id}/pricing`)} className="text-sm text-white/80 bg-white/5 px-2 py-1 rounded">Request pricing</button>
                         )}
@@ -853,7 +853,7 @@ const UserDashboard: React.FC = () => {
           <motion.div
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="fixed bottom-16 left-0 right-0 bg-black/95 backdrop-blur-lg border-t border-white/10 p-3 shadow-2xl mx-4 rounded-t-xl"
+            className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-white/10 p-3 shadow-2xl mx-4 rounded-t-xl"
           >
             <div className="flex items-center justify-between">
               {/* Track Info */}
@@ -878,7 +878,7 @@ const UserDashboard: React.FC = () => {
               <div className="flex items-center gap-3 w-3/5 justify-end">
                 <button 
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-10 h-10 rounded-full bg-[#36454F] hover:bg-[#9B5DE5] text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 touch-target"
+                  className="w-10 h-10 rounded-full bg-card hover:bg-primary text-white flex items-center justify-center shadow-lg transition-all hover:scale-105 touch-target"
                 >
                   {isPlaying ? <FaPause className="w-4 h-4" /> : <FaPlay className="w-4 h-4 ml-0.5" />}
                 </button>
@@ -894,7 +894,7 @@ const UserDashboard: React.FC = () => {
               <span className="text-xs text-white/60 w-8 text-right mobile-text-xs">0:00</span>
               <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-[#36454F] to-[#9B5DE5] rounded-full"
+                  className="h-full bg-gradient-to-r from-card to-primary rounded-full"
                   style={{ width: '30%' }}
                 ></div>
               </div>

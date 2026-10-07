@@ -97,7 +97,7 @@ function SpectrumVisualizer({ isPlaying, progress, className = '' }: { isPlaying
           transform: scaleY(0.35);
           transform-origin: bottom;
           border-radius: 2px 2px 0 0;
-          background: linear-gradient(to top, #9B5DE5, #9B5DE5);
+          background: linear-gradient(to top, rgb(var(--primary-accent)), rgb(var(--primary-accent)));
           opacity: 0.35;
         }
         .spectrum-bar.is-playing {
@@ -105,9 +105,9 @@ function SpectrumVisualizer({ isPlaying, progress, className = '' }: { isPlaying
           opacity: 0.8;
         }
         .spectrum-progress {
-          background: linear-gradient(to right, #9B5DE5, #9B5DE5, #9B5DE5);
+          background: linear-gradient(to right, rgb(var(--primary-accent)), rgb(var(--primary-accent)), rgb(var(--primary-accent)));
           transition: width 250ms linear;
-          box-shadow: 0 0 8px rgba(155, 93, 229, 0.65);
+          box-shadow: 0 0 8px rgba(var(--primary-accent), 0.65);
         }
         @keyframes spectrum-pulse {
           0%, 100% { transform: scaleY(0.3); opacity: 0.45; }
@@ -546,12 +546,12 @@ export default function MobilePlayer({
                 className="block h-10 w-10 aspect-square rounded-full object-cover shadow-lg"
               />
               {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-background/40">
                   <div className="animate-spin rounded-full h-2 w-2 border-b-2 border-white"></div>
                 </div>
               )}
               {isVideo && (
-                <div className="absolute top-1 left-1 rounded-full bg-black/70 p-1">
+                <div className="absolute top-1 left-1 rounded-full bg-background/70 p-1">
                   <VideoCameraIcon className="w-3 h-3 text-white" />
                 </div>
               )}
@@ -597,13 +597,13 @@ export default function MobilePlayer({
               <button
                 onClick={onPlayPause}
                 disabled={isLoading}
-                className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 active:scale-95"
+                className="w-8 h-8 bg-card rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-50 active:scale-95"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isPlaying ? (
-                  <PauseIcon className="w-4 h-4 text-black ml-0.5" />
+                  <PauseIcon className="w-4 h-4 text-foreground ml-0.5" />
                 ) : (
-                  <PlayIcon className="w-4 h-4 text-black ml-0.5" />
+                  <PlayIcon className="w-4 h-4 text-foreground ml-0.5" />
                 )}
               </button>
 
@@ -677,14 +677,14 @@ export default function MobilePlayer({
           <motion.button
             type="button"
             aria-label="Close expanded player"
-            className="fixed inset-0 bottom-16 z-[59] bg-black/60"
+            className="fixed inset-0 bottom-16 z-[59] bg-background/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsExpanded(false)}
           />
           <motion.section
-            className="fixed inset-x-0 bottom-16 z-[60] flex h-[58dvh] min-h-[360px] max-h-[620px] flex-col overflow-hidden rounded-t-3xl bg-black shadow-2xl"
+            className="fixed inset-x-0 bottom-16 z-[60] flex h-[58dvh] min-h-[360px] max-h-[620px] flex-col overflow-hidden rounded-t-3xl bg-background shadow-2xl"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -692,7 +692,7 @@ export default function MobilePlayer({
             aria-label="Expanded audio player"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="absolute inset-0 bg-black">
+            <div className="absolute inset-0 bg-background">
               <Image
                 src={track.imageUrl || '/default-cover.jpg'}
                 alt=""
@@ -702,7 +702,7 @@ export default function MobilePlayer({
                 className="scale-105 object-cover opacity-75"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/95" />
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#36454F]/30 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-card/30 via-transparent to-transparent" />
             </div>
 
             <div className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-3 pt-2 text-white">
@@ -741,7 +741,7 @@ export default function MobilePlayer({
                 </button>
               </div>
 
-              <div className="relative my-2 h-9 shrink-0 overflow-hidden rounded-lg bg-black/20">
+              <div className="relative my-2 h-9 shrink-0 overflow-hidden rounded-lg bg-background/20">
                 <SpectrumVisualizer
                   isPlaying={isPlaying}
                   progress={duration > 0 ? currentTime / duration : 0}
@@ -767,7 +767,7 @@ export default function MobilePlayer({
                   type="button"
                   onClick={onPlayPause}
                   disabled={isLoading}
-                  className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-black disabled:opacity-50"
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-card text-foreground disabled:opacity-50"
                   aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
                   {isPlaying ? <PauseIcon className="h-6 w-6" /> : <PlayIcon className="h-6 w-6" />}
@@ -798,7 +798,7 @@ export default function MobilePlayer({
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain pt-2">
                 <section>
                   <h2 className="mb-1 text-xs font-semibold uppercase tracking-widest text-purple/30">Lyrics</h2>
-                  <div className="rounded-xl bg-[#36454F] px-3 py-2">
+                  <div className="rounded-xl bg-card px-3 py-2">
                     <p className="min-h-5 text-sm font-semibold leading-5 text-white" aria-live="polite">
                       {lyricLines[activeLyricIndex]?.text || 'No lyrics are available for this track.'}
                     </p>
@@ -834,7 +834,7 @@ export default function MobilePlayer({
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-xl bg-black/25 px-3 py-2 text-xs text-white/50">No tracks are queued.</p>
+                    <p className="rounded-xl bg-background/25 px-3 py-2 text-xs text-white/50">No tracks are queued.</p>
                   )}
                 </section>
 
@@ -846,14 +846,14 @@ export default function MobilePlayer({
                   {comments.length > 0 ? (
                     <div className="space-y-2">
                       {comments.map((comment) => (
-                        <article key={comment.id} className="rounded-xl bg-[#36454F]/70 px-3 py-2">
+                        <article key={comment.id} className="rounded-xl bg-card/70 px-3 py-2">
                           <p className="text-[11px] font-semibold text-white/80">{comment.userName}</p>
                           <p className="text-xs leading-5 text-white/65">{comment.content}</p>
                         </article>
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-xl bg-[#36454F]/70 px-3 py-2 text-xs text-white/70">No comments yet.</p>
+                    <p className="rounded-xl bg-card/70 px-3 py-2 text-xs text-white/70">No comments yet.</p>
                   )}
                   <Link href={`/track/${track.id}`} className="mt-2 inline-block text-xs font-semibold text-purple/30">
                     Open track discussion
@@ -865,12 +865,12 @@ export default function MobilePlayer({
                       maxLength={1000}
                       placeholder="Add a comment..."
                       aria-label="Add a comment"
-                      className="min-w-0 flex-1 rounded-xl bg-[#36454F] px-3 py-2 text-xs text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
+                      className="min-w-0 flex-1 rounded-xl bg-card px-3 py-2 text-xs text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
                     />
                     <button
                       type="submit"
                       disabled={commentSending || !commentDraft.trim()}
-                      className="rounded-xl bg-black px-3 text-xs font-semibold text-white disabled:opacity-50"
+                      className="rounded-xl bg-background px-3 text-xs font-semibold text-white disabled:opacity-50"
                     >
                       {commentSending ? 'Sending' : 'Post'}
                     </button>

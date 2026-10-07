@@ -313,7 +313,7 @@ export default function VideoPlayer({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className={isMinimized && isMobile ? 'fixed bottom-4 right-4 z-[70] w-[180px] sm:w-[220px]' : 'fixed inset-0 z-[60] bg-black/95 flex items-center justify-center p-2 sm:p-4'}
+          className={isMinimized && isMobile ? 'fixed bottom-4 right-4 z-[70] w-[180px] sm:w-[220px]' : 'fixed inset-0 z-[60] bg-background/95 flex items-center justify-center p-2 sm:p-4'}
           onClick={isMinimized && isMobile ? undefined : onClose}
         >
           <motion.div
@@ -321,10 +321,10 @@ export default function VideoPlayer({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className={isMinimized && isMobile ? 'w-full overflow-hidden rounded-[20px] bg-black/90 shadow-2xl backdrop-blur' : 'w-full max-w-5xl overflow-hidden rounded-[24px] bg-[#000000]/95 shadow-2xl'}
+            className={isMinimized && isMobile ? 'w-full overflow-hidden rounded-[20px] bg-background/90 shadow-2xl backdrop-blur' : 'w-full max-w-5xl overflow-hidden rounded-[24px] bg-background/95 shadow-2xl'}
           >
             <div
-              className="relative bg-black"
+              className="relative bg-background"
               style={{ touchAction: 'manipulation' }}
               onClick={handleMediaTap}
               onTouchStart={handleMediaTap}
@@ -335,7 +335,7 @@ export default function VideoPlayer({
                 ref={videoRef}
                 src={resolvedVideoUrl ? resolveVideoQualityUrl(resolvedVideoUrl, selectedQuality) : undefined}
                 poster={coverUrl ?? undefined}
-                className={isMinimized && isMobile ? 'aspect-video w-full object-cover' : 'aspect-video w-full object-contain bg-black'}
+                className={isMinimized && isMobile ? 'aspect-video w-full object-cover' : 'aspect-video w-full object-contain bg-background'}
                 onTouchEnd={handleMediaTap}
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleTimeUpdate}
@@ -349,7 +349,7 @@ export default function VideoPlayer({
                 webkit-playsinline="true"
               />
               {playbackError && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-6 text-center text-sm text-purple/30">
+                <div className="absolute inset-0 flex items-center justify-center bg-background/80 px-6 text-center text-sm text-purple/30">
                   {playbackError}
                 </div>
               )}
@@ -365,7 +365,7 @@ export default function VideoPlayer({
                   {isMobile && !isMinimized && (
                     <button
                       onClick={() => setIsMinimized(true)}
-                      className="rounded-full bg-black/40 p-2 text-white transition hover:bg-white/10"
+                      className="rounded-full bg-background/40 p-2 text-white transition hover:bg-white/10"
                     >
                       <Minimize2 className="h-4 w-4" />
                     </button>
@@ -373,14 +373,14 @@ export default function VideoPlayer({
                   {isMobile && isMinimized && (
                     <button
                       onClick={() => setIsMinimized(false)}
-                      className="rounded-full bg-black/40 p-2 text-white transition hover:bg-white/10"
+                      className="rounded-full bg-background/40 p-2 text-white transition hover:bg-white/10"
                     >
                       <Maximize2 className="h-4 w-4" />
                     </button>
                   )}
                   <button
                     onClick={onClose}
-                    className="rounded-full bg-black/40 p-2 text-white transition hover:bg-white/10"
+                    className="rounded-full bg-background/40 p-2 text-white transition hover:bg-white/10"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -392,7 +392,7 @@ export default function VideoPlayer({
                   <motion.div
                     animate={{ opacity: showControls ? 1 : 0 }}
                     transition={{ duration: 0.2 }}
-                    className="rounded-[18px] border border-white/10 bg-black/40 p-3 backdrop-blur"
+                    className="rounded-[18px] border border-white/10 bg-background/40 p-3 backdrop-blur"
                   >
                     <div className="mb-3 flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -417,7 +417,7 @@ export default function VideoPlayer({
                             <Settings2 className="h-4 w-4" />
                           </button>
                           {showQualityMenu && (
-                            <div className="absolute bottom-12 right-0 min-w-[120px] rounded-2xl border border-white/10 bg-black/90 p-2 text-sm shadow-xl">
+                            <div className="absolute bottom-12 right-0 min-w-[120px] rounded-2xl border border-white/10 bg-background/90 p-2 text-sm shadow-xl">
                               {getVideoQualityOptions(resolvedVideoUrl).map((option) => (
                                 <button
                                   key={option.value}
@@ -473,7 +473,7 @@ export default function VideoPlayer({
             </div>
 
             {!isMinimized && (
-              <div className="bg-[#000000] p-3 sm:p-4">
+              <div className="bg-background p-3 sm:p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold text-white">Related videos</p>

@@ -98,8 +98,8 @@ export default function CreatePlaylistPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-gradient-to-br from-[#000000]/95 via-[#000000]/80 to-[#000000]/95 min-h-screen pb-32">
-      <div className="mb-8 rounded-3xl border border-purple/40 bg-[#000000]/80 p-8 shadow-2xl shadow-purple/20">
+    <div className="p-6 max-w-4xl mx-auto bg-gradient-to-br from-background/95 via-background/80 to-background/95 min-h-screen pb-32">
+      <div className="mb-8 rounded-3xl border border-purple/40 bg-background/80 p-8 shadow-2xl shadow-purple/20">
         <div className="flex flex-col gap-3">
           <div className="inline-flex items-center gap-2 rounded-full bg-purple/10 px-4 py-2 text-sm uppercase tracking-[0.24em] text-purple/45">
             Create Playlist
@@ -113,7 +113,7 @@ export default function CreatePlaylistPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Cover Image Upload */}
-        <div className="bg-[#36454F]/70 rounded-xl p-6">
+        <div className="bg-card/70 rounded-xl p-6">
           <h2 className="text-lg font-medium text-white mb-4">Cover Image</h2>
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             {/* Cover Preview */}
@@ -136,7 +136,7 @@ export default function CreatePlaylistPage() {
                   </button>
                 </div>
               ) : (
-                <div className="w-48 h-48 bg-[#36454F] border-2 border-dashed border-charcoal/50 rounded-xl flex flex-col items-center justify-center text-white/60 hover:border-charcoal/50 transition-colors">
+                <div className="w-48 h-48 bg-card border-2 border-dashed border-charcoal/50 rounded-xl flex flex-col items-center justify-center text-white/60 hover:border-charcoal/50 transition-colors">
                   <ImageIcon className="w-12 h-12 mb-2" />
                   <span className="text-sm">No cover</span>
                 </div>
@@ -148,7 +148,7 @@ export default function CreatePlaylistPage() {
               <p className="text-white/60 mb-4">
                 Upload a cover image for your playlist. Recommended size: 1000x1000 pixels.
               </p>
-              <label className="flex items-center gap-2 px-4 py-2 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-lg transition-colors cursor-pointer w-fit">
+              <label className="flex items-center gap-2 px-4 py-2 bg-card hover:bg-primary text-white rounded-lg transition-colors cursor-pointer w-fit">
                 <Upload className="w-4 h-4" />
                 Choose Image
                 <input
@@ -163,7 +163,7 @@ export default function CreatePlaylistPage() {
         </div>
 
         {/* Playlist Details */}
-        <div className="bg-[#36454F]/70 rounded-xl p-6">
+        <div className="bg-card/70 rounded-xl p-6">
           <h2 className="text-lg font-medium text-white mb-4">Playlist Details</h2>
           
           <div className="space-y-4">
@@ -178,7 +178,7 @@ export default function CreatePlaylistPage() {
                 value={playlistData.name}
                 onChange={handleInputChange}
                 placeholder="My Awesome Playlist"
-                className="w-full px-4 py-3 bg-[#000000] border border-purple/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent placeholder-white/60"
+                className="w-full px-4 py-3 bg-background border border-purple/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent placeholder-white/60"
                 required
               />
             </div>
@@ -194,7 +194,7 @@ export default function CreatePlaylistPage() {
                 onChange={handleInputChange}
                 placeholder="Describe your playlist..."
                 rows={4}
-                className="w-full px-4 py-3 bg-[#000000] border border-purple/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent placeholder-white/60 resize-none"
+                className="w-full px-4 py-3 bg-background border border-purple/40 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple/75 focus:border-transparent placeholder-white/60 resize-none"
               />
             </div>
 

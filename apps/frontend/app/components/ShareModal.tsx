@@ -89,8 +89,8 @@ export default function ShareModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-black rounded-2xl p-4 max-w-md w-full max-h-[72vh] sm:max-h-[80vh] overflow-y-auto shadow-2xl shadow-black/40">
+    <div className="fixed inset-0 bg-background/60 z-50 flex items-center justify-center p-4">
+      <div className="bg-background rounded-2xl p-4 max-w-md w-full max-h-[72vh] sm:max-h-[80vh] overflow-y-auto shadow-2xl shadow-black/40">
         <div className="flex items-start justify-between gap-4 mb-3">
           <div>
             <h3 className="text-xl font-bold text-white">Share Track</h3>

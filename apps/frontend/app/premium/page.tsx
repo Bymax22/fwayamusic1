@@ -82,13 +82,13 @@ export default function PremiumPage() {
     });
   };
 
-  if (loading) return <div className="p-6 max-w-7xl mx-auto bg-black text-white min-h-screen text-center py-20">Loading premium tracks...</div>;
+  if (loading) return <div className="p-6 max-w-7xl mx-auto bg-background text-white min-h-screen text-center py-20">Loading premium tracks...</div>;
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-white">
       <div className="relative overflow-hidden">
         <div className="relative p-6 max-w-7xl mx-auto pb-32">
-          <div className="rounded-[2rem] bg-[#000000]/90 p-6 shadow-xl shadow-charcoal/20">
+          <div className="rounded-[2rem] bg-background/90 p-6 shadow-xl shadow-charcoal/20">
             <div className="mb-10">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.24em] text-purple/45">
                 <Crown className="w-4 h-4 text-purple/60" />
@@ -112,7 +112,7 @@ export default function PremiumPage() {
                 {media.map((track) => (
                   <div
                     key={track.id}
-                    className="group rounded-[2rem] bg-[#000000]/90 overflow-hidden transition hover:ring-purple/20 shadow-lg shadow-black/20"
+                    className="group rounded-[2rem] bg-background/90 overflow-hidden transition hover:ring-purple/20 shadow-lg shadow-black/20"
                   >
                     <div className="relative overflow-hidden">
                       <Image

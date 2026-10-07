@@ -123,7 +123,7 @@ export default function NewReleasesPage() {
   }, [filter, media]);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-black min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-background min-h-screen pb-32">
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between mb-6">
@@ -166,7 +166,7 @@ export default function NewReleasesPage() {
             return (
               <div 
                 key={release.id} 
-                className="bg-[#000000] rounded-3xl overflow-hidden transition-colors group"
+                className="bg-background rounded-3xl overflow-hidden transition-colors group"
               >
                 <div className="relative">
                   <Image 
@@ -177,12 +177,12 @@ export default function NewReleasesPage() {
                       (e.target as HTMLImageElement).src = '/default-cover.jpg';
                     }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all">
+                  <div className="absolute inset-0 flex items-center justify-center bg-background bg-opacity-0 group-hover:bg-opacity-30 transition-all">
                     <button 
                       onClick={() => handlePlay(release)}
                       className={`transform transition-all ${currentTrack?.id === release.id && isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 group-hover:opacity-100 group-hover:translate-y-0'}`}
                     >
-                      <div className="w-12 h-12 rounded-full bg-[#36454F] flex items-center justify-center shadow-lg">
+                      <div className="w-12 h-12 rounded-full bg-card flex items-center justify-center shadow-lg">
                         {currentTrack?.id === release.id && isPlaying ? (
                           <Waveform playing className="h-5 w-5" />
                         ) : (
@@ -239,7 +239,7 @@ export default function NewReleasesPage() {
       {/* Load More Button */}
       {filteredReleases.length > 0 && (
         <div className="mt-8 flex justify-center">
-          <button className="px-6 py-3 bg-[#36454F] hover:bg-[#36454F]/80 text-white rounded-xl transition-colors">
+          <button className="px-6 py-3 bg-card hover:bg-card/80 text-white rounded-xl transition-colors">
             Load More Releases
           </button>
         </div>

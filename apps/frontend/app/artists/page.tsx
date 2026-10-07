@@ -103,7 +103,7 @@ export default function ArtistsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black p-4 md:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Users className="w-8 h-8 text-purple/60" />

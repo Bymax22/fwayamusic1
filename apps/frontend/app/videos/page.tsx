@@ -84,7 +84,7 @@ export default function VideosPage() {
         </div>
 
         {error ? (
-          <div className="rounded-3xl bg-black p-6 text-sm text-purple/45">{error}</div>
+          <div className="rounded-3xl bg-background p-6 text-sm text-purple/45">{error}</div>
         ) : loading ? (
           <div className="space-y-4">
             <div className="h-24 rounded-3xl bg-charcoal animate-pulse" />

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function SupportPage() {
   return (
-    <div className="min-h-screen pb-40 lg:pb-0 px-5 pt-6 bg-black text-white">
+    <div className="min-h-screen pb-40 lg:pb-0 px-5 pt-6 bg-background text-white">
       <main className="max-w-3xl mx-auto">
         <h1 className="text-2xl font-semibold">Support</h1>
         <p className="mt-2 text-white/60">Need help? Browse FAQs or send us a message.</p>

@@ -385,9 +385,9 @@ export default function ResellerDashboard() {
     });
     alert('Demo payout method added!');
   }}
-  className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg transition-colors text-left border-2 border-dashed border-[#36454F]"
+  className="w-full flex items-center gap-3 p-4 bg-card hover:bg-card/80 rounded-lg transition-colors text-left border-2 border-dashed border-card"
 >
-  <Plus className="w-5 h-5 text-[#36454F]" />
+  <Plus className="w-5 h-5 text-card-foreground" />
   <div>
     <p className="font-medium text-white">Add Payout Method</p>
     <p className="text-sm text-white/60">Add mobile money or bank account</p>
@@ -444,7 +444,7 @@ export default function ResellerDashboard() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/20 backdrop-blur-sm">
         <div className="relative w-32 h-32">
           <motion.div
             animate={{
@@ -463,13 +463,13 @@ export default function ResellerDashboard() {
                 repeatType: "reverse",
               },
             }}
-            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-[#36454F]"
+            className="absolute inset-0 rounded-full border-2 border-opacity-20 border-card"
             style={{
               background: `conic-gradient(
                 from 0deg at 50% 50%,
-                rgba(54, 69, 79, 0) 0deg,
-                rgba(54, 69, 79, 0.3) 120deg,
-                rgba(54, 69, 79, 0) 240deg
+                rgba(var(--card), 0) 0deg,
+                rgba(var(--card), 0.3) 120deg,
+                rgba(var(--card), 0) 240deg
               )`,
             }}
           />
@@ -477,9 +477,9 @@ export default function ResellerDashboard() {
             animate={{
               scale: [1, 1.1, 1],
               boxShadow: [
-                '0 0 0 0 rgba(54, 69, 79, 0.4)',
-                '0 0 0 15px rgba(54, 69, 79, 0)',
-                '0 0 0 30px rgba(54, 69, 79, 0)'
+                '0 0 0 0 rgba(var(--card), 0.4)',
+                '0 0 0 15px rgba(var(--card), 0)',
+                '0 0 0 30px rgba(var(--card), 0)'
               ]
             }}
             transition={{
@@ -487,7 +487,7 @@ export default function ResellerDashboard() {
               repeat: Infinity,
               ease: "easeOut"
             }}
-            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#36454F] to-[#9B5DE5] flex items-center justify-center"
+            className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-card to-primary flex items-center justify-center"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
               <path 
@@ -506,7 +506,7 @@ export default function ResellerDashboard() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-[#36454F]"
+            className="absolute -bottom-6 left-0 right-0 text-center text-sm font-bold text-card-foreground"
           >
             Loading...
           </motion.span>
@@ -524,7 +524,7 @@ export default function ResellerDashboard() {
     <ThemeProvider>
       <AuthProvider>
         <PaymentProvider>
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#36454F]/95 to-[#000000]/95 min-h-screen pb-32">
+    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-card/95 to-background/95 min-h-screen pb-32">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -551,7 +551,7 @@ export default function ResellerDashboard() {
           <button
             onClick={handlePayoutRequest}
             disabled={!kycStatus?.isVerified || stats.pendingCommission < 10}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#36454F] to-[#9B5DE5] disabled:from-charcoal/50 disabled:to-charcoal/50 text-white rounded-xl hover:shadow-lg transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-card to-primary disabled:from-charcoal/50 disabled:to-charcoal/50 text-white rounded-xl hover:shadow-lg transition-all"
           >
             <Wallet className="w-5 h-5" />
             Request Payout
@@ -560,14 +560,14 @@ export default function ResellerDashboard() {
       </div>
 
        {/* Navigation Tabs */}
-<div className="flex gap-4 border-b border-[#36454F] pb-2 mb-6 overflow-x-auto">
+<div className="flex gap-4 border-b border-card pb-2 mb-6 overflow-x-auto">
   {tabs.map(tab => (
     <button
       key={tab.id}
       onClick={() => setActiveTab(tab.id)}
       className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${
         activeTab === tab.id 
-          ? 'text-[#36454F] border-b-2 border-[#36454F]'
+          ? 'text-card-foreground border-b-2 border-card'
           : 'text-white/60 hover:text-white/90'
       }`}
     >
@@ -579,7 +579,7 @@ export default function ResellerDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-[#36454F]/70 rounded-xl p-6 border-l-4 border-purple/75">
+        <div className="bg-card/70 rounded-xl p-6 border-l-4 border-purple/75">
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-white/60 text-sm mb-1">Total Earnings</p>
@@ -595,7 +595,7 @@ export default function ResellerDashboard() {
           </div>
         </div>
 
-        <div className="bg-[#36454F]/70 rounded-xl p-6 border-l-4 border-purple/75">
+        <div className="bg-card/70 rounded-xl p-6 border-l-4 border-purple/75">
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-white/60 text-sm mb-1">Pending Earnings</p>
@@ -608,7 +608,7 @@ export default function ResellerDashboard() {
           <p className="text-purple/60 text-sm">Available for payout</p>
         </div>
 
-        <div className="bg-[#36454F]/70 rounded-xl p-6 border-l-4 border-purple/75">
+        <div className="bg-card/70 rounded-xl p-6 border-l-4 border-purple/75">
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-white/60 text-sm mb-1">Total Sales</p>
@@ -624,7 +624,7 @@ export default function ResellerDashboard() {
           </div>
         </div>
 
-        <div className="bg-[#36454F]/70 rounded-xl p-6 border-l-4 border-purple/75">
+        <div className="bg-card/70 rounded-xl p-6 border-l-4 border-purple/75">
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-white/60 text-sm mb-1">Active Links</p>
@@ -642,19 +642,19 @@ export default function ResellerDashboard() {
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Commissions */}
-          <div className="lg:col-span-2 bg-[#36454F]/70 rounded-xl p-6">
+          <div className="lg:col-span-2 bg-card/70 rounded-xl p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-white">Recent Commissions</h2>
               <button 
                 onClick={() => setActiveTab('commissions')}
-                className="text-[#36454F] hover:text-[#9B5DE5] text-sm"
+                className="text-card-foreground hover:text-primary text-sm"
               >
                 View all
               </button>
             </div>
             <div className="space-y-4">
               {commissions.slice(0, 5).map(commission => (
-                <div key={commission.id} className="flex items-center justify-between p-4 bg-[#36454F] rounded-lg">
+                <div key={commission.id} className="flex items-center justify-between p-4 bg-card rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${
                       commission.status === 'PAID' ? 'bg-purple/75' :
@@ -683,7 +683,7 @@ export default function ResellerDashboard() {
           {/* Quick Actions & KYC Status */}
           <div className="space-y-6">
             {/* KYC Status Card */}
-            <div className="bg-[#36454F]/70 rounded-xl p-6">
+            <div className="bg-card/70 rounded-xl p-6">
               <h2 className="text-xl font-bold text-white mb-4">Verification Status</h2>
               {kycStatus ? (
                 <div className="space-y-4">
@@ -715,7 +715,7 @@ export default function ResellerDashboard() {
                   {!kycStatus.isVerified && kycStatus.status !== 'PENDING' && (
                     <button
                       onClick={startKYCVerification}
-                      className="w-full py-3 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors font-medium"
+                      className="w-full py-3 bg-card hover:bg-primary text-white rounded-xl transition-colors font-medium"
                     >
                       Start Verification
                     </button>
@@ -730,14 +730,14 @@ export default function ResellerDashboard() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-[#36454F]/70 rounded-xl p-6">
+            <div className="bg-card/70 rounded-xl p-6">
               <h2 className="text-xl font-bold text-white mb-6">Quick Actions</h2>
               <div className="space-y-4">
                 <button 
                   onClick={() => setActiveTab('links')}
-                  className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-4 bg-card hover:bg-card/80 rounded-lg transition-colors text-left"
                 >
-                  <Plus className="w-5 h-5 text-[#36454F]" />
+                  <Plus className="w-5 h-5 text-card-foreground" />
                   <div>
                     <p className="font-medium text-white">Create New Link</p>
                     <p className="text-sm text-white/60">Generate reseller link for a track</p>
@@ -747,17 +747,17 @@ export default function ResellerDashboard() {
                 <button 
                   onClick={handlePayoutRequest}
                   disabled={!kycStatus?.isVerified || stats.pendingCommission < 10}
-                  className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-4 bg-card hover:bg-card/80 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors text-left"
                 >
-                  <Wallet className="w-5 h-5 text-[#36454F]" />
+                  <Wallet className="w-5 h-5 text-card-foreground" />
                   <div>
                     <p className="font-medium text-white">Request Payout</p>
                     <p className="text-sm text-white/60">Withdraw earnings to your account</p>
                   </div>
                 </button>
 
-                <button className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg transition-colors text-left">
-                  <Download className="w-5 h-5 text-[#36454F]" />
+                <button className="w-full flex items-center gap-3 p-4 bg-card hover:bg-card/80 rounded-lg transition-colors text-left">
+                  <Download className="w-5 h-5 text-card-foreground" />
                   <div>
                     <p className="font-medium text-white">Export Reports</p>
                     <p className="text-sm text-white/60">Download sales and earnings data</p>
@@ -772,13 +772,13 @@ export default function ResellerDashboard() {
       {activeTab === 'links' && (
         <div className="space-y-6">
           {/* Create New Link */}
-          <div className="bg-[#36454F]/70 rounded-xl p-6">
+          <div className="bg-card/70 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Generate Reseller Link</h2>
             <div className="flex gap-4">
               <select 
                 value={selectedMedia || ''}
                 onChange={(e) => setSelectedMedia(Number(e.target.value))}
-                className="flex-1 px-4 py-3 bg-[#36454F] border border-[#36454F] text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#36454F] focus:border-transparent"
+                className="flex-1 px-4 py-3 bg-card border border-card text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
               >
                 <option value="">Select a track to promote</option>
                 {availableMedia.map(media => (
@@ -790,14 +790,14 @@ export default function ResellerDashboard() {
               <button
                 onClick={() => selectedMedia && generateResellerLink(selectedMedia)}
                 disabled={!selectedMedia}
-                className="px-6 py-3 bg-[#36454F] hover:bg-[#9B5DE5] disabled:bg-charcoal disabled:cursor-not-allowed text-white rounded-xl transition-colors"
+                className="px-6 py-3 bg-card hover:bg-primary disabled:bg-charcoal disabled:cursor-not-allowed text-white rounded-xl transition-colors"
               >
                 Generate Link
               </button>
             </div>
             {/* Selected media details and pricing snapshot */}
             {selectedMediaDetails && (
-              <div className="mt-4 p-4 bg-[#000000]/50 rounded-lg border border-[#36454F] text-sm text-white/90">
+              <div className="mt-4 p-4 bg-background/50 rounded-lg border border-card text-sm text-white/90">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-white">{selectedMediaDetails.title}</p>
@@ -818,7 +818,7 @@ export default function ResellerDashboard() {
                   </div>
                   <div className="flex items-center gap-2">
                     {selectedMediaDetails.acceptedPricingSnapshotId && (
-                      <button onClick={() => viewPricingSnapshot(selectedMediaDetails.id)} className="text-sm text-[#36454F]">View snapshot</button>
+                      <button onClick={() => viewPricingSnapshot(selectedMediaDetails.id)} className="text-sm text-card-foreground">View snapshot</button>
                     )}
                     {!selectedMediaDetails.acceptedPricingSnapshotId && selectedMediaDetails.allowReselling && (
                       <button onClick={() => generateResellerLink(selectedMediaDetails.id)} className="text-sm text-white/90 bg-white/5 px-2 py-1 rounded">Create reseller link</button>
@@ -830,14 +830,14 @@ export default function ResellerDashboard() {
           </div>
 
           {/* Active Links */}
-          <div className="bg-[#36454F]/70 rounded-xl p-6">
+          <div className="bg-card/70 rounded-xl p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-white">Your Reseller Links</h2>
               <div className="flex gap-2">
-                <button className="p-2 bg-[#36454F] rounded-lg text-white/60 hover:text-white transition-colors">
+                <button className="p-2 bg-card rounded-lg text-white/60 hover:text-white transition-colors">
                   <Filter className="w-4 h-4" />
                 </button>
-                <button className="p-2 bg-[#36454F] rounded-lg text-white/60 hover:text-white transition-colors">
+                <button className="p-2 bg-card rounded-lg text-white/60 hover:text-white transition-colors">
                   <Download className="w-4 h-4" />
                 </button>
               </div>
@@ -845,7 +845,7 @@ export default function ResellerDashboard() {
 
             <div className="space-y-4">
               {resellerLinks.map(link => (
-                <div key={link.id} className="bg-[#36454F] rounded-lg p-4">
+                <div key={link.id} className="bg-card rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       {link.media.artCoverUrl ? (
@@ -855,7 +855,7 @@ export default function ResellerDashboard() {
                           className="w-12 h-12 rounded-lg object-cover"
                         />
                       ) : (
-                        <div className="w-12 h-12 bg-gradient-to-br from-[#36454F] to-[#9B5DE5] rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-card to-primary rounded-lg flex items-center justify-center">
                           <Link className="w-6 h-6 text-white" />
                         </div>
                       )}
@@ -885,12 +885,12 @@ export default function ResellerDashboard() {
                       <div className="text-right">
                         <p className="text-sm text-white/60">Your Link:</p>
                         <div className="flex items-center gap-2">
-                          <code className="text-white bg-[#000000] px-2 py-1 rounded text-sm">
+                          <code className="text-white bg-background px-2 py-1 rounded text-sm">
                             {getResellerLinkUrl(link.code)}
                           </code>
                           <button
                             onClick={() => copyToClipboard(getResellerLinkUrl(link.code))}
-                            className="p-1 text-white/60 hover:text-[#36454F] transition-colors"
+                            className="p-1 text-white/60 hover:text-card-foreground transition-colors"
                           >
                             {copiedLink === getResellerLinkUrl(link.code) ? (
                               <Check className="w-4 h-4 text-purple/75" />
@@ -900,7 +900,7 @@ export default function ResellerDashboard() {
                           </button>
                         </div>
                       </div>
-                      <button className="p-2 bg-[#000000] text-white/60 hover:text-white rounded-lg transition-colors">
+                      <button className="p-2 bg-background text-white/60 hover:text-white rounded-lg transition-colors">
                         <Share2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -913,16 +913,16 @@ export default function ResellerDashboard() {
       )}
 
       {activeTab === 'commissions' && (
-        <div className="bg-[#36454F]/70 rounded-xl p-6">
+        <div className="bg-card/70 rounded-xl p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-white">Commission History</h2>
             <div className="flex gap-2">
-              <select className="px-3 py-2 bg-[#36454F] border border-[#36454F] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#36454F] focus:border-transparent">
+              <select className="px-3 py-2 bg-card border border-card text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent">
                 <option>All Time</option>
                 <option>This Month</option>
                 <option>Last Month</option>
               </select>
-              <button className="p-2 bg-[#36454F] rounded-lg text-white/60 hover:text-white transition-colors">
+              <button className="p-2 bg-card rounded-lg text-white/60 hover:text-white transition-colors">
                 <Download className="w-4 h-4" />
               </button>
             </div>
@@ -931,7 +931,7 @@ export default function ResellerDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#36454F]">
+                <tr className="border-b border-card">
                   <th className="text-left py-3 px-4 text-white/60 font-medium">Track</th>
                   <th className="text-left py-3 px-4 text-white/60 font-medium">Customer</th>
                   <th className="text-left py-3 px-4 text-white/60 font-medium">Amount</th>
@@ -941,7 +941,7 @@ export default function ResellerDashboard() {
               </thead>
               <tbody>
                 {commissions.map(commission => (
-                  <tr key={commission.id} className="border-b border-[#36454F] hover:bg-[#36454F]/50">
+                  <tr key={commission.id} className="border-b border-card hover:bg-card/50">
                     <td className="py-3 px-4 text-white">{commission.media.title}</td>
                     <td className="py-3 px-4 text-white/60">
                       {commission.transaction.user.displayName || commission.transaction.user.username}
@@ -968,11 +968,11 @@ export default function ResellerDashboard() {
       {activeTab === 'payouts' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Payout Methods */}
-          <div className="lg:col-span-2 bg-[#36454F]/70 rounded-xl p-6">
+          <div className="lg:col-span-2 bg-card/70 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Payout Methods</h2>
             <div className="space-y-4">
               {paymentAccounts.map(account => (
-                <div key={account.id} className="flex items-center justify-between p-4 bg-[#36454F] rounded-lg">
+                <div key={account.id} className="flex items-center justify-between p-4 bg-card rounded-lg">
                   <div className="flex items-center gap-3">
                     {getProviderIcon(account.provider)}
                     <div>
@@ -992,7 +992,7 @@ export default function ResellerDashboard() {
                   </div>
                   <div className="flex gap-2">
                     {!account.isDefault && (
-                      <button className="text-[#36454F] hover:text-[#9B5DE5] text-sm">
+                      <button className="text-card-foreground hover:text-primary text-sm">
                         Set Primary
                       </button>
                     )}
@@ -1005,9 +1005,9 @@ export default function ResellerDashboard() {
 
               <button 
                 onClick={() => {/* Open add account modal */}}
-                className="w-full flex items-center gap-3 p-4 bg-[#36454F] hover:bg-[#36454F]/80 rounded-lg transition-colors text-left border-2 border-dashed border-[#36454F]"
+                className="w-full flex items-center gap-3 p-4 bg-card hover:bg-card/80 rounded-lg transition-colors text-left border-2 border-dashed border-card"
               >
-                <Plus className="w-5 h-5 text-[#36454F]" />
+                <Plus className="w-5 h-5 text-card-foreground" />
                 <div>
                   <p className="font-medium text-white">Add Payout Method</p>
                   <p className="text-sm text-white/60">Add mobile money or bank account</p>
@@ -1017,7 +1017,7 @@ export default function ResellerDashboard() {
           </div>
 
           {/* Payout Summary */}
-          <div className="bg-[#36454F]/70 rounded-xl p-6">
+          <div className="bg-card/70 rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Payout Summary</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -1045,7 +1045,7 @@ export default function ResellerDashboard() {
               <button
                 onClick={handlePayoutRequest}
                 disabled={!kycStatus?.isVerified || stats.pendingCommission < 10}
-                className="w-full mt-4 py-3 bg-[#36454F] hover:bg-[#9B5DE5] disabled:bg-charcoal disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium"
+                className="w-full mt-4 py-3 bg-card hover:bg-primary disabled:bg-charcoal disabled:cursor-not-allowed text-white rounded-xl transition-colors font-medium"
               >
                 Request Payout (${stats.pendingCommission.toFixed(2)})
               </button>
@@ -1061,7 +1061,7 @@ export default function ResellerDashboard() {
       )}
 
       {activeTab === 'verification' && (
-        <div className="bg-[#36454F]/70 rounded-xl p-6">
+        <div className="bg-card/70 rounded-xl p-6">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold text-white mb-2">Identity Verification</h2>
             <p className="text-white/60 mb-8">
@@ -1113,7 +1113,7 @@ export default function ResellerDashboard() {
                   <div className="text-center">
                     <button
                       onClick={startKYCVerification}
-                      className="px-8 py-4 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors font-medium text-lg"
+                      className="px-8 py-4 bg-card hover:bg-primary text-white rounded-xl transition-colors font-medium text-lg"
                     >
                       Start Verification Process
                     </button>
@@ -1129,7 +1129,7 @@ export default function ResellerDashboard() {
       <h4 className="text-lg font-bold text-white mb-4">Document Status</h4>
       <div className="space-y-3">
         {kycStatus.documents.map((doc: KYCStatus['documents'][number], index: number) => (
-          <div key={index} className="flex items-center justify-between p-4 bg-[#36454F] rounded-lg">
+          <div key={index} className="flex items-center justify-between p-4 bg-card rounded-lg">
             <div>
               <p className="font-medium text-white">{doc.type}</p>
               <p className="text-sm text-white/60">{doc.status}</p>
@@ -1148,7 +1148,7 @@ export default function ResellerDashboard() {
   )}
 
                 {/* Benefits */}
-                <div className="bg-[#36454F] rounded-xl p-6">
+                <div className="bg-card rounded-xl p-6">
                   <h4 className="text-lg font-bold text-white mb-4">Benefits of Verification</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-center gap-3">
@@ -1176,7 +1176,7 @@ export default function ResellerDashboard() {
                 <p className="text-white/60">Unable to load verification status</p>
                 <button
                   onClick={fetchDashboardData}
-                  className="mt-4 px-6 py-3 bg-[#36454F] hover:bg-[#9B5DE5] text-white rounded-xl transition-colors"
+                  className="mt-4 px-6 py-3 bg-card hover:bg-primary text-white rounded-xl transition-colors"
                 >
                   Retry
                 </button>

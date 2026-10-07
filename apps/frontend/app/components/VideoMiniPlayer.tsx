@@ -39,7 +39,7 @@ export default function VideoMiniPlayer() {
 
   return (
     <div
-      className="fixed bottom-24 right-4 z-50 w-[calc(100%-2rem)] sm:w-[340px] rounded-3xl bg-black p-3 shadow-lg shadow-black/40 transition-all duration-200 lg:bottom-6 lg:right-6 cursor-pointer"
+      className="fixed bottom-24 right-4 z-50 w-[calc(100%-2rem)] sm:w-[340px] rounded-3xl bg-background p-3 shadow-lg shadow-black/40 transition-all duration-200 lg:bottom-6 lg:right-6 cursor-pointer"
       onClick={openWatchPage}
       role="button"
       tabIndex={0}

@@ -174,7 +174,7 @@ export default function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-3 w-[320px] overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl">
+        <div className="absolute right-0 z-50 mt-3 w-[320px] overflow-hidden rounded-3xl border border-white/10 bg-background shadow-2xl">
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-charcoal">
             <div>
               <p className="text-sm font-semibold text-white">Notifications</p>
@@ -208,7 +208,7 @@ export default function NotificationBell() {
                 key={notification.id}
                 type="button"
                 onClick={() => handleNotificationClick(notification)}
-                className={`w-full text-left px-4 py-3 transition ${notification.isRead ? "bg-black hover:bg-charcoal" : "bg-charcoal hover:bg-charcoal"}`}
+                className={`w-full text-left px-4 py-3 transition ${notification.isRead ? "bg-background hover:bg-charcoal" : "bg-charcoal hover:bg-charcoal"}`}
               >
                 <div className="flex items-start gap-3">
                   <span
